@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { ArrowLeft, Plus, Edit, Trash2, CheckCircle, Circle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRouter } from "next/navigation";
 
 interface Membership {
   id: string;
@@ -28,8 +29,9 @@ interface Brand {
 }
 
 export default function MembershipsPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { t } = useLanguage();
+  const router = useRouter();
   const [customMembership, setCustomMembership] = useState({
     name: "",
     description: "",
@@ -42,6 +44,30 @@ export default function MembershipsPage() {
   const [availableBrands, setAvailableBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, router]);
+
+  // Don't render anything while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">טוען...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   // Load available brands from database
   useEffect(() => {
@@ -284,6 +310,7 @@ export default function MembershipsPage() {
   const handleSaveChanges = async () => {
     if (!session) {
       console.error('No session available');
+      alert('אנא התחבר מחדש כדי לשמור את השינויים');
       return;
     }
     
@@ -313,12 +340,15 @@ export default function MembershipsPage() {
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to save memberships:', response.status, errorData);
-        // Show error message to user
-        alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
+        
+        if (response.status === 401) {
+          alert('הסשן פג תוקף. אנא התחבר מחדש.');
+        } else {
+          alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
+        }
       }
     } catch (error) {
       console.error('Error saving memberships:', error);
-      // Show error message to user
       alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
     } finally {
       setIsSaving(false);
