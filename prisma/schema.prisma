@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  dateOfBirth   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  memberships   UserMembership[]
+  notifications Notification[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Brand {
+  id          String    @id @default(cuid())
+  name        String
+  logoUrl     String
+  website     String
+  description String?
+  category    String    // e.g., "restaurant", "retail", "beauty", "entertainment"
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+
+  benefits    Benefit[]
+  memberships UserMembership[]
+
+  @@map("brands")
+}
+
+model Benefit {
+  id                String   @id @default(cuid())
+  brandId           String
+  title             String
+  description       String
+  termsAndConditions String?
+  redemptionMethod  String   // e.g., "code", "app", "in-store", "automatic"
+  promoCode         String?
+  url               String?
+  validityType      String   // "birthday_date", "birthday_month", "birthday_week"
+  validityDuration  Int?     // number of days
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+
+  brand             Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  notifications     Notification[]
+
+  @@map("benefits")
+}
+
+model UserMembership {
+  id        String   @id @default(cuid())
+  userId    String
+  brandId   String
+  isActive  Boolean  @default(true)
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, brandId])
+  @@map("user_memberships")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  benefitId String?
+  type      String   // "birthday_month_start", "benefit_expiring", "new_benefit"
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  scheduledFor DateTime?
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  benefit   Benefit? @relation(fields: [benefitId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}

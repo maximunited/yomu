@@ -1,0 +1,732 @@
+export type Language = 'he' | 'en';
+
+export interface Translations {
+  // Navigation
+  home: string;
+  dashboard: string;
+  memberships: string;
+  profile: string;
+  notifications: string;
+  signIn: string;
+  signUp: string;
+  signOut: string;
+  back: string;
+  settings: string;
+  logout: string;
+  
+  // Common
+  save: string;
+  cancel: string;
+  edit: string;
+  delete: string;
+  copy: string;
+  copied: string;
+  moreDetails: string;
+  loading: string;
+  saving: string;
+  saveChanges: string;
+  
+  // Landing Page
+  appName: string;
+  appTagline: string;
+  getStarted: string;
+  learnMore: string;
+  allRightsReserved: string;
+  
+  // Auth
+  email: string;
+  password: string;
+  confirmPassword: string;
+  forgotPassword: string;
+  signInWithGoogle: string;
+  signUpWithGoogle: string;
+  alreadyHaveAccount: string;
+  dontHaveAccount: string;
+  createAccount: string;
+  
+  // Onboarding
+  welcomeTitle: string;
+  welcomeSubtitle: string;
+  selectMemberships: string;
+  selectMembershipsDescription: string;
+  continue: string;
+  
+  // Dashboard
+  myBenefits: string;
+  activeNow: string;
+  comingSoon: string;
+  noActiveBenefits: string;
+  noUpcomingBenefits: string;
+  couponCode: string;
+  validUntil: string;
+  expiresIn: string;
+  
+  // Memberships
+  manageMemberships: string;
+  membershipsDescription: string;
+  activeMemberships: string;
+  totalMemberships: string;
+  selectedPrograms: string;
+  moreProgramsMoreBenefits: string;
+  addCustomMembership: string;
+  customMembershipName: string;
+  customMembershipDescription: string;
+  customMembershipCategory: string;
+  
+  // Profile
+  profileSettings: string;
+  personalInformation: string;
+  notificationSettings: string;
+  privacyPolicy: string;
+  termsOfService: string;
+  contactUs: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  phoneNumber: string;
+  emailNotifications: string;
+  pushNotifications: string;
+  smsNotifications: string;
+  fullName: string;
+  anniversaryDate: string;
+  optional: string;
+  profilePicture: string;
+  clickToChange: string;
+  editProfile: string;
+  emailPermanent: string;
+  appearance: string;
+  darkMode: string;
+  lightMode: string;
+  darkModeDescription: string;
+  language: string;
+  interfaceLanguage: string;
+  languageDescription: string;
+  account: string;
+  
+  // Notifications
+  notifications: string;
+  markAllAsRead: string;
+  noNotifications: string;
+  newBenefit: string;
+  benefitExpiring: string;
+  birthdayMonthStart: string;
+  
+  // Benefit Details
+  benefitDetails: string;
+  termsAndConditions: string;
+  howToRedeem: string;
+  visitWebsite: string;
+  
+  // Categories
+  fashion: string;
+  food: string;
+  health: string;
+  home: string;
+  finance: string;
+  grocery: string;
+  transport: string;
+  entertainment: string;
+  
+  // Footer
+  privacy: string;
+  terms: string;
+  contact: string;
+  
+  // Static Text
+  backToHome: string;
+  termsOfUse: string;
+  privacyPolicy: string;
+  contactUs: string;
+  loading: string;
+  validOnlyOnBirthday: string;
+  validForEntireMonth: string;
+  validForWeek: string;
+  validForLimitedPeriod: string;
+  discountOnAllPurchases: string;
+  specialBirthdayDiscount: string;
+  return: string;
+  manageMemberships: string;
+  activeOutOfTotal: string;
+  selectAllMemberships: string;
+  programsSelected: string;
+  moreProgramsMoreBenefits: string;
+  addCustomMembership: string;
+  customMembershipName: string;
+  customMembershipDescription: string;
+  customMembershipCategory: string;
+  chooseCategory: string;
+  addMembership: string;
+  changesSavedSuccessfully: string;
+  contactInformation: string;
+  sendMessage: string;
+  fullName: string;
+  subject: string;
+  message: string;
+  sendMessage: string;
+  workingHours: string;
+  address: string;
+  phone: string;
+  chooseSubject: string;
+  technicalSupport: string;
+  improvementSuggestion: string;
+  bugReport: string;
+  generalQuestion: string;
+  writeYourMessageHere: string;
+  enterYourFullName: string;
+  yourEmail: string;
+  benefitDetails: string;
+  reportIncorrectInfo: string;
+  thankYouForReporting: string;
+  weWillCheckAndUpdate: string;
+  notifications: string;
+  markAllAsRead: string;
+  noNotifications: string;
+  birthdayMonthStarted: string;
+  newBenefitsAvailable: string;
+  benefitExpiringSoon: string;
+  benefitExpiresInDays: string;
+  newBenefitAvailable: string;
+  addedNewBenefit: string;
+  newBenefitFrom: string;
+  hoursAgo: string;
+  daysAgo: string;
+  ago: string;
+  
+  // About Page
+  about: string;
+  aboutTitle: string;
+  aboutDescription: string;
+  mission: string;
+  missionDescription: string;
+  vision: string;
+  visionDescription: string;
+  team: string;
+  contributors: string;
+  contributorsDescription: string;
+  
+  // Membership Types
+  free: string;
+  paid: string;
+  membershipType: string;
+  membershipCost: string;
+  costDetails: string;
+  
+  // Search and Filter
+  search: string;
+  searchPlaceholder: string;
+  filterBy: string;
+  allCategories: string;
+  quickFilters: string;
+  
+  // New Services
+  escapeRoom: string;
+  escapeRoomBenefit: string;
+  bacaroRestaurant: string;
+  bacaroBenefit: string;
+  shegevRestaurant: string;
+  shegevBenefit: string;
+  jamesBeer: string;
+  jamesBenefit: string;
+  pragRestaurant: string;
+  pragBenefit: string;
+  mikaConvenience: string;
+  mikaBenefit: string;
+  kfcBenefit: string;
+  manamDIY: string;
+  manamBenefit: string;
+  shilav: string;
+  shilavBenefit: string;
+  youmangus: string;
+  youmangusBenefit: string;
+  m32Burgers: string;
+  m32BurgersBenefit: string;
+  libiraRestaurant: string;
+  libiraRestaurantBenefit: string;
+}
+
+export const translations: Record<Language, Translations> = {
+  he: {
+    // Navigation
+    home: 'בית',
+    dashboard: 'לוח בקרה',
+    memberships: 'חברויות',
+    profile: 'פרופיל',
+    notifications: 'התראות',
+    signIn: 'התחברות',
+    signUp: 'הרשמה',
+    signOut: 'התנתקות',
+    back: 'חזרה',
+    settings: 'הגדרות',
+    logout: 'התנתקות',
+    
+    // Common
+    save: 'שמור',
+    cancel: 'ביטול',
+    edit: 'ערוך',
+    delete: 'מחק',
+    copy: 'העתק',
+    copied: 'הועתק',
+    moreDetails: 'פרטים נוספים',
+    loading: 'טוען...',
+    saving: 'שומר...',
+    saveChanges: 'שמור שינויים',
+    
+    // Landing Page
+    appName: 'YomU',
+    appTagline: 'הטבות יום הולדת במקום אחד',
+    getStarted: 'התחל עכשיו',
+    learnMore: 'למידע נוסף',
+    allRightsReserved: 'כל הזכויות שמורות',
+    
+    // Auth
+    email: 'אימייל',
+    password: 'סיסמה',
+    confirmPassword: 'אימות סיסמה',
+    forgotPassword: 'שכחתי סיסמה',
+    signInWithGoogle: 'התחבר עם Google',
+    signUpWithGoogle: 'הירשם עם Google',
+    alreadyHaveAccount: 'כבר יש לך חשבון?',
+    dontHaveAccount: 'אין לך חשבון?',
+    createAccount: 'צור חשבון',
+    
+    // Onboarding
+    welcomeTitle: 'ברוכים הבאים ל-YomU!',
+    welcomeSubtitle: 'בחרו את תוכניות החברות שלכם כדי להתחיל',
+    selectMemberships: 'בחרו חברויות',
+    selectMembershipsDescription: 'בחרו את כל תוכניות החברות שלכם כדי שנוכל להציג לכם את כל ההטבות ליום הולדת',
+    continue: 'המשך',
+    
+    // Dashboard
+    myBenefits: 'הטבות שלי',
+    activeNow: 'פעיל עכשיו',
+    comingSoon: 'בקרוב',
+    noActiveBenefits: 'אין הטבות פעילות כרגע',
+    noUpcomingBenefits: 'אין הטבות קרובות',
+    couponCode: 'קוד קופון:',
+    validUntil: 'תקף עד:',
+    expiresIn: 'פג תוקף בעוד:',
+    
+    // Memberships
+    manageMemberships: 'ניהול חברויות',
+    membershipsDescription: 'בחרו את כל תוכניות החברות שלכם כדי שנוכל להציג לכם את כל ההטבות ליום הולדת',
+    activeMemberships: 'חברויות פעילות',
+    totalMemberships: 'סה"כ חברויות',
+    selectedPrograms: 'נבחרו תוכניות',
+    moreProgramsMoreBenefits: 'ככל שתבחרו יותר תוכניות, כך תקבלו יותר הטבות ליום הולדת',
+    addCustomMembership: 'הוסף חברות מותאמת',
+    customMembershipName: 'שם החברות',
+    customMembershipDescription: 'תיאור',
+    customMembershipCategory: 'קטגוריה',
+    
+    // Profile
+    profileSettings: 'הגדרות פרופיל',
+    personalInformation: 'מידע אישי',
+    notificationSettings: 'הגדרות התראות',
+    privacyPolicy: 'מדיניות פרטיות',
+    termsOfService: 'תנאי שימוש',
+    contactUs: 'צור קשר',
+    firstName: 'שם פרטי',
+    lastName: 'שם משפחה',
+    dateOfBirth: 'תאריך לידה',
+    phoneNumber: 'מספר טלפון',
+    emailNotifications: 'התראות אימייל',
+    pushNotifications: 'התראות דחיפה',
+    smsNotifications: 'התראות SMS',
+    fullName: 'שם מלא',
+    anniversaryDate: 'תאריך נישואין',
+    optional: 'אופציונלי',
+    profilePicture: 'תמונת פרופיל',
+    clickToChange: 'לחץ לשינוי',
+    editProfile: 'ערוך פרופיל',
+    emailPermanent: 'כתובת האימייל קבועה ולא ניתנת לשינוי',
+    appearance: 'מראה',
+    darkMode: 'מצב כהה',
+    lightMode: 'מצב בהיר',
+    darkModeDescription: 'שנה את מראה האפליקציה',
+    language: 'שפה',
+    interfaceLanguage: 'שפת הממשק',
+    languageDescription: 'בחר את השפה המועדפת עליך',
+    account: 'חשבון',
+    
+    // Notifications
+    notifications: 'התראות',
+    markAllAsRead: 'סמן הכל כנקרא',
+    noNotifications: 'אין התראות חדשות',
+    newBenefit: 'הטבה חדשה',
+    benefitExpiring: 'הטבה פוקעת',
+    birthdayMonthStart: 'חודש יום הולדת התחיל',
+    
+    // Benefit Details
+    benefitDetails: 'פרטי הטבה',
+    termsAndConditions: 'תנאים והגבלות',
+    howToRedeem: 'איך לממש',
+    visitWebsite: 'בקר באתר',
+    
+    // Categories
+    fashion: 'אופנה',
+    food: 'מזון',
+    health: 'בריאות',
+    home: 'בית',
+    finance: 'פיננסי',
+    grocery: 'מזון',
+    transport: 'תחבורה',
+    entertainment: 'בידור',
+    
+    // Footer
+    privacy: 'פרטיות',
+    terms: 'תנאים',
+    contact: 'צור קשר',
+    
+    // Static Text
+    backToHome: 'חזרה לדף הבית',
+    termsOfUse: 'תנאי שימוש',
+    privacyPolicy: 'מדיניות פרטיות',
+    contactUs: 'צור קשר',
+    loading: 'טוען...',
+    validOnlyOnBirthday: 'תקף ביום ההולדת בלבד',
+    validForEntireMonth: 'תקף לכל החודש',
+    validForWeek: 'תקף לשבוע',
+    validForLimitedPeriod: 'תקף לתקופה מוגבלת',
+    discountOnAllPurchases: '30% הנחה על כל הקנייה',
+    specialBirthdayDiscount: 'הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות',
+    return: 'חזרה',
+    manageMemberships: 'ניהול חברויות',
+    activeOutOfTotal: 'פעילים מתוך',
+    selectAllMemberships: 'בחרו את כל תוכניות החברות שלכם כדי שנוכל להציג לכם את כל ההטבות ליום הולדת',
+    programsSelected: 'תוכניות נבחרו',
+    moreProgramsMoreBenefits: 'ככל שתבחרו יותר תוכניות, כך תקבלו יותר הטבות ליום הולדת',
+    addCustomMembership: 'הוסף חברות מותאמת אישית',
+    customMembershipName: 'שם החברות',
+    customMembershipDescription: 'תיאור קצר',
+    customMembershipCategory: 'בחר קטגוריה',
+    chooseCategory: 'בחר קטגוריה',
+    addMembership: 'הוסף חברות',
+    changesSavedSuccessfully: 'השינויים נשמרו בהצלחה!',
+    contactInformation: 'פרטי קשר',
+    sendMessage: 'שלח הודעה',
+    fullName: 'שם מלא',
+    subject: 'נושא',
+    message: 'הודעה',
+    workingHours: 'שעות פעילות',
+    address: 'כתובת',
+    phone: 'טלפון',
+    chooseSubject: 'בחר נושא',
+    technicalSupport: 'תמיכה טכנית',
+    improvementSuggestion: 'הצעת שיפור',
+    bugReport: 'דיווח על באג',
+    generalQuestion: 'שאלה כללית',
+    writeYourMessageHere: 'כתוב את הודעתך כאן...',
+    enterYourFullName: 'הכנס את שמך המלא',
+    yourEmail: 'your@email.com',
+    benefitDetails: 'פרטי הטבה',
+    reportIncorrectInfo: 'דווח על מידע שגוי או חסר',
+    thankYouForReporting: 'תודה על הדיווח!',
+    weWillCheckAndUpdate: 'נבדוק את המידע ונעדכן בהקדם.',
+    notifications: 'התראות',
+    markAllAsRead: 'סמן הכל כנקרא',
+    noNotifications: 'אין התראות',
+    birthdayMonthStarted: 'חודש יום הולדת התחיל! 🎉',
+    newBenefitsAvailable: 'יש לך 5 הטבות חדשות זמינות לחודש יום ההולדת שלך',
+    benefitExpiringSoon: 'הטבה מסתיימת בקרוב',
+    benefitExpiresInDays: 'הטבה של Fox מסתיימת בעוד 3 ימים',
+    newBenefitAvailable: 'הטבה חדשה זמינה',
+    addedNewBenefit: 'Starbucks הוסיף הטבה חדשה ליום הולדת',
+    newBenefitFrom: 'הטבה חדשה מ-Super-Pharm',
+    hoursAgo: 'שעות לפני',
+    daysAgo: 'ימים לפני',
+    ago: 'לפני',
+    
+    // About Page
+    about: 'אודות',
+    aboutTitle: 'אודות YomU',
+    aboutDescription: 'הפלטפורמה המובילה להטבות יום הולדת בישראל',
+    mission: 'המשימה שלנו',
+    missionDescription: 'לעזור לכם למצות את כל ההטבות ליום הולדת ולחסוך כסף',
+    vision: 'החזון שלנו',
+    visionDescription: 'להפוך את חודש יום ההולדת לחודש החסכון של השנה',
+    team: 'הצוות',
+    contributors: 'תורמים',
+    contributorsDescription: 'האנשים שעומדים מאחורי YomU',
+    
+    // Membership Types
+    free: 'חינמי',
+    paid: 'בתשלום',
+    membershipType: 'סוג חברות',
+    membershipCost: 'עלות חברות',
+    costDetails: 'פרטי עלות',
+    
+    // Search and Filter
+    search: 'חיפוש',
+    searchPlaceholder: 'חפש חברויות...',
+    filterBy: 'סנן לפי',
+    allCategories: 'כל הקטגוריות',
+    quickFilters: 'סינון מהיר',
+    
+    // New Services
+    escapeRoom: 'אסקייפרום',
+    escapeRoomBenefit: '50 שח הנחה בחודש יום הולדת',
+    bacaroRestaurant: 'מסעדת באקרו (רעננה)',
+    bacaroBenefit: 'מנה ראשונה וקינוח מתנה',
+    shegevRestaurant: 'שגב (מסעדה)',
+    shegevBenefit: 'מנה ראשונה',
+    jamesBeer: 'ג\'מס',
+    jamesBenefit: 'חצי ליטר בירה',
+    pragRestaurant: 'פראג הקטנה (מסעדה)',
+    pragBenefit: '50 נק\' מתנה',
+    mikaConvenience: 'מיקה חנויות נוחות',
+    mikaBenefit: '10 שח מתנה בהצגת תעודה',
+    kfcBenefit: 'המבורגר 1+1',
+    manamDIY: 'מנמ עשה זאת בעצמך',
+    manamBenefit: '50 שח מתנה (מעל 300)',
+    shilav: 'שילב',
+    shilavBenefit: 'הטבות מיוחדות',
+    youmangus: 'יומנגוס',
+    youmangusBenefit: 'הטבות ייחודיות',
+    m32Burgers: 'M32 המבורגרים',
+    m32BurgersBenefit: '15% הנחה בחודש יום הולדת',
+    libiraRestaurant: 'מסעדת ליבירה',
+    libiraRestaurantBenefit: 'בירה וקינוח בישיבה בלבד כל החודש',
+  },
+  en: {
+    // Navigation
+    home: 'Home',
+    dashboard: 'Dashboard',
+    memberships: 'Memberships',
+    profile: 'Profile',
+    notifications: 'Notifications',
+    signIn: 'Sign In',
+    signUp: 'Sign Up',
+    signOut: 'Sign Out',
+    back: 'Back',
+    settings: 'Settings',
+    logout: 'Logout',
+    
+    // Common
+    save: 'Save',
+    cancel: 'Cancel',
+    edit: 'Edit',
+    delete: 'Delete',
+    copy: 'Copy',
+    copied: 'Copied',
+    moreDetails: 'More Details',
+    loading: 'Loading...',
+    saving: 'Saving...',
+    saveChanges: 'Save Changes',
+    
+    // Landing Page
+    appName: 'YomU',
+    appTagline: 'Birthday Benefits in One Place',
+    getStarted: 'Get Started',
+    learnMore: 'Learn More',
+    allRightsReserved: 'All Rights Reserved',
+    
+    // Auth
+    email: 'Email',
+    password: 'Password',
+    confirmPassword: 'Confirm Password',
+    forgotPassword: 'Forgot Password',
+    signInWithGoogle: 'Sign In with Google',
+    signUpWithGoogle: 'Sign Up with Google',
+    alreadyHaveAccount: 'Already have an account?',
+    dontHaveAccount: "Don't have an account?",
+    createAccount: 'Create Account',
+    
+    // Onboarding
+    welcomeTitle: 'Welcome to YomU!',
+    welcomeSubtitle: 'Select your memberships to get started',
+    selectMemberships: 'Select Memberships',
+    selectMembershipsDescription: 'Select all your membership programs so we can show you all birthday benefits',
+    continue: 'Continue',
+    
+    // Dashboard
+    myBenefits: 'My Benefits',
+    activeNow: 'Active Now',
+    comingSoon: 'Coming Soon',
+    noActiveBenefits: 'No active benefits right now',
+    noUpcomingBenefits: 'No upcoming benefits',
+    couponCode: 'Coupon Code:',
+    validUntil: 'Valid Until:',
+    expiresIn: 'Expires In:',
+    
+    // Memberships
+    manageMemberships: 'Manage Memberships',
+    membershipsDescription: 'Select all your membership programs so we can show you all birthday benefits',
+    activeMemberships: 'Active Memberships',
+    totalMemberships: 'Total Memberships',
+    selectedPrograms: 'Selected Programs',
+    moreProgramsMoreBenefits: 'The more programs you select, the more birthday benefits you\'ll get',
+    addCustomMembership: 'Add Custom Membership',
+    customMembershipName: 'Membership Name',
+    customMembershipDescription: 'Description',
+    customMembershipCategory: 'Category',
+    
+    // Profile
+    profileSettings: 'Profile Settings',
+    personalInformation: 'Personal Information',
+    notificationSettings: 'Notification Settings',
+    privacyPolicy: 'Privacy Policy',
+    termsOfService: 'Terms of Service',
+    contactUs: 'Contact Us',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    dateOfBirth: 'Date of Birth',
+    phoneNumber: 'Phone Number',
+    emailNotifications: 'Email Notifications',
+    pushNotifications: 'Push Notifications',
+    smsNotifications: 'SMS Notifications',
+    fullName: 'Full Name',
+    anniversaryDate: 'Anniversary Date',
+    optional: 'Optional',
+    profilePicture: 'Profile Picture',
+    clickToChange: 'Click to change',
+    editProfile: 'Edit Profile',
+    emailPermanent: 'Email address is permanent and cannot be changed',
+    appearance: 'Appearance',
+    darkMode: 'Dark Mode',
+    lightMode: 'Light Mode',
+    darkModeDescription: 'Change the appearance of the app',
+    language: 'Language',
+    interfaceLanguage: 'Interface Language',
+    languageDescription: 'Choose your preferred language',
+    account: 'Account',
+    
+    // Notifications
+    notifications: 'Notifications',
+    markAllAsRead: 'Mark All as Read',
+    noNotifications: 'No new notifications',
+    newBenefit: 'New Benefit',
+    benefitExpiring: 'Benefit Expiring',
+    birthdayMonthStart: 'Birthday Month Started',
+    
+    // Benefit Details
+    benefitDetails: 'Benefit Details',
+    termsAndConditions: 'Terms & Conditions',
+    howToRedeem: 'How to Redeem',
+    visitWebsite: 'Visit Website',
+    
+    // Categories
+    fashion: 'Fashion',
+    food: 'Food',
+    health: 'Health',
+    home: 'Home',
+    finance: 'Finance',
+    grocery: 'Grocery',
+    transport: 'Transport',
+    entertainment: 'Entertainment',
+    
+    // Footer
+    privacy: 'Privacy',
+    terms: 'Terms',
+    contact: 'Contact',
+    
+    // Static Text
+    backToHome: 'Back to Home',
+    termsOfUse: 'Terms of Use',
+    privacyPolicy: 'Privacy Policy',
+    contactUs: 'Contact Us',
+    loading: 'Loading...',
+    validOnlyOnBirthday: 'Valid only on birthday',
+    validForEntireMonth: 'Valid for entire month',
+    validForWeek: 'Valid for week',
+    validForLimitedPeriod: 'Valid for limited period',
+    discountOnAllPurchases: '30% discount on all purchases',
+    specialBirthdayDiscount: 'Special birthday discount - 30% discount on all purchases in store',
+    return: 'Return',
+    manageMemberships: 'Manage Memberships',
+    activeOutOfTotal: 'active out of',
+    selectAllMemberships: 'Select all your memberships so we can show you all birthday benefits',
+    programsSelected: 'programs selected',
+    moreProgramsMoreBenefits: 'The more programs you select, the more birthday benefits you\'ll get',
+    addCustomMembership: 'Add Custom Membership',
+    customMembershipName: 'Membership Name',
+    customMembershipDescription: 'Short Description',
+    customMembershipCategory: 'Choose Category',
+    chooseCategory: 'Choose Category',
+    addMembership: 'Add Membership',
+    changesSavedSuccessfully: 'Changes saved successfully!',
+    contactInformation: 'Contact Information',
+    sendMessage: 'Send Message',
+    fullName: 'Full Name',
+    subject: 'Subject',
+    message: 'Message',
+    workingHours: 'Working Hours',
+    address: 'Address',
+    phone: 'Phone',
+    chooseSubject: 'Choose Subject',
+    technicalSupport: 'Technical Support',
+    improvementSuggestion: 'Improvement Suggestion',
+    bugReport: 'Bug Report',
+    generalQuestion: 'General Question',
+    writeYourMessageHere: 'Write your message here...',
+    enterYourFullName: 'Enter your full name',
+    yourEmail: 'your@email.com',
+    benefitDetails: 'Benefit Details',
+    reportIncorrectInfo: 'Report incorrect or missing information',
+    thankYouForReporting: 'Thank you for reporting!',
+    weWillCheckAndUpdate: 'We will check the information and update it soon.',
+    notifications: 'Notifications',
+    markAllAsRead: 'Mark All as Read',
+    noNotifications: 'No notifications',
+    birthdayMonthStarted: 'Birthday month started! 🎉',
+    newBenefitsAvailable: 'You have 5 new benefits available for your birthday month',
+    benefitExpiringSoon: 'Benefit expiring soon',
+    benefitExpiresInDays: 'Fox benefit expires in 3 days',
+    newBenefitAvailable: 'New benefit available',
+    addedNewBenefit: 'Starbucks added a new birthday benefit',
+    newBenefitFrom: 'New benefit from Super-Pharm',
+    hoursAgo: 'hours ago',
+    daysAgo: 'days ago',
+    ago: 'ago',
+    
+    // About Page
+    about: 'About',
+    aboutTitle: 'About YomU',
+    aboutDescription: 'The leading platform for birthday benefits in Israel',
+    mission: 'Our Mission',
+    missionDescription: 'To help you maximize all birthday benefits and save money',
+    vision: 'Our Vision',
+    visionDescription: 'To make your birthday month the savings month of the year',
+    team: 'Team',
+    contributors: 'Contributors',
+    contributorsDescription: 'The people behind YomU',
+    
+    // Membership Types
+    free: 'Free',
+    paid: 'Paid',
+    membershipType: 'Membership Type',
+    membershipCost: 'Membership Cost',
+    costDetails: 'Cost Details',
+    
+    // Search and Filter
+    search: 'Search',
+    searchPlaceholder: 'Search memberships...',
+    filterBy: 'Filter by',
+    allCategories: 'All Categories',
+    quickFilters: 'Quick Filters',
+    
+    // New Services
+    escapeRoom: 'Escape Room',
+    escapeRoomBenefit: '50 NIS discount in birthday month',
+    bacaroRestaurant: 'Bacaro Restaurant (Raanana)',
+    bacaroBenefit: 'Free appetizer and dessert',
+    shegevRestaurant: 'Shegev (Restaurant)',
+    shegevBenefit: 'Free appetizer',
+    jamesBeer: 'James',
+    jamesBenefit: 'Half liter beer',
+    pragRestaurant: 'Little Prague (Restaurant)',
+    pragBenefit: '50 points bonus',
+    mikaConvenience: 'Mika Convenience Stores',
+    mikaBenefit: '10 NIS bonus with ID',
+    kfcBenefit: '1+1 Burger',
+    manamDIY: 'Manam DIY',
+    manamBenefit: '50 NIS bonus (over 300)',
+    shilav: 'Shilav',
+    shilavBenefit: 'Special benefits',
+    youmangus: 'Youmangus',
+    youmangusBenefit: 'Unique benefits',
+    m32Burgers: 'M32 Burgers',
+    m32BurgersBenefit: '15% discount in birthday month',
+    libiraRestaurant: 'Libira Restaurant',
+    libiraRestaurantBenefit: 'Beer and dessert for dine-in only all month',
+  },
+}; 
