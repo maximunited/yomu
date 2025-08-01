@@ -311,6 +311,7 @@ export default function MembershipsPage() {
     if (!session) {
       console.error('No session available');
       alert('אנא התחבר מחדש כדי לשמור את השינויים');
+      router.push('/auth/signin');
       return;
     }
     
@@ -343,6 +344,7 @@ export default function MembershipsPage() {
         
         if (response.status === 401) {
           alert('הסשן פג תוקף. אנא התחבר מחדש.');
+          router.push('/auth/signin');
         } else {
           alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
         }

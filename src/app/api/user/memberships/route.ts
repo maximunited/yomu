@@ -10,7 +10,10 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) {
       console.log("No session or user ID found");
       return NextResponse.json(
-        { message: "לא מורשה" },
+        { 
+          message: "לא מורשה - אנא התחבר מחדש",
+          error: "AUTHENTICATION_REQUIRED"
+        },
         { status: 401 }
       );
     }
@@ -83,7 +86,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error saving memberships:", error);
     return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
+      { 
+        message: "שגיאה פנימית בשרת",
+        error: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }
@@ -95,7 +101,10 @@ export async function GET(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { message: "לא מורשה" },
+        { 
+          message: "לא מורשה - אנא התחבר מחדש",
+          error: "AUTHENTICATION_REQUIRED"
+        },
         { status: 401 }
       );
     }
@@ -114,7 +123,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching memberships:", error);
     return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
+      { 
+        message: "שגיאה פנימית בשרת",
+        error: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }
