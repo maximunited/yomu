@@ -71,20 +71,33 @@ export default function MembershipsPage() {
 
   // Load available brands from database
   useEffect(() => {
-    const loadBrands = async () => {
+    const loadData = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch('/api/brands');
-        if (response.ok) {
-          const brands = await response.json();
+        // Load brands
+        const brandsResponse = await fetch('/api/brands');
+        if (brandsResponse.ok) {
+          const brands = await brandsResponse.json();
           setAvailableBrands(brands);
           
-          // Convert brands to memberships format
+          // Load user's existing memberships
+          const userMembershipsResponse = await fetch('/api/user/memberships');
+          let userMemberships: any[] = [];
+          if (userMembershipsResponse.ok) {
+            const userData = await userMembershipsResponse.json();
+            userMemberships = userData.memberships || [];
+          }
+          
+          // Create a set of active brand IDs for quick lookup
+          const activeBrandIds = new Set(userMemberships.map((m: any) => m.brandId));
+          
+          // Convert brands to memberships format with correct active state
           const brandMemberships: Membership[] = brands.map((brand: Brand) => ({
             id: brand.id,
             name: brand.name,
             description: brand.description,
             category: brand.category,
-            isActive: false, // Will be updated from user memberships
+            isActive: activeBrandIds.has(brand.id),
             icon: brand.logoUrl,
             type: "free" as const,
             cost: null
@@ -93,7 +106,7 @@ export default function MembershipsPage() {
           setMemberships(brandMemberships);
         }
       } catch (error) {
-        console.error('Error loading brands:', error);
+        console.error('Error loading data:', error);
         // Fallback to mock data if API fails
         setMemberships([
           {
@@ -293,7 +306,7 @@ export default function MembershipsPage() {
     };
 
     if (session) {
-      loadBrands();
+      loadData();
     }
   }, [session]);
 
