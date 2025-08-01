@@ -23,10 +23,25 @@ interface Benefit {
   termsAndConditions?: string;
 }
 
+interface UserMembership {
+  id: string;
+  brandId: string;
+  isActive: boolean;
+  brand: {
+    id: string;
+    name: string;
+    logoUrl: string;
+    website: string;
+    description: string;
+    category: string;
+  };
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [benefits, setBenefits] = useState<Benefit[]>([]);
+  const [userMemberships, setUserMemberships] = useState<UserMembership[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -37,19 +52,38 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      fetchBenefits();
+      fetchUserData();
     }
   }, [status]);
 
-  const fetchBenefits = async () => {
+  const fetchUserData = async () => {
     try {
-      const response = await fetch("/api/benefits");
-      if (response.ok) {
-        const data = await response.json();
-        setBenefits(data.benefits);
+      setIsLoading(true);
+      
+      // Load user's memberships first
+      const membershipsResponse = await fetch("/api/user/memberships");
+      let userMembershipsData: UserMembership[] = [];
+      if (membershipsResponse.ok) {
+        const membershipsData = await membershipsResponse.json();
+        userMembershipsData = membershipsData.memberships || [];
+        setUserMemberships(userMembershipsData);
+      }
+
+      // Load all benefits
+      const benefitsResponse = await fetch("/api/benefits");
+      if (benefitsResponse.ok) {
+        const benefitsData = await benefitsResponse.json();
+        
+        // Filter benefits to only show those for brands the user is a member of
+        const userBrandIds = new Set(userMembershipsData.map(m => m.brandId));
+        const userBenefits = benefitsData.benefits.filter((benefit: any) => 
+          userBrandIds.has(benefit.brandId)
+        );
+        
+        setBenefits(userBenefits);
       }
     } catch (error) {
-      console.error("Error fetching benefits:", error);
+      console.error("Error fetching user data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +119,8 @@ export default function DashboardPage() {
       home: "bg-blue-100 text-blue-800",
       finance: "bg-yellow-100 text-yellow-800",
       grocery: "bg-pink-100 text-pink-800",
+      entertainment: "bg-indigo-100 text-indigo-800",
+      convenience: "bg-teal-100 text-teal-800",
     };
     return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
@@ -100,52 +136,9 @@ export default function DashboardPage() {
     );
   }
 
-  // Mock data for demo purposes
-  const mockBenefits: Benefit[] = [
-    {
-      id: "1",
-      title: "30% הנחה על כל הקנייה",
-      description: "הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות",
-      brand: {
-        name: "Fox",
-        logoUrl: "/images/brands/fox.png"
-      },
-      promoCode: "BDAY30",
-      url: "https://fox.co.il",
-      validityType: "birthday_month",
-      redemptionMethod: "קוד קופון",
-      termsAndConditions: "הטבה תקפה לחודש יום ההולדת בלבד"
-    },
-    {
-      id: "2",
-      title: "קפה חינם",
-      description: "קפה חינם ביום ההולדת שלך",
-      brand: {
-        name: "Starbucks",
-        logoUrl: "/images/brands/starbucks.png"
-      },
-      validityType: "birthday_date",
-      redemptionMethod: "אוטומטי באפליקציה",
-      termsAndConditions: "תקף ביום ההולדת בלבד"
-    },
-    {
-      id: "3",
-      title: "הנחה של 50 ₪",
-      description: "הנחה של 50 ₪ על קנייה מעל 200 ₪",
-      brand: {
-        name: "Super-Pharm",
-        logoUrl: "/images/brands/superpharm.png"
-      },
-      promoCode: "BDAY50",
-      url: "https://super-pharm.co.il",
-      validityType: "birthday_month",
-      redemptionMethod: "קוד קופון",
-      termsAndConditions: "תקף לחודש יום ההולדת"
-    }
-  ];
-
-  const activeBenefits = mockBenefits.filter(b => b.validityType === "birthday_month");
-  const upcomingBenefits = mockBenefits.filter(b => b.validityType === "birthday_date");
+  // Filter benefits based on validity type
+  const activeBenefits = benefits.filter(b => b.validityType === "birthday_month");
+  const upcomingBenefits = benefits.filter(b => b.validityType === "birthday_date");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -200,9 +193,25 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             שלום {session?.user?.name || "משתמש"}! 🎉
           </h1>
-          <p className="text-gray-600">
-            הנה ההטבות ליום הולדת שלך
+          <p className="text-gray-600 mb-6">
+            הנה ההטבות שלך ליום הולדת
           </p>
+          
+          {/* Membership Summary */}
+          <div className="bg-white rounded-lg p-4 mb-6 max-w-md mx-auto">
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <ShoppingBag className="w-5 h-5 text-purple-600" />
+              <span className="text-sm font-medium text-gray-700">חברויות פעילות</span>
+            </div>
+            <div className="text-2xl font-bold text-purple-600">
+              {userMemberships.filter(m => m.isActive).length}
+            </div>
+            <Link href="/memberships">
+              <Button variant="outline" size="sm" className="mt-2">
+                ניהול חברויות
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Active Now Section */}

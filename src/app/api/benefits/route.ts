@@ -33,53 +33,44 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // For demo purposes, return mock benefits
-    // In a real app, you'd filter benefits based on user's birthday and memberships
-    const mockBenefits = [
-      {
-        id: "1",
-        title: "30% הנחה על כל הקנייה",
-        description: "הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות",
-        brand: {
-          name: "Fox",
-          logoUrl: "/images/brands/fox.png"
-        },
-        promoCode: "BDAY30",
-        url: "https://fox.co.il",
-        validityType: "birthday_month",
-        redemptionMethod: "קוד קופון",
-        termsAndConditions: "הטבה תקפה לחודש יום ההולדת בלבד"
+    // Load all benefits from database
+    const benefits = await prisma.benefit.findMany({
+      where: {
+        isActive: true,
       },
-      {
-        id: "2",
-        title: "קפה חינם",
-        description: "קפה חינם ביום ההולדת שלך",
+      include: {
         brand: {
-          name: "Starbucks",
-          logoUrl: "/images/brands/starbucks.png"
+          select: {
+            id: true,
+            name: true,
+            logoUrl: true,
+            website: true,
+          },
         },
-        validityType: "birthday_date",
-        redemptionMethod: "אוטומטי באפליקציה",
-        termsAndConditions: "תקף ביום ההולדת בלבד"
       },
-      {
-        id: "3",
-        title: "הנחה של 50 ₪",
-        description: "הנחה של 50 ₪ על קנייה מעל 200 ₪",
-        brand: {
-          name: "Super-Pharm",
-          logoUrl: "/images/brands/super-pharm.png"
-        },
-        promoCode: "BDAY50",
-        url: "https://super-pharm.co.il",
-        validityType: "birthday_month",
-        redemptionMethod: "קוד קופון",
-        termsAndConditions: "תקף לחודש יום ההולדת"
-      }
-    ];
+    });
+
+    // Transform benefits to match the expected format
+    const transformedBenefits = benefits.map(benefit => ({
+      id: benefit.id,
+      title: benefit.title,
+      description: benefit.description,
+      brandId: benefit.brandId,
+      brand: {
+        name: benefit.brand.name,
+        logoUrl: benefit.brand.logoUrl,
+        website: benefit.brand.website,
+      },
+      promoCode: benefit.promoCode,
+      url: benefit.brand.website,
+      validityType: benefit.validityType || "birthday_month",
+      validityDuration: benefit.validityDuration,
+      redemptionMethod: benefit.redemptionMethod,
+      termsAndConditions: benefit.termsAndConditions,
+    }));
 
     return NextResponse.json({
-      benefits: mockBenefits,
+      benefits: transformedBenefits,
       memberships: userMemberships.length
     });
   } catch (error) {
