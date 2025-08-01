@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
+      console.log("No session or user ID found");
       return NextResponse.json(
         { message: "לא מורשה" },
         { status: 401 }
@@ -23,25 +24,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For now, we'll create mock brand records if they don't exist
-    // In a real app, you'd have these pre-populated in the database
+    console.log("Processing brand IDs:", brandIds);
+
+    // First, deactivate all existing memberships for this user
+    await prisma.userMembership.updateMany({
+      where: {
+        userId: session.user.id,
+      },
+      data: {
+        isActive: false,
+      },
+    });
+
+    // Then create/update memberships for the selected brands
     const memberships = await Promise.all(
       brandIds.map(async (brandId) => {
-        // Check if brand exists, if not create a mock one
-        let brand = await prisma.brand.findFirst({
-          where: { name: { contains: brandId } }
+        // Check if brand exists by ID
+        const brand = await prisma.brand.findUnique({
+          where: { id: brandId }
         });
 
         if (!brand) {
-          // Create a mock brand for demo purposes
-          brand = await prisma.brand.create({
-            data: {
-              name: brandId,
-              logoUrl: `https://via.placeholder.com/60x60/FF6B6B/FFFFFF?text=${brandId.substring(0, 2).toUpperCase()}`,
-              website: "https://example.com",
-              category: "general",
-            }
-          });
+          console.log(`Brand with ID ${brandId} not found`);
+          return null;
         }
 
         // Create or update user membership
@@ -64,10 +69,14 @@ export async function POST(request: NextRequest) {
       })
     );
 
+    const validMemberships = memberships.filter(m => m !== null);
+
+    console.log(`Created ${validMemberships.length} memberships`);
+
     return NextResponse.json(
       { 
         message: "חברויות נשמרו בהצלחה",
-        memberships: memberships.length 
+        memberships: validMemberships.length 
       },
       { status: 200 }
     );

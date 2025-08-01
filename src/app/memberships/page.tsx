@@ -282,13 +282,18 @@ export default function MembershipsPage() {
   };
 
   const handleSaveChanges = async () => {
-    if (!session) return;
+    if (!session) {
+      console.error('No session available');
+      return;
+    }
     
     setIsSaving(true);
     try {
       const activeBrandIds = memberships
         .filter(m => m.isActive)
         .map(m => m.id);
+
+      console.log('Saving memberships:', activeBrandIds);
 
       const response = await fetch('/api/user/memberships', {
         method: 'POST',
@@ -298,14 +303,23 @@ export default function MembershipsPage() {
         body: JSON.stringify({ brandIds: activeBrandIds }),
       });
 
+      console.log('Response status:', response.status);
+
       if (response.ok) {
+        const result = await response.json();
+        console.log('Save successful:', result);
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
       } else {
-        console.error('Failed to save memberships');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to save memberships:', response.status, errorData);
+        // Show error message to user
+        alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
       }
     } catch (error) {
       console.error('Error saving memberships:', error);
+      // Show error message to user
+      alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
     } finally {
       setIsSaving(false);
     }
