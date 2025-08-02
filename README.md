@@ -77,6 +77,80 @@ YomU (יום-You) is a mobile-first web application that aggregates and displays
 6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
+## 🐳 Docker & Podman Support
+
+### Quick Start with Docker
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd bday-benefits
+   ```
+
+2. **Run the setup script**
+   ```bash
+   ./scripts/docker-setup.sh setup
+   ```
+
+3. **Start the application**
+   ```bash
+   # Production mode
+   ./scripts/docker-setup.sh start
+   
+   # Development mode (with hot reload)
+   ./scripts/docker-setup.sh start-dev
+   ```
+
+4. **Initialize the database**
+   ```bash
+   ./scripts/docker-setup.sh init-db
+   ```
+
+5. **Access the application**
+   - Production: [http://localhost:3000](http://localhost:3000)
+   - Development: [http://localhost:3001](http://localhost:3001)
+
+### Using Podman
+
+The same commands work with Podman. The setup script automatically detects and uses Podman if Docker is not available.
+
+### Docker Commands
+
+```bash
+# Start production services
+docker-compose up -d
+
+# Start development services
+docker-compose --profile dev up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop services
+docker-compose down
+
+# Rebuild images
+docker-compose build --no-cache
+```
+
+### Podman Commands
+
+```bash
+# Start production services
+podman-compose up -d
+
+# Start development services
+podman-compose --profile dev up -d
+
+# View logs
+podman-compose logs -f app
+
+# Stop services
+podman-compose down
+```
+
+For detailed Docker/Podman documentation, see [docs/DOCKER.md](docs/DOCKER.md).
+
 ## 🛠️ Tech Stack
 
 ### Frontend

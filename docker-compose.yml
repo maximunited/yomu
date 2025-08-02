@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # SQLite database (using a volume to persist data)
+  db:
+    image: alpine:latest
+    container_name: yomu-db
+    volumes:
+      - db_data:/data
+    command: sh -c "apk add --no-cache sqlite && sqlite3 /data/dev.db 'CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY);' && tail -f /dev/null"
+    restart: unless-stopped
+
+  # YomU Next.js application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yomu-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/data/dev.db
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-secret-key-here
+    volumes:
+      - db_data:/data
+      - ./prisma:/app/prisma
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - yomu-network
+
+  # Development version (optional)
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: yomu-app-dev
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:/data/dev.db
+      - NEXTAUTH_URL=http://localhost:3001
+      - NEXTAUTH_SECRET=your-secret-key-here
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - db_data:/data
+      - ./prisma:/app/prisma
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - yomu-network
+    profiles:
+      - dev
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  yomu-network:
+    driver: bridge 
