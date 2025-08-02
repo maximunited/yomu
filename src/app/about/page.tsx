@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { ArrowLeft, Users, Target, Eye, Heart } from "lucide-react";
+import { ArrowLeft, Users, Target, Eye, Heart, User, Palette } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AboutPage() {
@@ -78,22 +78,22 @@ export default function AboutPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="text-center p-4">
                 <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-10 h-10 text-white" />
+                  <User className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">מפתח ראשי</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">מפתח מוביל</h3>
                 <p className="text-gray-600 dark:text-gray-300">Lead Developer</p>
               </div>
 
               <div className="text-center p-4">
-                <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-10 h-10 text-white" />
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Palette className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">מעצב UX/UI</h3>
                 <p className="text-gray-600 dark:text-gray-300">UX/UI Designer</p>
               </div>
 
               <div className="text-center p-4">
-                <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Target className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">מנהל מוצר</h3>

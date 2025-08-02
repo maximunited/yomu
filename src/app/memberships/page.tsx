@@ -358,6 +358,8 @@ export default function MembershipsPage() {
         if (response.status === 401) {
           alert('הסשן פג תוקף. אנא התחבר מחדש.');
           router.push('/auth/signin');
+        } else if (response.status === 500) {
+          alert('שגיאה בשרת. אנא נסה שוב מאוחר יותר.');
         } else {
           alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
         }

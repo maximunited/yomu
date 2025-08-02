@@ -76,7 +76,10 @@ export default function SignUpPage() {
       if (result?.error) {
         setError("שגיאה בהתחברות אוטומטית");
       } else {
-        router.push("/onboarding");
+        // Add a small delay to ensure session is established
+        setTimeout(() => {
+          router.push("/onboarding");
+        }, 1000);
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : "שגיאה בהרשמה");
