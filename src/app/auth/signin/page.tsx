@@ -14,6 +14,8 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [saveEmail, setSaveEmail] = useState(false);
+  const [keepSignedIn, setKeepSignedIn] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,6 +116,35 @@ export default function SignInPage() {
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
+              </div>
+            </div>
+
+            {/* Checkboxes */}
+            <div className="space-y-3">
+              <div className="flex items-center">
+                <input
+                  id="saveEmail"
+                  type="checkbox"
+                  checked={saveEmail}
+                  onChange={(e) => setSaveEmail(e.target.checked)}
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                />
+                <label htmlFor="saveEmail" className="mr-2 block text-sm text-gray-700">
+                  שמור אימייל
+                </label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  id="keepSignedIn"
+                  type="checkbox"
+                  checked={keepSignedIn}
+                  onChange={(e) => setKeepSignedIn(e.target.checked)}
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                />
+                <label htmlFor="keepSignedIn" className="mr-2 block text-sm text-gray-700">
+                  השאר אותי מחובר
+                </label>
               </div>
             </div>
 

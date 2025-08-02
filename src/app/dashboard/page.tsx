@@ -292,11 +292,11 @@ export default function DashboardPage() {
               <span className="text-xl font-bold text-gray-900">YomU</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
+              <Button variant="outline" size="sm" className="border-2 border-gray-400 hover:border-gray-500">
                 <Bell className="w-5 h-5" />
               </Button>
               <div className="relative group">
-                <button className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg px-3 py-2 transition-colors">
+                <button className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg px-3 py-2 transition-colors border-2 border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500">
                   <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center overflow-hidden">
                     {userProfilePicture ? (
                       <img 

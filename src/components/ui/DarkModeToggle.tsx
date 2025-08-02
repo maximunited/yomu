@@ -11,7 +11,7 @@ interface DarkModeToggleProps {
 }
 
 export function DarkModeToggle({ 
-  variant = "ghost", 
+  variant = "outline", 
   size = "sm", 
   showText = false,
   className = ""
@@ -23,7 +23,7 @@ export function DarkModeToggle({
       variant={variant}
       size={size}
       onClick={toggleDarkMode}
-      className={className}
+      className={`border-2 border-gray-400 hover:border-gray-500 ${className}`}
       aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
       {isDarkMode ? (

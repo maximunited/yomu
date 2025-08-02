@@ -21,7 +21,7 @@ export default function HomePage() {
             <DarkModeToggle />
             <LanguageSwitcher />
             <Link href="/auth/signin">
-              <Button variant="ghost">התחברות</Button>
+              <Button variant="outline" className="border-2 border-gray-400 hover:border-gray-500">התחברות</Button>
             </Link>
             <Link href="/auth/signup">
               <Button>הרשמה</Button>
