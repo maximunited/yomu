@@ -67,49 +67,49 @@ const predefinedBrands = [
     name: "אסקייפרום",
     logoUrl: "/images/brands/escape-room.svg",
     website: "https://www.escape-room.co.il",
-    description: "50 שח הנחה בחודש יומולדת",
+    description: "חדרי בריחה - 50 שח הנחה בחודש יומולדת",
     category: "entertainment"
   },
   {
-    name: "מסעדת באקרו (רעננה)",
+    name: "באקרו - Buckaroo",
     logoUrl: "/images/brands/bacaro.svg",
     website: "https://www.bacaro.co.il",
-    description: "מנה ראשונה וקינוח מתנה",
+    description: "מסעדה - קינוח ומנה ראשונה מתנה",
     category: "food"
   },
   {
-    name: "שגב (מסעדה)",
+    name: "שגב",
     logoUrl: "/images/brands/shegev.svg",
     website: "https://www.shegev.co.il",
-    description: "מנה ראשונה",
+    description: "מסעדה - מנה ראשונה מתנה",
     category: "food"
   },
   {
-    name: "ג'מס",
+    name: "ג'מס - JEMS",
     logoUrl: "/images/brands/james.svg",
     website: "https://www.james.co.il",
-    description: "חצי ליטר בירה",
+    description: "חצי ליטר בירה מתנה",
     category: "food"
   },
   {
-    name: "פראג הקטנה (מסעדה)",
+    name: "פראג הקטנה",
     logoUrl: "/images/brands/prague.svg",
-    website: "https://www.prague.co.il",
-    description: "50 נק' מתנה",
+    website: "https://littleprague.co.il/",
+    description: "מסעדה צ'כית אותנטית - כל החודש",
     category: "food"
   },
   {
     name: "מיקה חנויות נוחות",
     logoUrl: "/images/brands/mika.svg",
     website: "https://www.mika.co.il",
-    description: "10 שח מתנה בהצגת תעודה",
+    description: "10 שח מתנה בהצגת תעודה מזהה",
     category: "convenience"
   },
   {
-    name: "מנמ עשה זאת בעצמך",
+    name: "מנמ",
     logoUrl: "/images/brands/menam.svg",
     website: "https://www.menam.co.il",
-    description: "50 שח מתנה (מעל 300)",
+    description: "50 שח מתנה בקנייה מעל 300 שח",
     category: "home"
   },
   {
@@ -172,7 +172,7 @@ async function seed() {
     
     console.log(`Created ${createdBrands.length} brands`);
     
-    // Create some sample benefits
+    // Create benefits with updated specifications
     console.log('Creating benefits...');
     const sampleBenefits = [
       {
@@ -183,8 +183,9 @@ async function seed() {
         redemptionMethod: "app",
         promoCode: "BIRTHDAY2024",
         url: "https://www.mcdonalds.co.il/birthday",
-        validityType: "birthday_date",
-        validityDuration: 1
+        validityType: "birthday_exact_date",
+        validityDuration: 1,
+        isFree: true
       },
       {
         brandId: createdBrands.find(b => b.name === "Super-Pharm - LifeStyle")?.id,
@@ -194,8 +195,117 @@ async function seed() {
         redemptionMethod: "in-store",
         promoCode: null,
         url: "https://www.super-pharm.co.il/birthday",
-        validityType: "birthday_month",
-        validityDuration: 30
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: false
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "אסקייפרום")?.id,
+        title: "50 שח הנחה בחודש יומולדת",
+        description: "50 שח הנחה על חדרי בריחה בחודש יום ההולדת - כל החודש הקלנדרי",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.escape-room.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: false
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "באקרו - Buckaroo")?.id,
+        title: "קינוח ומנה ראשונה מתנה",
+        description: "קינוח ומנה ראשונה מתנה כל החודש",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.bacaro.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "מסעדת ליבירה")?.id,
+        title: "הטבות מיוחדות כל החודש",
+        description: "הטבות מיוחדות במסעדת ליבירה כל החודש",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.libira.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "פראג הקטנה")?.id,
+        title: "הטבות מיוחדות כל החודש",
+        description: "הטבות מיוחדות במסעדה צ'כית אותנטית כל החודש",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://littleprague.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "שגב")?.id,
+        title: "מנה ראשונה מתנה",
+        description: "מנה ראשונה מתנה כל החודש",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.shegev.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "ג'מס - JEMS")?.id,
+        title: "חצי ליטר בירה מתנה",
+        description: "חצי ליטר בירה מתנה כל החודש",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.james.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "מיקה חנויות נוחות")?.id,
+        title: "10 שח מתנה בהצגת תעודה מזהה",
+        description: "10 שח מתנה בהצגת תעודה מזהה כל החודש",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת, נדרשת הצגת תעודה מזהה",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.mika.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "KFC")?.id,
+        title: "המבורגר 1+1 מתנה",
+        description: "המבורגר 1+1 מתנה כל החודש",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.kfc.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "מנמ")?.id,
+        title: "50 שח מתנה בקנייה מעל 300 שח",
+        description: "50 שח מתנה בקנייה מעל 300 שח כל החודש",
+        termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת, בקנייה מעל 300 שח",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.menam.co.il/birthday",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: false
       }
     ];
     

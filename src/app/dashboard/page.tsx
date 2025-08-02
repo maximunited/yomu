@@ -514,6 +514,10 @@ export default function DashboardPage() {
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(benefit.brand.category)}`}>
                     {getCategoryDisplayName(benefit.brand.category)}
                   </span>
+                  {/* Membership Type Label */}
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mr-2 ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+                    {benefit.isFree ? 'חינם' : 'בתשלום'}
+                  </span>
                 </div>
                 
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
@@ -598,6 +602,10 @@ export default function DashboardPage() {
                 <div className="mb-3">
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(benefit.brand.category)}`}>
                     {getCategoryDisplayName(benefit.brand.category)}
+                  </span>
+                  {/* Membership Type Label */}
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mr-2 ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+                    {benefit.isFree ? 'חינם' : 'בתשלום'}
                   </span>
                 </div>
                 

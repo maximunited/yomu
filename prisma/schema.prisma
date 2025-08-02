@@ -92,6 +92,7 @@ model Benefit {
   url               String?
   validityType      String   // "birthday_date", "birthday_month", "birthday_week"
   validityDuration  Int?     // number of days
+  isFree            Boolean  @default(true)  // true for free benefits, false for paid
   isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
