@@ -261,8 +261,23 @@ export default function DashboardPage() {
   const filteredUpcomingBenefits = filterBenefits(upcomingBenefits);
 
   // Get unique categories from benefits
-  const allCategories = Array.from(new Set(benefits.map(b => b.brand.category)));
+  const allCategories = Array.from(new Set(benefits.map(b => b.brand.category).filter(Boolean)));
   const allValidityDurations = Array.from(new Set(benefits.map(b => getValidityDurationDisplay(b.validityType))));
+
+  // Debug logging for categories
+  console.log("Benefits with categories:", benefits.map(b => ({ 
+    brand: b.brand.name, 
+    category: b.brand.category 
+  })));
+  console.log("All categories found:", allCategories);
+
+  // Fallback categories if none are found in benefits
+  const fallbackCategories = [
+    'food', 'health', 'fashion', 'home', 'finance', 'grocery', 
+    'entertainment', 'convenience', 'transport', 'baby'
+  ];
+  
+  const displayCategories = allCategories.length > 0 ? allCategories : fallbackCategories;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -382,11 +397,11 @@ export default function DashboardPage() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
                 >
-                  <option value="">כל הקטגוריות</option>
-                  {allCategories.map(category => (
-                    <option key={category} value={category}>
+                  <option key="all" value="">כל הקטגוריות</option>
+                  {displayCategories.map(category => (
+                    <option key={`category-${category}`} value={category}>
                       {getCategoryDisplayName(category)}
                     </option>
                   ))}
@@ -399,11 +414,11 @@ export default function DashboardPage() {
                 <select
                   value={selectedValidityDuration}
                   onChange={(e) => setSelectedValidityDuration(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
                 >
-                  <option value="">כל התקופות</option>
+                  <option key="all-durations" value="">כל התקופות</option>
                   {allValidityDurations.map(duration => (
-                    <option key={duration} value={duration}>
+                    <option key={`duration-${duration}`} value={duration}>
                       {duration}
                     </option>
                   ))}
@@ -416,11 +431,11 @@ export default function DashboardPage() {
                 <select
                   value={selectedMembershipType}
                   onChange={(e) => setSelectedMembershipType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
                 >
-                  <option value="">כל הסוגים</option>
-                  <option value="free">חינם</option>
-                  <option value="paid">בתשלום</option>
+                  <option key="all-types" value="">כל הסוגים</option>
+                  <option key="free" value="free">חינם</option>
+                  <option key="paid" value="paid">בתשלום</option>
                 </select>
               </div>
             </div>
