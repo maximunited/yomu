@@ -492,7 +492,7 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredActiveBenefits.map((benefit) => (
-              <div key={benefit.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div key={benefit.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow flex flex-col h-full">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <img
@@ -523,7 +523,7 @@ export default function DashboardPage() {
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
                   {benefit.title}
                 </h4>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-sm mb-4 flex-grow">
                   {benefit.description}
                 </p>
 
@@ -544,7 +544,7 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 mt-auto">
                   {benefit.url && (
                     <Button
                       variant="outline"
@@ -581,7 +581,7 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredUpcomingBenefits.map((benefit) => (
-              <div key={benefit.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow opacity-75">
+              <div key={benefit.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow opacity-75 flex flex-col h-full">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <img
@@ -612,11 +612,11 @@ export default function DashboardPage() {
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
                   {benefit.title}
                 </h4>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-sm mb-4 flex-grow">
                   {benefit.description}
                 </p>
 
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 mt-auto">
                   <Button
                     variant="outline"
                     size="sm"

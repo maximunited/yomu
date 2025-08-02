@@ -586,30 +586,31 @@ export default function MembershipsPage() {
             {filteredMemberships.map((membership) => (
               <div
                 key={membership.id}
-                className={`bg-white dark:bg-gray-800 rounded-lg p-4 border-2 transition-all cursor-pointer ${
+                className={`bg-white dark:bg-gray-800 rounded-lg p-4 border-2 transition-all cursor-pointer flex flex-col h-full ${
                   membership.isActive
                     ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
                     : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
                 onClick={() => toggleMembership(membership.id)}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
+                {/* Header with icon, title, description, and checkbox */}
+                <div className="flex items-start justify-between mb-3 flex-grow">
+                  <div className="flex items-start space-x-3 flex-grow">
                     {membership.icon.startsWith('/') ? (
                       <img
                         src={membership.icon}
                         alt={membership.name}
-                        className="w-8 h-8 rounded-full object-cover"
+                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
                         }}
                       />
                     ) : (
-                      <span className="text-2xl">{membership.icon}</span>
+                      <span className="text-2xl flex-shrink-0">{membership.icon}</span>
                     )}
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <div className="flex-grow min-w-0">
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
                         {membership.name}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -617,7 +618,7 @@ export default function MembershipsPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
                     {membership.isActive ? (
                       <CheckCircle className="w-5 h-5 text-purple-600" />
                     ) : (
@@ -626,7 +627,8 @@ export default function MembershipsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                {/* Tags section - always at bottom */}
+                <div className="flex items-center justify-between mt-auto pt-3">
                   <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(membership.category)}`}>
                     {membership.category === "food" && "מזון"}
                     {membership.category === "health" && "בריאות"}
