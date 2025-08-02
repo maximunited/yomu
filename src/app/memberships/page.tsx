@@ -334,17 +334,31 @@ export default function MembershipsPage() {
     setIsSaving(true);
     try {
       const activeBrandIds = memberships
-        .filter(m => m.isActive)
+        .filter(m => m.isActive && !m.id.startsWith('custom-'))
         .map(m => m.id);
 
-      console.log('Saving memberships:', activeBrandIds);
+      const activeCustomMemberships = memberships
+        .filter(m => m.isActive && m.id.startsWith('custom-'))
+        .map(m => ({
+          name: m.name,
+          description: m.description,
+          category: m.category,
+          icon: m.icon,
+          type: m.type,
+          cost: m.cost,
+        }));
+
+      console.log('Saving memberships:', { activeBrandIds, activeCustomMemberships });
 
       const response = await fetch('/api/user/memberships', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ brandIds: activeBrandIds }),
+        body: JSON.stringify({ 
+          brandIds: activeBrandIds,
+          customMemberships: activeCustomMemberships
+        }),
       });
 
       console.log('Response status:', response.status);
@@ -379,7 +393,7 @@ export default function MembershipsPage() {
   const handleAddCustomMembership = () => {
     if (customMembership.name && customMembership.description && customMembership.category) {
       const newMembership: Membership = {
-        id: Date.now().toString(),
+        id: `custom-${Date.now().toString()}`,
         name: customMembership.name,
         description: customMembership.description,
         category: customMembership.category,

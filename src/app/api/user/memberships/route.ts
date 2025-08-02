@@ -33,17 +33,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const { brandIds } = await request.json();
+    const { brandIds, customMemberships } = await request.json();
     console.log("Received brandIds:", brandIds);
-
-    if (!brandIds || !Array.isArray(brandIds)) {
-      return NextResponse.json(
-        { message: "רשימת מותגים נדרשת" },
-        { status: 400 }
-      );
-    }
-
-    console.log("Processing brand IDs:", brandIds);
+    console.log("Received customMemberships:", customMemberships);
 
     // First, deactivate all existing memberships for this user
     await prisma.userMembership.updateMany({
@@ -55,47 +47,94 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Then create/update memberships for the selected brands
-    const memberships = await Promise.all(
-      brandIds.map(async (brandId) => {
-        // Check if brand exists by ID
-        const brand = await prisma.brand.findUnique({
-          where: { id: brandId }
-        });
+    const results = [];
 
-        if (!brand) {
-          console.log(`Brand with ID ${brandId} not found`);
-          return null;
-        }
+    // Handle regular brand memberships
+    if (brandIds && Array.isArray(brandIds)) {
+      console.log("Processing brand IDs:", brandIds);
 
-        // Create or update user membership
-        return prisma.userMembership.upsert({
-          where: {
-            userId_brandId: {
+      const brandMemberships = await Promise.all(
+        brandIds.map(async (brandId) => {
+          // Check if brand exists by ID
+          const brand = await prisma.brand.findUnique({
+            where: { id: brandId }
+          });
+
+          if (!brand) {
+            console.log(`Brand with ID ${brandId} not found`);
+            return null;
+          }
+
+          // Create or update user membership
+          return prisma.userMembership.upsert({
+            where: {
+              userId_brandId: {
+                userId: userId,
+                brandId: brand.id,
+              }
+            },
+            update: {
+              isActive: true,
+            },
+            create: {
               userId: userId,
               brandId: brand.id,
+              isActive: true,
             }
-          },
-          update: {
-            isActive: true,
-          },
-          create: {
-            userId: userId,
-            brandId: brand.id,
-            isActive: true,
+          });
+        })
+      );
+
+      results.push(...brandMemberships.filter(m => m !== null));
+    }
+
+    // Handle custom memberships
+    if (customMemberships && Array.isArray(customMemberships)) {
+      console.log("Processing custom memberships:", customMemberships);
+
+      const customMembershipResults = await Promise.all(
+        customMemberships.map(async (customMembership) => {
+          if (!customMembership.name || !customMembership.description || !customMembership.category) {
+            console.log("Invalid custom membership data:", customMembership);
+            return null;
           }
-        });
-      })
-    );
 
-    const validMemberships = memberships.filter(m => m !== null);
+          // Create custom membership
+          const createdCustomMembership = await prisma.customMembership.create({
+            data: {
+              userId: userId,
+              name: customMembership.name,
+              description: customMembership.description,
+              category: customMembership.category,
+              icon: customMembership.icon || "/images/brands/restaurant.svg",
+              type: customMembership.type || "free",
+              cost: customMembership.cost || null,
+              isActive: true,
+            }
+          });
 
-    console.log(`Created ${validMemberships.length} memberships`);
+          // Create user membership for the custom membership
+          const userMembership = await prisma.userMembership.create({
+            data: {
+              userId: userId,
+              customMembershipId: createdCustomMembership.id,
+              isActive: true,
+            }
+          });
+
+          return userMembership;
+        })
+      );
+
+      results.push(...customMembershipResults.filter(m => m !== null));
+    }
+
+    console.log(`Created ${results.length} memberships`);
 
     return NextResponse.json(
       { 
         message: "חברויות נשמרו בהצלחה",
-        memberships: validMemberships.length 
+        memberships: results.length 
       },
       { status: 200 }
     );
@@ -140,19 +179,52 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const memberships = await prisma.userMembership.findMany({
+    // Get regular brand memberships
+    const brandMemberships = await prisma.userMembership.findMany({
       where: {
         userId: userId,
         isActive: true,
+        brandId: { not: null },
       },
       include: {
         brand: true,
       },
     });
 
-    console.log(`Found ${memberships.length} memberships`);
+    // Get custom memberships
+    const customMemberships = await prisma.userMembership.findMany({
+      where: {
+        userId: userId,
+        isActive: true,
+        customMembershipId: { not: null },
+      },
+      include: {
+        customMembership: true,
+      },
+    });
 
-    return NextResponse.json({ memberships });
+    // Transform custom memberships to match brand membership format
+    const transformedCustomMemberships = customMemberships.map(membership => ({
+      id: membership.customMembership!.id,
+      brandId: membership.customMembership!.id,
+      isActive: membership.isActive,
+      brand: {
+        id: membership.customMembership!.id,
+        name: membership.customMembership!.name,
+        logoUrl: membership.customMembership!.icon,
+        website: "",
+        description: membership.customMembership!.description,
+        category: membership.customMembership!.category,
+        type: membership.customMembership!.type,
+        cost: membership.customMembership!.cost,
+      },
+    }));
+
+    const allMemberships = [...brandMemberships, ...transformedCustomMemberships];
+
+    console.log(`Found ${allMemberships.length} memberships`);
+
+    return NextResponse.json({ memberships: allMemberships });
   } catch (error) {
     console.error("Error fetching memberships:", error);
     return NextResponse.json(

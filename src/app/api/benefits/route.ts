@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
       validityDuration: benefit.validityDuration,
       redemptionMethod: benefit.redemptionMethod,
       termsAndConditions: benefit.termsAndConditions,
+      isFree: benefit.isFree,
     }));
 
     return NextResponse.json({

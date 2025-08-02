@@ -209,7 +209,7 @@ async function seed() {
         url: "https://www.escape-room.co.il/birthday",
         validityType: "birthday_entire_month",
         validityDuration: 30,
-        isFree: false
+        isFree: true
       },
       {
         brandId: createdBrands.find(b => b.name === "באקרו - Buckaroo")?.id,
