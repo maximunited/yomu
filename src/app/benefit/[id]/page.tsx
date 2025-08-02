@@ -219,9 +219,10 @@ export default function BenefitDetailPage() {
                   variant="default"
                   onClick={() => window.open(benefit.url, '_blank')}
                   className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                  title="לחץ לקנייה ישירה באתר המותג"
                 >
                   <ExternalLink className="w-5 h-5 ml-2" />
-                  לקנייה באתר
+                  לקנייה באתר המותג
                 </Button>
               )}
               
@@ -229,13 +230,20 @@ export default function BenefitDetailPage() {
                 variant="outline"
                 onClick={() => window.open(benefit.brand.website, '_blank')}
                 className="w-full"
+                title="לחץ לביקור באתר הרשמי של המותג"
               >
                 <ExternalLink className="w-5 h-5 ml-2" />
-                אתר המותג
+                אתר המותג הרשמי
               </Button>
               
               <Button
                 variant="outline"
+                onClick={() => {
+                  // Open email client with pre-filled subject and body
+                  const subject = encodeURIComponent(`דיווח על מידע שגוי - ${benefit.brand.name}`);
+                  const body = encodeURIComponent(`שלום,\n\nאני רוצה לדווח על מידע שגוי או חסר בהטבה הבאה:\n\nמותג: ${benefit.brand.name}\nהטבה: ${benefit.title}\nתיאור: ${benefit.description}\n\nפרטים נוספים:\n`);
+                  window.open(`mailto:support@yomu.co.il?subject=${subject}&body=${body}`, '_blank');
+                }}
                 className="w-full text-red-600 border-red-200 hover:bg-red-50"
               >
                 <AlertTriangle className="w-5 h-5 ml-2" />
