@@ -389,6 +389,8 @@ export default function MembershipsPage() {
         cost: null
       };
       setMemberships(prev => [...prev, newMembership]);
+      // Also update originalMemberships to include the new membership as inactive
+      setOriginalMemberships(prev => [...prev, { ...newMembership, isActive: false }]);
       setCustomMembership({ name: "", description: "", category: "" });
     }
   };
@@ -411,11 +413,24 @@ export default function MembershipsPage() {
   const hasChanges = () => {
     if (originalMemberships.length === 0) return false;
     
-    // Compare current memberships with original memberships
-    return memberships.some((current, index) => {
+    // Check if any existing memberships have changed their active state
+    const existingMembershipsChanged = memberships.some((current, index) => {
       const original = originalMemberships[index];
       return original && current.isActive !== original.isActive;
     });
+    
+    // Check if any new custom memberships have been added and are active
+    const newActiveMemberships = memberships.filter(m => 
+      !originalMemberships.some(original => original.id === m.id) && m.isActive
+    );
+    
+    return existingMembershipsChanged || newActiveMemberships.length > 0;
+  };
+
+  const isCustomMembershipFormValid = () => {
+    return customMembership.name.trim() !== "" && 
+           customMembership.description.trim() !== "" && 
+           customMembership.category !== "";
   };
 
   const activeCount = memberships.filter(m => m.isActive).length;
@@ -699,7 +714,12 @@ export default function MembershipsPage() {
             </div>
             <Button
               onClick={handleAddCustomMembership}
-              className="mt-4 bg-green-600 hover:bg-green-700 text-white"
+              disabled={!isCustomMembershipFormValid()}
+              className={`mt-4 ${
+                isCustomMembershipFormValid()
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
+              }`}
             >
               הוסף חברות
             </Button>
