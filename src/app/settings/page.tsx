@@ -54,6 +54,27 @@ export default function SettingsPage() {
     if (savedDarkMode) {
       document.documentElement.classList.add("dark");
     }
+
+    // Load profile data
+    const loadProfile = async () => {
+      try {
+        const response = await fetch('/api/user/profile');
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(prev => ({
+            ...prev,
+            ...data.user,
+            // Convert null dates to empty strings for React inputs
+            dateOfBirth: data.user.dateOfBirth ? new Date(data.user.dateOfBirth).toISOString().split('T')[0] : '',
+            anniversaryDate: data.user.anniversaryDate ? new Date(data.user.anniversaryDate).toISOString().split('T')[0] : '',
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    };
+
+    loadProfile();
   }, []);
 
   const toggleDarkMode = () => {
@@ -70,11 +91,42 @@ export default function SettingsPage() {
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsEditing(false);
-    setIsSaving(false);
-    // In a real app, this would save to the backend
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: profile.name,
+          dateOfBirth: profile.dateOfBirth,
+          anniversaryDate: profile.anniversaryDate,
+          profilePicture: profile.profilePicture,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update the profile with the saved data
+        setProfile(prev => ({
+          ...prev,
+          ...data.user,
+          // Convert null dates to empty strings for React inputs
+          dateOfBirth: data.user.dateOfBirth ? new Date(data.user.dateOfBirth).toISOString().split('T')[0] : '',
+          anniversaryDate: data.user.anniversaryDate ? new Date(data.user.anniversaryDate).toISOString().split('T')[0] : '',
+        }));
+        setIsEditing(false);
+        // Show success message (you could add a toast notification here)
+      } else {
+        console.error('Failed to save profile');
+        // Show error message
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      // Show error message
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleLogout = () => {
@@ -86,12 +138,44 @@ export default function SettingsPage() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
+        const newProfilePicture = e.target?.result as string;
         setProfile(prev => ({
           ...prev,
-          profilePicture: e.target?.result as string
+          profilePicture: newProfilePicture
         }));
+        
+        // Auto-save the profile picture immediately
+        saveProfilePicture(newProfilePicture);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const saveProfilePicture = async (profilePicture: string) => {
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: profile.name,
+          dateOfBirth: profile.dateOfBirth,
+          anniversaryDate: profile.anniversaryDate,
+          profilePicture: profilePicture,
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Profile picture saved successfully');
+        // Could add a toast notification here
+      } else {
+        console.error('Failed to save profile picture');
+        // Could add error notification here
+      }
+    } catch (error) {
+      console.error('Error saving profile picture:', error);
+      // Could add error notification here
     }
   };
 

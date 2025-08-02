@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { Gift, Calendar, Star, Bell, Copy, ExternalLink, ChevronRight, ShoppingBag, User } from "lucide-react";
+import { Gift, Calendar, Star, Copy, ExternalLink } from "lucide-react";
 
 interface Benefit {
   id: string;
@@ -210,13 +210,6 @@ export default function DemoPage() {
                       לקנייה
                     </Button>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="opacity-50 cursor-not-allowed"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
                 </div>
               </div>
             ))}

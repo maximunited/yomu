@@ -58,84 +58,84 @@ const predefinedBrands = [
   },
   {
     name: "KFC",
-    logoUrl: "/images/brands/kfc.png",
+    logoUrl: "/images/brands/kfc.svg",
     website: "https://www.kfc.co.il",
     description: "הטבות על מזון מהיר",
     category: "food"
   },
   {
     name: "אסקייפרום",
-    logoUrl: "🏷️",
+    logoUrl: "/images/brands/escape-room.svg",
     website: "https://www.escape-room.co.il",
     description: "50 שח הנחה בחודש יומולדת",
     category: "entertainment"
   },
   {
     name: "מסעדת באקרו (רעננה)",
-    logoUrl: "🍽️",
+    logoUrl: "/images/brands/bacaro.svg",
     website: "https://www.bacaro.co.il",
     description: "מנה ראשונה וקינוח מתנה",
     category: "food"
   },
   {
     name: "שגב (מסעדה)",
-    logoUrl: "🍽️",
+    logoUrl: "/images/brands/shegev.svg",
     website: "https://www.shegev.co.il",
     description: "מנה ראשונה",
     category: "food"
   },
   {
     name: "ג'מס",
-    logoUrl: "🍺",
+    logoUrl: "/images/brands/james.svg",
     website: "https://www.james.co.il",
     description: "חצי ליטר בירה",
     category: "food"
   },
   {
     name: "פראג הקטנה (מסעדה)",
-    logoUrl: "🍽️",
+    logoUrl: "/images/brands/prague.svg",
     website: "https://www.prague.co.il",
     description: "50 נק' מתנה",
     category: "food"
   },
   {
     name: "מיקה חנויות נוחות",
-    logoUrl: "🏪",
+    logoUrl: "/images/brands/mika.svg",
     website: "https://www.mika.co.il",
     description: "10 שח מתנה בהצגת תעודה",
     category: "convenience"
   },
   {
     name: "מנמ עשה זאת בעצמך",
-    logoUrl: "🔧",
+    logoUrl: "/images/brands/menam.svg",
     website: "https://www.menam.co.il",
     description: "50 שח מתנה (מעל 300)",
     category: "home"
   },
   {
     name: "שילב",
-    logoUrl: "🏷️",
+    logoUrl: "/images/brands/shilav.svg",
     website: "https://www.shilav.co.il",
     description: "הטבות על מוצרי תינוקות",
     category: "baby"
   },
   {
     name: "יומנגוס",
-    logoUrl: "🍦",
+    logoUrl: "/images/brands/yomango.svg",
     website: "https://www.yomango.co.il",
     description: "הטבות על גלידה",
     category: "food"
   },
   {
     name: "M32 המבורגרים",
-    logoUrl: "🍔",
+    logoUrl: "/images/brands/m32.svg",
     website: "https://www.m32.co.il",
     description: "15% הנחה בחודש יומולדת",
     category: "food"
   },
   {
     name: "מסעדת ליבירה",
-    logoUrl: "🍽️",
+    logoUrl: "/images/brands/libira.svg",
     website: "https://www.libira.co.il",
     description: "בירה וקינוח בישיבה בלבד כל החודש",
     category: "food"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -25,51 +25,58 @@ interface Benefit {
 
 export default function BenefitDetailPage() {
   const params = useParams();
+  const [benefit, setBenefit] = useState<Benefit | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  // Mock data - in real app this would come from API
-  const mockBenefits: Record<string, Benefit> = {
-    "1": {
-      id: "1",
-      title: "30% הנחה על כל הקנייה",
-      description: "הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות Fox. הטבה תקפה לחודש יום ההולדת בלבד.",
-      brand: {
-        name: "Fox",
-        logoUrl: "/images/brands/fox.png",
-        website: "https://fox.co.il"
-      },
-      promoCode: "BDAY30",
-      url: "https://fox.co.il",
-      validityType: "birthday_month",
-      redemptionMethod: "קוד קופון",
-      termsAndConditions: "הטבה תקפה לחודש יום ההולדת בלבד. לא ניתן לשלב עם הטבות אחרות. תקף בחנויות Fox בלבד.",
-      howToRedeem: "הצג את הקוד בקופה או הזן אותו באתר בעת הקנייה"
-    },
-    "3": {
-      id: "3",
-      title: "הנחה של 50 ₪",
-      description: "הנחה של 50 ₪ על קנייה מעל 200 ₪ ברשת Super-Pharm. הטבה תקפה לחודש יום ההולדת.",
-      brand: {
-        name: "Super-Pharm",
-        logoUrl: "/images/brands/superpharm.png",
-        website: "https://super-pharm.co.il"
-      },
-      promoCode: "BDAY50",
-      url: "https://super-pharm.co.il",
-      validityType: "birthday_month",
-      redemptionMethod: "קוד קופון",
-      termsAndConditions: "תקף לחודש יום ההולדת. מינימום קנייה 200 ₪. לא ניתן לשלב עם הטבות אחרות.",
-      howToRedeem: "הצג את הקוד בקופה או הזן אותו באפליקציה"
+  useEffect(() => {
+    const fetchBenefit = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/benefits/${params.id}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError("הטבה לא נמצאה");
+          } else {
+            setError("שגיאה בטעינת ההטבה");
+          }
+          return;
+        }
+        
+        const data = await response.json();
+        setBenefit(data);
+      } catch (error) {
+        console.error("Error fetching benefit:", error);
+        setError("שגיאה בטעינת ההטבה");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (params.id) {
+      fetchBenefit();
     }
-  };
+  }, [params.id]);
 
-  const benefit = mockBenefits[params.id as string];
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">טוען...</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (!benefit) {
+  if (error || !benefit) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
+            <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-4">הטבה לא נמצאה</h1>
             <p className="text-gray-600 mb-6">ההטבה שביקשת לא קיימת או הוסרה.</p>
             <Link href="/dashboard">
@@ -110,15 +117,19 @@ export default function BenefitDetailPage() {
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-5 h-5 ml-1" />
+                חזור
+              </Button>
+            </Link>
             <div className="flex items-center space-x-3">
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="w-4 h-4 ml-1" />
-                  חזרה
-                </Button>
-              </Link>
-              <span className="text-xl font-bold text-gray-900">פרטי הטבה</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                <Gift className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-xl font-bold text-gray-900">YomU</span>
             </div>
+            <div className="w-10"></div> {/* Spacer for centering */}
           </div>
         </div>
       </header>
@@ -126,9 +137,9 @@ export default function BenefitDetailPage() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            {/* Brand Header */}
-            <div className="flex items-center space-x-4 mb-6">
+          {/* Brand Info */}
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div className="flex items-center space-x-4 mb-4">
               <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                 <img
                   src={benefit.brand.logoUrl}
@@ -138,95 +149,96 @@ export default function BenefitDetailPage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{benefit.brand.name}</h1>
-                <span className="text-sm text-purple-600 font-medium">
-                  {getValidityText(benefit.validityType)}
-                </span>
+                <p className="text-gray-600">{benefit.title}</p>
               </div>
             </div>
+            
+            <div className="flex items-center space-x-2 mb-4">
+              <Calendar className="w-5 h-5 text-purple-600" />
+              <span className="text-sm text-purple-600 font-medium">
+                {getValidityText(benefit.validityType)}
+              </span>
+            </div>
+          </div>
 
-            {/* Benefit Title */}
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">{benefit.title}</h2>
-            <p className="text-gray-600 text-lg mb-6">{benefit.description}</p>
+          {/* Benefit Details */}
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">פרטי ההטבה</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">תיאור</h3>
+                <p className="text-gray-600">{benefit.description}</p>
+              </div>
 
-            {/* Promo Code Section */}
-            {benefit.promoCode && (
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <Gift className="w-5 h-5 ml-2 text-purple-600" />
-                  קוד קופון
-                </h3>
-                <div className="flex items-center space-x-3">
-                  <code className="bg-white border border-purple-300 px-4 py-3 rounded-md text-lg font-mono text-purple-800 font-bold flex-1">
-                    {benefit.promoCode}
-                  </code>
-                  <Button
-                    variant="default"
-                    onClick={() => copyToClipboard(benefit.promoCode!)}
-                    className={copiedCode === benefit.promoCode ? "bg-green-600" : ""}
-                  >
-                    {copiedCode === benefit.promoCode ? (
-                      <span className="text-sm font-medium">✓ הועתק</span>
-                    ) : (
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">אופן המימוש</h3>
+                <p className="text-gray-600">{benefit.redemptionMethod}</p>
+              </div>
+
+              {benefit.promoCode && (
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-2">קוד קופון</h3>
+                  <div className="flex items-center space-x-2">
+                    <code className="bg-purple-100 border border-purple-200 px-4 py-2 rounded-md text-lg font-mono text-purple-800 font-bold">
+                      {benefit.promoCode}
+                    </code>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => copyToClipboard(benefit.promoCode!)}
+                      className="bg-purple-600 text-white hover:bg-purple-700"
+                    >
                       <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
+                    </Button>
+                  </div>
+                  {copiedCode === benefit.promoCode && (
+                    <p className="text-green-600 text-sm mt-2">✓ הועתק ללוח</p>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* How to Redeem */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                <Info className="w-5 h-5 ml-2 text-blue-600" />
-                איך לממש
-              </h3>
-              <p className="text-gray-700 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                {benefit.howToRedeem || benefit.redemptionMethod}
-              </p>
+              {benefit.termsAndConditions && (
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-2">תנאים והגבלות</h3>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-gray-600 text-sm">{benefit.termsAndConditions}</p>
+                  </div>
+                </div>
+              )}
             </div>
+          </div>
 
-            {/* Terms and Conditions */}
-            {benefit.termsAndConditions && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">תנאים והגבלות</h3>
-                <p className="text-gray-700 bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  {benefit.termsAndConditions}
-                </p>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex space-x-3 mb-4">
+          {/* Action Buttons */}
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">פעולות</h2>
+            
+            <div className="space-y-3">
               {benefit.url && (
                 <Button
                   variant="default"
-                  className="flex-1"
                   onClick={() => window.open(benefit.url, '_blank')}
+                  className="w-full bg-purple-600 text-white hover:bg-purple-700"
                 >
-                  <ExternalLink className="w-4 h-4 ml-2" />
+                  <ExternalLink className="w-5 h-5 ml-2" />
                   לקנייה באתר
                 </Button>
               )}
+              
               <Button
                 variant="outline"
                 onClick={() => window.open(benefit.brand.website, '_blank')}
+                className="w-full"
               >
-                <ExternalLink className="w-4 h-4 ml-2" />
+                <ExternalLink className="w-5 h-5 ml-2" />
                 אתר המותג
               </Button>
-            </div>
-
-            {/* Report Button */}
-            <div className="border-t pt-4">
+              
               <Button
                 variant="outline"
-                onClick={() => {
-                  // In a real app, this would open a report form or modal
-                  alert("תודה על הדיווח! נבדוק את המידע ונעדכן בהקדם.");
-                }}
-                className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                className="w-full text-red-600 border-red-200 hover:bg-red-50"
               >
-                <AlertTriangle className="w-4 h-4 ml-2" />
+                <AlertTriangle className="w-5 h-5 ml-2" />
                 דווח על מידע שגוי או חסר
               </Button>
             </div>

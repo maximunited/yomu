@@ -45,6 +45,8 @@ model User {
   emailVerified DateTime?
   image         String?
   dateOfBirth   DateTime?
+  anniversaryDate DateTime?
+  profilePicture String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
 

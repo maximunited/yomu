@@ -81,7 +81,7 @@ const popularBrands: Brand[] = [
   {
     id: "coffee-shop",
     name: "Coffee Shop",
-    logoUrl: "https://via.placeholder.com/60x60/8B4513/FFFFFF?text=CS",
+    logoUrl: "/images/brands/coffee-shop.svg",
     category: "food",
     description: "הטבות על קפה ומשקאות"
   }

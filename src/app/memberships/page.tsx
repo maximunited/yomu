@@ -185,7 +185,7 @@ export default function MembershipsPage() {
             description: "הטבות על מזון מהיר",
             category: "food",
             isActive: false,
-            icon: "/images/brands/kfc.png",
+            icon: "/images/brands/kfc.svg",
             type: "free",
             cost: null
           },
@@ -195,7 +195,7 @@ export default function MembershipsPage() {
             description: "50 שח הנחה בחודש יומולדת",
             category: "entertainment",
             isActive: false,
-            icon: "🏷️",
+            icon: "/images/brands/escape-room.svg",
             type: "free",
             cost: null
           },
@@ -205,7 +205,7 @@ export default function MembershipsPage() {
             description: "מנה ראשונה וקינוח מתנה",
             category: "food",
             isActive: false,
-            icon: "🍽️",
+            icon: "/images/brands/bacaro.svg",
             type: "free",
             cost: null
           },
@@ -215,7 +215,7 @@ export default function MembershipsPage() {
             description: "מנה ראשונה",
             category: "food",
             isActive: false,
-            icon: "🍽️",
+            icon: "/images/brands/shegev.svg",
             type: "free",
             cost: null
           },
@@ -225,7 +225,7 @@ export default function MembershipsPage() {
             description: "חצי ליטר בירה",
             category: "food",
             isActive: false,
-            icon: "🍺",
+            icon: "/images/brands/james.svg",
             type: "free",
             cost: null
           },
@@ -235,7 +235,7 @@ export default function MembershipsPage() {
             description: "50 נק' מתנה",
             category: "food",
             isActive: false,
-            icon: "🍽️",
+            icon: "/images/brands/prague.svg",
             type: "free",
             cost: null
           },
@@ -245,7 +245,7 @@ export default function MembershipsPage() {
             description: "10 שח מתנה בהצגת תעודה",
             category: "convenience",
             isActive: false,
-            icon: "🏪",
+            icon: "/images/brands/mika.svg",
             type: "free",
             cost: null
           },
@@ -255,7 +255,7 @@ export default function MembershipsPage() {
             description: "50 שח מתנה (מעל 300)",
             category: "home",
             isActive: false,
-            icon: "🔧",
+            icon: "/images/brands/menam.svg",
             type: "free",
             cost: null
           },
@@ -265,7 +265,7 @@ export default function MembershipsPage() {
             description: "הטבות על מוצרי תינוקות",
             category: "baby",
             isActive: false,
-            icon: "🏷️",
+            icon: "/images/brands/shilav.svg",
             type: "free",
             cost: null
           },
@@ -275,7 +275,7 @@ export default function MembershipsPage() {
             description: "הטבות על גלידה",
             category: "food",
             isActive: false,
-            icon: "🍦",
+            icon: "/images/brands/yomango.svg",
             type: "free",
             cost: null
           },
@@ -285,7 +285,7 @@ export default function MembershipsPage() {
             description: "15% הנחה בחודש יומולדת",
             category: "food",
             isActive: false,
-            icon: "🍔",
+            icon: "/images/brands/m32.svg",
             type: "free",
             cost: null
           },
@@ -295,7 +295,7 @@ export default function MembershipsPage() {
             description: "בירה וקינוח בישיבה בלבד כל החודש",
             category: "food",
             isActive: false,
-            icon: "🍽️",
+            icon: "/images/brands/libira.svg",
             type: "free",
             cost: null
           }
@@ -378,7 +378,7 @@ export default function MembershipsPage() {
         description: customMembership.description,
         category: customMembership.category,
         isActive: false,
-        icon: "🏷️",
+        icon: "/images/brands/restaurant.svg",
         type: "free",
         cost: null
       };
