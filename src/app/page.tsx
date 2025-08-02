@@ -1,14 +1,11 @@
-"use client";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Gift, Calendar, Star, Users } from "lucide-react";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { DynamicYear } from "@/components/DynamicYear";
 
 export default function HomePage() {
-  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
@@ -24,10 +21,10 @@ export default function HomePage() {
             <DarkModeToggle />
             <LanguageSwitcher />
             <Link href="/auth/signin">
-              <Button variant="ghost">{t('signIn')}</Button>
+              <Button variant="ghost">התחברות</Button>
             </Link>
             <Link href="/auth/signup">
-              <Button>{t('signUp')}</Button>
+              <Button>הרשמה</Button>
             </Link>
           </div>
         </nav>
@@ -37,7 +34,7 @@ export default function HomePage() {
       <main className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            {t('appTagline')}
+            אל תפספסו אף הטבה ליום הולדת
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
             מרכזים את כל ההטבות, הדילים והמתנות ליום הולדת במקום אחד. 
@@ -46,12 +43,12 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup">
               <Button size="lg" className="text-lg px-8 py-4">
-                {t('getStarted')}
+                התחל עכשיו
               </Button>
             </Link>
             <Link href="/demo">
               <Button variant="outline" size="lg" className="text-lg px-8 py-4">
-                {t('learnMore')}
+                למידע נוסף
               </Button>
             </Link>
           </div>
@@ -129,13 +126,13 @@ export default function HomePage() {
             <span className="text-xl font-bold">YomU</span>
           </div>
           <p className="text-gray-400 mb-4">
-            © {new Date().getFullYear()} YomU. {t('allRightsReserved')}.
+            © <DynamicYear /> YomU. כל הזכויות שמורות.
           </p>
           <div className="flex justify-center space-x-6 text-sm text-gray-400" dir="ltr">
-            <Link href="/about" className="hover:text-white">{t('about')}</Link>
-            <Link href="/privacy" className="hover:text-white">{t('privacy')}</Link>
-            <Link href="/terms" className="hover:text-white">{t('terms')}</Link>
-            <Link href="/contact" className="hover:text-white">{t('contact')}</Link>
+            <Link href="/about" className="hover:text-white">אודות</Link>
+            <Link href="/privacy" className="hover:text-white">פרטיות</Link>
+            <Link href="/terms" className="hover:text-white">תנאים</Link>
+            <Link href="/contact" className="hover:text-white">צור קשר</Link>
           </div>
         </div>
       </footer>
