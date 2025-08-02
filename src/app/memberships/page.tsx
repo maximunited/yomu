@@ -41,6 +41,7 @@ export default function MembershipsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [memberships, setMemberships] = useState<Membership[]>([]);
+  const [originalMemberships, setOriginalMemberships] = useState<Membership[]>([]);
   const [availableBrands, setAvailableBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -104,6 +105,7 @@ export default function MembershipsPage() {
           }));
           
           setMemberships(brandMemberships);
+          setOriginalMemberships(brandMemberships); // Initialize original memberships
         }
       } catch (error) {
         console.error('Error loading data:', error);
@@ -300,6 +302,7 @@ export default function MembershipsPage() {
             cost: null
           }
         ]);
+        setOriginalMemberships(memberships); // Ensure original memberships are set even on fallback
       } finally {
         setIsLoading(false);
       }
@@ -351,6 +354,7 @@ export default function MembershipsPage() {
         console.log('Save successful:', result);
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
+        setOriginalMemberships(memberships); // Update original memberships after successful save
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to save memberships:', response.status, errorData);
@@ -402,6 +406,16 @@ export default function MembershipsPage() {
       baby: "bg-rose-100 text-rose-800"
     };
     return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800";
+  };
+
+  const hasChanges = () => {
+    if (originalMemberships.length === 0) return false;
+    
+    // Compare current memberships with original memberships
+    return memberships.some((current, index) => {
+      const original = originalMemberships[index];
+      return original && current.isActive !== original.isActive;
+    });
   };
 
   const activeCount = memberships.filter(m => m.isActive).length;
@@ -627,8 +641,12 @@ export default function MembershipsPage() {
               </div>
               <Button
                 onClick={handleSaveChanges}
-                disabled={isSaving}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                disabled={isSaving || !hasChanges()}
+                className={`${
+                  isSaving || !hasChanges()
+                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                    : "bg-purple-600 hover:bg-purple-700 text-white"
+                }`}
               >
                 {isSaving ? "שומר..." : "שמור שינויים"}
               </Button>
