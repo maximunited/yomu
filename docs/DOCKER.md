@@ -70,7 +70,7 @@ This document provides instructions for running YomU using Docker or Podman with
 
 ## Services Overview
 
-### Production Stack (`docker-compose.yml` / `podman-compose.yml`)
+### Production Stack (`compose.yml`)
 
 - **app**: Next.js application (production build)
 - **db**: SQLite database with persistent storage

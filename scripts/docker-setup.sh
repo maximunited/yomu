@@ -33,11 +33,11 @@ print_error() {
 check_container_runtime() {
     if command -v docker &> /dev/null; then
         CONTAINER_RUNTIME="docker"
-        COMPOSE_CMD="docker-compose"
+        COMPOSE_CMD_ARRAY=("docker" "compose")
         print_success "Docker found"
     elif command -v podman &> /dev/null; then
         CONTAINER_RUNTIME="podman"
-        COMPOSE_CMD="podman-compose"
+        COMPOSE_CMD_ARRAY=("podman" "compose")
         print_success "Podman found"
     else
         print_error "Neither Docker nor Podman is installed"
@@ -47,8 +47,14 @@ check_container_runtime() {
 
 # Check if compose is available
 check_compose() {
-    if ! command -v $COMPOSE_CMD &> /dev/null; then
-        print_error "$COMPOSE_CMD is not installed"
+    if ! command -v "${COMPOSE_CMD_ARRAY[0]}" &> /dev/null; then
+        print_error "${COMPOSE_CMD_ARRAY[0]} is not installed"
+        exit 1
+    fi
+    
+    # Check if compose plugin is available
+    if ! "${COMPOSE_CMD_ARRAY[0]}" compose version &> /dev/null; then
+        print_error "${COMPOSE_CMD_ARRAY[0]} compose is not available"
         exit 1
     fi
 }
@@ -83,21 +89,21 @@ EOF
 # Build images
 build_images() {
     print_status "Building Docker images..."
-    $COMPOSE_CMD build
+    "${COMPOSE_CMD_ARRAY[@]}" build
     print_success "Images built successfully"
 }
 
 # Start services
 start_services() {
     local profile=$1
-    if [ "$profile" = "dev" ]; then
+    if [ "${profile}" = "dev" ]; then
         print_status "Starting development services..."
-        $COMPOSE_CMD --profile dev up -d
+        "${COMPOSE_CMD_ARRAY[@]}" --profile dev up -d
         print_success "Development services started"
         print_status "Access the application at: http://localhost:3001"
     else
         print_status "Starting production services..."
-        $COMPOSE_CMD up -d
+        "${COMPOSE_CMD_ARRAY[@]}" up -d
         print_success "Production services started"
         print_status "Access the application at: http://localhost:3000"
     fi
@@ -106,71 +112,72 @@ start_services() {
 # Stop services
 stop_services() {
     print_status "Stopping services..."
-    $COMPOSE_CMD down
+    "${COMPOSE_CMD_ARRAY[@]}" down
     print_success "Services stopped"
 }
 
 # Initialize database
 init_database() {
     print_status "Initializing database..."
-    $COMPOSE_CMD exec app npx prisma migrate deploy
-    $COMPOSE_CMD exec app node scripts/seed.js
+    "${COMPOSE_CMD_ARRAY[@]}" exec app npx prisma migrate deploy
+    "${COMPOSE_CMD_ARRAY[@]}" exec app node scripts/seed.js
     print_success "Database initialized"
 }
 
 # View logs
 view_logs() {
     local service=$1
-    if [ -z "$service" ]; then
+    if [ -z "${service}" ]; then
         print_status "Showing all logs..."
-        $COMPOSE_CMD logs -f
+        "${COMPOSE_CMD_ARRAY[@]}" logs -f
     else
-        print_status "Showing logs for $service..."
-        $COMPOSE_CMD logs -f $service
+        print_status "Showing logs for ${service}..."
+        "${COMPOSE_CMD_ARRAY[@]}" logs -f "${service}"
     fi
 }
 
 # Clean up
 cleanup() {
     print_status "Cleaning up containers and volumes..."
-    $COMPOSE_CMD down -v
+    "${COMPOSE_CMD_ARRAY[@]}" down -v
     print_success "Cleanup completed"
 }
 
 # Show status
 show_status() {
     print_status "Service status:"
-    $COMPOSE_CMD ps
+    "${COMPOSE_CMD_ARRAY[@]}" ps
 }
 
 # Backup database
 backup_database() {
-    local backup_dir="./backups"
-    mkdir -p $backup_dir
-    local timestamp=$(date +%Y%m%d_%H%M%S)
-    local backup_file="$backup_dir/backup_$timestamp.db"
+    local backup_dir timestamp backup_file
+    backup_dir="./backups"
+    mkdir -p "${backup_dir}"
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    backup_file="${backup_dir}/backup_${timestamp}.db"
     
     print_status "Creating database backup..."
-    $COMPOSE_CMD exec db sqlite3 /data/dev.db ".backup /data/backup_$timestamp.db"
-    docker cp yomu-db:/data/backup_$timestamp.db $backup_file
+    "${COMPOSE_CMD_ARRAY[@]}" exec db sqlite3 /data/dev.db ".backup /data/backup_${timestamp}.db"
+    "${CONTAINER_RUNTIME}" cp yomu-db:"/data/backup_${timestamp}.db" "${backup_file}"
     print_success "Database backed up to: $backup_file"
 }
 
 # Restore database
 restore_database() {
     local backup_file=$1
-    if [ -z "$backup_file" ]; then
+    if [ -z "${backup_file}" ]; then
         print_error "Please specify backup file path"
         exit 1
     fi
     
-    if [ ! -f "$backup_file" ]; then
-        print_error "Backup file not found: $backup_file"
+    if [ ! -f "${backup_file}" ]; then
+        print_error "Backup file not found: ${backup_file}"
         exit 1
     fi
     
-    print_status "Restoring database from: $backup_file"
-    docker cp $backup_file yomu-db:/data/dev.db
+    print_status "Restoring database from: ${backup_file}"
+    "${CONTAINER_RUNTIME}" cp "${backup_file}" yomu-db:/data/dev.db
     print_success "Database restored"
 }
 
@@ -211,7 +218,7 @@ main() {
     check_container_runtime
     check_compose
     
-    case $command in
+    case ${command} in
         "setup")
             setup_env
             build_images
@@ -231,7 +238,7 @@ main() {
             start_services
             ;;
         "logs")
-            view_logs $option
+            view_logs "${option}"
             ;;
         "status")
             show_status
@@ -243,7 +250,7 @@ main() {
             backup_database
             ;;
         "restore")
-            restore_database $option
+            restore_database "${option}"
             ;;
         "cleanup")
             cleanup
@@ -252,7 +259,7 @@ main() {
             show_help
             ;;
         *)
-            print_error "Unknown command: $command"
+            print_error "Unknown command: ${command}"
             show_help
             exit 1
             ;;
