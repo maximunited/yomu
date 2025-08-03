@@ -1,13 +1,29 @@
+'use client';
+
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Gift, Calendar, Star, Users } from "lucide-react";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
 import { DynamicYear } from "@/components/DynamicYear";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useDarkMode } from "@/contexts/DarkModeContext";
 
 export default function HomePage() {
+  const { t } = useLanguage();
+  const { isDarkMode } = useDarkMode();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white' 
+        : 'bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 text-gray-900'
+    }`}>
+      {/* Debug info - remove this later */}
+      <div className="fixed top-4 left-4 bg-red-500 text-white p-2 rounded z-50">
+        Dark Mode: {isDarkMode ? 'ON' : 'OFF'}
+      </div>
+      
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
@@ -15,16 +31,16 @@ export default function HomePage() {
             <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
               <Gift className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">YomU</span>
+            <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>YomU</span>
           </div>
           <div className="flex items-center space-x-4">
             <DarkModeToggle />
             <LanguageSwitcher />
             <Link href="/auth/signin">
-              <Button variant="outline" className="border-2 border-gray-400 hover:border-gray-500">התחברות</Button>
+              <Button variant="outline" className="border-2 border-gray-400 hover:border-gray-500">{t('signIn')}</Button>
             </Link>
             <Link href="/auth/signup">
-              <Button>הרשמה</Button>
+              <Button>{t('signUp')}</Button>
             </Link>
           </div>
         </nav>
@@ -33,22 +49,21 @@ export default function HomePage() {
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            אל תפספסו אף הטבה ליום הולדת
+          <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            {t('heroTitle')}
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            מרכזים את כל ההטבות, הדילים והמתנות ליום הולדת במקום אחד. 
-            עקבו אחרי כל התוכניות שלכם וקבלו התראות בזמן אמת.
+          <p className={`text-xl mb-8 max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            {t('heroDescription')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup">
               <Button size="lg" className="text-lg px-8 py-4">
-                התחל עכשיו
+                {t('getStarted')}
               </Button>
             </Link>
             <Link href="/demo">
               <Button variant="outline" size="lg" className="text-lg px-8 py-4">
-                למידע נוסף
+                {t('learnMore')}
               </Button>
             </Link>
           </div>
@@ -60,11 +75,11 @@ export default function HomePage() {
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Gift className="w-8 h-8 text-purple-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              הטבות מרוכזות
+            <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              {t('feature1Title')}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              כל ההטבות ליום הולדת מכל התוכניות שלכם במקום אחד
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+              {t('feature1Description')}
             </p>
           </div>
 
@@ -72,11 +87,11 @@ export default function HomePage() {
             <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Calendar className="w-8 h-8 text-pink-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              התראות חכמות
+            <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              {t('feature2Title')}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              קבלו התראות בזמן אמת על הטבות חדשות ותזכורות
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+              {t('feature2Description')}
             </p>
           </div>
 
@@ -84,40 +99,40 @@ export default function HomePage() {
             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Star className="w-8 h-8 text-orange-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              חיסכון בזמן
+            <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              {t('feature3Title')}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              חסכו זמן וכסף - אל תפספסו אף הטבה ליום הולדת
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+              {t('feature3Description')}
             </p>
           </div>
         </div>
 
         {/* Stats Section */}
-        <div className="mt-24 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+        <div className={`mt-24 rounded-2xl p-8 shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-3xl font-bold text-purple-600 mb-2">50+</div>
-              <div className="text-gray-600 dark:text-gray-300">מותגים</div>
+              <div className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{t('statsBrands')}</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-pink-600 mb-2">200+</div>
-              <div className="text-gray-600 dark:text-gray-300">הטבות</div>
+              <div className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{t('statsBenefits')}</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-orange-600 mb-2">10K+</div>
-              <div className="text-gray-600 dark:text-gray-300">משתמשים</div>
+              <div className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{t('statsUsers')}</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-green-600 mb-2">₪500K+</div>
-              <div className="text-gray-600 dark:text-gray-300">נחסך</div>
+              <div className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{t('statsSaved')}</div>
             </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="mt-24 bg-gray-900 dark:bg-black text-white py-12">
+      <footer className={`mt-24 py-12 ${isDarkMode ? 'bg-black text-white' : 'bg-gray-900 text-white'}`}>
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
@@ -126,13 +141,13 @@ export default function HomePage() {
             <span className="text-xl font-bold">YomU</span>
           </div>
           <p className="text-gray-400 mb-4">
-            © <DynamicYear /> YomU. כל הזכויות שמורות.
+            © <DynamicYear /> YomU. {t('allRightsReserved')}.
           </p>
           <div className="flex justify-center space-x-6 text-sm text-gray-400" dir="ltr">
-            <Link href="/about" className="hover:text-white">אודות</Link>
-            <Link href="/privacy" className="hover:text-white">פרטיות</Link>
-            <Link href="/terms" className="hover:text-white">תנאים</Link>
-            <Link href="/contact" className="hover:text-white">צור קשר</Link>
+            <Link href="/about" className="hover:text-white">{t('about')}</Link>
+            <Link href="/privacy" className="hover:text-white">{t('privacy')}</Link>
+            <Link href="/terms" className="hover:text-white">{t('terms')}</Link>
+            <Link href="/contact" className="hover:text-white">{t('contact')}</Link>
           </div>
         </div>
       </footer>

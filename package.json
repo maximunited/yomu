@@ -14,7 +14,10 @@
     "test:partnerships": "node tests/integration/final-multi-brand-test.js",
     "test:api": "node tests/api/test-api.js",
     "test:translations": "node tests/integration/test-missing-translations.js",
-    "test:connection": "node tests/integration/test-connection.js"
+    "test:connection": "node tests/integration/test-connection.js",
+    "admin:help": "node scripts/admin-helper.js",
+    "db:seed": "node scripts/seed.js",
+    "db:studio": "npx prisma studio"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",

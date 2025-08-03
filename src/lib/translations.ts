@@ -33,6 +33,18 @@ export interface Translations {
   getStarted: string;
   learnMore: string;
   allRightsReserved: string;
+  heroTitle: string;
+  heroDescription: string;
+  feature1Title: string;
+  feature1Description: string;
+  feature2Title: string;
+  feature2Description: string;
+  feature3Title: string;
+  feature3Description: string;
+  statsBrands: string;
+  statsBenefits: string;
+  statsUsers: string;
+  statsSaved: string;
   
   // Auth
   email: string;
@@ -86,8 +98,11 @@ export interface Translations {
   dateOfBirth: string;
   phoneNumber: string;
   emailNotifications: string;
+  emailNotificationsDescription: string;
   pushNotifications: string;
+  pushNotificationsDescription: string;
   smsNotifications: string;
+  smsNotificationsDescription: string;
   fullName: string;
   anniversaryDate: string;
   optional: string;
@@ -102,6 +117,9 @@ export interface Translations {
   language: string;
   interfaceLanguage: string;
   languageDescription: string;
+  fullySupported: string;
+  betaLanguages: string;
+  betaLanguagesNote: string;
   account: string;
   
   // Notifications
@@ -289,6 +307,18 @@ export const translations: Record<Language, Translations> = {
     getStarted: 'התחל עכשיו',
     learnMore: 'למידע נוסף',
     allRightsReserved: 'כל הזכויות שמורות',
+    heroTitle: 'אל תפספסו אף הטבה ליום הולדת',
+    heroDescription: 'מרכזים את כל ההטבות, הדילים והמתנות ליום הולדת במקום אחד. עקבו אחרי כל התוכניות שלכם וקבלו התראות בזמן אמת.',
+    feature1Title: 'הטבות מרוכזות',
+    feature1Description: 'כל ההטבות ליום הולדת מכל התוכניות שלכם במקום אחד',
+    feature2Title: 'התראות חכמות',
+    feature2Description: 'קבלו התראות בזמן אמת על הטבות חדשות ותזכורות',
+    feature3Title: 'חיסכון בזמן',
+    feature3Description: 'חסכו זמן וכסף - אל תפספסו אף הטבה ליום הולדת',
+    statsBrands: 'מותגים',
+    statsBenefits: 'הטבות',
+    statsUsers: 'משתמשים',
+    statsSaved: 'נחסך',
     
     // Auth
     email: 'אימייל',
@@ -342,8 +372,11 @@ export const translations: Record<Language, Translations> = {
     dateOfBirth: 'תאריך לידה',
     phoneNumber: 'מספר טלפון',
     emailNotifications: 'התראות אימייל',
+    emailNotificationsDescription: 'קבל התראות על הטבות חדשות ותזכורות ליום הולדת לכתובת האימייל שלך',
     pushNotifications: 'התראות דחיפה',
+    pushNotificationsDescription: 'קבל התראות מיידיות על הטבות חדשות ותזכורות ליום הולדת במכשיר שלך',
     smsNotifications: 'התראות SMS',
+    smsNotificationsDescription: 'קבל הודעות SMS על הטבות חדשות ותזכורות ליום הולדת למספר הטלפון שלך',
     fullName: 'שם מלא',
     anniversaryDate: 'תאריך נישואין',
     optional: 'אופציונלי',
@@ -358,6 +391,9 @@ export const translations: Record<Language, Translations> = {
     language: 'שפה',
     interfaceLanguage: 'שפת הממשק',
     languageDescription: 'בחר את השפה המועדפת עליך',
+    fullySupported: 'שפות נתמכות במלואן',
+    betaLanguages: 'שפות בגרסת בטא',
+    betaLanguagesNote: 'שפות בגרסת בטא עשויות להיות מתורגמות חלקית',
     account: 'חשבון',
     
     // Notifications
@@ -542,6 +578,18 @@ export const translations: Record<Language, Translations> = {
     getStarted: 'Get Started',
     learnMore: 'Learn More',
     allRightsReserved: 'All Rights Reserved',
+    heroTitle: 'Never Miss a Birthday Deal Again',
+    heroDescription: 'We centralize all birthday benefits, deals, and gifts in one place. Track all your programs and receive real-time notifications.',
+    feature1Title: 'Centralized Benefits',
+    feature1Description: 'All birthday benefits from all your programs in one place',
+    feature2Title: 'Smart Notifications',
+    feature2Description: 'Receive real-time notifications about new benefits and reminders',
+    feature3Title: 'Time Saving',
+    feature3Description: 'Save time and money - never miss a birthday deal',
+    statsBrands: 'Brands',
+    statsBenefits: 'Benefits',
+    statsUsers: 'Users',
+    statsSaved: 'Saved',
     
     // Auth
     email: 'Email',
@@ -595,8 +643,11 @@ export const translations: Record<Language, Translations> = {
     dateOfBirth: 'Date of Birth',
     phoneNumber: 'Phone Number',
     emailNotifications: 'Email Notifications',
+    emailNotificationsDescription: 'Receive notifications about new benefits and birthday reminders to your email address',
     pushNotifications: 'Push Notifications',
+    pushNotificationsDescription: 'Receive instant notifications about new benefits and birthday reminders on your device',
     smsNotifications: 'SMS Notifications',
+    smsNotificationsDescription: 'Receive SMS messages about new benefits and birthday reminders to your phone number',
     fullName: 'Full Name',
     anniversaryDate: 'Anniversary Date',
     optional: 'Optional',
@@ -611,6 +662,9 @@ export const translations: Record<Language, Translations> = {
     language: 'Language',
     interfaceLanguage: 'Interface Language',
     languageDescription: 'Choose your preferred language',
+    fullySupported: 'Fully Supported',
+    betaLanguages: 'Beta Languages',
+    betaLanguagesNote: 'Beta languages may be partially translated',
     account: 'Account',
     
     // Notifications

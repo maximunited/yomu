@@ -21,6 +21,7 @@ import {
   Globe
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 interface UserProfile {
   name: string;
@@ -357,17 +358,18 @@ export default function SettingsPage() {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('language')}</h2>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="space-y-4">
               <div>
-                <h3 className="font-medium text-gray-900 dark:text-white">{t('interfaceLanguage')}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{t('languageDescription')}</p>
+                <h3 className="font-medium text-gray-900 dark:text-white mb-2">{t('interfaceLanguage')}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('languageDescription')}</p>
+                <LanguageSelector variant="dropdown" showBeta={true} />
               </div>
-              <Button
-                variant="outline"
-                onClick={() => setLanguage(language === 'he' ? 'en' : 'he')}
-              >
-                {language === 'he' ? 'English' : 'עברית'}
-              </Button>
+              
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('betaLanguagesNote')}
+                </p>
+              </div>
             </div>
           </div>
 

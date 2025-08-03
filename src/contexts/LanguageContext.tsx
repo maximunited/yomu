@@ -1,48 +1,68 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Language, translations } from '@/lib/translations';
+import { translations } from '@/lib/translations';
+import { 
+  LanguageCode, 
+  detectUserLanguage, 
+  getLanguageInfo, 
+  getDirection,
+  DEFAULT_LANGUAGE 
+} from '@/lib/languages';
 
 interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
+  language: LanguageCode;
+  setLanguage: (lang: LanguageCode) => void;
   t: (key: keyof typeof translations.he) => string;
   dir: 'rtl' | 'ltr';
+  languageInfo: ReturnType<typeof getLanguageInfo>;
+  isRTL: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('he');
+  const [language, setLanguageState] = useState<LanguageCode>(DEFAULT_LANGUAGE);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Mark as hydrated and load language from localStorage
+    // Mark as hydrated and detect user language
     setIsHydrated(true);
-    const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage && (savedLanguage === 'he' || savedLanguage === 'en')) {
-      setLanguageState(savedLanguage);
-    }
+    const detectedLanguage = detectUserLanguage();
+    setLanguageState(detectedLanguage);
   }, []);
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = (lang: LanguageCode) => {
     setLanguageState(lang);
     if (isHydrated) {
       localStorage.setItem('language', lang);
-      // Update document direction
-      document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+      // Update document direction and language
+      const languageInfo = getLanguageInfo(lang);
+      document.documentElement.dir = languageInfo.dir;
       document.documentElement.lang = lang;
     }
   };
 
   const t = (key: keyof typeof translations.he): string => {
-    return translations[language][key] || key;
+    // Fallback chain: current language -> English -> Hebrew -> key
+    const currentTranslation = translations[language]?.[key];
+    if (currentTranslation) return currentTranslation;
+    
+    const englishTranslation = translations.en?.[key];
+    if (englishTranslation) return englishTranslation;
+    
+    const hebrewTranslation = translations.he?.[key];
+    if (hebrewTranslation) return hebrewTranslation;
+    
+    return key;
   };
 
-  const dir = language === 'he' ? 'rtl' : 'ltr';
+  const languageInfo = getLanguageInfo(language);
+  const dir = languageInfo.dir;
+  const isRTL = languageInfo.isRTL;
 
   useEffect(() => {
-    // Set initial document direction only after hydration
+    // Set initial document direction and language only after hydration
     if (isHydrated) {
       document.documentElement.dir = dir;
       document.documentElement.lang = language;
@@ -50,7 +70,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language, dir, isHydrated]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, dir }}>
+    <LanguageContext.Provider value={{ 
+      language, 
+      setLanguage, 
+      t, 
+      dir, 
+      languageInfo,
+      isRTL 
+    }}>
       {children}
     </LanguageContext.Provider>
   );

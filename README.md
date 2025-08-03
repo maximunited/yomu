@@ -9,9 +9,11 @@ YomU (יום-You) is a mobile-first web application that aggregates and displays
 - **Birthday Benefits Tracking**: Centralized platform for all birthday benefits
 - **Membership Management**: Easy management of loyalty program memberships
 - **Real-time Notifications**: Push notifications for new benefits and expiring deals
-- **Multi-language Support**: Full Hebrew and English interface
+- **Multi-language Support**: Full Hebrew and English interface with 10 additional beta languages
 - **Dark Mode**: Global dark mode support
 - **Mobile-First Design**: Responsive design optimized for mobile devices
+- **Admin Dashboard**: Complete CRUD interface for managing brands and benefits
+- **Language Management**: Advanced language selector with RTL/LTR support
 
 ### User Features
 
@@ -21,6 +23,20 @@ YomU (יום-You) is a mobile-first web application that aggregates and displays
 - **Benefit Details**: Full descriptions, terms & conditions, and redemption methods
 - **Search & Filter**: Advanced search and filtering capabilities
 - **Custom Memberships**: Add and manage custom membership programs
+- **Language Selection**: Choose from 12 supported languages with native names and flags
+
+### Admin Features
+
+- **Brand Management**: Add, edit, delete, and toggle brands
+- **Benefit Management**: Create and manage benefits with full validation
+- **Bulk Operations**: Import/export data via command-line tools
+- **Status Control**: Toggle active/inactive status for brands and benefits
+- **Data Integrity**: Automatic cascade deletion for related records
+
+### Supported Languages
+
+- **Fully Supported**: Hebrew (עברית), English
+- **Beta Languages**: Arabic (العربية), Russian (Русский), French (Français), Spanish (Español), German (Deutsch), Italian (Italiano), Portuguese (Português), Japanese (日本語), Korean (한국어), Chinese (中文)
 
 ### Supported Brands & Services
 
@@ -280,6 +296,52 @@ The application uses Prisma with the following main models:
 - `Benefit`: Birthday benefits and details
 - `UserMembership`: User's active memberships
 - `Notification`: User notifications
+- `CustomMembership`: User-defined membership programs
+- `BrandPartnership`: Brand partnership relationships
+
+## 🛠️ Admin Tools
+
+### Admin Dashboard
+
+Access the admin interface at `/admin` to manage brands and benefits:
+
+- **Brand Management**: Add, edit, delete, and toggle brands
+- **Benefit Management**: Create and manage benefits with validation
+- **Real-time Updates**: Immediate reflection of changes
+- **Data Integrity**: Automatic cascade deletion
+
+### Command-Line Tools
+
+Use the admin helper script for bulk operations:
+
+```bash
+# Import brands from JSON file
+node scripts/admin-helper.js import-brands brands.json
+
+# Export current brands to JSON
+node scripts/admin-helper.js export-brands
+
+# List all brands
+node scripts/admin-helper.js list-brands
+
+# Toggle brand status
+node scripts/admin-helper.js toggle-brand <brand-id>
+
+# Similar commands for benefits
+node scripts/admin-helper.js import-benefits benefits.json
+node scripts/admin-helper.js export-benefits
+node scripts/admin-helper.js list-benefits
+node scripts/admin-helper.js toggle-benefit <benefit-id>
+```
+
+### Language Management
+
+The application supports 12 languages with automatic RTL/LTR detection:
+
+- **Language Detection**: Browser language, localStorage, or manual selection
+- **RTL Support**: Automatic text direction for Arabic and Hebrew
+- **Translation Fallbacks**: Robust fallback chain (current → English → Hebrew → key)
+- **Beta Languages**: 10 additional languages in beta with partial translations
 
 ## 🚀 Deployment
 
