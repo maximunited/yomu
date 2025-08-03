@@ -225,6 +225,41 @@ export interface Translations {
   contributors: string;
   contributorsDescription: string;
   
+  // Team Members
+  leadDeveloper: string;
+  uxDesigner: string;
+  productManager: string;
+  contentContributors: string;
+  contentContributorsDescription: string;
+  qualityAssurance: string;
+  qualityAssuranceDescription: string;
+  
+  // Terms Page
+  termsAcceptance: string;
+  termsAcceptanceDescription: string;
+  serviceUsage: string;
+  serviceUsageDescription: string;
+  liability: string;
+  liabilityDescription: string;
+  termsChanges: string;
+  termsChangesDescription: string;
+  accountCancellation: string;
+  accountCancellationDescription: string;
+  
+  // Privacy Page
+  dataCollection: string;
+  dataCollectionDescription: string;
+  security: string;
+  securityDescription: string;
+  userRights: string;
+  userRightsDescription: string;
+  policyUpdates: string;
+  policyUpdatesDescription: string;
+  
+  // Contact Page
+  contactAddress: string;
+  contactPhone: string;
+  
   // Membership Types
   free: string;
   paid: string;
@@ -498,6 +533,76 @@ export const translations: Record<Language, Translations> = {
     contributors: 'תורמים',
     contributorsDescription: 'האנשים שעומדים מאחורי YomU',
     
+    // Team Members
+    leadDeveloper: 'מפתח מוביל',
+    uxDesigner: 'מעצב UX/UI',
+    productManager: 'מנהל מוצר',
+    contentContributors: 'תורמי תוכן',
+    contentContributorsDescription: 'אנשים שתרמו מידע על הטבות יום הולדת',
+    qualityAssurance: 'בודקי איכות',
+    qualityAssuranceDescription: 'צוות הבודק את דיוק המידע',
+    
+    // Terms Page
+    termsAcceptance: 'קבלת התנאים',
+    termsAcceptanceDescription: 'השימוש באתר YomU מהווה הסכמה לתנאי השימוש הללו. אם אינכם מסכימים לתנאים, אנא אל תשתמשו בשירות.',
+    serviceUsage: 'שימוש בשירות',
+    serviceUsageDescription: 'השירות מיועד לשימוש אישי בלבד. אסור להשתמש בשירות למטרות מסחריות או להפיץ מידע ללא אישור.',
+    liability: 'אחריות',
+    liabilityDescription: 'אנו משתדלים לספק מידע מדויק, אך איננו אחראים לטעויות או למידע לא מעודכן. יש לוודא את פרטי ההטבות ישירות אצל הספקים.',
+    termsChanges: 'שינויים בתנאים',
+    termsChangesDescription: 'אנו שומרים לעצמנו את הזכות לשנות תנאים אלו בכל עת. שינויים יובאו לידיעת המשתמשים.',
+    accountCancellation: 'ביטול חשבון',
+    accountCancellationDescription: 'ניתן לבטל את החשבון בכל עת דרך הגדרות החשבון. ביטול החשבון יביא למחיקת כל הנתונים הקשורים.',
+    
+    // Privacy Page
+    dataCollection: 'איסוף מידע',
+    dataCollectionDescription: 'אנו אוספים מידע בסיסי כגון שם, כתובת דוא"ל ותאריך לידה כדי לספק לכם את השירות הטוב ביותר. המידע שלכם נשמר בצורה מאובטחת ולא יועבר לצדדים שלישיים ללא הסכמתכם המפורשת.',
+    security: 'אבטחה',
+    securityDescription: 'אנו משתמשים בטכנולוגיות אבטחה מתקדמות כדי להגן על המידע שלכם. כל הנתונים מוצפנים ומועברים באמצעות חיבורים מאובטחים.',
+    userRights: 'זכויות המשתמש',
+    userRightsDescription: 'יש לכם הזכות לבקש גישה למידע שלכם, לעדכן אותו או למחוק אותו בכל עת. ניתן ליצור איתנו קשר דרך דף "צור קשר" באתר.',
+    policyUpdates: 'עדכונים למדיניות',
+    policyUpdatesDescription: 'מדיניות זו עשויה להתעדכן מעת לעת. שינויים משמעותיים יובאו לידיעתכם באמצעות הודעות באתר או בדוא"ל.',
+    
+    // Contact Page
+    contactAddress: 'רחוב הרצל 123, תל אביב',
+    contactPhone: '03-1234567',
+    
+    // Team Members
+    leadDeveloper: 'מתכנת מוביל',
+    uxDesigner: 'עיצוב וניתוח משתמש',
+    productManager: 'ניהול מוצר',
+    contentContributors: 'תורמי תוכן',
+    contentContributorsDescription: 'האנשים שעובדים על תוכן ועיצוב של YomU',
+    qualityAssurance: 'איתור באגים ואימות תמיכה',
+    qualityAssuranceDescription: 'האנשים שעובדים על אימות תמיכה ואיתור באגים בפלטפורמה',
+    
+    // Terms Page
+    termsAcceptance: 'אימות תנאי שימוש',
+    termsAcceptanceDescription: 'אנא קרא את תנאי השימוש והסכמו אותם כדי להמשיך להשתמש בפלטפורמה',
+    serviceUsage: 'שימוש בשירות',
+    serviceUsageDescription: 'אנא שימוש בפלטפורמה בצורה חוקית ומותאמת לצרכים שלך',
+    liability: 'הגבלת חובה',
+    liabilityDescription: 'אנא שים לב שכל המידע והשירות שניתנים בפלטפורמה מוגן בכל זמן ומקום, ואין לנו חובה להציג אותם בכל זמן או בכל צורה',
+    termsChanges: 'שינויים בתנאי שימוש',
+    termsChangesDescription: 'אנו שמים לב לשינויים בתנאי השימוש ונעדכן אותם בהקדם',
+    accountCancellation: 'ביטול חשבון',
+    accountCancellationDescription: 'אם אתה רוצה לבטל את חשבון הפלטפורמה, אנא צור קשר עם צוות התמיכה שלנו ונעזור לך בכל שלב',
+    
+    // Privacy Page
+    dataCollection: 'איסוף נתונים',
+    dataCollectionDescription: 'אנו מאסים את כל הנתונים שנאספו מכל מקום בפלטפורמה, כולל מידע אישי, מידע מוגן, מידע שנאספה באופן אוטומטי ומידע שנאספה באופן ידני',
+    security: 'אבטחה',
+    securityDescription: 'אנו מבצעים מספר מדידות אבטחה כדי להבטיח שכל הנתונים והשירות שנאספו בפלטפורמה מוגן בצורה מובנית ומוגן בצורה מובנית',
+    userRights: 'זכויות משתמש',
+    userRightsDescription: 'אתה זכאי לגישה לכל הנתונים שנאספו מכל מקום בפלטפורמה, כולל זכות לגישה לגיבוי וזכות לגישה לגיבוי שנאספה באופן אוטומטי וזכות לגישה לגיבוי שנאספה באופן ידני',
+    policyUpdates: 'עדכוני מדיניות',
+    policyUpdatesDescription: 'אנו שמים לב לשינויים במדיניות פרטיות ונעדכן אותם בהקדם',
+    
+    // Contact Page
+    contactAddress: 'כתובת חברתנו',
+    contactPhone: 'טלפון חברתנו',
+    
     // Membership Types
     free: 'חינמי',
     paid: 'בתשלום',
@@ -769,6 +874,41 @@ export const translations: Record<Language, Translations> = {
     team: 'Team',
     contributors: 'Contributors',
     contributorsDescription: 'The people behind YomU',
+    
+    // Team Members
+    leadDeveloper: 'Lead Developer',
+    uxDesigner: 'UX Designer',
+    productManager: 'Product Manager',
+    contentContributors: 'Content Contributors',
+    contentContributorsDescription: 'People who contributed information about birthday benefits',
+    qualityAssurance: 'Quality Assurance',
+    qualityAssuranceDescription: 'Team that verifies the accuracy of information',
+    
+    // Terms Page
+    termsAcceptance: 'Terms Acceptance',
+    termsAcceptanceDescription: 'Using the YomU website constitutes agreement to these terms of use. If you do not agree to the terms, please do not use the service.',
+    serviceUsage: 'Service Usage',
+    serviceUsageDescription: 'The service is intended for personal use only. It is not permitted to use the service for commercial purposes or to distribute information without permission.',
+    liability: 'Liability',
+    liabilityDescription: 'We strive to provide accurate information, but we are not responsible for errors or outdated information. Please verify benefit details directly with providers.',
+    termsChanges: 'Changes to Terms',
+    termsChangesDescription: 'We reserve the right to change these terms at any time. Changes will be brought to users\' attention.',
+    accountCancellation: 'Account Cancellation',
+    accountCancellationDescription: 'You can cancel your account at any time through account settings. Canceling your account will result in deletion of all related data.',
+    
+    // Privacy Page
+    dataCollection: 'Data Collection',
+    dataCollectionDescription: 'We collect basic information such as name, email address, and date of birth to provide you with the best service. Your information is stored securely and will not be shared with third parties without your explicit consent.',
+    security: 'Security',
+    securityDescription: 'We use advanced security technologies to protect your information. All data is encrypted and transmitted through secure connections.',
+    userRights: 'User Rights',
+    userRightsDescription: 'You have the right to request access to your information, update it, or delete it at any time. You can contact us through the "Contact Us" page on the website.',
+    policyUpdates: 'Policy Updates',
+    policyUpdatesDescription: 'This policy may be updated from time to time. Significant changes will be brought to your attention through website notifications or email.',
+    
+    // Contact Page
+    contactAddress: 'Herzl Street 123, Tel Aviv',
+    contactPhone: '03-1234567',
     
     // Membership Types
     free: 'Free',

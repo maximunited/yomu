@@ -19,10 +19,7 @@ export default function HomePage() {
         ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white' 
         : 'bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 text-gray-900'
     }`}>
-      {/* Debug info - remove this later */}
-      <div className="fixed top-4 left-4 bg-red-500 text-white p-2 rounded z-50">
-        Dark Mode: {isDarkMode ? 'ON' : 'OFF'}
-      </div>
+
       
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
