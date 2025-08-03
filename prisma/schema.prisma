@@ -72,14 +72,38 @@ model Brand {
   website     String
   description String?
   category    String    // e.g., "restaurant", "retail", "beauty", "entertainment"
+  
+  // Action button configuration
+  actionUrl   String?   // URL for primary action (reserve table, navigate, order, etc.)
+  actionType  String?   // Type of action: "reserve", "navigate", "order", "book", "call"
+  actionLabel String?   // Custom label for action button
+  
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
 
   benefits    Benefit[]
   memberships UserMembership[]
+  
+  // Many-to-many partnerships
+  partnershipsFrom BrandPartnership[] @relation("BrandA")
+  partnershipsTo   BrandPartnership[] @relation("BrandB")
 
   @@map("brands")
+}
+
+model BrandPartnership {
+  id       String @id @default(cuid())
+  brandAId String
+  brandBId String
+  
+  brandA Brand @relation("BrandA", fields: [brandAId], references: [id], onDelete: Cascade)
+  brandB Brand @relation("BrandB", fields: [brandBId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([brandAId, brandBId])
+  @@map("brand_partnerships")
 }
 
 model Benefit {

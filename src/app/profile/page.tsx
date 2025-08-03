@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { ArrowLeft, User, Mail, Calendar, Bell, Shield, LogOut, Edit, Save } from "lucide-react";
+import { ArrowLeft, User, Mail, Calendar, Bell, Shield, LogOut, Edit, Save, Heart } from "lucide-react";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -13,6 +13,7 @@ export default function ProfilePage() {
     name: session?.user?.name || "משתמש",
     email: session?.user?.email || "user@example.com",
     dateOfBirth: "1990-01-01",
+    anniversaryDate: "",
     notifications: {
       email: true,
       push: true,
@@ -144,6 +145,28 @@ export default function ProfilePage() {
                   ) : (
                     <p className="text-gray-900">
                       {new Date(userData.dateOfBirth).toLocaleDateString('he-IL')}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                    <Heart className="w-4 h-4 ml-1 text-gray-500" />
+                    תאריך יום נישואין
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="date"
+                      value={userData.anniversaryDate}
+                      onChange={(e) => setUserData(prev => ({ ...prev, anniversaryDate: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  ) : (
+                    <p className="text-gray-900">
+                      {userData.anniversaryDate 
+                        ? new Date(userData.anniversaryDate).toLocaleDateString('he-IL')
+                        : "לא הוגדר"
+                      }
                     </p>
                   )}
                 </div>

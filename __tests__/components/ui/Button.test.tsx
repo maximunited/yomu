@@ -17,7 +17,7 @@ describe('Button', () => {
     const { rerender } = render(<Button variant="outline">Outline Button</Button>)
     
     let button = screen.getByRole('button', { name: 'Outline Button' })
-    expect(button).toHaveClass('border', 'border-gray-300', 'bg-white', 'text-gray-700')
+    expect(button).toHaveClass('border-2', 'border-gray-400', 'bg-white', 'text-gray-700')
     
     rerender(<Button variant="ghost">Ghost Button</Button>)
     button = screen.getByRole('button', { name: 'Ghost Button' })

@@ -55,9 +55,21 @@ export async function POST(request: NextRequest) {
 
       const brandMemberships = await Promise.all(
         brandIds.map(async (brandId) => {
-          // Check if brand exists by ID
+          // Check if brand exists by ID and get its partnerships
           const brand = await prisma.brand.findUnique({
-            where: { id: brandId }
+            where: { id: brandId },
+            include: {
+              partnershipsFrom: {
+                include: {
+                  brandB: true
+                }
+              },
+              partnershipsTo: {
+                include: {
+                  brandA: true
+                }
+              }
+            }
           });
 
           if (!brand) {
@@ -65,8 +77,10 @@ export async function POST(request: NextRequest) {
             return null;
           }
 
-          // Create or update user membership
-          return prisma.userMembership.upsert({
+          const membershipsToCreate = [];
+
+          // Create membership for the main brand
+          const mainMembership = await prisma.userMembership.upsert({
             where: {
               userId_brandId: {
                 userId: userId,
@@ -82,10 +96,53 @@ export async function POST(request: NextRequest) {
               isActive: true,
             }
           });
+          
+          membershipsToCreate.push(mainMembership);
+
+          // Get all partner brands (bidirectional partnerships)
+          const partnerBrands = [];
+          
+          // Add brands where this brand is brandA in partnerships
+          brand.partnershipsFrom.forEach(partnership => {
+            partnerBrands.push(partnership.brandB);
+          });
+          
+          // Add brands where this brand is brandB in partnerships
+          brand.partnershipsTo.forEach(partnership => {
+            partnerBrands.push(partnership.brandA);
+          });
+
+          // Create memberships for partner brands
+          if (partnerBrands.length > 0) {
+            console.log(`Creating partnership memberships for ${brand.name} ↔ ${partnerBrands.map(p => p.name).join(', ')}`);
+            
+            for (const partnerBrand of partnerBrands) {
+              const partnerMembership = await prisma.userMembership.upsert({
+                where: {
+                  userId_brandId: {
+                    userId: userId,
+                    brandId: partnerBrand.id,
+                  }
+                },
+                update: {
+                  isActive: true,
+                },
+                create: {
+                  userId: userId,
+                  brandId: partnerBrand.id,
+                  isActive: true,
+                }
+              });
+              
+              membershipsToCreate.push(partnerMembership);
+            }
+          }
+
+          return membershipsToCreate;
         })
       );
 
-      results.push(...brandMemberships.filter(m => m !== null));
+      results.push(...brandMemberships.filter(m => m !== null).flat());
     }
 
     // Handle custom memberships

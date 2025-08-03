@@ -5,10 +5,12 @@ This document provides instructions for running YomU using Docker or Podman with
 ## Prerequisites
 
 ### Docker
+
 - [Docker](https://docs.docker.com/get-docker/) installed
 - [Docker Compose](https://docs.docker.com/compose/install/) installed
 
 ### Podman
+
 - [Podman](https://podman.io/getting-started/installation) installed
 - [Podman Compose](https://github.com/containers/podman-compose) installed
 
@@ -17,18 +19,21 @@ This document provides instructions for running YomU using Docker or Podman with
 ### Using Docker
 
 1. **Clone the repository** (if not already done):
+
    ```bash
    git clone <repository-url>
-   cd bday-benefits
+   cd yomu
    ```
 
 2. **Set up environment variables**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 3. **Build and run the application**:
+
    ```bash
    # Production mode
    docker-compose up -d
@@ -38,24 +43,27 @@ This document provides instructions for running YomU using Docker or Podman with
    ```
 
 4. **Access the application**:
-   - Production: http://localhost:3000
-   - Development: http://localhost:3001
+   - Production: <http://localhost:3000>
+   - Development: <http://localhost:3001>
 
 ### Using Podman
 
 1. **Clone the repository** (if not already done):
+
    ```bash
    git clone <repository-url>
-   cd bday-benefits
+   cd yomu
    ```
 
 2. **Set up environment variables**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 3. **Build and run the application**:
+
    ```bash
    # Production mode
    podman-compose up -d
@@ -65,8 +73,8 @@ This document provides instructions for running YomU using Docker or Podman with
    ```
 
 4. **Access the application**:
-   - Production: http://localhost:3000
-   - Development: http://localhost:3001
+   - Production: <http://localhost:3000>
+   - Development: <http://localhost:3001>
 
 ## Services Overview
 
@@ -174,18 +182,21 @@ docker cp ./backup/dev.db yomu-db:/data/dev.db
 ### Using Development Container
 
 1. **Start development environment**:
+
    ```bash
    docker-compose --profile dev up -d
    ```
 
-2. **Access development server**: http://localhost:3001
+2. **Access development server**: <http://localhost:3001>
 
 3. **View logs**:
+
    ```bash
    docker-compose logs -f app-dev
    ```
 
 4. **Run commands in container**:
+
    ```bash
    docker-compose exec app-dev npm run test
    docker-compose exec app-dev npx prisma studio
@@ -194,6 +205,7 @@ docker cp ./backup/dev.db yomu-db:/data/dev.db
 ### Hot Reload
 
 The development container includes volume mounts for:
+
 - Source code changes
 - Node modules (cached)
 - Database persistence
@@ -202,37 +214,43 @@ Changes to your code will automatically trigger hot reload.
 
 ## Production Deployment
 
-### Using Docker
+### Dev Using Docker
 
 1. **Build production image**:
+
    ```bash
    docker-compose build app
    ```
 
 2. **Start production stack**:
+
    ```bash
    docker-compose up -d
    ```
 
 3. **Initialize database**:
+
    ```bash
    docker-compose exec app npx prisma migrate deploy
    docker-compose exec app node scripts/seed.js
    ```
 
-### Using Podman
+### Dev Using Podman
 
 1. **Build production image**:
+
    ```bash
    podman-compose build app
    ```
 
 2. **Start production stack**:
+
    ```bash
    podman-compose up -d
    ```
 
 3. **Initialize database**:
+
    ```bash
    podman-compose exec app npx prisma migrate deploy
    podman-compose exec app node scripts/seed.js
@@ -243,6 +261,7 @@ Changes to your code will automatically trigger hot reload.
 ### Common Issues
 
 1. **Port already in use**:
+
    ```bash
    # Check what's using the port
    lsof -i :3000
@@ -252,6 +271,7 @@ Changes to your code will automatically trigger hot reload.
    ```
 
 2. **Database connection issues**:
+
    ```bash
    # Check database container
    docker-compose logs db
@@ -261,12 +281,14 @@ Changes to your code will automatically trigger hot reload.
    ```
 
 3. **Build failures**:
+
    ```bash
    # Clean build cache
    docker-compose build --no-cache app
    ```
 
 4. **Permission issues (Podman)**:
+
    ```bash
    # Run with correct SELinux labels
    podman-compose up -d
@@ -347,7 +369,7 @@ docker cp yomu-db:/data/backup_*.db ./backups/
 
 ```bash
 # Backup volumes
-docker run --rm -v yomu_bday-benefits_db_data:/data -v $(pwd):/backup alpine tar czf /backup/db_backup_$(date +%Y%m%d_%H%M%S).tar.gz /data
+docker run --rm -v yomu_db_data:/data -v $(pwd):/backup alpine tar czf /backup/db_backup_$(date +%Y%m%d_%H%M%S).tar.gz /data
 ```
 
 ## Scaling
@@ -362,6 +384,7 @@ docker-compose up -d --scale app=3
 ### Load Balancing
 
 For production deployments, consider using:
+
 - Nginx reverse proxy
 - Traefik for automatic SSL
 - Docker Swarm for orchestration
@@ -373,4 +396,4 @@ When contributing to the Docker setup:
 1. Test both Docker and Podman configurations
 2. Update documentation for any changes
 3. Ensure backward compatibility
-4. Test in both development and production modes 
+4. Test in both development and production modes

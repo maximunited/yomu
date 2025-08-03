@@ -7,12 +7,51 @@ export async function GET(request: NextRequest) {
       where: {
         isActive: true,
       },
+      include: {
+        partnershipsFrom: {
+          include: {
+            brandB: true
+          }
+        },
+        partnershipsTo: {
+          include: {
+            brandA: true
+          }
+        }
+      },
       orderBy: {
         name: 'asc',
       },
     });
 
-    return NextResponse.json(brands);
+    // Transform brands to include partner brands in a usable format
+    const transformedBrands = brands.map(brand => {
+      const partnerBrands = [];
+      
+      // Add partners where this brand is brandA
+      brand.partnershipsFrom.forEach(partnership => {
+        if (partnership.brandB && partnership.brandB.isActive) {
+          partnerBrands.push(partnership.brandB);
+        }
+      });
+      
+      // Add partners where this brand is brandB
+      brand.partnershipsTo.forEach(partnership => {
+        if (partnership.brandA && partnership.brandA.isActive) {
+          partnerBrands.push(partnership.brandA);
+        }
+      });
+
+      return {
+        ...brand,
+        partnerBrands,
+        // Keep old field names for backward compatibility during transition
+        childBrands: partnerBrands,
+        parentBrand: null
+      };
+    });
+
+    return NextResponse.json(transformedBrands);
   } catch (error) {
     console.error("Error fetching brands:", error);
     return NextResponse.json(

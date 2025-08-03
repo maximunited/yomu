@@ -75,7 +75,7 @@ describe('Benefit Validation', () => {
       expect(result.errors).toContain('Description is required')
       expect(result.errors).toContain('Brand ID is required')
       expect(result.errors).toContain('Redemption method is required')
-      expect(result.errors).toContain('Invalid validity type: invalid_type. Valid types are:')
+      expect(result.errors.some(error => error.includes('Invalid validity type: invalid_type'))).toBe(true)
     })
 
     it('should reject invalid validity types', () => {
@@ -89,7 +89,7 @@ describe('Benefit Validation', () => {
 
       const result = validateBenefitData(invalidBenefit)
       expect(result.isValid).toBe(false)
-      expect(result.errors).toContain('Invalid validity type: invalid_type. Valid types are:')
+      expect(result.errors.some(error => error.includes('Invalid validity type: invalid_type'))).toBe(true)
     })
 
     it('should accept legacy validity types', () => {

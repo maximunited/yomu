@@ -13,7 +13,7 @@ The testing setup includes:
 
 ## Test Structure
 
-```
+```text
 __tests__/
 ├── api/                    # API route tests
 │   ├── benefits.test.ts
@@ -81,6 +81,7 @@ npx playwright test --debug
 Unit tests focus on individual functions and components in isolation.
 
 **Examples:**
+
 - Component rendering with different props
 - Utility function behavior
 - Form validation logic
@@ -93,6 +94,7 @@ Unit tests focus on individual functions and components in isolation.
 Integration tests verify that different parts of the application work together correctly.
 
 **Examples:**
+
 - API route handling
 - Database operations
 - Authentication flow
@@ -105,6 +107,7 @@ Integration tests verify that different parts of the application work together c
 E2E tests simulate real user interactions across the entire application.
 
 **Examples:**
+
 - User registration and login
 - Dashboard navigation
 - Benefit browsing and redemption
@@ -345,4 +348,4 @@ When adding new tests:
 2. Use the provided test utilities
 3. Add appropriate mocks for external dependencies
 4. Include both positive and negative test cases
-5. Update this documentation if needed 
+5. Update this documentation if needed

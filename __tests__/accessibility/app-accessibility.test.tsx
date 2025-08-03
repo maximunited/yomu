@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '../utils/test-helpers';
 import userEvent from '@testing-library/user-event';
 import HomePage from '@/app/page';
 import DashboardPage from '@/app/dashboard/page';

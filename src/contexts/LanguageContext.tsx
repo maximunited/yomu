@@ -14,9 +14,11 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('he');
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Load language from localStorage on mount
+    // Mark as hydrated and load language from localStorage
+    setIsHydrated(true);
     const savedLanguage = localStorage.getItem('language') as Language;
     if (savedLanguage && (savedLanguage === 'he' || savedLanguage === 'en')) {
       setLanguageState(savedLanguage);
@@ -25,10 +27,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('language', lang);
-    // Update document direction
-    document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
-    document.documentElement.lang = lang;
+    if (isHydrated) {
+      localStorage.setItem('language', lang);
+      // Update document direction
+      document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+      document.documentElement.lang = lang;
+    }
   };
 
   const t = (key: keyof typeof translations.he): string => {
@@ -38,10 +42,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const dir = language === 'he' ? 'rtl' : 'ltr';
 
   useEffect(() => {
-    // Set initial document direction
-    document.documentElement.dir = dir;
-    document.documentElement.lang = language;
-  }, [language, dir]);
+    // Set initial document direction only after hydration
+    if (isHydrated) {
+      document.documentElement.dir = dir;
+      document.documentElement.lang = language;
+    }
+  }, [language, dir, isHydrated]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, dir }}>

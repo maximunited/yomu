@@ -183,7 +183,10 @@ export async function POST(request: NextRequest) {
       sampleBenefits.map(async (benefit) => {
         if (benefit.brandId) {
           return await prisma.benefit.create({
-            data: benefit
+            data: {
+              ...benefit,
+              brandId: benefit.brandId as string
+            }
           });
         }
       })

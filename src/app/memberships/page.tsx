@@ -17,6 +17,8 @@ interface Membership {
   icon: string;
   type: "free" | "paid";
   cost: string | null;
+  partnerBrands?: Brand[];
+  partnerCount?: number;
 }
 
 interface Brand {
@@ -26,6 +28,9 @@ interface Brand {
   website: string;
   description: string;
   category: string;
+  partnerBrands?: Brand[];
+  childBrands?: Brand[]; // For backward compatibility
+  parentBrand?: Brand;
 }
 
 export default function MembershipsPage() {
@@ -53,23 +58,6 @@ export default function MembershipsPage() {
     }
   }, [status, router]);
 
-  // Don't render anything while checking authentication
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">טוען...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render if not authenticated
-  if (status === "unauthenticated") {
-    return null;
-  }
-
   // Load available brands from database
   useEffect(() => {
     const loadData = async () => {
@@ -93,16 +81,34 @@ export default function MembershipsPage() {
           const activeBrandIds = new Set(userMemberships.map((m: any) => m.brandId));
           
           // Convert brands to memberships format with correct active state
-          const brandMemberships: Membership[] = brands.map((brand: Brand) => ({
-            id: brand.id,
-            name: brand.name,
-            description: brand.description,
-            category: brand.category,
-            isActive: activeBrandIds.has(brand.id),
-            icon: brand.logoUrl,
-            type: "free" as const,
-            cost: null
-          }));
+          const brandMemberships: Membership[] = brands.map((brand: Brand) => {
+            // Build description with partnership info
+            let description = brand.description;
+            const partners = brand.partnerBrands || brand.childBrands || [];
+            if (partners.length > 0) {
+              if (partners.length <= 2) {
+                // Show full names for small partnerships
+                const partnerNames = partners.map(partner => partner.name).join(', ');
+                description += ` | ${t('includesAccessTo')}: ${partnerNames}`;
+              } else {
+                // Show count for larger partnerships to keep UI clean
+                description += ` | ${t('includesAccessTo')}-${partners.length} ${t('additionalBrands')}`;
+              }
+            }
+            
+            return {
+              id: brand.id,
+              name: brand.name,
+              description: description,
+              category: brand.category,
+              isActive: activeBrandIds.has(brand.id),
+              icon: brand.logoUrl,
+              type: "free" as const,
+              cost: null,
+              partnerBrands: partners,
+              partnerCount: partners.length
+            };
+          });
           
           setMemberships(brandMemberships);
           setOriginalMemberships(brandMemberships); // Initialize original memberships
@@ -312,6 +318,23 @@ export default function MembershipsPage() {
       loadData();
     }
   }, [session]);
+
+  // Don't render anything while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">טוען...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   const toggleMembership = (id: string) => {
     setMemberships(prev => 
@@ -616,6 +639,16 @@ export default function MembershipsPage() {
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         {membership.description}
                       </p>
+                      {membership.partnerCount && membership.partnerCount > 2 && (
+                        <details className="mt-2">
+                          <summary className="text-xs text-purple-600 cursor-pointer hover:text-purple-800">
+                            {t('showBrandList')} ({membership.partnerCount})
+                          </summary>
+                          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {membership.partnerBrands?.map(partner => partner.name).join(' • ')}
+                          </div>
+                        </details>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center space-x-2 flex-shrink-0 ml-2">

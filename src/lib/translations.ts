@@ -104,7 +104,7 @@ export interface Translations {
   account: string;
   
   // Notifications
-  notifications: string;
+  notificationsTitle: string;
   markAllAsRead: string;
   noNotifications: string;
   newBenefit: string;
@@ -121,7 +121,7 @@ export interface Translations {
   fashion: string;
   food: string;
   health: string;
-  home: string;
+  homeCategory: string;
   finance: string;
   grocery: string;
   transport: string;
@@ -178,7 +178,7 @@ export interface Translations {
   reportIncorrectInfo: string;
   thankYouForReporting: string;
   weWillCheckAndUpdate: string;
-  notifications: string;
+  notificationsTitle: string;
   markAllAsRead: string;
   noNotifications: string;
   birthdayMonthStarted: string;
@@ -218,6 +218,14 @@ export interface Translations {
   allCategories: string;
   quickFilters: string;
   
+  // Multi-brand Partnerships
+  includesAccessTo: string;
+  additionalBrands: string;
+  showBrandList: string;
+  partnerships: string;
+  partners: string;
+  partnerBrands: string;
+  
   // New Services
   escapeRoom: string;
   escapeRoomBenefit: string;
@@ -247,7 +255,7 @@ export interface Translations {
 export const translations: Record<Language, Translations> = {
   he: {
     // Navigation
-    home: 'בית',
+    homeCategory: 'בית',
     dashboard: 'לוח בקרה',
     memberships: 'חברויות',
     profile: 'פרופיל',
@@ -349,7 +357,7 @@ export const translations: Record<Language, Translations> = {
     account: 'חשבון',
     
     // Notifications
-    notifications: 'התראות',
+    notificationsTitle: 'התראות',
     markAllAsRead: 'סמן הכל כנקרא',
     noNotifications: 'אין התראות חדשות',
     newBenefit: 'הטבה חדשה',
@@ -366,7 +374,7 @@ export const translations: Record<Language, Translations> = {
     fashion: 'אופנה',
     food: 'מזון',
     health: 'בריאות',
-    home: 'בית',
+    homeCategory: 'בית',
     finance: 'פיננסי',
     grocery: 'מזון',
     transport: 'תחבורה',
@@ -422,7 +430,7 @@ export const translations: Record<Language, Translations> = {
     reportIncorrectInfo: 'דווח על מידע שגוי או חסר',
     thankYouForReporting: 'תודה על הדיווח!',
     weWillCheckAndUpdate: 'נבדוק את המידע ונעדכן בהקדם.',
-    notifications: 'התראות',
+    notificationsTitle: 'התראות',
     markAllAsRead: 'סמן הכל כנקרא',
     noNotifications: 'אין התראות',
     birthdayMonthStarted: 'חודש יום הולדת התחיל! 🎉',
@@ -462,6 +470,14 @@ export const translations: Record<Language, Translations> = {
     allCategories: 'כל הקטגוריות',
     quickFilters: 'סינון מהיר',
     
+    // Multi-brand Partnerships
+    includesAccessTo: 'כולל גישה ל',
+    additionalBrands: 'מותגים נוספים',
+    showBrandList: 'הצג רשימת מותגים',
+    partnerships: 'שותפויות',
+    partners: 'שותפים',
+    partnerBrands: 'מותגים שותפים',
+    
     // New Services
     escapeRoom: 'אסקייפרום',
     escapeRoomBenefit: '50 שח הנחה בחודש יום הולדת',
@@ -489,11 +505,11 @@ export const translations: Record<Language, Translations> = {
   },
   en: {
     // Navigation
-    home: 'Home',
+    homeCategory: 'Home',
     dashboard: 'Dashboard',
     memberships: 'Memberships',
     profile: 'Profile',
-    notifications: 'Notifications',
+    notificationsTitle: 'Notifications',
     signIn: 'Sign In',
     signUp: 'Sign Up',
     signOut: 'Sign Out',
@@ -592,6 +608,7 @@ export const translations: Record<Language, Translations> = {
     
     // Notifications
     notifications: 'Notifications',
+    notificationsTitle: 'Notifications',
     markAllAsRead: 'Mark All as Read',
     noNotifications: 'No new notifications',
     newBenefit: 'New Benefit',
@@ -608,7 +625,7 @@ export const translations: Record<Language, Translations> = {
     fashion: 'Fashion',
     food: 'Food',
     health: 'Health',
-    home: 'Home',
+    homeCategory: 'Home',
     finance: 'Finance',
     grocery: 'Grocery',
     transport: 'Transport',
@@ -664,7 +681,7 @@ export const translations: Record<Language, Translations> = {
     reportIncorrectInfo: 'Report incorrect or missing information',
     thankYouForReporting: 'Thank you for reporting!',
     weWillCheckAndUpdate: 'We will check the information and update it soon.',
-    notifications: 'Notifications',
+    notificationsTitle: 'Notifications',
     markAllAsRead: 'Mark All as Read',
     noNotifications: 'No notifications',
     birthdayMonthStarted: 'Birthday month started! 🎉',
@@ -703,6 +720,14 @@ export const translations: Record<Language, Translations> = {
     filterBy: 'Filter by',
     allCategories: 'All Categories',
     quickFilters: 'Quick Filters',
+    
+    // Multi-brand Partnerships
+    includesAccessTo: 'includes access to',
+    additionalBrands: 'additional brands',
+    showBrandList: 'show brand list',
+    partnerships: 'partnerships',
+    partners: 'partners',
+    partnerBrands: 'partner brands',
     
     // New Services
     escapeRoom: 'Escape Room',

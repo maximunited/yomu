@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/providers/SessionProvider";
@@ -12,7 +12,11 @@ export const metadata: Metadata = {
   description: "Never miss a birthday deal again. Track all your birthday benefits, deals, and freebies in one place.",
   keywords: "birthday, benefits, deals, freebies, Israel, loyalty programs",
   authors: [{ name: "YomU Team" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

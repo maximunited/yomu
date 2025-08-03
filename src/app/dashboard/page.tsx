@@ -17,6 +17,10 @@ interface Benefit {
     name: string;
     logoUrl: string;
     category: string;
+    website?: string;
+    actionUrl?: string;
+    actionType?: string;
+    actionLabel?: string;
   };
   promoCode?: string;
   url?: string;
@@ -308,20 +312,20 @@ export default function DashboardPage() {
                       <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     )}
                   </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                     {session?.user?.name || "משתמש"}
                   </span>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="py-1">
                     <Link href="/settings">
-                      <button className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                         הגדרות
                       </button>
                     </Link>
                     <button 
                       onClick={() => signOut({ callbackUrl: "/" })}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       התנתקות
                     </button>
@@ -545,15 +549,16 @@ export default function DashboardPage() {
                 )}
 
                 <div className="flex space-x-2 mt-auto">
-                  {benefit.url && (
+                  {/* Contextual action button based on brand category */}
+                  {(benefit.brand.actionUrl || benefit.url) && (
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => window.open(benefit.url, '_blank')}
+                      onClick={() => window.open(benefit.brand.actionUrl || benefit.url, '_blank')}
                       className="flex-1"
                     >
                       <ExternalLink className="w-4 h-4 ml-1" />
-                      לקנייה
+                      {benefit.brand.actionLabel || 'לקנייה'}
                     </Button>
                   )}
                   <Button

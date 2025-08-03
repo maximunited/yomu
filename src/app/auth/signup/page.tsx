@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Gift, Mail, Lock, Eye, EyeOff, User, Calendar } from "lucide-react";
+import { Gift, Mail, Lock, Eye, EyeOff, User, Calendar, Heart } from "lucide-react";
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -15,6 +15,7 @@ export default function SignUpPage() {
     password: "",
     confirmPassword: "",
     dateOfBirth: "",
+    anniversaryDate: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -57,6 +58,7 @@ export default function SignUpPage() {
           email: formData.email,
           password: formData.password,
           dateOfBirth: formData.dateOfBirth,
+          anniversaryDate: formData.anniversaryDate || null,
         }),
       });
 
@@ -176,6 +178,27 @@ export default function SignUpPage() {
                   required
                 />
               </div>
+            </div>
+
+            <div>
+              <label htmlFor="anniversaryDate" className="block text-sm font-medium text-gray-700 mb-2">
+                תאריך יום נישואין <span className="text-gray-500 text-xs">(אופציונלי)</span>
+              </label>
+              <div className="relative">
+                <Heart className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
+                  id="anniversaryDate"
+                  name="anniversaryDate"
+                  type="date"
+                  value={formData.anniversaryDate}
+                  onChange={handleChange}
+                  className="pl-10"
+                  placeholder="תאריך יום נישואין (אופציונלי)"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                הוסף תאריך יום נישואין כדי לקבל הטבות מיוחדות ליום השנה שלך
+              </p>
             </div>
 
             <div>
