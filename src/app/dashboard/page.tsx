@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { Gift, Calendar, Star, Bell, Copy, ExternalLink, ShoppingBag, User, Search, Filter, Moon, Shield, LogOut } from "lucide-react";
 import { isBenefitActive, getUpcomingBenefits, getValidityDisplayText } from "@/lib/benefit-validation";
 import { useLanguage } from "@/contexts/LanguageContext";
+import type { Translations } from "@/lib/translations";
 
 interface Benefit {
   id: string;
@@ -62,6 +63,10 @@ export default function DashboardPage() {
   const [selectedValidityDuration, setSelectedValidityDuration] = useState("");
   const [selectedMembershipType, setSelectedMembershipType] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Used benefits state
+  const [usedBenefits, setUsedBenefits] = useState<Set<string>>(new Set());
+  const [usedBenefitsLoading, setUsedBenefitsLoading] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -131,10 +136,97 @@ export default function DashboardPage() {
       } else {
         console.log("Benefits response not ok:", await benefitsResponse.text());
       }
+
+      // Load used benefits
+      await fetchUsedBenefits();
     } catch (error) {
       console.error("Error fetching user data:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchUsedBenefits = async () => {
+    try {
+      setUsedBenefitsLoading(true);
+      const response = await fetch("/api/user/used-benefits");
+      if (response.ok) {
+        const data = await response.json();
+        const usedBenefitIds = new Set<string>(data.usedBenefits.map((ub: any) => ub.benefitId as string));
+        setUsedBenefits(usedBenefitIds);
+      }
+    } catch (error) {
+      console.error("Error fetching used benefits:", error);
+    } finally {
+      setUsedBenefitsLoading(false);
+    }
+  };
+
+  const markBenefitAsUsed = async (benefitId: string, notes?: string) => {
+    try {
+      setUsedBenefitsLoading(true);
+      console.log('Marking benefit as used:', benefitId);
+      
+      const response = await fetch("/api/user/used-benefits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ benefitId, notes }),
+      });
+
+      console.log('Response status:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Success response:', data);
+        setUsedBenefits(prev => new Set([...prev, benefitId]));
+        // Show success feedback
+        alert('Benefit marked as used successfully!');
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to mark benefit as used:', response.status, errorText);
+        // Show user feedback
+        alert(`Failed to mark benefit as used: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error("Error marking benefit as used:", error);
+      alert(`Error marking benefit as used: ${error}`);
+    } finally {
+      setUsedBenefitsLoading(false);
+    }
+  };
+
+  const unmarkBenefitAsUsed = async (benefitId: string) => {
+    try {
+      setUsedBenefitsLoading(true);
+      console.log('Unmarking benefit as used:', benefitId);
+      
+      const response = await fetch(`/api/user/used-benefits/${benefitId}`, {
+        method: "DELETE",
+      });
+
+      console.log('Response status:', response.status);
+
+      if (response.ok) {
+        setUsedBenefits(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(benefitId);
+          return newSet;
+        });
+        // Show success feedback
+        alert('Benefit unmarked successfully!');
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to unmark benefit as used:', response.status, errorText);
+        // Show user feedback
+        alert(`Failed to unmark benefit as used: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error("Error unmarking benefit as used:", error);
+      alert(`Error unmarking benefit as used: ${error}`);
+    } finally {
+      setUsedBenefitsLoading(false);
     }
   };
 
@@ -148,7 +240,8 @@ export default function DashboardPage() {
   };
 
   const getValidityText = (benefit: Benefit) => {
-    return getValidityDisplayText(benefit.validityType);
+    const key = getValidityDisplayText(benefit.validityType) as keyof Translations;
+    return t(key);
   };
 
   const getCategoryColor = (category: string) => {
@@ -531,7 +624,11 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredActiveBenefits.map((benefit) => (
-              <div key={benefit.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow flex flex-col h-full">
+              <div key={benefit.id} className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 flex flex-col h-full ${
+                usedBenefits.has(benefit.id) 
+                  ? 'bg-gray-50 border-2 border-green-200 shadow-green-100' 
+                  : 'bg-white border-2 border-transparent'
+              }`}>
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <img
@@ -549,14 +646,20 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Category Tag */}
-                <div className="mb-3">
+                <div className="mb-3 flex flex-wrap gap-2">
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(benefit.brand.category)}`}>
                     {getCategoryDisplayName(benefit.brand.category)}
                   </span>
                   {/* Membership Type Label */}
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mr-2 ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
                     {benefit.isFree ? t('free') : t('paid')}
                   </span>
+                  {/* Used Status */}
+                  {usedBenefits.has(benefit.id) && (
+                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                      ✓ {t('usedOn')} {new Date().toLocaleDateString()}
+                    </span>
+                  )}
                 </div>
                 
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
@@ -584,6 +687,39 @@ export default function DashboardPage() {
                 )}
 
                 <div className="flex space-x-2 mt-auto">
+                  {/* Used/Unused Button */}
+                  <Button
+                    variant={usedBenefits.has(benefit.id) ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => usedBenefits.has(benefit.id) 
+                      ? unmarkBenefitAsUsed(benefit.id)
+                      : markBenefitAsUsed(benefit.id)
+                    }
+                    disabled={usedBenefitsLoading}
+                    className={`flex-1 transition-all duration-200 ${
+                      usedBenefits.has(benefit.id) 
+                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-md' 
+                        : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
+                    } ${usedBenefitsLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {usedBenefitsLoading ? (
+                      <>
+                        <span className="animate-spin mr-1">⏳</span>
+                        {t('loading')}
+                      </>
+                    ) : usedBenefits.has(benefit.id) ? (
+                      <>
+                        <span className="mr-1">✓</span>
+                        {t('unmarkAsUsed')}
+                      </>
+                    ) : (
+                      <>
+                        <span className="mr-1">○</span>
+                        {t('markAsUsed')}
+                      </>
+                    )}
+                  </Button>
+                  
                   {/* Contextual action button based on brand category */}
                   {(benefit.brand.actionUrl || benefit.url) && (
                     <Button
@@ -670,6 +806,54 @@ export default function DashboardPage() {
             ))}
           </div>
         </div>
+
+        {/* Used Benefits History */}
+        {usedBenefits.size > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <Gift className="w-6 h-6 text-green-600" />
+                <h2 className="text-2xl font-bold text-gray-900">{t('usedBenefitsHistory')}</h2>
+                <span className="text-sm text-gray-500">({usedBenefits.size})</span>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <p className="text-gray-600 mb-4">{t('usedBenefitsHistoryDescription')}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {benefits
+                  .filter(benefit => usedBenefits.has(benefit.id))
+                  .map((benefit) => (
+                    <div key={benefit.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+                          <img
+                            src={benefit.brand.logoUrl}
+                            alt={benefit.brand.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 text-sm">{benefit.brand.name}</h4>
+                          <p className="text-xs text-gray-600">{benefit.title}</p>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">{t('usedOn')} {new Date().toLocaleDateString()}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => unmarkBenefitAsUsed(benefit.id)}
+                          className="text-xs"
+                        >
+                          {t('unmarkAsUsed')}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-lg p-6">

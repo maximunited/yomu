@@ -25,6 +25,7 @@ export interface Translations {
   saving: string;
   saveChanges: string;
   unsavedChangesWarning: string;
+  loading: string;
   
   // Landing Page
   appName: string;
@@ -387,6 +388,31 @@ export interface Translations {
   githubSignInError: string;
   githubSignUpError: string;
   signUpWithGitHub: string;
+  
+  // Used Benefits
+  markAsUsed: string;
+  unmarkAsUsed: string;
+  usedBenefits: string;
+  usedBenefitsDescription: string;
+  noUsedBenefits: string;
+  usedOn: string;
+  addNotes: string;
+  notes: string;
+  markBenefitAsUsed: string;
+  unmarkBenefitAsUsed: string;
+  benefitUsedSuccessfully: string;
+  benefitUnmarkedSuccessfully: string;
+  usedBenefitsHistory: string;
+  usedBenefitsHistoryDescription: string;
+  
+  // API Key
+  apiKey: string;
+  apiKeyDescription: string;
+  editApiKey: string;
+  saveApiKey: string;
+  copyApiKey: string;
+  apiKeyCopied: string;
+  apiKeySaved: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -665,6 +691,31 @@ export const translations: Record<Language, Translations> = {
     githubSignInError: 'שגיאה בהתחברות עם GitHub',
     githubSignUpError: 'שגיאה בהרשמה דרך GitHub',
     signUpWithGitHub: 'הירשם עם GitHub',
+    
+    // Used Benefits
+    markAsUsed: 'סמן כמשומש',
+    unmarkAsUsed: 'בטל סימון כמשומש',
+    usedBenefits: 'הטבות משומשות',
+    usedBenefitsDescription: 'הטבות שסימנת כמשומשות',
+    noUsedBenefits: 'אין הטבות משומשות',
+    usedOn: 'שומש ב:',
+    addNotes: 'הוסף הערות',
+    notes: 'הערות',
+    markBenefitAsUsed: 'סמן הטבה כמשומשת',
+    unmarkBenefitAsUsed: 'בטל סימון הטבה כמשומשת',
+    benefitUsedSuccessfully: 'הטבה סומנה כמשומשת בהצלחה',
+    benefitUnmarkedSuccessfully: 'סימון הטבה כמשומשת בוטל בהצלחה',
+    usedBenefitsHistory: 'היסטוריית הטבות משומשות',
+    usedBenefitsHistoryDescription: 'צפה בכל ההטבות שסימנת כמשומשות',
+    
+    // API Key
+    apiKey: 'מפתח API',
+    apiKeyDescription: 'השתמש במפתח API זה לבדיקות ופיתוח. ברירת מחדל: key123',
+    editApiKey: 'ערוך מפתח API',
+    saveApiKey: 'שמור מפתח API',
+    copyApiKey: 'העתק',
+    apiKeyCopied: 'מפתח API הועתק',
+    apiKeySaved: 'מפתח API נשמר',
     
     // Team Members
     leadDeveloper: 'מתכנת מוביל',
@@ -1255,5 +1306,30 @@ export const translations: Record<Language, Translations> = {
     githubSignInError: 'GitHub sign in error',
     githubSignUpError: 'GitHub registration error',
     signUpWithGitHub: 'Sign up with GitHub',
+    
+    // Used Benefits
+    markAsUsed: 'Mark as Used',
+    unmarkAsUsed: 'Unmark as Used',
+    usedBenefits: 'Used Benefits',
+    usedBenefitsDescription: 'Benefits you have marked as used',
+    noUsedBenefits: 'No used benefits',
+    usedOn: 'Used on:',
+    addNotes: 'Add notes',
+    notes: 'Notes',
+    markBenefitAsUsed: 'Mark benefit as used',
+    unmarkBenefitAsUsed: 'Unmark benefit as used',
+    benefitUsedSuccessfully: 'Benefit marked as used successfully',
+    benefitUnmarkedSuccessfully: 'Benefit unmarked successfully',
+    usedBenefitsHistory: 'Used Benefits History',
+    usedBenefitsHistoryDescription: 'View all benefits you have marked as used',
+    
+    // API Key
+    apiKey: 'API Key',
+    apiKeyDescription: 'Use this API key for testing and development purposes. Default: key123',
+    editApiKey: 'Edit API Key',
+    saveApiKey: 'Save API Key',
+    copyApiKey: 'Copy',
+    apiKeyCopied: 'API key copied',
+    apiKeySaved: 'API key saved',
   },
 }; 

@@ -43,12 +43,14 @@ model User {
   dateOfBirth       DateTime?
   anniversaryDate   DateTime?
   profilePicture    String?
+  apiKey            String             @default("key123")
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @default(now()) @updatedAt
   accounts          Account[]
   sessions          Session[]
   customMemberships CustomMembership[]
   notifications     Notification[]
+  usedBenefits      UsedBenefit[]
   memberships       UserMembership[]
 }
 
@@ -110,6 +112,7 @@ model Benefit {
   updatedAt          DateTime       @default(now()) @updatedAt
   brand              Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
   notifications      Notification[]
+  usedBenefits       UsedBenefit[]
 
   @@map("benefits")
 }
@@ -185,4 +188,19 @@ model Notification {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+
+model UsedBenefit {
+  id        String   @id @default(cuid())
+  userId    String
+  benefitId String
+  usedAt    DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  benefit   Benefit  @relation(fields: [benefitId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, benefitId])
+  @@map("used_benefits")
 }

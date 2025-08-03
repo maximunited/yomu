@@ -18,7 +18,9 @@ import {
   Save,
   Bell,
   Shield,
-  Globe
+  Globe,
+  Key,
+  Copy
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -50,6 +52,9 @@ export default function SettingsPage() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [apiKey, setApiKey] = useState("key123");
+  const [isApiKeyEditing, setIsApiKeyEditing] = useState(false);
+  const [isApiKeySaving, setIsApiKeySaving] = useState(false);
 
   useEffect(() => {
     // Check for saved dark mode preference
@@ -81,6 +86,21 @@ export default function SettingsPage() {
     };
 
     loadProfile();
+    
+    // Load API key
+    const loadApiKey = async () => {
+      try {
+        const response = await fetch('/api/user/api-key');
+        if (response.ok) {
+          const data = await response.json();
+          setApiKey(data.apiKey);
+        }
+      } catch (error) {
+        console.error('Error loading API key:', error);
+      }
+    };
+
+    loadApiKey();
   }, []);
 
   const toggleDarkMode = () => {
@@ -182,6 +202,36 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error saving profile picture:', error);
       // Could add error notification here
+    }
+  };
+
+  const handleSaveApiKey = async () => {
+    setIsApiKeySaving(true);
+    try {
+      const response = await fetch('/api/user/api-key', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ apiKey }),
+      });
+
+      if (response.ok) {
+        setIsApiKeyEditing(false);
+      }
+    } catch (error) {
+      console.error('Error saving API key:', error);
+    } finally {
+      setIsApiKeySaving(false);
+    }
+  };
+
+  const copyApiKeyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(apiKey);
+      // You could add a toast notification here
+    } catch (error) {
+      console.error('Error copying API key:', error);
     }
   };
 
@@ -319,6 +369,71 @@ export default function SettingsPage() {
                     <Button 
                       variant="outline" 
                       onClick={() => setIsEditing(false)}
+                    >
+                      {t('cancel')}
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* API Key Section */}
+          <div id="api-key" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div className="flex items-center space-x-3 mb-6">
+              <Key className="w-6 h-6 text-purple-600" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('apiKey')}</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t('apiKey')}
+                </label>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    disabled={!isApiKeyEditing}
+                    className="flex-1 dark:bg-gray-700 dark:text-white dark:border-gray-600 font-mono"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyApiKeyToClipboard}
+                    className="flex items-center space-x-2"
+                  >
+                    <Copy className="w-4 h-4" />
+                    {t('copyApiKey')}
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {t('apiKeyDescription')}
+                </p>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                {!isApiKeyEditing ? (
+                  <Button onClick={() => setIsApiKeyEditing(true)}>
+                    <Key className="w-4 h-4 ml-2" />
+                    {t('editApiKey')}
+                  </Button>
+                ) : (
+                  <>
+                    <Button 
+                      onClick={handleSaveApiKey}
+                      disabled={isApiKeySaving}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Save className="w-4 h-4 ml-2" />
+                      {isApiKeySaving ? t('saving') : t('saveApiKey')}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setIsApiKeyEditing(false);
+                        setApiKey("key123"); // Reset to default
+                      }}
                     >
                       {t('cancel')}
                     </Button>
