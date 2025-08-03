@@ -22,7 +22,6 @@ export interface Translations {
   copy: string;
   copied: string;
   moreDetails: string;
-  loading: string;
   saving: string;
   saveChanges: string;
   unsavedChangesWarning: string;
@@ -120,18 +119,13 @@ export interface Translations {
   fullySupported: string;
   betaLanguages: string;
   betaLanguagesNote: string;
-  account: string;
   
   // Notifications
-  notificationsTitle: string;
-  markAllAsRead: string;
-  noNotifications: string;
   newBenefit: string;
   benefitExpiring: string;
   birthdayMonthStart: string;
   
   // Benefit Details
-  benefitDetails: string;
   termsAndConditions: string;
   howToRedeem: string;
   visitWebsite: string;
@@ -156,9 +150,6 @@ export interface Translations {
   // Static Text
   backToHome: string;
   termsOfUse: string;
-  privacyPolicy: string;
-  contactUs: string;
-  loading: string;
   validOnlyOnBirthday: string;
   validForEntireMonth: string;
   validForWeek: string;
@@ -166,24 +157,15 @@ export interface Translations {
   discountOnAllPurchases: string;
   specialBirthdayDiscount: string;
   return: string;
-  manageMemberships: string;
   activeOutOfTotal: string;
   selectAllMemberships: string;
   programsSelected: string;
-  moreProgramsMoreBenefits: string;
-  addCustomMembership: string;
-  customMembershipName: string;
-  customMembershipDescription: string;
-  customMembershipCategory: string;
   chooseCategory: string;
   addMembership: string;
   changesSavedSuccessfully: string;
   contactInformation: string;
-  sendMessage: string;
-  fullName: string;
   subject: string;
   message: string;
-  sendMessage: string;
   workingHours: string;
   address: string;
   phone: string;
@@ -195,18 +177,11 @@ export interface Translations {
   writeYourMessageHere: string;
   enterYourFullName: string;
   yourEmail: string;
-  benefitDetails: string;
   reportIncorrectInfo: string;
   thankYouForReporting: string;
   weWillCheckAndUpdate: string;
-  notificationsTitle: string;
-  markAllAsRead: string;
-  noNotifications: string;
-  birthdayMonthStarted: string;
   newBenefitsAvailable: string;
-  benefitExpiringSoon: string;
   benefitExpiresInDays: string;
-  newBenefitAvailable: string;
   addedNewBenefit: string;
   newBenefitFrom: string;
   hoursAgo: string;
@@ -378,12 +353,9 @@ export interface Translations {
   searchAndFilter: string;
   showFilters: string;
   hideFilters: string;
-  searchPlaceholder: string;
   category: string;
-  allCategories: string;
   validityPeriod: string;
   allPeriods: string;
-  membershipType: string;
   
   // Dashboard additional UI
   allTypes: string;
@@ -391,6 +363,7 @@ export interface Translations {
   periodLabel: string;
   typeLabel: string;
   buyNow: string;
+  quickActions: string;
   
   // Notifications
   birthdayMonthStarted: string;
@@ -410,6 +383,10 @@ export interface Translations {
   signingIn: string;
   or: string;
   signUpNow: string;
+  signInWithGitHub: string;
+  githubSignInError: string;
+  githubSignUpError: string;
+  signUpWithGitHub: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -684,6 +661,10 @@ export const translations: Record<Language, Translations> = {
     signingIn: 'מתחבר...',
     or: 'או',
     signUpNow: 'הירשמו עכשיו',
+    signInWithGitHub: 'התחבר עם GitHub',
+    githubSignInError: 'שגיאה בהתחברות עם GitHub',
+    githubSignUpError: 'שגיאה בהרשמה דרך GitHub',
+    signUpWithGitHub: 'הירשם עם GitHub',
     
     // Team Members
     leadDeveloper: 'מתכנת מוביל',
@@ -850,6 +831,7 @@ export const translations: Record<Language, Translations> = {
     periodLabel: 'תקופה',
     typeLabel: 'סוג',
     buyNow: 'קנה עכשיו',
+    quickActions: 'פעולות מהירות',
     
     // Notifications
     birthdayMonthStarted: 'חודש יום הולדת התחיל! 🎉',
@@ -1249,6 +1231,7 @@ export const translations: Record<Language, Translations> = {
     periodLabel: 'Period',
     typeLabel: 'Type',
     buyNow: 'Buy Now',
+    quickActions: 'Quick Actions',
     
     // Notifications
     birthdayMonthStarted: 'Birthday month started! 🎉',
@@ -1268,5 +1251,9 @@ export const translations: Record<Language, Translations> = {
     signingIn: 'Signing in...',
     or: 'or',
     signUpNow: 'Sign up now',
+    signInWithGitHub: 'Sign in with GitHub',
+    githubSignInError: 'GitHub sign in error',
+    githubSignUpError: 'GitHub registration error',
+    signUpWithGitHub: 'Sign up with GitHub',
   },
 }; 

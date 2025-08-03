@@ -298,7 +298,12 @@ export default function DashboardPage() {
               <span className="text-xl font-bold text-gray-900">YomU</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" className="border-2 border-gray-400 hover:border-gray-500">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-2 border-gray-400 hover:border-gray-500"
+                onClick={() => router.push("/notifications")}
+              >
                 <Bell className="w-5 h-5" />
               </Button>
               <div className="relative group">
@@ -658,7 +663,7 @@ export default function DashboardPage() {
                     onClick={() => router.push(`/benefit/${benefit.id}`)}
                     className="flex-1"
                   >
-                    פרטים נוספים
+                    {t('moreDetails')}
                   </Button>
                 </div>
               </div>
@@ -668,7 +673,7 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">פעולות מהירות</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('quickActions')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Button
               variant="outline"
@@ -677,7 +682,7 @@ export default function DashboardPage() {
             >
               <div className="text-center">
                 <ShoppingBag className="w-6 h-6 mx-auto mb-2" />
-                <span>ניהול חברויות</span>
+                <span>{t('manageMemberships')}</span>
               </div>
             </Button>
             <Button
@@ -687,7 +692,7 @@ export default function DashboardPage() {
             >
               <div className="text-center">
                 <Bell className="w-6 h-6 mx-auto mb-2" />
-                <span>התראות</span>
+                <span>{t('notifications')}</span>
               </div>
             </Button>
           </div>

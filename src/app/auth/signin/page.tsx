@@ -57,8 +57,22 @@ export default function SignInPage() {
     }
   };
 
+  const handleGitHubSignIn = async () => {
+    setIsLoading(true);
+    try {
+      await signIn("github", { callbackUrl: "/dashboard" });
+    } catch (error) {
+      setError(t('githubSignInError'));
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className={`min-h-screen transition-colors duration-300 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+        : 'bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50'
+    }`}>
       <PageHeader title={t('signIn')} showBackButton={true} />
       
       <div className="flex items-center justify-center p-4 pt-8">
@@ -69,23 +83,27 @@ export default function SignInPage() {
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <Gift className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">YomU</span>
+              <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>YomU</span>
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('welcome')}</h1>
-            <p className="text-gray-600 dark:text-gray-300">{t('signInToYourAccount')}</p>
+            <h1 className={`text-3xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('welcome')}</h1>
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{t('signInToYourAccount')}</p>
           </div>
 
           {/* Form */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+          <div className={`rounded-2xl shadow-lg p-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
+                <div className={`px-4 py-3 rounded-lg ${
+                  isDarkMode 
+                    ? 'bg-red-900/20 border border-red-800 text-red-300' 
+                    : 'bg-red-50 border border-red-200 text-red-700'
+                }`}>
                   {error}
                 </div>
               )}
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="email" className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   {t('email')}
                 </label>
                 <div className="relative">
@@ -103,7 +121,7 @@ export default function SignInPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="password" className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   {t('password')}
                 </label>
                 <div className="relative">
@@ -128,29 +146,29 @@ export default function SignInPage() {
               </div>
 
               {/* Checkboxes */}
-              <div className="space-y-3">
-                <div className="flex items-center">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
                   <input
                     id="saveEmail"
                     type="checkbox"
                     checked={saveEmail}
                     onChange={(e) => setSaveEmail(e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5"
                   />
-                  <label htmlFor="saveEmail" className="mr-2 block text-sm text-gray-700 dark:text-gray-300">
+                  <label htmlFor="saveEmail" className={`block text-sm leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     {t('saveEmail')}
                   </label>
                 </div>
                 
-                <div className="flex items-center">
+                <div className="flex items-start space-x-3">
                   <input
                     id="keepSignedIn"
                     type="checkbox"
                     checked={keepSignedIn}
                     onChange={(e) => setKeepSignedIn(e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5"
                   />
-                  <label htmlFor="keepSignedIn" className="mr-2 block text-sm text-gray-700 dark:text-gray-300">
+                  <label htmlFor="keepSignedIn" className={`block text-sm leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     {t('keepMeSignedIn')}
                   </label>
                 </div>
@@ -168,10 +186,10 @@ export default function SignInPage() {
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+                  <div className={`w-full border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`} />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">{t('or')}</span>
+                  <span className={`px-2 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'}`}>{t('or')}</span>
                 </div>
               </div>
 
@@ -189,10 +207,22 @@ export default function SignInPage() {
                 </svg>
                 {t('signInWithGoogle')}
               </Button>
+
+              <Button
+                variant="outline"
+                className="w-full mt-3"
+                onClick={handleGitHubSignIn}
+                disabled={isLoading}
+              >
+                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                {t('signInWithGitHub')}
+              </Button>
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 {t('dontHaveAccount')}{" "}
                 <Link href="/auth/signup" className="text-purple-600 hover:text-purple-500 font-medium">
                   {t('signUpNow')}
