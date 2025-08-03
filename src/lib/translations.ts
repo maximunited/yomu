@@ -25,6 +25,7 @@ export interface Translations {
   loading: string;
   saving: string;
   saveChanges: string;
+  unsavedChangesWarning: string;
   
   // Landing Page
   appName: string;
@@ -126,6 +127,8 @@ export interface Translations {
   grocery: string;
   transport: string;
   entertainment: string;
+  convenience: string;
+  baby: string;
   
   // Footer
   privacy: string;
@@ -278,6 +281,7 @@ export const translations: Record<Language, Translations> = {
     loading: 'טוען...',
     saving: 'שומר...',
     saveChanges: 'שמור שינויים',
+    unsavedChangesWarning: 'יש לך שינויים שלא נשמרו. אם תעזוב עכשיו השינויים יאבדו. האם אתה בטוח שברצונך לעזוב?',
     
     // Landing Page
     appName: 'YomU',
@@ -379,6 +383,8 @@ export const translations: Record<Language, Translations> = {
     grocery: 'מזון',
     transport: 'תחבורה',
     entertainment: 'בידור',
+    convenience: 'נוחות',
+    baby: 'תינוקות',
     
     // Footer
     privacy: 'פרטיות',
@@ -528,6 +534,7 @@ export const translations: Record<Language, Translations> = {
     loading: 'Loading...',
     saving: 'Saving...',
     saveChanges: 'Save Changes',
+    unsavedChangesWarning: 'You have unsaved changes. If you leave now, your changes will be lost. Are you sure you want to leave?',
     
     // Landing Page
     appName: 'YomU',
@@ -630,6 +637,8 @@ export const translations: Record<Language, Translations> = {
     grocery: 'Grocery',
     transport: 'Transport',
     entertainment: 'Entertainment',
+    convenience: 'Convenience',
+    baby: 'Baby',
     
     // Footer
     privacy: 'Privacy',

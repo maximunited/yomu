@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Gift, Calendar, Star, Bell, Copy, ExternalLink, ShoppingBag, User, Search, Filter } from "lucide-react";
+import { Gift, Calendar, Star, Bell, Copy, ExternalLink, ShoppingBag, User, Search, Filter, Moon, Shield, LogOut } from "lucide-react";
 import { isBenefitActive, getUpcomingBenefits, getValidityDisplayText } from "@/lib/benefit-validation";
 
 interface Benefit {
@@ -300,7 +300,7 @@ export default function DashboardPage() {
                 <Bell className="w-5 h-5" />
               </Button>
               <div className="relative group">
-                <button className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg px-3 py-2 transition-colors border-2 border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500">
+                <button className="flex items-center space-x-2 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg px-3 py-2 transition-colors border-2 border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500">
                   <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center overflow-hidden">
                     {userProfilePicture ? (
                       <img 
@@ -312,21 +312,49 @@ export default function DashboardPage() {
                       <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     )}
                   </div>
-                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  <span className="text-sm font-medium text-black dark:text-white">
                     {session?.user?.name || "משתמש"}
                   </span>
                 </button>
-                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="py-1">
-                    <Link href="/settings">
-                      <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        הגדרות
+                    <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      הגדרות
+                    </div>
+                    <Link href="/settings#profile">
+                      <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                        <User className="w-4 h-4 ml-2" />
+                        פרופיל אישי
                       </button>
                     </Link>
+                    <Link href="/settings#notifications">
+                      <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                        <Bell className="w-4 h-4 ml-2" />
+                        התראות
+                      </button>
+                    </Link>
+                    <Link href="/settings#appearance">
+                      <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                        <Moon className="w-4 h-4 ml-2" />
+                        מראה ושפה
+                      </button>
+                    </Link>
+                    <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
+                    <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      חשבון
+                    </div>
+                    <Link href="/settings#account">
+                      <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                        <Shield className="w-4 h-4 ml-2" />
+                        ניהול חשבון
+                      </button>
+                    </Link>
+                    <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
                     <button 
                       onClick={() => signOut({ callbackUrl: "/" })}
-                      className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center"
                     >
+                      <LogOut className="w-4 h-4 ml-2" />
                       התנתקות
                     </button>
                   </div>
@@ -639,7 +667,7 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">פעולות מהירות</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Button
               variant="outline"
               onClick={() => router.push("/memberships")}
@@ -658,16 +686,6 @@ export default function DashboardPage() {
               <div className="text-center">
                 <Bell className="w-6 h-6 mx-auto mb-2" />
                 <span>התראות</span>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/profile")}
-              className="h-16"
-            >
-              <div className="text-center">
-                <User className="w-6 h-6 mx-auto mb-2" />
-                <span>פרופיל</span>
               </div>
             </Button>
           </div>

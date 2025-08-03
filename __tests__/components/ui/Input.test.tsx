@@ -100,7 +100,7 @@ describe('Input', () => {
     render(<Input placeholder="Focus input" />)
     
     const input = screen.getByPlaceholderText('Focus input')
-    expect(input).toHaveClass('focus-visible:outline-none', 'focus-visible:ring-2')
+    expect(input).toHaveClass('focus:outline-none', 'focus:ring-2', 'focus:ring-purple-500')
   })
 
   it('should handle required attribute', () => {

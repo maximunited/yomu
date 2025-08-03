@@ -40,11 +40,17 @@ export default function MembershipsPage() {
   const [customMembership, setCustomMembership] = useState({
     name: "",
     description: "",
-    category: ""
+    category: "",
+    url: "",
+    type: "free" as "free" | "paid",
+    cost: "",
+    partnerBrands: [] as string[]
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showCustomMembershipDialog, setShowCustomMembershipDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedMembershipType, setSelectedMembershipType] = useState("");
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [originalMemberships, setOriginalMemberships] = useState<Membership[]>([]);
   const [availableBrands, setAvailableBrands] = useState<Brand[]>([]);
@@ -92,11 +98,11 @@ export default function MembershipsPage() {
                 description += ` | ${t('includesAccessTo')}: ${partnerNames}`;
               } else {
                 // Show count for larger partnerships to keep UI clean
-                description += ` | ${t('includesAccessTo')}-${partners.length} ${t('additionalBrands')}`;
+                description += ` | ${t('includesAccessTo')} ${partners.length} ${t('additionalBrands')}`;
               }
             }
             
-            return {
+            const membership: Membership = {
               id: brand.id,
               name: brand.name,
               description: description,
@@ -105,9 +111,15 @@ export default function MembershipsPage() {
               icon: brand.logoUrl,
               type: "free" as const,
               cost: null,
-              partnerBrands: partners,
-              partnerCount: partners.length
+              partnerBrands: partners
             };
+            
+            // Only add partnerCount if there are actually partners
+            if (partners.length > 0) {
+              membership.partnerCount = partners.length;
+            }
+            
+            return membership;
           });
           
           setMemberships(brandMemberships);
@@ -415,6 +427,11 @@ export default function MembershipsPage() {
 
   const handleAddCustomMembership = () => {
     if (customMembership.name && customMembership.description && customMembership.category) {
+      // Create partner brands array from available brands based on selected names
+      const selectedPartnerBrands = availableBrands.filter(brand => 
+        customMembership.partnerBrands.includes(brand.name)
+      );
+
       const newMembership: Membership = {
         id: `custom-${Date.now().toString()}`,
         name: customMembership.name,
@@ -422,13 +439,29 @@ export default function MembershipsPage() {
         category: customMembership.category,
         isActive: false,
         icon: "/images/brands/restaurant.svg",
-        type: "free",
-        cost: null
+        type: customMembership.type,
+        cost: customMembership.type === "paid" && customMembership.cost ? customMembership.cost : null,
+        partnerBrands: selectedPartnerBrands
       };
+      
+      // Only add partnerCount if there are actually partners
+      if (selectedPartnerBrands.length > 0) {
+        newMembership.partnerCount = selectedPartnerBrands.length;
+      }
+
       setMemberships(prev => [...prev, newMembership]);
       // Also update originalMemberships to include the new membership as inactive
       setOriginalMemberships(prev => [...prev, { ...newMembership, isActive: false }]);
-      setCustomMembership({ name: "", description: "", category: "" });
+      setCustomMembership({ 
+        name: "", 
+        description: "", 
+        category: "", 
+        url: "", 
+        type: "free", 
+        cost: "", 
+        partnerBrands: [] 
+      });
+      setShowCustomMembershipDialog(false);
     }
   };
 
@@ -465,19 +498,74 @@ export default function MembershipsPage() {
   };
 
   const isCustomMembershipFormValid = () => {
-    return customMembership.name.trim() !== "" && 
-           customMembership.description.trim() !== "" && 
-           customMembership.category !== "";
+    const basicFieldsValid = customMembership.name.trim() !== "" && 
+                            customMembership.description.trim() !== "" && 
+                            customMembership.category !== "";
+    
+    // If it's a paid membership, cost is required
+    const costValid = customMembership.type === "free" || 
+                     (customMembership.type === "paid" && customMembership.cost.trim() !== "");
+    
+    return basicFieldsValid && costValid;
+  };
+
+  const handlePartnerBrandToggle = (brandName: string) => {
+    setCustomMembership(prev => ({
+      ...prev,
+      partnerBrands: prev.partnerBrands.includes(brandName)
+        ? prev.partnerBrands.filter(name => name !== brandName)
+        : [...prev.partnerBrands, brandName]
+    }));
+  };
+
+  const getCategoryDisplayName = (category: string) => {
+    // Always check translations first
+    switch (category) {
+      case 'food':
+        return t('food');
+      case 'health':
+        return t('health');
+      case 'fashion':
+        return t('fashion');
+      case 'transport':
+        return t('transport');
+      case 'home':
+        return t('homeCategory');
+      case 'finance':
+      case 'financial':
+        return t('finance');
+      case 'grocery':
+        return t('grocery');
+      case 'entertainment':
+        return t('entertainment');
+      case 'convenience':
+        return t('convenience');
+      case 'baby':
+        return t('baby');
+      default:
+        return category; // fallback to the original category name if no translation
+    }
+  };
+
+  const handleBackNavigation = () => {
+    if (hasChanges()) {
+      if (confirm(t('unsavedChangesWarning'))) {
+        router.push('/dashboard');
+      }
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   const activeCount = memberships.filter(m => m.isActive).length;
 
-  // Filter memberships based on search and category
+  // Filter memberships based on search, category, and membership type
   const filteredMemberships = memberships.filter(membership => {
     const matchesSearch = membership.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          membership.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || membership.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesMembershipType = !selectedMembershipType || membership.type === selectedMembershipType;
+    return matchesSearch && matchesCategory && matchesMembershipType;
   });
 
   if (isLoading) {
@@ -496,22 +584,49 @@ export default function MembershipsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+      <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="w-4 h-4 ml-1" />
-                  חזרה
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleBackNavigation}
+              >
+                <ArrowLeft className="w-4 h-4 ml-1" />
+                חזרה
+              </Button>
               <span className="text-xl font-bold text-gray-900 dark:text-white">ניהול חברויות</span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4 relative">
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 {activeCount} מתוך {memberships.length} פעילים
               </span>
+              <div className="relative">
+                <Button
+                  onClick={handleSaveChanges}
+                  disabled={isSaving || !hasChanges()}
+                  className={`${
+                    isSaving || !hasChanges()
+                      ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                      : "bg-purple-600 hover:bg-purple-700 text-white"
+                  }`}
+                >
+                  {isSaving ? "שומר..." : "שמור שינויים"}
+                </Button>
+                
+                {/* Success Message - positioned under save button */}
+                {showSuccessMessage && (
+                  <div className="absolute top-full left-0 mt-2 bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded-md shadow-lg text-sm whitespace-nowrap z-50">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span>החברויות נשמרו בהצלחה!</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -545,16 +660,17 @@ export default function MembershipsPage() {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
                 >
-                  <option value="">כל הקטגוריות</option>
-                  <option value="food">מזון</option>
-                  <option value="health">בריאות</option>
-                  <option value="fashion">אופנה</option>
-                  <option value="transport">תחבורה</option>
-                  <option value="home">בית</option>
-                  <option value="grocery">מזון</option>
-                  <option value="entertainment">בידור</option>
-                  <option value="convenience">נוחות</option>
-                  <option value="baby">תינוקות</option>
+                  <option value="">{t('allCategories')}</option>
+                  <option value="food">{t('food')}</option>
+                  <option value="health">{t('health')}</option>
+                  <option value="fashion">{t('fashion')}</option>
+                  <option value="transport">{t('transport')}</option>
+                  <option value="home">{t('homeCategory')}</option>
+                  <option value="finance">{t('finance')}</option>
+                  <option value="grocery">{t('grocery')}</option>
+                  <option value="entertainment">{t('entertainment')}</option>
+                  <option value="convenience">{t('convenience')}</option>
+                  <option value="baby">{t('baby')}</option>
                 </select>
               </div>
             </div>
@@ -562,9 +678,9 @@ export default function MembershipsPage() {
             {/* Quick Filter Buttons */}
             <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => setSelectedCategory("")}
+                onClick={() => setSelectedMembershipType("")}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedCategory === "" 
+                  selectedMembershipType === "" 
                     ? "bg-purple-600 text-white" 
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
@@ -572,34 +688,24 @@ export default function MembershipsPage() {
                 הכל
               </button>
               <button
-                onClick={() => setSelectedCategory("food")}
+                onClick={() => setSelectedMembershipType("free")}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedCategory === "food" 
+                  selectedMembershipType === "free" 
                     ? "bg-purple-600 text-white" 
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
               >
-                מזון
+                חינם
               </button>
               <button
-                onClick={() => setSelectedCategory("fashion")}
+                onClick={() => setSelectedMembershipType("paid")}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedCategory === "fashion" 
+                  selectedMembershipType === "paid" 
                     ? "bg-purple-600 text-white" 
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
               >
-                אופנה
-              </button>
-              <button
-                onClick={() => setSelectedCategory("health")}
-                className={`px-3 py-1 rounded-full text-sm ${
-                  selectedCategory === "health" 
-                    ? "bg-purple-600 text-white" 
-                    : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
-                }`}
-              >
-                בריאות
+                בתשלום
               </button>
             </div>
           </div>
@@ -639,7 +745,7 @@ export default function MembershipsPage() {
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         {membership.description}
                       </p>
-                      {membership.partnerCount && membership.partnerCount > 2 && (
+                      {membership.partnerCount && membership.partnerCount > 0 && membership.partnerCount > 2 && (
                         <details className="mt-2">
                           <summary className="text-xs text-purple-600 cursor-pointer hover:text-purple-800">
                             {t('showBrandList')} ({membership.partnerCount})
@@ -663,15 +769,7 @@ export default function MembershipsPage() {
                 {/* Tags section - always at bottom */}
                 <div className="flex items-center justify-between mt-auto pt-3">
                   <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(membership.category)}`}>
-                    {membership.category === "food" && "מזון"}
-                    {membership.category === "health" && "בריאות"}
-                    {membership.category === "fashion" && "אופנה"}
-                    {membership.category === "transport" && "תחבורה"}
-                    {membership.category === "home" && "בית"}
-                    {membership.category === "grocery" && "מזון"}
-                    {membership.category === "entertainment" && "בידור"}
-                    {membership.category === "convenience" && "נוחות"}
-                    {membership.category === "baby" && "תינוקות"}
+                    {getCategoryDisplayName(membership.category)}
                   </span>
                   <div className="flex items-center space-x-2">
                     <span className={`px-2 py-1 rounded-full text-xs ${
@@ -692,89 +790,212 @@ export default function MembershipsPage() {
             ))}
           </div>
 
-          {/* Summary */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  חברויות פעילות: {activeCount} מתוך {memberships.length}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  חברויות חינמיות: {memberships.filter(m => m.type === "free" && m.isActive).length}
-                </p>
+
+
+          {/* Floating Add Button */}
+          <button
+            onClick={() => setShowCustomMembershipDialog(true)}
+            className="fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-20"
+            aria-label="הוסף חברות מותאמת אישית"
+          >
+            <Plus className="w-6 h-6" />
+          </button>
+        </div>
+      </main>
+
+      {/* Custom Membership Dialog */}
+      {showCustomMembershipDialog && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowCustomMembershipDialog(false);
+            }
+          }}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                הוסף חברות מותאמת אישית
+              </h3>
+              <button
+                onClick={() => setShowCustomMembershipDialog(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    שם החברות *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="שם החברות"
+                    value={customMembership.name}
+                    onChange={(e) => setCustomMembership(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    קטגוריה *
+                  </label>
+                  <select
+                    value={customMembership.category}
+                    onChange={(e) => setCustomMembership(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
+                  >
+                    <option value="">בחר קטגוריה</option>
+                    <option value="food">{t('food')}</option>
+                    <option value="health">{t('health')}</option>
+                    <option value="fashion">{t('fashion')}</option>
+                    <option value="transport">{t('transport')}</option>
+                    <option value="home">{t('homeCategory')}</option>
+                    <option value="finance">{t('finance')}</option>
+                    <option value="grocery">{t('grocery')}</option>
+                    <option value="entertainment">{t('entertainment')}</option>
+                    <option value="convenience">{t('convenience')}</option>
+                    <option value="baby">{t('baby')}</option>
+                  </select>
+                </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  תיאור *
+                </label>
+                <textarea
+                  placeholder="תיאור החברות וההטבות"
+                  value={customMembership.description}
+                  onChange={(e) => setCustomMembership(prev => ({ ...prev, description: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  אתר אינטרנט
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://example.com"
+                  value={customMembership.url}
+                  onChange={(e) => setCustomMembership(prev => ({ ...prev, url: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
+                />
+              </div>
+
+              {/* Membership Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  סוג חברות
+                </label>
+                <div className="flex space-x-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="membershipType"
+                      value="free"
+                      checked={customMembership.type === "free"}
+                      onChange={(e) => setCustomMembership(prev => ({ ...prev, type: e.target.value as "free" | "paid", cost: "" }))}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">חינם</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="membershipType"
+                      value="paid"
+                      checked={customMembership.type === "paid"}
+                      onChange={(e) => setCustomMembership(prev => ({ ...prev, type: e.target.value as "free" | "paid" }))}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">בתשלום</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Cost field - only show if paid */}
+              {customMembership.type === "paid" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    עלות *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="₪99/שנה"
+                    value={customMembership.cost}
+                    onChange={(e) => setCustomMembership(prev => ({ ...prev, cost: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
+                  />
+                </div>
+              )}
+
+              {/* Partner Brands */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  מותגים שותפים (אופציונלי)
+                </label>
+                <div className="max-h-32 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-2">
+                  {availableBrands.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {availableBrands.map((brand) => (
+                        <label key={brand.id} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={customMembership.partnerBrands.includes(brand.name)}
+                            onChange={() => handlePartnerBrandToggle(brand.name)}
+                            className="mr-2"
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{brand.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">טוען מותגים...</p>
+                  )}
+                </div>
+                {customMembership.partnerBrands.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      נבחרו {customMembership.partnerBrands.length} מותגים: {customMembership.partnerBrands.join(', ')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex space-x-3 mt-6">
               <Button
-                onClick={handleSaveChanges}
-                disabled={isSaving || !hasChanges()}
-                className={`${
-                  isSaving || !hasChanges()
-                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                    : "bg-purple-600 hover:bg-purple-700 text-white"
+                onClick={() => setShowCustomMembershipDialog(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                ביטול
+              </Button>
+              <Button
+                onClick={handleAddCustomMembership}
+                disabled={!isCustomMembershipFormValid()}
+                className={`flex-1 ${
+                  isCustomMembershipFormValid()
+                    ? "bg-purple-600 hover:bg-purple-700 text-white"
+                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
                 }`}
               >
-                {isSaving ? "שומר..." : "שמור שינויים"}
+                הוסף
               </Button>
             </div>
           </div>
-
-          {/* Success Message */}
-          {showSuccessMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-              <p>החברויות נשמרו בהצלחה!</p>
-            </div>
-          )}
-
-          {/* Custom Membership Form */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              הוסף חברות מותאמת אישית
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input
-                type="text"
-                placeholder="שם החברות"
-                value={customMembership.name}
-                onChange={(e) => setCustomMembership(prev => ({ ...prev, name: e.target.value }))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
-              />
-              <input
-                type="text"
-                placeholder="תיאור"
-                value={customMembership.description}
-                onChange={(e) => setCustomMembership(prev => ({ ...prev, description: e.target.value }))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
-              />
-              <select
-                value={customMembership.category}
-                onChange={(e) => setCustomMembership(prev => ({ ...prev, category: e.target.value }))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
-              >
-                <option value="">בחר קטגוריה</option>
-                <option value="food">מזון</option>
-                <option value="health">בריאות</option>
-                <option value="fashion">אופנה</option>
-                <option value="transport">תחבורה</option>
-                <option value="home">בית</option>
-                <option value="grocery">מזון</option>
-                <option value="entertainment">בידור</option>
-                <option value="convenience">נוחות</option>
-                <option value="baby">תינוקות</option>
-              </select>
-            </div>
-            <Button
-              onClick={handleAddCustomMembership}
-              disabled={!isCustomMembershipFormValid()}
-              className={`mt-4 ${
-                isCustomMembershipFormValid()
-                  ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
-              }`}
-            >
-              הוסף חברות
-            </Button>
-          </div>
         </div>
-      </main>
+      )}
     </div>
   );
 } 

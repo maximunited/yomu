@@ -68,11 +68,11 @@ describe('BenefitDetailPage Accessibility', () => {
     render(<BenefitDetailPage />);
     
     await screen.findByText('Test Benefit');
+    await screen.findByText('TEST123'); // Wait for promo code to appear
     
     // Check copy button
-    const copyButton = screen.getByRole('button', { name: /copy/i });
+    const copyButton = screen.getByRole('button', { name: /העתק קוד קופון/i });
     expect(copyButton).toBeInTheDocument();
-    expect(copyButton).toHaveAttribute('aria-label');
     
     // Check action buttons
     const buyButton = screen.getByRole('button', { name: /לקנייה באתר המותג/i });
@@ -152,9 +152,10 @@ describe('BenefitDetailPage Accessibility', () => {
     render(<BenefitDetailPage />);
     
     await screen.findByText('Test Benefit');
+    await screen.findByText('TEST123'); // Wait for promo code to appear
     
     // Test copy functionality with screen reader feedback
-    const copyButton = screen.getByRole('button', { name: /copy/i });
+    const copyButton = screen.getByRole('button', { name: /העתק קוד קופון/i });
     await user.click(copyButton);
     
     // Check for success message
@@ -184,8 +185,8 @@ describe('BenefitDetailPage Accessibility', () => {
     
     render(<BenefitDetailPage />);
     
-    // Check for error message
-    const errorMessage = await screen.findByText(/לא נמצאה הטבה/i);
+    // Check for error message - exact match
+    const errorMessage = await screen.findByText('הטבה לא נמצאה');
     expect(errorMessage).toBeInTheDocument();
   });
 }); 

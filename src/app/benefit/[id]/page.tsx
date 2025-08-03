@@ -188,6 +188,8 @@ export default function BenefitDetailPage() {
                       size="sm"
                       onClick={() => copyToClipboard(benefit.promoCode!)}
                       className="bg-purple-600 text-white hover:bg-purple-700"
+                      aria-label="העתק קוד קופון"
+                      title="העתק קוד קופון"
                     >
                       <Copy className="w-4 h-4" />
                     </Button>

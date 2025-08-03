@@ -42,6 +42,11 @@ export default function SettingsPage() {
     anniversaryDate: "",
     profilePicture: ""
   });
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: true,
+    sms: false
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -203,7 +208,7 @@ export default function SettingsPage() {
         <div className="max-w-2xl mx-auto space-y-6">
           
           {/* Profile Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div id="profile" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
             <div className="flex items-center space-x-3 mb-6">
               <User className="w-6 h-6 text-purple-600" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('profile')}</h2>
@@ -323,7 +328,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Appearance Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div id="appearance" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
             <div className="flex items-center space-x-3 mb-6">
               {isDarkMode ? <Moon className="w-6 h-6 text-purple-600" /> : <Sun className="w-6 h-6 text-purple-600" />}
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('appearance')}</h2>
@@ -366,18 +371,97 @@ export default function SettingsPage() {
             </div>
           </div>
 
+          {/* Notification Settings */}
+          <div id="notifications" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div className="flex items-center space-x-3 mb-6">
+              <Bell className="w-6 h-6 text-purple-600" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('notifications')}</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-gray-900 dark:text-white">{t('emailNotifications')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('emailNotificationsDescription')}</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={notifications.email}
+                    onChange={(e) => setNotifications(prev => ({ ...prev, email: e.target.checked }))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-gray-900 dark:text-white">{t('pushNotifications')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('pushNotificationsDescription')}</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={notifications.push}
+                    onChange={(e) => setNotifications(prev => ({ ...prev, push: e.target.checked }))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-gray-900 dark:text-white">{t('smsNotifications')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('smsNotificationsDescription')}</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={notifications.sms}
+                    onChange={(e) => setNotifications(prev => ({ ...prev, sms: e.target.checked }))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
           {/* Account Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div id="account" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
             <div className="flex items-center space-x-3 mb-6">
               <Shield className="w-6 h-6 text-purple-600" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('account')}</h2>
             </div>
 
             <div className="space-y-4">
+              <Link href="/privacy">
+                <Button variant="outline" className="w-full justify-start">
+                  <Shield className="w-4 h-4 ml-2" />
+                  {t('privacyPolicy')}
+                </Button>
+              </Link>
+              
+              <Link href="/terms">
+                <Button variant="outline" className="w-full justify-start">
+                  <Shield className="w-4 h-4 ml-2" />
+                  {t('termsOfService')}
+                </Button>
+              </Link>
+              
+              <Link href="/contact">
+                <Button variant="outline" className="w-full justify-start">
+                  <Mail className="w-4 h-4 ml-2" />
+                  {t('contact')}
+                </Button>
+              </Link>
+              
               <Button
                 variant="outline"
                 onClick={handleLogout}
-                className="w-full text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <LogOut className="w-4 h-4 ml-2" />
                 {t('logout')}
