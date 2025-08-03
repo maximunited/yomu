@@ -72,7 +72,7 @@ export default function AboutPage() {
                 <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <User className="w-10 h-10 text-white" />
                 </div>
-                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>מפתח מוביל</h3>
+                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('leadDeveloper')}</h3>
                 <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Lead Developer</p>
               </div>
 
@@ -80,7 +80,7 @@ export default function AboutPage() {
                 <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Palette className="w-10 h-10 text-white" />
                 </div>
-                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>מעצב UX/UI</h3>
+                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('uxDesigner')}</h3>
                 <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>UX/UI Designer</p>
               </div>
 
@@ -88,7 +88,7 @@ export default function AboutPage() {
                 <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Target className="w-10 h-10 text-white" />
                 </div>
-                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>מנהל מוצר</h3>
+                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('productManager')}</h3>
                 <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Product Manager</p>
               </div>
             </div>
@@ -101,15 +101,15 @@ export default function AboutPage() {
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>תורמי תוכן</h3>
+                <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('contentContributors')}</h3>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  אנשים שתרמו מידע על הטבות יום הולדת
+                  {t('contentContributorsDescription')}
                 </p>
               </div>
               <div className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>בודקי איכות</h3>
+                <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('qualityAssurance')}</h3>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  צוות הבודק את דיוק המידע
+                  {t('qualityAssuranceDescription')}
                 </p>
               </div>
             </div>

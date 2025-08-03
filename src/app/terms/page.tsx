@@ -31,45 +31,44 @@ export default function TermsPage() {
               <section>
                 <h2 className={`text-xl font-semibold mb-3 flex items-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <CheckCircle className="w-5 h-5 ml-2 text-green-600" />
-                  קבלת התנאים
+                  {t('termsAcceptance')}
                 </h2>
                 <p className="leading-relaxed">
-                  השימוש באתר YomU מהווה הסכמה לתנאי השימוש הללו. אם אינכם מסכימים לתנאים, אנא אל תשתמשו בשירות.
+                  {t('termsAcceptanceDescription')}
                 </p>
               </section>
 
               <section>
                 <h2 className={`text-xl font-semibold mb-3 flex items-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <Info className="w-5 h-5 ml-2 text-blue-600" />
-                  שימוש בשירות
+                  {t('serviceUsage')}
                 </h2>
                 <p className="leading-relaxed">
-                  השירות מיועד לשימוש אישי בלבד. אסור להשתמש בשירות למטרות מסחריות או להפיץ מידע ללא אישור.
+                  {t('serviceUsageDescription')}
                 </p>
               </section>
 
               <section>
                 <h2 className={`text-xl font-semibold mb-3 flex items-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <AlertTriangle className="w-5 h-5 ml-2 text-yellow-600" />
-                  אחריות
+                  {t('liability')}
                 </h2>
                 <p className="leading-relaxed">
-                  אנו משתדלים לספק מידע מדויק, אך איננו אחראים לטעויות או למידע לא מעודכן. 
-                  יש לוודא את פרטי ההטבות ישירות אצל הספקים.
+                  {t('liabilityDescription')}
                 </p>
               </section>
 
               <section>
-                <h2 className={`text-xl font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>שינויים בתנאים</h2>
+                <h2 className={`text-xl font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('termsChanges')}</h2>
                 <p className="leading-relaxed">
-                  אנו שומרים לעצמנו את הזכות לשנות תנאים אלו בכל עת. שינויים יובאו לידיעת המשתמשים.
+                  {t('termsChangesDescription')}
                 </p>
               </section>
 
               <section>
-                <h2 className={`text-xl font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>ביטול חשבון</h2>
+                <h2 className={`text-xl font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('accountCancellation')}</h2>
                 <p className="leading-relaxed">
-                  ניתן לבטל את החשבון בכל עת דרך הגדרות החשבון. ביטול החשבון יביא למחיקת כל הנתונים הקשורים.
+                  {t('accountCancellationDescription')}
                 </p>
               </section>
 

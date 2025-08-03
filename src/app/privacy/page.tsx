@@ -31,40 +31,37 @@ export default function PrivacyPage() {
               <section>
                 <h2 className={`text-xl font-semibold mb-3 flex items-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <Eye className="w-5 h-5 ml-2" />
-                  איסוף מידע
+                  {t('dataCollection')}
                 </h2>
                 <p className="leading-relaxed">
-                  אנו אוספים מידע בסיסי כגון שם, כתובת דוא"ל ותאריך לידה כדי לספק לכם את השירות הטוב ביותר. 
-                  המידע שלכם נשמר בצורה מאובטחת ולא יועבר לצדדים שלישיים ללא הסכמתכם המפורשת.
+                  {t('dataCollectionDescription')}
                 </p>
               </section>
 
               <section>
                 <h2 className={`text-xl font-semibold mb-3 flex items-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <Lock className="w-5 h-5 ml-2" />
-                  אבטחה
+                  {t('security')}
                 </h2>
                 <p className="leading-relaxed">
-                  אנו משתמשים בטכנולוגיות אבטחה מתקדמות כדי להגן על המידע שלכם. 
-                  כל הנתונים מוצפנים ומועברים באמצעות חיבורים מאובטחים.
+                  {t('securityDescription')}
                 </p>
               </section>
 
               <section>
                 <h2 className={`text-xl font-semibold mb-3 flex items-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <User className="w-5 h-5 ml-2" />
-                  זכויות המשתמש
+                  {t('userRights')}
                 </h2>
                 <p className="leading-relaxed">
-                  יש לכם הזכות לבקש גישה למידע שלכם, לעדכן אותו או למחוק אותו בכל עת. 
-                  ניתן ליצור איתנו קשר דרך דף "צור קשר" באתר.
+                  {t('userRightsDescription')}
                 </p>
               </section>
 
               <section>
-                <h2 className={`text-xl font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>עדכונים למדיניות</h2>
+                <h2 className={`text-xl font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('policyUpdates')}</h2>
                 <p className="leading-relaxed">
-                  מדיניות זו עשויה להתעדכן מעת לעת. שינויים משמעותיים יובאו לידיעתכם באמצעות הודעות באתר או בדוא"ל.
+                  {t('policyUpdatesDescription')}
                 </p>
               </section>
 

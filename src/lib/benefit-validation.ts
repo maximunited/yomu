@@ -4,7 +4,7 @@ export interface BenefitValidationRule {
   validityType: string;
   description: string;
   validationLogic: (userDOB: Date, currentDate: Date) => boolean;
-  displayText: string;
+  displayTextKey: string;
 }
 
 export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
@@ -16,7 +16,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       return userDOB.getMonth() === currentDate.getMonth() && 
              userDOB.getDate() === currentDate.getDate();
     },
-    displayText: "תקף ביום ההולדת בלבד"
+    displayTextKey: "validityExactDate"
   },
   
   "birthday_entire_month": {
@@ -25,7 +25,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
     validationLogic: (userDOB: Date, currentDate: Date) => {
       return userDOB.getMonth() === currentDate.getMonth();
     },
-    displayText: "תקף לכל החודש"
+    displayTextKey: "validityEntireMonth"
   },
   
   "birthday_week_before_after": {
@@ -43,7 +43,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף לשבוע לפני ואחרי"
+    displayTextKey: "validityWeekBeforeAfter"
   },
   
   "birthday_weekend": {
@@ -61,7 +61,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף לשבוע של יום ההולדת"
+    displayTextKey: "validityWeekend"
   },
   
   "birthday_30_days": {
@@ -79,7 +79,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף ל-30 ימים"
+    displayTextKey: "validity30Days"
   },
   
   "birthday_7_days_before": {
@@ -97,7 +97,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף ל-7 ימים לפני"
+    displayTextKey: "validity7DaysBefore"
   },
   
   "birthday_7_days_after": {
@@ -115,7 +115,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף ל-7 ימים אחרי"
+    displayTextKey: "validity7DaysAfter"
   },
   
   "birthday_3_days_before": {
@@ -133,7 +133,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף ל-3 ימים לפני"
+    displayTextKey: "validity3DaysBefore"
   },
   
   "birthday_3_days_after": {
@@ -151,7 +151,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף ל-3 ימים אחרי"
+    displayTextKey: "validity3DaysAfter"
   },
   
   // Anniversary benefits (for future use)
@@ -163,7 +163,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // For now, return false as anniversaryDate is not implemented
       return false;
     },
-    displayText: "תקף ביום השנה בלבד"
+    displayTextKey: "validityExactDate"
   },
   
   "anniversary_entire_month": {
@@ -173,7 +173,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // This would need anniversaryDate from user profile
       return false;
     },
-    displayText: "תקף לכל חודש השנה"
+    displayTextKey: "validityEntireMonth"
   },
   
   "anniversary_week_before_after": {
@@ -183,7 +183,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // This would need anniversaryDate from user profile
       return false;
     },
-    displayText: "תקף לשבוע לפני ואחרי יום השנה"
+    displayTextKey: "validityWeekBeforeAfter"
   }
 };
 
@@ -226,7 +226,7 @@ export function validateBenefitData(benefitData: any): { isValid: boolean; error
 
 export function getValidityDisplayText(validityType: string): string {
   const normalizedType = LEGACY_VALIDITY_TYPES[validityType] || validityType;
-  return VALIDITY_TYPES[normalizedType]?.displayText || "תקף לתקופה מוגבלת";
+  return VALIDITY_TYPES[normalizedType]?.displayTextKey || "validityLimitedPeriod";
 }
 
 export function isBenefitActive(benefit: any, userDOB: Date | null, currentDate: Date = new Date()): boolean {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { Check, Gift, ShoppingBag, Coffee, Car, Plane, Heart } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Brand {
   id: string;
@@ -20,70 +21,70 @@ const popularBrands: Brand[] = [
     name: "Fox - Dream Card",
     logoUrl: "/images/brands/fox.png",
     category: "fashion",
-    description: "הטבות על ביגוד והנעלה"
+    description: "brandDescriptionFashion"
   },
   {
     id: "super-pharm-lifestyle",
     name: "Super-Pharm - LifeStyle",
     logoUrl: "/images/brands/super-pharm.png",
     category: "health",
-    description: "הטבות על מוצרי בריאות ויופי"
+    description: "brandDescriptionHealth"
   },
   {
     id: "mcdonalds",
     name: "McDonald's",
     logoUrl: "/images/brands/mcdonalds.png",
     category: "food",
-    description: "הטבות על מזון מהיר"
+    description: "brandDescriptionFood"
   },
   {
     id: "bbb",
     name: "BBB",
     logoUrl: "/images/brands/bbb.png",
     category: "home",
-    description: "הטבות על מוצרי בית"
+    description: "brandDescriptionHome"
   },
   {
     id: "hm",
     name: "H&M",
     logoUrl: "/images/brands/hm.png",
     category: "fashion",
-    description: "הטבות על ביגוד"
+    description: "brandDescriptionFashion"
   },
   {
     id: "isracard",
     name: "Isracard",
     logoUrl: "/images/brands/isracard.png",
     category: "finance",
-    description: "הטבות על שירותים פיננסיים"
+    description: "brandDescriptionFinance"
   },
   {
     id: "max",
     name: "Max",
     logoUrl: "/images/brands/max.png",
     category: "fashion",
-    description: "הטבות על ביגוד והנעלה"
+    description: "brandDescriptionFashion"
   },
   {
     id: "starbucks",
     name: "Starbucks",
     logoUrl: "/images/brands/starbucks.png",
     category: "food",
-    description: "הטבות על קפה ומשקאות"
+    description: "brandDescriptionCoffee"
   },
   {
     id: "shufersal",
     name: "Shufersal",
     logoUrl: "/images/brands/shufersal.png",
     category: "grocery",
-    description: "הטבות על מוצרי מזון"
+    description: "brandDescriptionGrocery"
   },
   {
     id: "coffee-shop",
     name: "Coffee Shop",
     logoUrl: "/images/brands/coffee-shop.svg",
     category: "food",
-    description: "הטבות על קפה ומשקאות"
+    description: "brandDescriptionCoffee"
   }
 ];
 
@@ -100,6 +101,7 @@ const categoryIcons = {
 export default function OnboardingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -114,7 +116,7 @@ export default function OnboardingPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">טוען...</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -130,7 +132,7 @@ export default function OnboardingPage() {
 
   const handleSubmit = async () => {
     if (selectedBrands.length === 0) {
-      alert("אנא בחרו לפחות תוכנית אחת");
+      alert(t('onboardingSelectAtLeastOne'));
       return;
     }
 
@@ -149,11 +151,11 @@ export default function OnboardingPage() {
       if (response.ok) {
         router.push("/dashboard");
       } else {
-        throw new Error("שגיאה בשמירת החברויות");
+        throw new Error(t('onboardingSaveError'));
       }
     } catch (error) {
       console.error("Error saving memberships:", error);
-      alert("שגיאה בשמירת החברויות");
+      alert(t('onboardingSaveError'));
     } finally {
       setIsLoading(false);
     }
@@ -171,10 +173,10 @@ export default function OnboardingPage() {
             <span className="text-2xl font-bold text-gray-900">YomU</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            איזה תוכניות חברות יש לכם?
+            {t('onboardingTitle')}
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            בחרו את כל תוכניות החברות שלכם כדי שנוכל להציג לכם את כל ההטבות ליום הולדת
+            {t('onboardingDescription')}
           </p>
         </div>
 
@@ -214,7 +216,7 @@ export default function OnboardingPage() {
                         {brand.name}
                       </h3>
                       <p className="text-gray-500 text-xs">
-                        {brand.description}
+                        {t(brand.description as keyof typeof t)}
                       </p>
                     </div>
                     <IconComponent className="w-5 h-5 text-gray-400" />
@@ -227,7 +229,7 @@ export default function OnboardingPage() {
           {/* Action Buttons */}
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600">
-              נבחרו {selectedBrands.length} תוכניות
+              {t('onboardingSelectedCount').replace('{count}', selectedBrands.length.toString())}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -235,14 +237,14 @@ export default function OnboardingPage() {
                 disabled={isLoading || selectedBrands.length === 0}
                 className="px-8 py-3"
               >
-                {isLoading ? "שומר..." : "המשך לדשבורד"}
+                {isLoading ? t('onboardingSaving') : t('onboardingContinueToDashboard')}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push("/dashboard")}
                 className="px-8 py-3"
               >
-                דלג לעת עתה
+                {t('onboardingSkipForNow')}
               </Button>
             </div>
           </div>

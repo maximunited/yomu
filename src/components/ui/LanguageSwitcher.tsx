@@ -19,7 +19,7 @@ export function LanguageSwitcher() {
       className="flex items-center space-x-2"
     >
       <Globe className="w-4 h-4" />
-      <span>{language === 'he' ? 'EN' : 'עב'}</span>
+      <span>{language === 'he' ? t('languageAbbreviationEnglish') : t('languageAbbreviationHebrew')}</span>
     </Button>
   );
 } 

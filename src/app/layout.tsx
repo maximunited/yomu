@@ -1,22 +1,15 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/providers/SessionProvider";
-import { LanguageProvider } from "@/contexts/LanguageContext";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "YomU - יום-You | Birthday Benefits",
-  description: "Never miss a birthday deal again. Track all your birthday benefits, deals, and freebies in one place.",
-  keywords: "birthday, benefits, deals, freebies, Israel, loyalty programs",
-  authors: [{ name: "YomU Team" }],
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
+  description: "Discover and manage your birthday benefits from all your favorite brands",
 };
 
 export default function RootLayout({
@@ -27,13 +20,13 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl">
       <body className={inter.className}>
-        <DarkModeProvider>
-          <LanguageProvider>
-            <SessionProvider>
+        <SessionProvider>
+          <DarkModeProvider>
+            <LanguageProvider>
               {children}
-            </SessionProvider>
-          </LanguageProvider>
-        </DarkModeProvider>
+            </LanguageProvider>
+          </DarkModeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

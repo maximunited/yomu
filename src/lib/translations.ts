@@ -259,6 +259,7 @@ export interface Translations {
   // Contact Page
   contactAddress: string;
   contactPhone: string;
+  workingHoursValue: string;
   
   // Membership Types
   free: string;
@@ -306,6 +307,109 @@ export interface Translations {
   m32BurgersBenefit: string;
   libiraRestaurant: string;
   libiraRestaurantBenefit: string;
+  
+  // Onboarding page
+  onboardingTitle: string;
+  onboardingDescription: string;
+  onboardingSelectAtLeastOne: string;
+  onboardingSaveError: string;
+  onboardingContinueToDashboard: string;
+  onboardingSkipForNow: string;
+  onboardingSelectedCount: string;
+  onboardingSaving: string;
+  
+  // Brand descriptions
+  brandDescriptionFashion: string;
+  brandDescriptionHealth: string;
+  brandDescriptionFood: string;
+  brandDescriptionHome: string;
+  brandDescriptionFinance: string;
+  brandDescriptionCoffee: string;
+  brandDescriptionGrocery: string;
+  
+  // Dashboard categories
+  categoryFashion: string;
+  categoryFood: string;
+  categoryHealth: string;
+  categoryHome: string;
+  categoryFinance: string;
+  categoryGrocery: string;
+  categoryEntertainment: string;
+  categoryConvenience: string;
+  categoryTransport: string;
+  categoryBaby: string;
+  
+  // Validity durations
+  validityExactDate: string;
+  validityEntireMonth: string;
+  validityWeekBeforeAfter: string;
+  validityWeekend: string;
+  validity30Days: string;
+  validity7DaysBefore: string;
+  validity7DaysAfter: string;
+  validity3DaysBefore: string;
+  validity3DaysAfter: string;
+  validityLimitedPeriod: string;
+  
+  // Language abbreviations
+  languageAbbreviationHebrew: string;
+  languageAbbreviationEnglish: string;
+  
+  // Page titles
+  pageTitle: string;
+  
+  // Dashboard UI elements
+  user: string;
+  personalProfile: string;
+  appearanceAndLanguage: string;
+  account: string;
+  accountManagement: string;
+  helloUser: string;
+  hereAreYourBirthdayBenefits: string;
+  
+  // Signup page
+  passwordsDoNotMatch: string;
+  passwordMinLength: string;
+  registrationError: string;
+  autoLoginError: string;
+  googleRegistrationError: string;
+  
+  // Dashboard filtering
+  searchAndFilter: string;
+  showFilters: string;
+  hideFilters: string;
+  searchPlaceholder: string;
+  category: string;
+  allCategories: string;
+  validityPeriod: string;
+  allPeriods: string;
+  membershipType: string;
+  
+  // Dashboard additional UI
+  allTypes: string;
+  categoryLabel: string;
+  periodLabel: string;
+  typeLabel: string;
+  buyNow: string;
+  
+  // Notifications
+  birthdayMonthStarted: string;
+  birthdayMonthStartedMessage: string;
+  benefitExpiringSoon: string;
+  benefitExpiringMessage: string;
+  newBenefitAvailable: string;
+  
+  // Signin page
+  welcome: string;
+  signInToYourAccount: string;
+  invalidCredentials: string;
+  signInError: string;
+  googleSignInError: string;
+  saveEmail: string;
+  keepMeSignedIn: string;
+  signingIn: string;
+  or: string;
+  signUpNow: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -567,6 +671,19 @@ export const translations: Record<Language, Translations> = {
     // Contact Page
     contactAddress: 'רחוב הרצל 123, תל אביב',
     contactPhone: '03-1234567',
+    workingHoursValue: 'א\'-ה\' 9:00-18:00',
+    
+    // Signin page
+    welcome: 'ברוכים הבאים',
+    signInToYourAccount: 'התחברו לחשבון שלכם',
+    invalidCredentials: 'פרטי התחברות שגויים',
+    signInError: 'שגיאה בהתחברות',
+    googleSignInError: 'שגיאה בהתחברות עם Google',
+    saveEmail: 'שמור אימייל',
+    keepMeSignedIn: 'השאר אותי מחובר',
+    signingIn: 'מתחבר...',
+    or: 'או',
+    signUpNow: 'הירשמו עכשיו',
     
     // Team Members
     leadDeveloper: 'מתכנת מוביל',
@@ -649,6 +766,97 @@ export const translations: Record<Language, Translations> = {
     m32BurgersBenefit: '15% הנחה בחודש יום הולדת',
     libiraRestaurant: 'מסעדת ליבירה',
     libiraRestaurantBenefit: 'בירה וקינוח בישיבה בלבד כל החודש',
+    
+    // Onboarding page
+    onboardingTitle: 'איזה תוכניות חברות יש לכם?',
+    onboardingDescription: 'בחרו את כל תוכניות החברות שלכם כדי שנוכל להציג לכם את כל ההטבות ליום הולדת',
+    onboardingSelectAtLeastOne: 'אנא בחרו לפחות תוכנית אחת',
+    onboardingSaveError: 'שגיאה בשמירת החברויות',
+    onboardingContinueToDashboard: 'המשך לדשבורד',
+    onboardingSkipForNow: 'דלג לעת עתה',
+    onboardingSelectedCount: 'נבחרו {count} תוכניות',
+    onboardingSaving: 'שומר...',
+    
+    // Brand descriptions
+    brandDescriptionFashion: 'הטבות על ביגוד והנעלה',
+    brandDescriptionHealth: 'הטבות על מוצרי בריאות ויופי',
+    brandDescriptionFood: 'הטבות על מזון מהיר',
+    brandDescriptionHome: 'הטבות על מוצרי בית',
+    brandDescriptionFinance: 'הטבות על שירותים פיננסיים',
+    brandDescriptionCoffee: 'הטבות על קפה ומשקאות',
+    brandDescriptionGrocery: 'הטבות על מוצרי מזון',
+    
+    // Dashboard categories
+    categoryFashion: 'אופנה',
+    categoryFood: 'מזון',
+    categoryHealth: 'בריאות',
+    categoryHome: 'בית',
+    categoryFinance: 'פיננסי',
+    categoryGrocery: 'מזון',
+    categoryEntertainment: 'בידור',
+    categoryConvenience: 'נוחות',
+    categoryTransport: 'תחבורה',
+    categoryBaby: 'תינוקות',
+    
+    // Validity durations
+    validityExactDate: 'יום אחד',
+    validityEntireMonth: 'חודש שלם',
+    validityWeekBeforeAfter: 'שבועיים',
+    validityWeekend: 'סוף שבוע',
+    validity30Days: '30 ימים',
+    validity7DaysBefore: '7 ימים לפני',
+    validity7DaysAfter: '7 ימים אחרי',
+    validity3DaysBefore: '3 ימים לפני',
+    validity3DaysAfter: '3 ימים אחרי',
+    validityLimitedPeriod: 'תקופה מוגבלת',
+    
+    // Language abbreviations
+    languageAbbreviationHebrew: 'עב',
+    languageAbbreviationEnglish: 'EN',
+    
+    // Page titles
+    pageTitle: 'YomU - יום-You | Birthday Benefits',
+    
+    // Dashboard UI elements
+    user: 'משתמש',
+    personalProfile: 'פרופיל אישי',
+    appearanceAndLanguage: 'מראה ושפה',
+    account: 'חשבון',
+    accountManagement: 'ניהול חשבון',
+    helloUser: 'שלום {name}! 🎉',
+    hereAreYourBirthdayBenefits: 'הנה ההטבות שלך ליום הולדת',
+    
+    // Signup page
+    passwordsDoNotMatch: 'הסיסמאות לא תואמות',
+    passwordMinLength: 'הסיסמה חייבת להיות לפחות 8 תווים',
+    registrationError: 'שגיאה בהרשמה',
+    autoLoginError: 'שגיאה בהתחברות אוטומטית',
+    googleRegistrationError: 'שגיאה בהרשמה דרך Google',
+    
+    // Dashboard filtering
+    searchAndFilter: 'חיפוש וסינון',
+    showFilters: 'הצג סינונים',
+    hideFilters: 'הסתר סינונים',
+    searchPlaceholder: 'חפש חברויות...',
+    category: 'קטגוריה',
+    allCategories: 'כל הקטגוריות',
+    validityPeriod: 'תקופה חוקית',
+    allPeriods: 'כל התקופות',
+    membershipType: 'סוג חברות',
+    
+    // Dashboard additional UI
+    allTypes: 'כל הסוגים',
+    categoryLabel: 'קטגוריה',
+    periodLabel: 'תקופה',
+    typeLabel: 'סוג',
+    buyNow: 'קנה עכשיו',
+    
+    // Notifications
+    birthdayMonthStarted: 'חודש יום הולדת התחיל! 🎉',
+    birthdayMonthStartedMessage: 'חודש יום הולדת התחיל! 🎉',
+    benefitExpiringSoon: 'הטבה מסתיימת בקרוב',
+    benefitExpiringMessage: 'הטבה מסתיימת בקרוב',
+    newBenefitAvailable: 'הטבה חדשה זמינה',
   },
   en: {
     // Navigation
@@ -909,6 +1117,7 @@ export const translations: Record<Language, Translations> = {
     // Contact Page
     contactAddress: 'Herzl Street 123, Tel Aviv',
     contactPhone: '03-1234567',
+    workingHoursValue: 'Sun-Thu 9:00-18:00',
     
     // Membership Types
     free: 'Free',
@@ -956,5 +1165,108 @@ export const translations: Record<Language, Translations> = {
     m32BurgersBenefit: '15% discount in birthday month',
     libiraRestaurant: 'Libira Restaurant',
     libiraRestaurantBenefit: 'Beer and dessert for dine-in only all month',
+    
+    // Onboarding page
+    onboardingTitle: 'Which membership programs do you have?',
+    onboardingDescription: 'Select all your membership programs so we can show you all birthday benefits',
+    onboardingSelectAtLeastOne: 'Please select at least one program',
+    onboardingSaveError: 'Error saving memberships',
+    onboardingContinueToDashboard: 'Continue to Dashboard',
+    onboardingSkipForNow: 'Skip for now',
+    onboardingSelectedCount: '{count} programs selected',
+    onboardingSaving: 'Saving...',
+    
+    // Brand descriptions
+    brandDescriptionFashion: 'Benefits on clothing and footwear',
+    brandDescriptionHealth: 'Benefits on health and beauty products',
+    brandDescriptionFood: 'Benefits on fast food',
+    brandDescriptionHome: 'Benefits on home products',
+    brandDescriptionFinance: 'Benefits on financial services',
+    brandDescriptionCoffee: 'Benefits on coffee and beverages',
+    brandDescriptionGrocery: 'Benefits on food products',
+    
+    // Dashboard categories
+    categoryFashion: 'Fashion',
+    categoryFood: 'Food',
+    categoryHealth: 'Health',
+    categoryHome: 'Home',
+    categoryFinance: 'Finance',
+    categoryGrocery: 'Grocery',
+    categoryEntertainment: 'Entertainment',
+    categoryConvenience: 'Convenience',
+    categoryTransport: 'Transport',
+    categoryBaby: 'Baby',
+    
+    // Validity durations
+    validityExactDate: 'One day',
+    validityEntireMonth: 'Entire month',
+    validityWeekBeforeAfter: 'Two weeks',
+    validityWeekend: 'Weekend',
+    validity30Days: '30 days',
+    validity7DaysBefore: '7 days before',
+    validity7DaysAfter: '7 days after',
+    validity3DaysBefore: '3 days before',
+    validity3DaysAfter: '3 days after',
+    validityLimitedPeriod: 'Limited period',
+    
+    // Language abbreviations
+    languageAbbreviationHebrew: 'עב',
+    languageAbbreviationEnglish: 'EN',
+    
+    // Page titles
+    pageTitle: 'YomU - יום-You | Birthday Benefits',
+    
+    // Dashboard UI elements
+    user: 'User',
+    personalProfile: 'Personal Profile',
+    appearanceAndLanguage: 'Appearance & Language',
+    account: 'Account',
+    accountManagement: 'Account Management',
+    helloUser: 'Hello {name}! 🎉',
+    hereAreYourBirthdayBenefits: 'Here are your birthday benefits',
+    
+    // Signup page
+    passwordsDoNotMatch: 'Passwords do not match',
+    passwordMinLength: 'Password must be at least 8 characters',
+    registrationError: 'Registration error',
+    autoLoginError: 'Auto-login error',
+    googleRegistrationError: 'Google registration error',
+    
+    // Dashboard filtering
+    searchAndFilter: 'Search & Filter',
+    showFilters: 'Show Filters',
+    hideFilters: 'Hide Filters',
+    searchPlaceholder: 'Search memberships...',
+    category: 'Category',
+    allCategories: 'All Categories',
+    validityPeriod: 'Validity Period',
+    allPeriods: 'All Periods',
+    membershipType: 'Membership Type',
+    
+    // Dashboard additional UI
+    allTypes: 'All Types',
+    categoryLabel: 'Category',
+    periodLabel: 'Period',
+    typeLabel: 'Type',
+    buyNow: 'Buy Now',
+    
+    // Notifications
+    birthdayMonthStarted: 'Birthday month started! 🎉',
+    birthdayMonthStartedMessage: 'You have 5 new benefits available for your birthday month',
+    benefitExpiringSoon: 'Benefit expiring soon',
+    benefitExpiringMessage: 'Fox benefit expires in 3 days',
+    newBenefitAvailable: 'New benefit available',
+    
+    // Signin page
+    welcome: 'Welcome',
+    signInToYourAccount: 'Sign in to your account',
+    invalidCredentials: 'Invalid credentials',
+    signInError: 'Sign in error',
+    googleSignInError: 'Google sign in error',
+    saveEmail: 'Save email',
+    keepMeSignedIn: 'Keep me signed in',
+    signingIn: 'Signing in...',
+    or: 'or',
+    signUpNow: 'Sign up now',
   },
 }; 

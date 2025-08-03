@@ -36,7 +36,7 @@ export default function ContactPage() {
                   <div className="flex items-center space-x-3">
                     <Mail className="w-5 h-5 text-purple-600" />
                     <div>
-                      <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>דוא"ל</p>
+                      <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('email')}</p>
                       <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>support@yomu.co.il</p>
                     </div>
                   </div>
@@ -45,7 +45,7 @@ export default function ContactPage() {
                     <Phone className="w-5 h-5 text-purple-600" />
                     <div>
                       <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('phone')}</p>
-                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>03-1234567</p>
+                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{t('contactPhone')}</p>
                     </div>
                   </div>
 
@@ -53,7 +53,7 @@ export default function ContactPage() {
                     <MapPin className="w-5 h-5 text-purple-600" />
                     <div>
                       <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('address')}</p>
-                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>רחוב הרצל 123, תל אביב</p>
+                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{t('contactAddress')}</p>
                     </div>
                   </div>
 
@@ -61,7 +61,7 @@ export default function ContactPage() {
                     <Clock className="w-5 h-5 text-purple-600" />
                     <div>
                       <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('workingHours')}</p>
-                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>א'-ה' 9:00-18:00</p>
+                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{t('workingHoursValue')}</p>
                     </div>
                   </div>
                 </div>

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Gift, Calendar, Star, Bell, Copy, ExternalLink, ShoppingBag, User, Search, Filter, Moon, Shield, LogOut } from "lucide-react";
 import { isBenefitActive, getUpcomingBenefits, getValidityDisplayText } from "@/lib/benefit-validation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Benefit {
   id: string;
@@ -48,6 +49,7 @@ interface UserMembership {
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [userMemberships, setUserMemberships] = useState<UserMembership[]>([]);
   const [userDOB, setUserDOB] = useState<Date | null>(null);
@@ -166,34 +168,34 @@ export default function DashboardPage() {
   };
 
   const getCategoryDisplayName = (category: string) => {
-    const categoryNames = {
-      fashion: "אופנה",
-      food: "מזון",
-      health: "בריאות",
-      home: "בית",
-      finance: "פיננסי",
-      grocery: "מזון",
-      entertainment: "בידור",
-      convenience: "נוחות",
-      transport: "תחבורה",
-      baby: "תינוקות"
+    const categoryMap = {
+      fashion: t('categoryFashion'),
+      food: t('categoryFood'),
+      health: t('categoryHealth'),
+      home: t('categoryHome'),
+      finance: t('categoryFinance'),
+      grocery: t('categoryGrocery'),
+      entertainment: t('categoryEntertainment'),
+      convenience: t('categoryConvenience'),
+      transport: t('categoryTransport'),
+      baby: t('categoryBaby')
     };
-    return categoryNames[category as keyof typeof categoryNames] || category;
+    return categoryMap[category as keyof typeof categoryMap] || category;
   };
 
   const getValidityDurationDisplay = (validityType: string) => {
     const durationMap = {
-      "birthday_exact_date": "יום אחד",
-      "birthday_entire_month": "חודש שלם",
-      "birthday_week_before_after": "שבועיים",
-      "birthday_weekend": "סוף שבוע",
-      "birthday_30_days": "30 ימים",
-      "birthday_7_days_before": "7 ימים לפני",
-      "birthday_7_days_after": "7 ימים אחרי",
-      "birthday_3_days_before": "3 ימים לפני",
-      "birthday_3_days_after": "3 ימים אחרי"
+      "birthday_exact_date": t('validityExactDate'),
+      "birthday_entire_month": t('validityEntireMonth'),
+      "birthday_week_before_after": t('validityWeekBeforeAfter'),
+      "birthday_weekend": t('validityWeekend'),
+      "birthday_30_days": t('validity30Days'),
+      "birthday_7_days_before": t('validity7DaysBefore'),
+      "birthday_7_days_after": t('validity7DaysAfter'),
+      "birthday_3_days_before": t('validity3DaysBefore'),
+      "birthday_3_days_after": t('validity3DaysAfter')
     };
-    return durationMap[validityType as keyof typeof durationMap] || "תקופה מוגבלת";
+    return durationMap[validityType as keyof typeof durationMap] || t('validityLimitedPeriod');
   };
 
   // Filter benefits based on search and filters
@@ -226,7 +228,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">טוען...</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -313,40 +315,40 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <span className="text-sm font-medium text-black dark:text-white">
-                    {session?.user?.name || "משתמש"}
+                    {session?.user?.name || t('user')}
                   </span>
                 </button>
                 <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="py-1">
                     <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      הגדרות
+                      {t('settings')}
                     </div>
                     <Link href="/settings#profile">
                       <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                         <User className="w-4 h-4 ml-2" />
-                        פרופיל אישי
+                        {t('personalProfile')}
                       </button>
                     </Link>
                     <Link href="/settings#notifications">
                       <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                         <Bell className="w-4 h-4 ml-2" />
-                        התראות
+                        {t('notifications')}
                       </button>
                     </Link>
                     <Link href="/settings#appearance">
                       <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                         <Moon className="w-4 h-4 ml-2" />
-                        מראה ושפה
+                        {t('appearanceAndLanguage')}
                       </button>
                     </Link>
                     <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
                     <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      חשבון
+                      {t('account')}
                     </div>
                     <Link href="/settings#account">
                       <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                         <Shield className="w-4 h-4 ml-2" />
-                        ניהול חשבון
+                        {t('accountManagement')}
                       </button>
                     </Link>
                     <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
@@ -355,7 +357,7 @@ export default function DashboardPage() {
                       className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center"
                     >
                       <LogOut className="w-4 h-4 ml-2" />
-                      התנתקות
+                                              {t('signOut')}
                     </button>
                   </div>
                 </div>
@@ -370,24 +372,24 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            שלום {session?.user?.name || "משתמש"}! 🎉
+            {t('helloUser').replace('{name}', session?.user?.name || t('user'))}
           </h1>
           <p className="text-gray-600 mb-6">
-            הנה ההטבות שלך ליום הולדת
+            {t('hereAreYourBirthdayBenefits')}
           </p>
           
           {/* Membership Summary */}
           <div className="bg-white rounded-lg p-4 mb-6 max-w-md mx-auto">
             <div className="flex items-center justify-center space-x-2 mb-2">
               <ShoppingBag className="w-5 h-5 text-purple-600" />
-              <span className="text-sm font-medium text-gray-700">חברויות פעילות</span>
+                              <span className="text-sm font-medium text-gray-700">{t('activeMemberships')}</span>
             </div>
             <div className="text-2xl font-bold text-purple-600">
               {userMemberships.filter(m => m.isActive).length}
             </div>
             <Link href="/memberships">
               <Button variant="outline" size="sm" className="mt-2">
-                ניהול חברויות
+                {t('manageMemberships')}
               </Button>
             </Link>
           </div>
@@ -396,7 +398,7 @@ export default function DashboardPage() {
         {/* Search and Filters Section */}
         <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">חיפוש וסינון</h2>
+                          <h2 className="text-lg font-semibold text-gray-900">{t('searchAndFilter')}</h2>
             <Button
               variant="outline"
               size="sm"
@@ -404,7 +406,7 @@ export default function DashboardPage() {
               className="flex items-center space-x-2"
             >
               <Filter className="w-4 h-4" />
-              <span>{showFilters ? "הסתר סינון" : "הצג סינון"}</span>
+                              <span>{showFilters ? t('hideFilters') : t('showFilters')}</span>
             </Button>
           </div>
 
@@ -413,7 +415,7 @@ export default function DashboardPage() {
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               type="text"
-              placeholder="חפש הטבות, מותגים או תיאורים..."
+                              placeholder={t('searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pr-10"
@@ -425,13 +427,13 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Category Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">קטגוריה</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('category')}</label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
                 >
-                  <option key="all" value="">כל הקטגוריות</option>
+                                      <option key="all" value="">{t('allCategories')}</option>
                   {displayCategories.map(category => (
                     <option key={`category-${category}`} value={category}>
                       {getCategoryDisplayName(category)}
@@ -442,13 +444,13 @@ export default function DashboardPage() {
 
               {/* Validity Duration Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">תקופת תוקף</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('validityPeriod')}</label>
                 <select
                   value={selectedValidityDuration}
                   onChange={(e) => setSelectedValidityDuration(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
                 >
-                  <option key="all-durations" value="">כל התקופות</option>
+                                      <option key="all-durations" value="">{t('allPeriods')}</option>
                   {allValidityDurations.map(duration => (
                     <option key={`duration-${duration}`} value={duration}>
                       {duration}
@@ -459,15 +461,15 @@ export default function DashboardPage() {
 
               {/* Membership Type Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">סוג חברות</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('membershipType')}</label>
                 <select
                   value={selectedMembershipType}
                   onChange={(e) => setSelectedMembershipType(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
                 >
-                  <option key="all-types" value="">כל הסוגים</option>
-                  <option key="free" value="free">חינם</option>
-                  <option key="paid" value="paid">בתשלום</option>
+                                      <option key="all-types" value="">{t('allTypes')}</option>
+                    <option key="free" value="free">{t('free')}</option>
+                    <option key="paid" value="paid">{t('paid')}</option>
                 </select>
               </div>
             </div>
@@ -478,7 +480,7 @@ export default function DashboardPage() {
             <div className="mt-4 flex flex-wrap gap-2">
               {selectedCategory && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
-                  קטגוריה: {getCategoryDisplayName(selectedCategory)}
+                  {t('categoryLabel')}: {getCategoryDisplayName(selectedCategory)}
                   <button
                     onClick={() => setSelectedCategory("")}
                     className="mr-2 text-purple-600 hover:text-purple-800"
@@ -489,7 +491,7 @@ export default function DashboardPage() {
               )}
               {selectedValidityDuration && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                  תקופה: {selectedValidityDuration}
+                  {t('periodLabel')}: {selectedValidityDuration}
                   <button
                     onClick={() => setSelectedValidityDuration("")}
                     className="mr-2 text-blue-600 hover:text-blue-800"
@@ -500,7 +502,7 @@ export default function DashboardPage() {
               )}
               {selectedMembershipType && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-                  סוג: {selectedMembershipType === "free" ? "חינם" : "בתשלום"}
+                  {t('typeLabel')}: {selectedMembershipType === "free" ? t('free') : t('paid')}
                   <button
                     onClick={() => setSelectedMembershipType("")}
                     className="mr-2 text-green-600 hover:text-green-800"
@@ -518,7 +520,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <Star className="w-6 h-6 text-purple-600" />
-              <h2 className="text-2xl font-bold text-gray-900">פעיל עכשיו</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{t('activeNow')}</h2>
               <span className="text-sm text-gray-500">({filteredActiveBenefits.length})</span>
             </div>
           </div>
@@ -548,7 +550,7 @@ export default function DashboardPage() {
                   </span>
                   {/* Membership Type Label */}
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mr-2 ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
-                    {benefit.isFree ? 'חינם' : 'בתשלום'}
+                    {benefit.isFree ? t('free') : t('paid')}
                   </span>
                 </div>
                 
@@ -561,7 +563,7 @@ export default function DashboardPage() {
 
                 {benefit.promoCode && (
                   <div className="flex items-center space-x-2 mb-4">
-                    <span className="text-sm text-gray-700 font-medium">קוד קופון:</span>
+                    <span className="text-sm text-gray-700 font-medium">{t('couponCode')}:</span>
                     <code className="bg-purple-100 border border-purple-200 px-3 py-2 rounded-md text-sm font-mono text-purple-800 font-bold">
                       {benefit.promoCode}
                     </code>
@@ -586,7 +588,7 @@ export default function DashboardPage() {
                       className="flex-1"
                     >
                       <ExternalLink className="w-4 h-4 ml-1" />
-                      {benefit.brand.actionLabel || 'לקנייה'}
+                      {benefit.brand.actionLabel || t('buyNow')}
                     </Button>
                   )}
                   <Button
@@ -595,7 +597,7 @@ export default function DashboardPage() {
                     onClick={() => router.push(`/benefit/${benefit.id}`)}
                     className="flex-1"
                   >
-                    פרטים נוספים
+                    {t('moreDetails')}
                   </Button>
                 </div>
               </div>
@@ -608,7 +610,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <Calendar className="w-6 h-6 text-orange-600" />
-              <h2 className="text-2xl font-bold text-gray-900">בקרוב</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{t('comingSoon')}</h2>
               <span className="text-sm text-gray-500">({filteredUpcomingBenefits.length})</span>
             </div>
           </div>
@@ -638,7 +640,7 @@ export default function DashboardPage() {
                   </span>
                   {/* Membership Type Label */}
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mr-2 ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
-                    {benefit.isFree ? 'חינם' : 'בתשלום'}
+                    {benefit.isFree ? t('free') : t('paid')}
                   </span>
                 </div>
                 
