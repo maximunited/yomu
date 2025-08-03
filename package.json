@@ -12,8 +12,9 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:partnerships": "node tests/integration/final-multi-brand-test.js",
-    "test:api": "node tests/api/seed-comprehensive.js",
-    "test:translations": "node tests/integration/test-missing-translations.js"
+    "test:api": "node tests/api/test-api.js",
+    "test:translations": "node tests/integration/test-missing-translations.js",
+    "test:connection": "node tests/integration/test-connection.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
