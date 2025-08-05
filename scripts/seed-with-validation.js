@@ -219,6 +219,88 @@ const benefits = [
     promoCode: null,
     validityType: "birthday_exact_date",
     validityDuration: 1
+  },
+
+  // DREAM CARD brands - entire month
+  {
+    brandName: "Terminal X",
+    title: "30% הנחה הטבת יום ההולדת",
+    description: "30% הנחה על כל הקנייה בחודש יום ההולדת - כרטיס DREAM CARD",
+    termsAndConditions: "תקף פעם אחת ברשת בחודש יום ההולדת. כרטיס מועדון DREAM CARD.",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  {
+    brandName: "Billabong",
+    title: "30% הנחה הטבת יום ההולדת",
+    description: "30% הנחה על כל הקנייה בחודש יום ההולדת - כרטיס DREAM CARD",
+    termsAndConditions: "תקף פעם אחת ברשת בחודש יום ההולדת. כרטיס מועדון DREAM CARD.",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  {
+    brandName: "Laline",
+    title: "30% הנחה הטבת יום ההולדת",
+    description: "30% הנחה על כל הקנייה בחודש יום ההולדת - כרטיס DREAM CARD",
+    termsAndConditions: "תקף פעם אחת ברשת בחודש יום ההולדת. כרטיס מועדון DREAM CARD.",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  {
+    brandName: "The Children's Place",
+    title: "30% הנחה הטבת יום ההולדת",
+    description: "30% הנחה על כל הקנייה בחודש יום ההולדת - כרטיס DREAM CARD",
+    termsAndConditions: "תקף פעם אחת ברשת בחודש יום ההולדת. כרטיס מועדון DREAM CARD.",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  {
+    brandName: "Aerie",
+    title: "30% הנחה הטבת יום ההולדת",
+    description: "30% הנחה על כל הקנייה בחודש יום ההולדת - כרטיס DREAM CARD",
+    termsAndConditions: "תקף פעם אחת ברשת בחודש יום ההולדת. כרטיס מועדון DREAM CARD.",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  {
+    brandName: "American Eagle",
+    title: "30% הנחה הטבת יום ההולדת",
+    description: "30% הנחה על כל הקנייה בחודש יום ההולדת - כרטיס DREAM CARD",
+    termsAndConditions: "תקף פעם אחת ברשת בחודש יום ההולדת. כרטיס מועדון DREAM CARD.",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  {
+    brandName: "Mango",
+    title: "30% הנחה הטבת יום ההולדת",
+    description: "30% הנחה על כל הקנייה בחודש יום ההולדת - כרטיס DREAM CARD",
+    termsAndConditions: "תקף פעם אחת ברשת בחודש יום ההולדת. כרטיס מועדון DREAM CARD.",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  {
+    brandName: "Fox Home",
+    title: "30% הנחה הטבת יום ההולדת",
+    description: "30% הנחה על כל הקנייה בחודש יום ההולדת - כרטיס DREAM CARD",
+    termsAndConditions: "תקף פעם אחת ברשת בחודש יום ההולדת. כרטיס מועדון DREAM CARD.",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
   }
 ];
 

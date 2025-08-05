@@ -139,6 +139,63 @@ const predefinedBrands = [
     website: "https://www.libira.co.il",
     description: "בירה וקינוח בישיבה בלבד כל החודש",
     category: "food"
+  },
+  // DREAM CARD brands
+  {
+    name: "Terminal X",
+    logoUrl: "/images/brands/terminal-x.png",
+    website: "https://www.terminal-x.com",
+    description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "fashion"
+  },
+  {
+    name: "Billabong",
+    logoUrl: "/images/brands/billabong.png",
+    website: "https://www.billabong.co.il",
+    description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "fashion"
+  },
+  {
+    name: "Laline",
+    logoUrl: "/images/brands/laline.png",
+    website: "https://www.laline.co.il",
+    description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "beauty"
+  },
+  {
+    name: "The Children's Place",
+    logoUrl: "/images/brands/tcp.png",
+    website: "https://www.childrensplace.co.il",
+    description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "kids"
+  },
+  {
+    name: "Aerie",
+    logoUrl: "/images/brands/aerie.png",
+    website: "https://www.aerie.co.il",
+    description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "fashion"
+  },
+  {
+    name: "American Eagle",
+    logoUrl: "/images/brands/american-eagle.png",
+    website: "https://www.ae.co.il",
+    description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "fashion"
+  },
+  {
+    name: "Mango",
+    logoUrl: "/images/brands/mango.png",
+    website: "https://www.mango.co.il",
+    description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "fashion"
+  },
+  {
+    name: "Fox Home",
+    logoUrl: "/images/brands/fox-home.png",
+    website: "https://www.fox.co.il/home",
+    description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "home"
   }
 ];
 
