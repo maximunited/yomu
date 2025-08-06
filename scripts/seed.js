@@ -22,7 +22,7 @@ const predefinedBrands = [
     category: "health"
   },
   {
-    name: "Fox - Dream Card",
+    name: "Fox",
     logoUrl: "/images/brands/fox.png",
     website: "https://www.fox.co.il",
     description: "הטבות על ביגוד והנעלה",
@@ -85,7 +85,7 @@ const predefinedBrands = [
     category: "food"
   },
   {
-    name: "ג'מס - JEMS",
+    name: "ג'מס - Jem's",
     logoUrl: "/images/brands/james.svg",
     website: "https://www.james.co.il",
     description: "חצי ליטר בירה מתנה",
@@ -195,6 +195,20 @@ const predefinedBrands = [
     logoUrl: "/images/brands/fox-home.png",
     website: "https://www.fox.co.il/home",
     description: "30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD",
+    category: "home"
+  },
+  {
+    name: "Lord Kitsch",
+    logoUrl: "/images/brands/lordkitsch.png",
+    website: "https://www.lordkitsch.co.il",
+    description: "אופנת נשים",
+    category: "fashion"
+  },
+  {
+    name: "SOHO",
+    logoUrl: "/images/brands/soho.png",
+    website: "https://www.sohocenter.co.il",
+    description: "הטבת יום הולדת לחברי מועדון הלקוחות",
     category: "home"
   }
 ];
@@ -363,6 +377,18 @@ async function seed() {
         validityType: "birthday_entire_month",
         validityDuration: 30,
         isFree: false
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "SOHO")?.id,
+        title: "50 ₪ מתנה לקנייה בחנויות SOHO",
+        description: "שלום! לרגל יום הולדתך אנו שמחים איתך ומזמינים אותך ליהנות מ-50 ₪ מתנה לקנייה באחת מחנויות הסוהו. ההטבה בתוקף מיום ההולדת ולמשך שבועיים (ללא התניית סכום הקנייה).",
+        termsAndConditions: "ההטבה הינה אישית ואינה ניתנת להעברה. על חוגג יום ההולדת להיות נוכח בחנות בעת הרכישה ולהציג תעודה מזהה במעמד מימוש ההטבה. ההטבה תקפה בקניית מוצר במחירו המלא ואינה כוללת כפל מבצעים והטבות. ההטבה ניתנת למימוש בחנויות סוהו בלבד, ואינה ניתנת למימוש באתר האינטרנט. מותנה ברכישה ב-99 ₪ ומעלה במהלך השנה. קבלת ההטבה מותנית בהצגת ההודעה שקיבלת ב-SMS או בדואר אלקטרוני. (במידה שלא קיבלת את מספר הלקוח ניתן לפנות לשירות הלקוחות במייל service@sohocenter.co.il)",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.sohocenter.co.il",
+        validityType: "birthday_plus_period",
+        validityDuration: 14,
+        isFree: true
       }
     ];
     

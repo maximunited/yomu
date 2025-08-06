@@ -792,7 +792,7 @@ export const translations: Record<Language, Translations> = {
     manamBenefit: '50 שח מתנה (מעל 300)',
     shilav: 'שילב',
     shilavBenefit: 'הטבות מיוחדות',
-    youmangus: 'יומנגוס',
+    youmangus: 'יומנגס',
     youmangusBenefit: 'הטבות ייחודיות',
     m32Burgers: 'M32 המבורגרים',
     m32BurgersBenefit: '15% הנחה בחודש יום הולדת',

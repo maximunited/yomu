@@ -51,9 +51,9 @@ const benefits = [
     validityDuration: 30
   },
   
-  // Fox - Dream Card
+  // Fox
   {
-    brandName: "Fox - Dream Card",
+    brandName: "Fox",
     title: "30% הנחה על כל הקנייה",
     description: "30% הנחה על כל הקנייה בחודש יום ההולדת",
     termsAndConditions: "תקף לכל החודש. לא כולל מוצרים מוגבלים.",
@@ -217,6 +217,18 @@ const benefits = [
     promoCode: null,
     validityType: "birthday_date",
     validityDuration: 1
+  },
+  
+  // SOHO
+  {
+    brandName: "SOHO",
+    title: "50 ₪ מתנה לקנייה בחנויות SOHO",
+    description: "שלום! לרגל יום הולדתך אנו שמחים איתך ומזמינים אותך ליהנות מ-50 ₪ מתנה לקנייה באחת מחנויות הסוהו. ההטבה בתוקף מיום ההולדת ולמשך שבועיים (ללא התניית סכום הקנייה).",
+    termsAndConditions: "ההטבה הינה אישית ואינה ניתנת להעברה. על חוגג יום ההולדת להיות נוכח בחנות בעת הרכישה ולהציג תעודה מזהה במעמד מימוש ההטבה. ההטבה תקפה בקניית מוצר במחירו המלא ואינה כוללת כפל מבצעים והטבות. ההטבה ניתנת למימוש בחנויות סוהו בלבד, ואינה ניתנת למימוש באתר האינטרנט. מותנה ברכישה ב-99 ₪ ומעלה במהלך השנה. קבלת ההטבה מותנית בהצגת ההודעה שקיבלת ב-SMS או בדואר אלקטרוני. (במידה שלא קיבלת את מספר הלקוח ניתן לפנות לשירות הלקוחות במייל service@sohocenter.co.il)",
+    redemptionMethod: "הצג את ההודעה שקיבלת ב-SMS או בדואר אלקטרוני בחנות",
+    promoCode: null,
+    validityType: "birthday_plus_period",
+    validityDuration: 14
   }
 ];
 

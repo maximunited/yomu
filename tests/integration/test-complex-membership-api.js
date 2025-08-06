@@ -21,9 +21,9 @@ async function testComplexMembershipApi() {
       where: { userId: testUser.id }
     });
 
-    // Find יומנגוס (which should now be connected to 3 other food brands)
+    // Find יומנגס (which should now be connected to 3 other food brands)
     const yomangus = await prisma.brand.findFirst({ 
-      where: { name: { contains: 'יומנגוס' } },
+      where: { name: { contains: 'יומנגס' } },
       include: {
         partnershipsFrom: { include: { brandB: { select: { name: true } } } },
         partnershipsTo: { include: { brandA: { select: { name: true } } } }
@@ -31,7 +31,7 @@ async function testComplexMembershipApi() {
     });
 
     if (!yomangus) {
-      console.log('❌ יומנגוס brand not found');
+      console.log('❌ יומנגס brand not found');
       return;
     }
 
@@ -171,7 +171,7 @@ async function testComplexMembershipApi() {
       where: { userId: testUser.id }
     });
 
-    // Try to subscribe to both יומנגוס and KFC (which are partners)
+    // Try to subscribe to both יומנגס and KFC (which are partners)
     const kfc = await prisma.brand.findFirst({ where: { name: { contains: 'KFC' } } });
     if (kfc) {
       console.log(`Subscribing to both ${yomangus.name} and ${kfc.name} (they are partners)`);

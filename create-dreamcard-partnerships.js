@@ -17,7 +17,8 @@ async function createDreamCardPartnerships() {
           { name: 'Aerie' },
           { name: 'American Eagle' },
           { name: 'Mango' },
-          { name: 'Fox Home' }
+          { name: 'Fox Home' },
+          { name: 'Fox' }
         ]
       },
       select: { id: true, name: true }

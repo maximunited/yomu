@@ -17,7 +17,7 @@ const predefinedBrands = [
     category: "health"
   },
   {
-    name: "Fox - Dream Card",
+    name: "Fox",
     logoUrl: "/images/brands/fox.png",
     website: "https://www.fox.co.il",
     description: "הטבות על ביגוד והנעלה",
@@ -67,8 +67,8 @@ const predefinedBrands = [
   },
   {
     name: "מסעדת באקרו (רעננה)",
-    logoUrl: "/images/brands/bacaro.svg",
-    website: "https://www.bacaro.co.il",
+    logoUrl: "/images/brands/buckaroo.svg",
+    website: "https://www.buckaroo.co.il",
     description: "מנה ראשונה וקינוח מתנה",
     category: "food"
   },
@@ -115,9 +115,9 @@ const predefinedBrands = [
     category: "baby"
   },
   {
-    name: "יומנגוס",
-    logoUrl: "/images/brands/yomango.svg",
-    website: "https://www.yomango.co.il",
+    name: "יומנגס",
+    logoUrl: "/images/brands/humongous.svg",
+    website: "https://www.humongous.co.il",
     description: "הטבות על גלידה",
     category: "food"
   },
@@ -134,6 +134,20 @@ const predefinedBrands = [
     website: "https://www.libira.co.il",
     description: "בירה וקינוח בישיבה בלבד כל החודש",
     category: "food"
+  },
+  {
+    name: "Lord Kitsch",
+    logoUrl: "/images/brands/lordkitsch.png",
+    website: "https://www.lordkitsch.co.il",
+    description: "אופנת נשים",
+    category: "fashion"
+  },
+  {
+    name: "SOHO",
+    logoUrl: "/images/brands/soho.png",
+    website: "https://www.sohocenter.co.il",
+    description: "הטבת יום הולדת לחברי מועדון הלקוחות",
+    category: "home"
   }
 ];
 

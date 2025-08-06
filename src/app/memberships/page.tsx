@@ -151,7 +151,7 @@ export default function MembershipsPage() {
           },
           {
             id: "3",
-            name: "Fox - Dream Card",
+            name: "Fox",
             description: "הטבות על ביגוד והנעלה",
             category: "fashion",
             isActive: false,
@@ -291,7 +291,7 @@ export default function MembershipsPage() {
           },
           {
             id: "17",
-            name: "יומנגוס",
+            name: "יומנגס",
             description: "הטבות על גלידה",
             category: "food",
             isActive: false,

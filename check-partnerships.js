@@ -21,14 +21,15 @@ async function checkPartnerships() {
     const dreamCardBrands = await prisma.brand.findMany({
       where: {
         OR: [
-          { name: 'TERMINAL X' },
-          { name: 'BILLABONG' },
-          { name: 'LALINE' },
-          { name: "THE CHILDREN'S PLACE" },
-          { name: 'AERIE' },
-          { name: 'AMERICAN EAGLE' },
-          { name: 'MANGO' },
-          { name: 'FOX HOME' }
+          { name: 'Terminal X' },
+          { name: 'Billabong' },
+          { name: 'Laline' },
+          { name: "The Children's Place" },
+          { name: 'Aerie' },
+          { name: 'American Eagle' },
+          { name: 'Mango' },
+          { name: 'Fox Home' },
+          { name: 'Fox' }
         ]
       },
       select: { id: true, name: true }

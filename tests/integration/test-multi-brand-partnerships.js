@@ -180,13 +180,13 @@ async function testMultiBrandPartnerships() {
     }
 
     // 6. Test complex scenario: What if we add a 4th brand?
-    console.log('\n6️⃣ Testing with a 4th brand (יומנגוס):');
+    console.log('\n6️⃣ Testing with a 4th brand (יומנגס):');
     
-    const yomangus = await prisma.brand.findFirst({ where: { name: { contains: 'יומנגוס' } } });
+    const yomangus = await prisma.brand.findFirst({ where: { name: { contains: 'יומנגס' } } });
     if (yomangus) {
       console.log(`Adding ${yomangus.name} to the food partnership network`);
       
-      // Connect יומנגוס to all existing food partners
+      // Connect יומנגס to all existing food partners
       const foodPartners = [kfc, mcdonalds, buckaroo];
       for (const partner of foodPartners) {
         const existingConnection = await prisma.brandPartnership.findFirst({
@@ -206,7 +206,7 @@ async function testMultiBrandPartnerships() {
         }
       }
 
-      // Test membership creation for יומנגוס (should create all 4 food brand memberships)
+      // Test membership creation for יומנגס (should create all 4 food brand memberships)
       await prisma.userMembership.deleteMany({ where: { userId: testUser.id } });
       
       const yomangusBrand = await prisma.brand.findUnique({
@@ -217,7 +217,7 @@ async function testMultiBrandPartnerships() {
         }
       });
 
-      // Create יומנגוס membership
+      // Create יומנגס membership
       await prisma.userMembership.create({
         data: { userId: testUser.id, brandId: yomangus.id, isActive: true }
       });

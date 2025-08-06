@@ -17,8 +17,8 @@ interface Brand {
 
 const popularBrands: Brand[] = [
   {
-    id: "fox-dream-card",
-    name: "Fox - Dream Card",
+    id: "fox",
+    name: "Fox",
     logoUrl: "/images/brands/fox.png",
     category: "fashion",
     description: "brandDescriptionFashion"

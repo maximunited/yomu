@@ -53,9 +53,9 @@ const updatedBenefits = [
     validityDuration: 30
   },
   
-  // Fox - Dream Card - entire month
+  // Fox - entire month
   {
-    brandName: "Fox - Dream Card",
+    brandName: "Fox",
     validityType: "birthday_entire_month",
     validityDuration: 30
   },
@@ -109,9 +109,9 @@ const updatedBenefits = [
     validityDuration: 1
   },
   
-  // יומנגוס - exact birthday only
+  // יומנגס - exact birthday only
   {
-    brandName: "יומנגוס",
+    brandName: "יומנגס",
     validityType: "birthday_exact_date",
     validityDuration: 1
   },

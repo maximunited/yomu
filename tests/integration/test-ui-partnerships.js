@@ -165,7 +165,7 @@ async function testUiPartnerships() {
     console.log(`Available food brands: ${allBrands.length}`);
     
     // Create a 5-brand food network by adding one more brand
-    const existingFoodPartners = ['KFC', 'McDonald', 'באקרו', 'יומנגוס'];
+    const existingFoodPartners = ['KFC', 'McDonald', 'באקרו', 'יומנגס'];
     const availableForNetwork = allBrands.filter(b => 
       !existingFoodPartners.some(existing => b.name.includes(existing))
     );
