@@ -25,8 +25,8 @@ playwright/.cache/
 playwright/.reports/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # next lint cache
 .eslintcache
@@ -45,6 +45,10 @@ desktop.ini
 .idea/
 .vscode/
 *.pem
+.dockerignore
+.dockerignore.local
+docker-compose.override.yml
+compose.override.yml
 
 # debug
 npm-debug.log*

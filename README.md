@@ -181,6 +181,25 @@ podman-compose down
 
 For detailed Docker/Podman documentation, see [docs/DOCKER.md](docs/DOCKER.md).
 
+## 🧪 Testing & Scripts
+
+```bash
+# Lint
+npm run lint
+
+# Unit/integration tests
+npm test
+
+# Playwright E2E
+npm run test:e2e
+
+# Translation checks
+npm run test:translations
+
+# Docker smoke test (Compose)
+npm run test:docker
+```
+
 ## 🛠️ Tech Stack
 
 ### Frontend

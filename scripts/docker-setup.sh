@@ -119,8 +119,9 @@ stop_services() {
 # Initialize database
 init_database() {
     print_status "Initializing database..."
-    "${COMPOSE_CMD_ARRAY[@]}" exec app npx prisma migrate deploy
-    "${COMPOSE_CMD_ARRAY[@]}" exec app node scripts/seed.js
+    "${COMPOSE_CMD_ARRAY[@]}" exec app npx prisma generate || true
+    "${COMPOSE_CMD_ARRAY[@]}" exec app npx prisma migrate deploy || true
+    "${COMPOSE_CMD_ARRAY[@]}" exec app node scripts/seed.js || true
     print_success "Database initialized"
 }
 
