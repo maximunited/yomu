@@ -5,6 +5,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { NextIntlClientProvider } from "next-intl";
+import { defaultLocale } from "../../i18n";
 import { DEFAULT_LOCALE, getMessages } from "@/i18n/messages";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,7 +20,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = DEFAULT_LOCALE;
+  const locale = defaultLocale;
   const messages = getMessages(locale);
 
   return (
