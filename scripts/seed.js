@@ -416,4 +416,10 @@ async function seed() {
   }
 }
 
-seed().catch(console.error); 
+// Export for tooling/tests
+module.exports = { predefinedBrands, seed };
+
+// Run only when executed directly
+if (require.main === module) {
+  seed().catch(console.error);
+}

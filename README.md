@@ -1,6 +1,7 @@
 # YomU - יום-You | Birthday Benefits Platform
 
 [![CI](https://github.com/maximunited/yomu/actions/workflows/ci.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/ci.yml)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-maxim__united-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/maxim_united)
 
 <!-- Suggested additional badges (uncomment those you want) -->
 <!-- Coverage via Codecov or Coveralls -->
@@ -423,6 +424,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For support, email <support@yomu.app> or create an issue in this repository.
+
+If you find this project helpful, you can support the work here:
+
+- Buy Me A Coffee: https://buymeacoffee.com/maxim_united
 
 ---
 
