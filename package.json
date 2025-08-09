@@ -15,6 +15,8 @@
     "test:api": "node tests/api/test-api.js",
     "test:translations": "node tests/integration/test-missing-translations.js",
     "test:connection": "node tests/integration/test-connection.js",
+    "test:docker": "node scripts/test-docker.js",
+    "verify:docker": "npm run test:docker",
     "admin:help": "node scripts/admin-helper.js",
     "db:seed": "node scripts/seed.js",
     "db:studio": "npx prisma studio"
