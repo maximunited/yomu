@@ -29,7 +29,7 @@ export async function GET(
 
     if (!benefit) {
       return NextResponse.json(
-        { message: "הטבה לא נמצאה" },
+        { message: "benefitNotFound" },
         { status: 404 }
       );
     }
@@ -56,7 +56,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching benefit:", error);
     return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
+      { message: "internalServerError" },
       { status: 500 }
     );
   }

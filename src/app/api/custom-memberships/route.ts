@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         userId = testUser.id;
       } else {
         return NextResponse.json(
-          { message: "לא מורשה - אנא התחבר מחדש" },
+          { message: "unauthorized" },
           { status: 401 }
         );
       }
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     if (!customMembershipId || !benefit) {
       return NextResponse.json(
-        { message: "נתונים חסרים" },
+        { message: "missingFields" },
         { status: 400 }
       );
     }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     if (!customMembership) {
       return NextResponse.json(
-        { message: "חברות מותאמת אישית לא נמצאה" },
+        { message: "customMembershipNotFound" },
         { status: 404 }
       );
     }
@@ -62,13 +62,13 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "הטבה נוספה בהצלחה",
+      message: "customMembershipCreated",
       benefit: createdBenefit,
     });
   } catch (error) {
     console.error("Error creating custom benefit:", error);
     return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
+      { message: "internalServerError" },
       { status: 500 }
     );
   }
@@ -85,7 +85,7 @@ export async function PUT(request: NextRequest) {
         userId = testUser.id;
       } else {
         return NextResponse.json(
-          { message: "לא מורשה - אנא התחבר מחדש" },
+          { message: "unauthorized" },
           { status: 401 }
         );
       }
@@ -95,7 +95,7 @@ export async function PUT(request: NextRequest) {
 
     if (!customMembershipId) {
       return NextResponse.json(
-        { message: "מזהה חברות מותאמת אישית נדרש" },
+        { message: "customMembershipIdRequired" },
         { status: 400 }
       );
     }
@@ -110,7 +110,7 @@ export async function PUT(request: NextRequest) {
 
     if (!customMembership) {
       return NextResponse.json(
-        { message: "חברות מותאמת אישית לא נמצאה" },
+        { message: "customMembershipNotFound" },
         { status: 404 }
       );
     }
@@ -122,13 +122,13 @@ export async function PUT(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "חברות מותאמת אישית עודכנה בהצלחה",
+      message: "customMembershipUpdated",
       membership: updatedMembership,
     });
   } catch (error) {
     console.error("Error updating custom membership:", error);
     return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
+      { message: "internalServerError" },
       { status: 500 }
     );
   }
@@ -145,7 +145,7 @@ export async function DELETE(request: NextRequest) {
         userId = testUser.id;
       } else {
         return NextResponse.json(
-          { message: "לא מורשה - אנא התחבר מחדש" },
+          { message: "unauthorized" },
           { status: 401 }
         );
       }
@@ -156,7 +156,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!customMembershipId) {
       return NextResponse.json(
-        { message: "מזהה חברות מותאמת אישית נדרש" },
+        { message: "customMembershipIdRequired" },
         { status: 400 }
       );
     }
@@ -171,7 +171,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!customMembership) {
       return NextResponse.json(
-        { message: "חברות מותאמת אישית לא נמצאה" },
+        { message: "customMembershipNotFound" },
         { status: 404 }
       );
     }
@@ -182,12 +182,12 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "חברות מותאמת אישית נמחקה בהצלחה",
+      message: "customMembershipDeleted",
     });
   } catch (error) {
     console.error("Error deleting custom membership:", error);
     return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
+      { message: "internalServerError" },
       { status: 500 }
     );
   }

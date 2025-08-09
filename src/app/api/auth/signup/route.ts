@@ -9,14 +9,14 @@ export async function POST(request: NextRequest) {
     // Validation
     if (!name || !email || !password || !dateOfBirth) {
       return NextResponse.json(
-        { message: "כל השדות נדרשים" },
+        { message: "missingFields" },
         { status: 400 }
       );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
-        { message: "הסיסמה חייבת להיות לפחות 6 תווים" },
+        { message: "passwordTooShort" },
         { status: 400 }
       );
     }
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { message: "משתמש עם כתובת אימייל זו כבר קיים" },
+        { message: "userAlreadyExists" },
         { status: 409 }
       );
     }
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { 
-        message: "משתמש נוצר בהצלחה",
+        message: "userCreatedSuccessfully",
         user: userWithoutPassword 
       },
       { status: 201 }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
+      { message: "internalServerError" },
       { status: 500 }
     );
   }

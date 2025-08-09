@@ -25,7 +25,7 @@ export async function PUT(request: NextRequest) {
         console.log("No users found in database");
         return NextResponse.json(
           { 
-            message: "לא מורשה - אנא התחבר מחדש",
+            message: "unauthorized",
             error: "AUTHENTICATION_REQUIRED"
           },
           { status: 401 }
@@ -55,7 +55,7 @@ export async function PUT(request: NextRequest) {
     console.log("Profile updated successfully");
 
     return NextResponse.json({
-      message: "הפרופיל עודכן בהצלחה",
+      message: "profileUpdatedSuccessfully",
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
         console.log("No users found in database");
         return NextResponse.json(
           { 
-            message: "לא מורשה - אנא התחבר מחדש",
+            message: "unauthorized",
             error: "AUTHENTICATION_REQUIRED"
           },
           { status: 401 }
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { message: "משתמש לא נמצא" },
+        { message: "userNotFound" },
         { status: 404 }
       );
     }
@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching profile:", error);
     return NextResponse.json(
       { 
-        message: "שגיאה בטעינת הפרופיל",
+        message: "profileLoadError",
         error: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }

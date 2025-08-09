@@ -96,7 +96,9 @@ export default function NotificationsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{t('notifications')}</h1>
-              <p className="text-gray-600">{unreadCount} {t('notifications')} חדשות</p>
+              <p className="text-gray-600">
+                {unreadCount > 0 ? t('newNotificationsCount').replace('{count}', String(unreadCount)) : t('noNewNotifications')}
+              </p>
             </div>
           </div>
           
@@ -117,7 +119,7 @@ export default function NotificationsPage() {
             <div className="text-center py-12">
               <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('noNotifications')}</h3>
-              <p className="text-gray-600">אין התראות חדשות כרגע</p>
+              <p className="text-gray-600">{t('noNewNotifications')}</p>
             </div>
           ) : (
             <div className="space-y-4">

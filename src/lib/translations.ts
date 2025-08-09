@@ -123,8 +123,11 @@ export interface Translations {
   
   // Notifications
   notificationsTitle: string;
+  markAsRead: string;
   markAllAsRead: string;
   noNotifications: string;
+  newNotificationsCount: string; // expects {count}
+  noNewNotifications: string;
   newBenefit: string;
   benefitExpiring: string;
   birthdayMonthStart: string;
@@ -418,6 +421,24 @@ export interface Translations {
   copyApiKey: string;
   apiKeyCopied: string;
   apiKeySaved: string;
+
+  // API/Errors
+  unauthorized: string;
+  internalServerError: string;
+  missingFields: string;
+  userCreatedSuccessfully: string;
+  passwordTooShort: string;
+  userAlreadyExists: string;
+  profileUpdatedSuccessfully: string;
+  profileUpdateError: string;
+  profileLoadError: string;
+  userNotFound: string;
+  customMembershipNotFound: string;
+  customMembershipCreated: string;
+  customMembershipUpdated: string;
+  customMembershipDeleted: string;
+  customMembershipIdRequired: string;
+  benefitNotFound: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -551,8 +572,11 @@ export const translations: Record<Language, Translations> = {
     
     // Notifications
     notificationsTitle: 'התראות',
+    markAsRead: 'סמן כנקרא',
     markAllAsRead: 'סמן הכל כנקרא',
-    noNotifications: 'אין התראות חדשות',
+    noNotifications: 'אין התראות',
+    newNotificationsCount: 'יש {count} התראות חדשות',
+    noNewNotifications: 'אין התראות חדשות',
     newBenefit: 'הטבה חדשה',
     benefitExpiring: 'הטבה פוקעת',
     birthdayMonthStart: 'חודש יום הולדת התחיל',
@@ -704,6 +728,23 @@ export const translations: Record<Language, Translations> = {
     copyApiKey: 'העתק',
     apiKeyCopied: 'מפתח API הועתק',
     apiKeySaved: 'מפתח API נשמר',
+    // API/Errors
+    unauthorized: 'לא מורשה - אנא התחבר מחדש',
+    internalServerError: 'שגיאה פנימית בשרת',
+    missingFields: 'כל השדות נדרשים',
+    userCreatedSuccessfully: 'משתמש נוצר בהצלחה',
+    passwordTooShort: 'הסיסמה חייבת להיות לפחות 6 תווים',
+    userAlreadyExists: 'משתמש עם כתובת אימייל זו כבר קיים',
+    profileUpdatedSuccessfully: 'הפרופיל עודכן בהצלחה',
+    profileUpdateError: 'שגיאה בעדכון הפרופיל',
+    profileLoadError: 'שגיאה בטעינת הפרופיל',
+    userNotFound: 'משתמש לא נמצא',
+    customMembershipNotFound: 'חברות מותאמת אישית לא נמצאה',
+    customMembershipCreated: 'הטבה נוספה בהצלחה',
+    customMembershipUpdated: 'חברות מותאמת אישית עודכנה בהצלחה',
+    customMembershipDeleted: 'חברות מותאמת אישית נמחקה בהצלחה',
+    customMembershipIdRequired: 'מזהה חברות מותאמת אישית נדרש',
+    benefitNotFound: 'הטבה לא נמצאה',
     
     // (duplicate team/terms/privacy/contact blocks removed; earlier canonical values kept above)
     
@@ -978,8 +1019,11 @@ export const translations: Record<Language, Translations> = {
     // Notifications
     notifications: 'Notifications',
     notificationsTitle: 'Notifications',
+    markAsRead: 'Mark as Read',
     markAllAsRead: 'Mark All as Read',
-    noNotifications: 'No new notifications',
+    noNotifications: 'No notifications',
+    newNotificationsCount: '{count} new notifications',
+    noNewNotifications: 'No new notifications',
     newBenefit: 'New Benefit',
     benefitExpiring: 'Benefit Expiring',
     birthdayMonthStart: 'Birthday Month Started',
@@ -1267,5 +1311,22 @@ export const translations: Record<Language, Translations> = {
     copyApiKey: 'Copy',
     apiKeyCopied: 'API key copied',
     apiKeySaved: 'API key saved',
+    // API/Errors
+    unauthorized: 'Unauthorized - please sign in again',
+    internalServerError: 'Internal server error',
+    missingFields: 'All fields are required',
+    userCreatedSuccessfully: 'User created successfully',
+    passwordTooShort: 'Password must be at least 6 characters',
+    userAlreadyExists: 'A user with this email already exists',
+    profileUpdatedSuccessfully: 'Profile updated successfully',
+    profileUpdateError: 'Error updating profile',
+    profileLoadError: 'Error loading profile',
+    userNotFound: 'User not found',
+    customMembershipNotFound: 'Custom membership not found',
+    customMembershipCreated: 'Custom membership created successfully',
+    customMembershipUpdated: 'Custom membership updated successfully',
+    customMembershipDeleted: 'Custom membership deleted successfully',
+    customMembershipIdRequired: 'Custom membership ID is required',
+    benefitNotFound: 'Benefit not found',
   },
 }; 

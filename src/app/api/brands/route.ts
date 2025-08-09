@@ -54,9 +54,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(transformedBrands);
   } catch (error) {
     console.error("Error fetching brands:", error);
-    return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
-      { status: 500 }
-    );
+  return NextResponse.json(
+    { message: "internalServerError" },
+    { status: 500 }
+  );
   }
 } 

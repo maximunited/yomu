@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         console.log("No users found in database");
         return NextResponse.json(
           { 
-            message: "לא מורשה - אנא התחבר מחדש",
+            message: "unauthorized",
             error: "AUTHENTICATION_REQUIRED"
           },
           { status: 401 }
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
     console.error("Error saving memberships:", error);
     return NextResponse.json(
       { 
-        message: "שגיאה פנימית בשרת",
+        message: "internalServerError",
         error: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }
@@ -228,7 +228,7 @@ export async function GET(request: NextRequest) {
         console.log("No users found in database");
         return NextResponse.json(
           { 
-            message: "לא מורשה - אנא התחבר מחדש",
+            message: "unauthorized",
             error: "AUTHENTICATION_REQUIRED"
           },
           { status: 401 }
@@ -286,7 +286,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching memberships:", error);
     return NextResponse.json(
       { 
-        message: "שגיאה פנימית בשרת",
+        message: "internalServerError",
         error: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }

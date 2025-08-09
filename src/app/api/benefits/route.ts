@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         console.log("No users found in database");
         return NextResponse.json(
           { 
-            message: "לא מורשה - אנא התחבר מחדש",
+            message: "unauthorized",
             error: "AUTHENTICATION_REQUIRED"
           },
           { status: 401 }
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching benefits:", error);
     return NextResponse.json(
-      { message: "שגיאה פנימית בשרת" },
+      { message: "internalServerError" },
       { status: 500 }
     );
   }

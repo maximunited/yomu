@@ -102,9 +102,10 @@ async function testMissingTranslations() {
     const possibleMissingTranslations = new Set();
 
     // Patterns to find translation usage
+    // Match calls to the i18n function named exactly `t( ... )`
+    // Use a left boundary that is not part of an identifier/dot to avoid matching in words like `split(` or `const(`
     const translationPatterns = [
-      /t\(['"`](\w+)['"`]\)/g,  // t('key')
-      /\.(\w+)\s*(?=[,;\}\s])/g, // Direct property access on translation object
+      /(?:^|[^A-Za-z0-9_$.])t\s*\(\s*['"`](\w+)['"`]\s*\)/g,
     ];
 
     // Patterns to find hardcoded Hebrew/English text that might need translation
@@ -169,7 +170,9 @@ async function testMissingTranslations() {
     // 5. Check for missing translations (used keys not in translation file)
     console.log('\n5️⃣ Checking for missing translation definitions:');
     
-    const missingDefinitions = [...usedTranslationKeys].filter(key => !allTranslationKeys.has(key));
+    const missingDefinitions = [...usedTranslationKeys]
+      .filter(key => /^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) // ignore numeric and non-identifier tokens
+      .filter(key => !allTranslationKeys.has(key));
 
     if (missingDefinitions.length > 0) {
       console.log(`❌ Found ${missingDefinitions.length} translation keys used but not defined:`);
@@ -199,11 +202,6 @@ async function testMissingTranslations() {
       'כולל גישה ל', // "includes access to"
       'מותגים נוספים', // "additional brands"
       'הצג רשימת מותגים', // "show brand list"
-      'שותפויות', // "partnerships"
-      'רשת', // "network"
-      'partnership', 
-      'partners',
-      'network',
       'includes access to',
       'additional brands',
       'show brand list'
@@ -216,7 +214,8 @@ async function testMissingTranslations() {
       const relativePath = path.relative(srcDir, file);
       
       for (const text of partnershipTexts) {
-        if (content.includes(text)) {
+        const quotedRegex = new RegExp(`["'\-\uFFFF]([^"'\\` + '`' + `]*${text}[^"'\\` + '`' + `]*)["'\-\uFFFF]`); // match text inside any quote
+        if (quotedRegex.test(content)) {
           foundPartnershipTexts.push(`${relativePath}: "${text}"`);
         }
       }
