@@ -2,45 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-
-interface Brand {
-  id?: string;
-  name: string;
-  logoUrl: string;
-  website: string;
-  description: string;
-  category: string;
-  isActive: boolean;
-  actionUrl?: string;
-  actionType?: string;
-  actionLabel?: string;
-}
-
-interface Benefit {
-  id?: string;
-  brandId: string;
-  title: string;
-  description: string;
-  termsAndConditions?: string;
-  redemptionMethod: string;
-  promoCode?: string;
-  url?: string;
-  validityType: string;
-  validityDuration?: number;
-  isFree: boolean;
-  isActive: boolean;
-}
+import type { Brand, Benefit } from '@/types/admin';
 
 interface AdminFormProps {
   type: 'brand' | 'benefit';
   item?: Brand | Benefit;
   brands?: Brand[];
-  onSave: (data: Brand | Benefit) => void;
+  onSave: (data: Partial<Brand> | Partial<Benefit>) => void | Promise<void>;
   onCancel: () => void;
 }
 
 export default function AdminForm({ type, item, brands, onSave, onCancel }: AdminFormProps) {
-  const [formData, setFormData] = useState<Brand | Benefit>({
+  const [formData, setFormData] = useState<Partial<Brand> | Partial<Benefit>>({
     name: '',
     logoUrl: '',
     website: '',
@@ -54,7 +27,7 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
       validityType: '',
       isFree: true,
     })
-  } as Brand | Benefit);
+  } as Partial<Brand> | Partial<Benefit>);
 
   useEffect(() => {
     if (item) {
@@ -96,50 +69,51 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
                     type="text"
                     value={(formData as Brand).name}
                     onChange={(e) => handleChange('name', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Logo URL</label>
-                  <input
-                    type="url"
-                    value={(formData as Brand).logoUrl}
-                    onChange={(e) => handleChange('logoUrl', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          <input
+            type="text"
+            placeholder="https://... or /images/brands/..."
+            value={(formData as Brand).logoUrl ?? ''}
+            onChange={(e) => handleChange('logoUrl', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Website</label>
-                  <input
-                    type="url"
-                    value={(formData as Brand).website}
-                    onChange={(e) => handleChange('website', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          <input
+            type="url"
+            value={(formData as Brand).website ?? ''}
+            onChange={(e) => handleChange('website', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Description</label>
-                  <textarea
-                    value={(formData as Brand).description}
-                    onChange={(e) => handleChange('description', e.target.value)}
+          <textarea
+            value={(formData as Brand).description ?? ''}
+            onChange={(e) => handleChange('description', e.target.value)}
                     rows={3}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Category</label>
-                  <select
-                    value={(formData as Brand).category}
-                    onChange={(e) => handleChange('category', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          <select
+            value={(formData as Brand).category ?? ''}
+            onChange={(e) => handleChange('category', e.target.value)}
+                   className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100"
                     required
                   >
                     <option value="">Select category</option>
@@ -159,7 +133,7 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
                     type="url"
                     value={(formData as Brand).actionUrl || ''}
                     onChange={(e) => handleChange('actionUrl', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
 
@@ -169,7 +143,7 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
                     type="text"
                     value={(formData as Brand).actionType || ''}
                     onChange={(e) => handleChange('actionType', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
 
@@ -179,7 +153,7 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
                     type="text"
                     value={(formData as Brand).actionLabel || ''}
                     onChange={(e) => handleChange('actionLabel', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
               </>
@@ -187,10 +161,10 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Brand</label>
-                  <select
-                    value={(formData as Benefit).brandId}
-                    onChange={(e) => handleChange('brandId', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          <select
+            value={(formData as Benefit).brandId ?? ''}
+            onChange={(e) => handleChange('brandId', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100"
                     required
                   >
                     <option value="">Select brand</option>
@@ -204,22 +178,22 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Title</label>
-                  <input
-                    type="text"
-                    value={(formData as Benefit).title}
-                    onChange={(e) => handleChange('title', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          <input
+            type="text"
+            value={(formData as Benefit).title ?? ''}
+            onChange={(e) => handleChange('title', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Description</label>
-                  <textarea
-                    value={(formData as Benefit).description}
-                    onChange={(e) => handleChange('description', e.target.value)}
+          <textarea
+            value={(formData as Benefit).description ?? ''}
+            onChange={(e) => handleChange('description', e.target.value)}
                     rows={3}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                     required
                   />
                 </div>
@@ -230,17 +204,17 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
                     value={(formData as Benefit).termsAndConditions || ''}
                     onChange={(e) => handleChange('termsAndConditions', e.target.value)}
                     rows={3}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Redemption Method</label>
-                  <input
-                    type="text"
-                    value={(formData as Benefit).redemptionMethod}
-                    onChange={(e) => handleChange('redemptionMethod', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          <input
+            type="text"
+            value={(formData as Benefit).redemptionMethod ?? ''}
+            onChange={(e) => handleChange('redemptionMethod', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                     required
                   />
                 </div>
@@ -251,7 +225,7 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
                     type="text"
                     value={(formData as Benefit).promoCode || ''}
                     onChange={(e) => handleChange('promoCode', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
 
@@ -261,16 +235,16 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
                     type="url"
                     value={(formData as Benefit).url || ''}
                     onChange={(e) => handleChange('url', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Validity Type</label>
-                  <select
-                    value={(formData as Benefit).validityType}
-                    onChange={(e) => handleChange('validityType', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          <select
+            value={(formData as Benefit).validityType ?? ''}
+            onChange={(e) => handleChange('validityType', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100"
                     required
                   >
                     <option value="">Select validity type</option>
@@ -284,19 +258,22 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Validity Duration (days)</label>
-                  <input
-                    type="number"
-                    value={(formData as Benefit).validityDuration || ''}
-                    onChange={(e) => handleChange('validityDuration', parseInt(e.target.value) || undefined)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          <input
+            type="number"
+            value={((formData as Benefit).validityDuration ?? '') as any}
+            onChange={(e) => {
+              const val = e.target.value;
+              handleChange('validityDuration', val === '' ? undefined : parseInt(val));
+            }}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
 
                 <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={(formData as Benefit).isFree}
-                    onChange={(e) => handleChange('isFree', e.target.checked)}
+          <input
+            type="checkbox"
+            checked={Boolean((formData as Benefit).isFree)}
+            onChange={(e) => handleChange('isFree', Boolean(e.target.checked))}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label className="ml-2 block text-sm text-gray-900">Free benefit</label>
@@ -305,10 +282,10 @@ export default function AdminForm({ type, item, brands, onSave, onCancel }: Admi
             )}
 
             <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={(formData as Brand | Benefit).isActive}
-                onChange={(e) => handleChange('isActive', e.target.checked)}
+          <input
+            type="checkbox"
+            checked={Boolean((formData as Brand | Benefit).isActive)}
+            onChange={(e) => handleChange('isActive', Boolean(e.target.checked))}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label className="ml-2 block text-sm text-gray-900">Active</label>

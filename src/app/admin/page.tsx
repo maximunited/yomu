@@ -5,33 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import AdminForm from '@/components/AdminForm';
-
-interface Brand {
-  id: string;
-  name: string;
-  logoUrl: string;
-  website: string;
-  description: string;
-  category: string;
-  isActive: boolean;
-  actionUrl?: string;
-  actionType?: string;
-  actionLabel?: string;
-}
-
-interface Benefit {
-  id: string;
-  title: string;
-  description: string;
-  redemptionMethod: string;
-  promoCode?: string;
-  url?: string;
-  validityType: string;
-  validityDuration?: number;
-  isFree: boolean;
-  isActive: boolean;
-  brandId: string;
-}
+import type { Brand, Benefit } from '@/types/admin';
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
@@ -52,15 +26,17 @@ export default function AdminPage() {
   }, [status, router]);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (status === 'authenticated') {
+      loadData();
+    }
+  }, [status]);
 
   const loadData = async () => {
     setIsLoading(true);
     try {
       const [brandsRes, benefitsRes] = await Promise.all([
         fetch('/api/brands'),
-        fetch('/api/benefits')
+        fetch('/api/admin/benefits')
       ]);
       
       if (brandsRes.ok) {
@@ -69,8 +45,11 @@ export default function AdminPage() {
       }
       
       if (benefitsRes.ok) {
-        const benefitsData = await benefitsRes.json();
-        setBenefits(benefitsData);
+        const payload = await benefitsRes.json();
+        const items = Array.isArray(payload) ? payload : (payload?.benefits ?? []);
+        setBenefits(items);
+      } else {
+        console.error('Benefits response not ok:', benefitsRes.status, await benefitsRes.text());
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -97,10 +76,14 @@ export default function AdminPage() {
 
   const handleToggleActive = async (id: string, type: 'brand' | 'benefit') => {
     try {
+      const current = type === 'brand'
+        ? brands.find(b => b.id === id)?.isActive
+        : benefits.find(b => b.id === id)?.isActive;
+
       const response = await fetch(`/api/admin/${type}s/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive: false }),
+        body: JSON.stringify({ isActive: !current }),
       });
       
       if (response.ok) {
@@ -111,7 +94,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleSaveItem = async (data: Brand | Benefit) => {
+  const handleSaveItem = async (data: Partial<Brand> | Partial<Benefit>) => {
     try {
       const isEditing = editingItem && editingItem.id;
       const url = isEditing 
@@ -263,7 +246,7 @@ export default function AdminPage() {
         ) : (
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <ul className="divide-y divide-gray-200">
-              {benefits.map((benefit) => (
+              {Array.isArray(benefits) && benefits.map((benefit) => (
                 <li key={benefit.id} className="px-6 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -317,9 +300,9 @@ export default function AdminPage() {
 
         {/* Form Modal */}
         {showForm && (
-          <AdminForm
+           <AdminForm
             type={activeTab === 'brands' ? 'brand' : 'benefit'}
-            item={editingItem}
+            item={editingItem ?? undefined}
             brands={activeTab === 'benefits' ? brands : undefined}
             onSave={handleSaveItem}
             onCancel={() => {
