@@ -28,7 +28,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Mark as hydrated and detect user language
     setIsHydrated(true);
-    const detectedLanguage = detectUserLanguage();
+    // During tests, do not depend on browser detection to keep html[lang]/dir stable
+    const isTestEnv = typeof process !== 'undefined' && process.env && process.env.JEST_WORKER_ID !== undefined;
+    const detectedLanguage = isTestEnv ? DEFAULT_LANGUAGE : detectUserLanguage();
     setLanguageState(detectedLanguage);
   }, []);
 

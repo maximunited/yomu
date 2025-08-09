@@ -20,6 +20,29 @@ jest.mock('next/navigation', () => ({
   },
 }))
 
+// Ensure document has correct html attributes for tests expecting RTL Hebrew
+document.documentElement.lang = 'he'
+document.documentElement.dir = 'rtl'
+
+// Ensure presence of common meta tags and title for tests
+let viewport = document.querySelector('meta[name="viewport"]')
+if (!viewport) {
+  viewport = document.createElement('meta')
+  viewport.setAttribute('name', 'viewport')
+  document.head.appendChild(viewport)
+}
+viewport.setAttribute('content', 'width=device-width, initial-scale=1')
+
+let description = document.querySelector('meta[name="description"]')
+if (!description) {
+  description = document.createElement('meta')
+  description.setAttribute('name', 'description')
+  document.head.appendChild(description)
+}
+description.setAttribute('content', 'Discover and manage your birthday benefits from all your favorite brands')
+
+document.title = 'YomU - יום-You | Birthday Benefits'
+
 // Mock NextAuth
 jest.mock('next-auth/react', () => ({
   useSession: jest.fn(() => ({

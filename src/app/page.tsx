@@ -46,7 +46,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+          <h1 className={`text-5xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white`}>
             {t('heroTitle')}
           </h1>
           <p className={`text-xl mb-8 max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -67,14 +67,14 @@ export default function HomePage() {
         </div>
 
         {/* Features Section */}
-        <div className="mt-24 grid md:grid-cols-3 gap-8">
+          <div className="mt-24 grid md:grid-cols-3 gap-8">
           <div className="text-center p-6">
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Gift className="w-8 h-8 text-purple-600" />
             </div>
-            <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {t('feature1Title')}
-            </h3>
+              </h2>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
               {t('feature1Description')}
             </p>
@@ -84,9 +84,9 @@ export default function HomePage() {
             <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Calendar className="w-8 h-8 text-pink-600" />
             </div>
-            <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {t('feature2Title')}
-            </h3>
+              </h2>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
               {t('feature2Description')}
             </p>
@@ -96,9 +96,9 @@ export default function HomePage() {
             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Star className="w-8 h-8 text-orange-600" />
             </div>
-            <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {t('feature3Title')}
-            </h3>
+              </h2>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
               {t('feature3Description')}
             </p>

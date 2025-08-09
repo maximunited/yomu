@@ -24,6 +24,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       lg: "h-11 px-8",
     };
 
+    const isDisabled = (props as React.ButtonHTMLAttributes<HTMLButtonElement>).disabled;
+
     return (
       <button
         className={cn(
@@ -32,6 +34,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           sizes[size],
           className
         )}
+        aria-disabled={isDisabled ? true : undefined}
         ref={ref}
         {...props}
       >

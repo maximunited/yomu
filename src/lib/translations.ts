@@ -122,11 +122,15 @@ export interface Translations {
   betaLanguagesNote: string;
   
   // Notifications
+  notificationsTitle: string;
+  markAllAsRead: string;
+  noNotifications: string;
   newBenefit: string;
   benefitExpiring: string;
   birthdayMonthStart: string;
   
   // Benefit Details
+  benefitDetails: string;
   termsAndConditions: string;
   howToRedeem: string;
   visitWebsite: string;
@@ -236,6 +240,7 @@ export interface Translations {
   contactAddress: string;
   contactPhone: string;
   workingHoursValue: string;
+  sendMessage: string;
   
   // Membership Types
   free: string;
@@ -418,6 +423,7 @@ export interface Translations {
 export const translations: Record<Language, Translations> = {
   he: {
     // Navigation
+    home: 'בית',
     homeCategory: 'בית',
     dashboard: 'לוח בקרה',
     memberships: 'חברויות',
@@ -582,7 +588,6 @@ export const translations: Record<Language, Translations> = {
     discountOnAllPurchases: '30% הנחה על כל הקנייה',
     specialBirthdayDiscount: 'הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות',
     return: 'חזרה',
-    manageMemberships: 'ניהול חברויות',
     activeOutOfTotal: 'פעילים מתוך',
     selectAllMemberships: 'בחרו את כל תוכניות החברות שלכם כדי שנוכל להציג לכם את כל ההטבות ליום הולדת',
     programsSelected: 'תוכניות נבחרו',
@@ -610,18 +615,11 @@ export const translations: Record<Language, Translations> = {
     writeYourMessageHere: 'כתוב את הודעתך כאן...',
     enterYourFullName: 'הכנס את שמך המלא',
     yourEmail: 'your@email.com',
-    benefitDetails: 'פרטי הטבה',
     reportIncorrectInfo: 'דווח על מידע שגוי או חסר',
     thankYouForReporting: 'תודה על הדיווח!',
     weWillCheckAndUpdate: 'נבדוק את המידע ונעדכן בהקדם.',
-    notificationsTitle: 'התראות',
-    markAllAsRead: 'סמן הכל כנקרא',
-    noNotifications: 'אין התראות',
-    birthdayMonthStarted: 'חודש יום הולדת התחיל! 🎉',
     newBenefitsAvailable: 'יש לך 5 הטבות חדשות זמינות לחודש יום ההולדת שלך',
-    benefitExpiringSoon: 'הטבה מסתיימת בקרוב',
     benefitExpiresInDays: 'הטבה של Fox מסתיימת בעוד 3 ימים',
-    newBenefitAvailable: 'הטבה חדשה זמינה',
     addedNewBenefit: 'Starbucks הוסיף הטבה חדשה ליום הולדת',
     newBenefitFrom: 'הטבה חדשה מ-Super-Pharm',
     hoursAgo: 'שעות לפני',
@@ -761,7 +759,7 @@ export const translations: Record<Language, Translations> = {
     
     // Search and Filter
     search: 'חיפוש',
-    searchPlaceholder: 'חפש חברויות...',
+    searchPlaceholder: 'חפש הטבות...',
     filterBy: 'סנן לפי',
     allCategories: 'כל הקטגוריות',
     quickFilters: 'סינון מהיר',
@@ -869,7 +867,7 @@ export const translations: Record<Language, Translations> = {
     searchAndFilter: 'חיפוש וסינון',
     showFilters: 'הצג סינונים',
     hideFilters: 'הסתר סינונים',
-    searchPlaceholder: 'חפש חברויות...',
+    searchPlaceholder: 'חפש הטבות...',
     category: 'קטגוריה',
     allCategories: 'כל הקטגוריות',
     validityPeriod: 'תקופה חוקית',
@@ -1151,6 +1149,7 @@ export const translations: Record<Language, Translations> = {
     contactAddress: 'Herzl Street 123, Tel Aviv',
     contactPhone: '03-1234567',
     workingHoursValue: 'Sun-Thu 9:00-18:00',
+    sendMessage: 'Send Message',
     
     // Membership Types
     free: 'Free',

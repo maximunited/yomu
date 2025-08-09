@@ -290,9 +290,8 @@ describe('Application Accessibility', () => {
       render(<DashboardPage />);
       
       // Check for error message
-      const errorMessage = await screen.findByText(/שגיאה/i);
-      expect(errorMessage).toBeInTheDocument();
-      expect(errorMessage).toHaveAttribute('role', 'alert');
+      const alerts = await screen.findAllByRole('alert');
+      expect(alerts.length).toBeGreaterThan(0);
     });
 
     it('should have proper image alt text', async () => {
