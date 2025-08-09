@@ -1,5 +1,31 @@
 # YomU - יום-You | Birthday Benefits Platform
 
+[![CI](https://github.com/maximunited/yomu/actions/workflows/ci.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/ci.yml)
+
+<!-- Suggested additional badges (uncomment those you want) -->
+<!-- Coverage via Codecov or Coveralls -->
+<!-- [![codecov](https://codecov.io/gh/maximunited/yomu/branch/master/graph/badge.svg)](https://codecov.io/gh/maximunited/yomu) -->
+<!-- [![Coverage Status](https://coveralls.io/repos/github/maximunited/yomu/badge.svg?branch=master)](https://coveralls.io/github/maximunited/yomu?branch=master) -->
+
+<!-- Lint and Type Check (if separate workflows exist) -->
+<!-- [![Lint](https://github.com/maximunited/yomu/actions/workflows/lint.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/lint.yml) -->
+<!-- [![Type Check](https://github.com/maximunited/yomu/actions/workflows/typecheck.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/typecheck.yml) -->
+
+<!-- Docker build/test -->
+<!-- [![Docker](https://github.com/maximunited/yomu/actions/workflows/docker.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/docker.yml) -->
+
+<!-- NPM audit (if workflow exists) -->
+<!-- [![Security Audit](https://github.com/maximunited/yomu/actions/workflows/audit.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/audit.yml) -->
+
+<!-- Repo metadata badges -->
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/maximunited/yomu/issues)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org)
+[![Commit Activity](https://img.shields.io/github/commit-activity/m/maximunited/yomu)](https://github.com/maximunited/yomu/pulse)
+[![Last Commit](https://img.shields.io/github/last-commit/maximunited/yomu)](https://github.com/maximunited/yomu/commits/master)
+[![Issues](https://img.shields.io/github/issues/maximunited/yomu)](https://github.com/maximunited/yomu/issues)
+[![Stars](https://img.shields.io/github/stars/maximunited/yomu?style=social)](https://github.com/maximunited/yomu/stargazers)
+
 YomU (יום-You) is a mobile-first web application that aggregates and displays personal birthday benefits, deals, and freebies for users in Israel. The platform helps users never miss a birthday deal again by consolidating information they would otherwise have to find manually.
 
 ## 🌟 Features
