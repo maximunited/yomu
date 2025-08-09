@@ -188,6 +188,12 @@ export interface Translations {
   enterYourFullName: string;
   yourEmail: string;
   reportIncorrectInfo: string;
+  reportEmailGreeting?: string;
+  reportEmailIntro?: string;
+  reportEmailBrand?: string;
+  reportEmailBenefit?: string;
+  reportEmailDescription?: string;
+  reportEmailMoreDetails?: string;
   thankYouForReporting: string;
   weWillCheckAndUpdate: string;
   newBenefitsAvailable: string;
@@ -441,6 +447,8 @@ export interface Translations {
   customMembershipDeleted: string;
   customMembershipIdRequired: string;
   benefitNotFound: string;
+  benefitDeletedSuccessfully?: string;
+  brandDeletedSuccessfully?: string;
 
   // Benefit detail page
   description: string;
@@ -459,6 +467,7 @@ export interface Translations {
   prismaConnectionFailed?: string;
   failedToFetchUsers?: string;
   benefitUnmarked?: string;
+  demo?: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -630,7 +639,7 @@ export const translations: Record<Language, Translations> = {
     termsOfUse: 'תנאי שימוש',
     validOnlyOnBirthday: 'תקף ביום ההולדת בלבד',
     validForEntireMonth: 'תקף לכל החודש',
-    validForWeek: 'תקף לשבוע',
+    validForWeek: 'תקף לשבוע לפני ואחרי',
     validForLimitedPeriod: 'תקף לתקופה מוגבלת',
     discountOnAllPurchases: '30% הנחה על כל הקנייה',
     specialBirthdayDiscount: 'הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות',
@@ -651,6 +660,12 @@ export const translations: Record<Language, Translations> = {
     phone: 'טלפון',
     chooseSubject: 'בחר נושא',
     reportIncorrectInfo: 'דווח על מידע שגוי או חסר',
+    reportEmailGreeting: 'שלום,',
+    reportEmailIntro: 'אני רוצה לדווח על מידע שגוי או חסר בהטבה הבאה:',
+    reportEmailBrand: 'מותג',
+    reportEmailBenefit: 'הטבה',
+    reportEmailDescription: 'תיאור',
+    reportEmailMoreDetails: 'פרטים נוספים:',
     thankYouForReporting: 'תודה על הדיווח!',
     weWillCheckAndUpdate: 'נבדוק את המידע ונעדכן בהקדם.',
     newBenefitsAvailable: 'יש לך 5 הטבות חדשות זמינות לחודש יום ההולדת שלך',
@@ -767,6 +782,8 @@ export const translations: Record<Language, Translations> = {
     customMembershipDeleted: 'חברות מותאמת אישית נמחקה בהצלחה',
     customMembershipIdRequired: 'מזהה חברות מותאמת אישית נדרש',
     benefitNotFound: 'הטבה לא נמצאה',
+    benefitDeletedSuccessfully: 'הטבה נמחקה בהצלחה',
+    brandDeletedSuccessfully: 'מותג נמחק בהצלחה',
     // Benefit detail page
     description: 'תיאור',
     benefitLoadError: 'שגיאה בטעינת ההטבה',
@@ -782,6 +799,7 @@ export const translations: Record<Language, Translations> = {
     prismaConnectionFailed: 'Prisma נכשל בהתחברות',
     failedToFetchUsers: 'נכשל באחזור משתמשים',
     benefitUnmarked: 'סימון הטבה הוסר',
+    demo: 'דמו',
     
     // (duplicate team/terms/privacy/contact blocks removed; earlier canonical values kept above)
     
@@ -1116,6 +1134,12 @@ export const translations: Record<Language, Translations> = {
     enterYourFullName: 'Enter your full name',
     yourEmail: 'your@email.com',
     reportIncorrectInfo: 'Report incorrect or missing information',
+    reportEmailGreeting: 'Hello,',
+    reportEmailIntro: 'I want to report incorrect or missing information for the following benefit:',
+    reportEmailBrand: 'Brand',
+    reportEmailBenefit: 'Benefit',
+    reportEmailDescription: 'Description',
+    reportEmailMoreDetails: 'Additional details:',
     thankYouForReporting: 'Thank you for reporting!',
     weWillCheckAndUpdate: 'We will check the information and update soon.',
     
@@ -1367,6 +1391,8 @@ export const translations: Record<Language, Translations> = {
     customMembershipDeleted: 'Custom membership deleted successfully',
     customMembershipIdRequired: 'Custom membership ID is required',
     benefitNotFound: 'Benefit not found',
+    benefitDeletedSuccessfully: 'Benefit deleted successfully',
+    brandDeletedSuccessfully: 'Brand deleted successfully',
     // Benefit detail page
     description: 'Description',
     benefitLoadError: 'Error loading benefit',
@@ -1382,5 +1408,6 @@ export const translations: Record<Language, Translations> = {
     prismaConnectionFailed: 'Prisma connection failed',
     failedToFetchUsers: 'Failed to fetch users',
     benefitUnmarked: 'Benefit unmarked as used',
+    demo: 'Demo',
   },
 }; 

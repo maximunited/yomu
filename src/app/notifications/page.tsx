@@ -39,7 +39,7 @@ export default function NotificationsPage() {
     {
       id: "3",
       title: t('newBenefitAvailable'),
-      message: "הטבה חדשה זמינה מ-Fox",
+      message: t('newBenefitAvailable'),
       type: "info",
       timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
       isRead: true,

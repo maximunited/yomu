@@ -93,13 +93,13 @@ export default function DemoPage() {
   const getValidityText = (benefit: Benefit) => {
     switch (benefit.validityType) {
       case "birthday_date":
-        return "תקף ביום ההולדת בלבד";
+        return t('validOnlyOnBirthday');
       case "birthday_month":
-        return "תקף לכל החודש";
+        return t('validForEntireMonth');
       case "birthday_week":
-        return "תקף לשבוע";
+        return t('validForWeek');
       default:
-        return "תקף לתקופה מוגבלת";
+        return t('validForLimitedPeriod');
     }
   };
 
@@ -119,9 +119,9 @@ export default function DemoPage() {
               <span className="text-xl font-bold text-gray-900">YomU</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">דמו</span>
+              <span className="text-sm text-gray-500">{t('demo') || 'דמו'}</span>
               <Link href="/auth/signup">
-                <Button size="sm">התחל עכשיו</Button>
+                <Button size="sm">{t('getStarted')}</Button>
               </Link>
             </div>
           </div>
@@ -133,14 +133,14 @@ export default function DemoPage() {
         {/* Welcome Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            ברוכים הבאים ל-YomU! 🎉
+            {t('welcome')} YomU! 🎉
           </h1>
           <p className="text-gray-600 mb-4">
-            הנה דוגמה של איך יראה הדשבורד שלכם
+            {t('hereAreYourBirthdayBenefits')}
           </p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-md mx-auto">
             <p className="text-sm text-yellow-800">
-              💡 זהו דמו עם נתונים לדוגמה. הירשמו כדי לראות את ההטבות האמיתיות שלכם!
+              💡 {t('learnMore')}
             </p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function DemoPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <Star className="w-6 h-6 text-purple-600" />
-            <h2 className="text-2xl font-bold text-gray-900">פעיל עכשיו</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{t('activeNow')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeBenefits.map((benefit) => (
@@ -179,7 +179,7 @@ export default function DemoPage() {
 
                 {benefit.promoCode && (
                   <div className="flex items-center space-x-2 mb-4">
-                    <span className="text-sm text-gray-700 font-medium">קוד קופון:</span>
+                    <span className="text-sm text-gray-700 font-medium">{t('couponCode')}:</span>
                     <code className="bg-purple-100 border border-purple-200 px-3 py-2 rounded-md text-sm font-mono text-purple-800 font-bold">
                       {benefit.promoCode}
                     </code>
@@ -190,7 +190,7 @@ export default function DemoPage() {
                       className={copiedCode === benefit.promoCode ? "bg-green-600 text-white" : "bg-purple-600 text-white hover:bg-purple-700"}
                     >
                       {copiedCode === benefit.promoCode ? (
-                        <span className="text-sm font-medium">✓ הועתק</span>
+                        <span className="text-sm font-medium">{t('copied')}</span>
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
@@ -207,7 +207,7 @@ export default function DemoPage() {
                       className="flex-1"
                     >
                       <ExternalLink className="w-4 h-4 ml-1" />
-                      לקנייה
+                      {t('buyNow')}
                     </Button>
                   )}
                 </div>
@@ -220,7 +220,7 @@ export default function DemoPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <Calendar className="w-6 h-6 text-orange-600" />
-            <h2 className="text-2xl font-bold text-gray-900">בקרוב</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{t('comingSoon')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {upcomingBenefits.map((benefit) => (
@@ -254,7 +254,7 @@ export default function DemoPage() {
                     size="sm"
                     className="flex-1 opacity-50 cursor-not-allowed"
                   >
-                    פרטים נוספים
+                    {t('moreDetails')}
                   </Button>
                 </div>
               </div>
@@ -265,20 +265,20 @@ export default function DemoPage() {
         {/* Call to Action */}
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            מוכנים להתחיל?
+            {t('getStarted')}
           </h3>
           <p className="text-gray-600 mb-6">
-            הירשמו עכשיו ותקבלו גישה לכל ההטבות ליום הולדת שלכם
+            {t('signUpNow')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup">
               <Button size="lg" className="px-8 py-3">
-                הירשמו עכשיו - חינם
+                {t('signUpNow')}
               </Button>
             </Link>
             <Link href="/auth/signin">
               <Button variant="outline" size="lg" className="px-8 py-3">
-                יש לכם כבר חשבון? התחברו
+                {t('alreadyHaveAccount')}
               </Button>
             </Link>
           </div>

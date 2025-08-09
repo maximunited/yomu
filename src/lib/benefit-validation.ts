@@ -1,4 +1,5 @@
 // Benefit validation system to ensure all benefits follow the specification
+import { translations, Language } from './translations'
 
 export interface BenefitValidationRule {
   validityType: string;
@@ -16,7 +17,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       return userDOB.getMonth() === currentDate.getMonth() && 
              userDOB.getDate() === currentDate.getDate();
     },
-    displayText: "תקף ביום ההולדת בלבד"
+    displayText: "validOnlyOnBirthday"
   },
   
   "birthday_entire_month": {
@@ -25,7 +26,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
     validationLogic: (userDOB: Date, currentDate: Date) => {
       return userDOB.getMonth() === currentDate.getMonth();
     },
-    displayText: "תקף לכל החודש"
+    displayText: "validForEntireMonth"
   },
   
   "birthday_week_before_after": {
@@ -43,7 +44,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף לשבוע לפני ואחרי"
+    displayText: "validForWeek"
   },
   
   "birthday_weekend": {
@@ -61,7 +62,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף בסופ״ש יום ההולדת"
+    displayText: "validityWeekend"
   },
   
   "birthday_30_days": {
@@ -79,7 +80,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף 30 ימים"
+    displayText: "validity30Days"
   },
   
   "birthday_7_days_before": {
@@ -97,7 +98,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף 7 ימים לפני"
+    displayText: "validity7DaysBefore"
   },
   
   "birthday_7_days_after": {
@@ -115,7 +116,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף 7 ימים אחרי"
+    displayText: "validity7DaysAfter"
   },
   
   "birthday_3_days_before": {
@@ -133,7 +134,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף 3 ימים לפני"
+    displayText: "validity3DaysBefore"
   },
   
   "birthday_3_days_after": {
@@ -151,7 +152,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayText: "תקף 3 ימים אחרי"
+    displayText: "validity3DaysAfter"
   },
   
   // Anniversary benefits (for future use)
@@ -163,7 +164,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // For now, return false as anniversaryDate is not implemented
       return false;
     },
-    displayText: "תקף ביום ההולדת בלבד"
+    displayText: "validOnlyOnBirthday"
   },
   
   "anniversary_entire_month": {
@@ -173,7 +174,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // This would need anniversaryDate from user profile
       return false;
     },
-    displayText: "תקף לכל החודש"
+    displayText: "validForEntireMonth"
   },
   
   "anniversary_week_before_after": {
@@ -183,7 +184,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // This would need anniversaryDate from user profile
       return false;
     },
-    displayText: "תקף לשבוע לפני ואחרי"
+    displayText: "validForWeek"
   }
 };
 
@@ -234,9 +235,11 @@ export function validateBenefitData(benefitData: any): { isValid: boolean; error
   };
 }
 
-export function getValidityDisplayText(validityType: string): string {
-  const normalizedType = LEGACY_VALIDITY_TYPES[validityType] || validityType;
-  return VALIDITY_TYPES[normalizedType]?.displayText || "תקף לתקופה מוגבלת";
+export function getValidityDisplayText(validityType: string, language: Language = 'he'): string {
+  const normalizedType = LEGACY_VALIDITY_TYPES[validityType] || validityType
+  const keyOrText = VALIDITY_TYPES[normalizedType]?.displayText || 'validForLimitedPeriod'
+  const translationMap = translations[language] as Record<string, string>
+  return translationMap[keyOrText] || keyOrText
 }
 
 export function isBenefitActive(benefit: any, userDOB: Date | null, currentDate: Date = new Date()): boolean {

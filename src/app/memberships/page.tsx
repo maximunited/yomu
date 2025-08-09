@@ -337,7 +337,7 @@ export default function MembershipsPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">טוען...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">{t('loading')}</p>
         </div>
       </div>
     );
@@ -361,7 +361,7 @@ export default function MembershipsPage() {
   const handleSaveChanges = async () => {
     if (!session) {
       console.error('No session available');
-      alert('אנא התחבר מחדש כדי לשמור את השינויים');
+      alert(t('unauthorized'));
       router.push('/auth/signin');
       return;
     }
@@ -409,17 +409,17 @@ export default function MembershipsPage() {
         console.error('Failed to save memberships:', response.status, errorData);
         
         if (response.status === 401) {
-          alert('הסשן פג תוקף. אנא התחבר מחדש.');
+          alert(t('unauthorized'));
           router.push('/auth/signin');
         } else if (response.status === 500) {
-          alert('שגיאה בשרת. אנא נסה שוב מאוחר יותר.');
+          alert(t('internalServerError'));
         } else {
-          alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
+          alert(t('profileUpdateError'));
         }
       }
     } catch (error) {
       console.error('Error saving memberships:', error);
-      alert('שגיאה בשמירת החברויות. אנא נסה שוב.');
+      alert(t('internalServerError'));
     } finally {
       setIsSaving(false);
     }
@@ -574,7 +574,7 @@ export default function MembershipsPage() {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">טוען חברויות...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">{t('loading')}</p>
           </div>
         </div>
       </div>
@@ -594,13 +594,13 @@ export default function MembershipsPage() {
                 onClick={handleBackNavigation}
               >
                 <ArrowLeft className="w-4 h-4 ml-1" />
-                חזרה
+                {t('back')}
               </Button>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">ניהול חברויות</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">{t('manageMemberships')}</span>
             </div>
             <div className="flex items-center space-x-4 relative">
               <span className="text-sm text-gray-600 dark:text-gray-300">
-                {activeCount} מתוך {memberships.length} פעילים
+                {t('activeOutOfTotal')} {memberships.length}
               </span>
               <div className="relative">
                 <Button
@@ -612,7 +612,7 @@ export default function MembershipsPage() {
                       : "bg-purple-600 hover:bg-purple-700 text-white"
                   }`}
                 >
-                  {isSaving ? "שומר..." : "שמור שינויים"}
+                  {isSaving ? t('saving') : t('saveChanges')}
                 </Button>
                 
                 {/* Success Message - positioned under save button */}
@@ -622,7 +622,7 @@ export default function MembershipsPage() {
                       <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
                       </div>
-                      <span>החברויות נשמרו בהצלחה!</span>
+                      <span>{t('changesSavedSuccessfully')}</span>
                     </div>
                   </div>
                 )}
@@ -638,7 +638,7 @@ export default function MembershipsPage() {
           {/* Instructions */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800 text-sm">
-              בחרו את כל תוכניות החברות שלכם כדי שנוכל להציג לכם את כל ההטבות ליום הולדת
+              {t('membershipsDescription')}
             </p>
           </div>
 
@@ -648,7 +648,7 @@ export default function MembershipsPage() {
               <div className="flex-1">
                 <input
                   type="text"
-                  placeholder="חפש חברויות..."
+                  placeholder={t('searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
@@ -685,7 +685,7 @@ export default function MembershipsPage() {
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
               >
-                הכל
+                {t('allTypes')}
               </button>
               <button
                 onClick={() => setSelectedMembershipType("free")}
@@ -695,7 +695,7 @@ export default function MembershipsPage() {
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
               >
-                חינם
+                {t('free')}
               </button>
               <button
                 onClick={() => setSelectedMembershipType("paid")}
@@ -705,7 +705,7 @@ export default function MembershipsPage() {
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
               >
-                בתשלום
+                {t('paid')}
               </button>
             </div>
           </div>
@@ -777,7 +777,7 @@ export default function MembershipsPage() {
                         ? "bg-green-100 text-green-800" 
                         : "bg-orange-100 text-orange-800"
                     }`}>
-                      {membership.type === "free" ? "חינם" : "בתשלום"}
+                      {membership.type === "free" ? t('free') : t('paid')}
                     </span>
                     {membership.cost && (
                       <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -796,7 +796,7 @@ export default function MembershipsPage() {
           <button
             onClick={() => setShowCustomMembershipDialog(true)}
             className="fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-20"
-            aria-label="הוסף חברות מותאמת אישית"
+            aria-label={t('addCustomMembership')}
           >
             <Plus className="w-6 h-6" />
           </button>
@@ -816,7 +816,7 @@ export default function MembershipsPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                הוסף חברות מותאמת אישית
+                {t('addCustomMembership')}
               </h3>
               <button
                 onClick={() => setShowCustomMembershipDialog(false)}
@@ -831,11 +831,11 @@ export default function MembershipsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    שם החברות *
+                    {t('customMembershipName')} *
                   </label>
                   <input
                     type="text"
-                    placeholder="שם החברות"
+                    placeholder={t('customMembershipName')}
                     value={customMembership.name}
                     onChange={(e) => setCustomMembership(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
@@ -844,14 +844,14 @@ export default function MembershipsPage() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    קטגוריה *
+                    {t('categoryLabel')} *
                   </label>
                   <select
                     value={customMembership.category}
                     onChange={(e) => setCustomMembership(prev => ({ ...prev, category: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
                   >
-                    <option value="">בחר קטגוריה</option>
+                    <option value="">{t('chooseCategory')}</option>
                     <option value="food">{t('food')}</option>
                     <option value="health">{t('health')}</option>
                     <option value="fashion">{t('fashion')}</option>
@@ -868,10 +868,10 @@ export default function MembershipsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  תיאור *
+                  {t('customMembershipDescription')} *
                 </label>
                 <textarea
-                  placeholder="תיאור החברות וההטבות"
+                  placeholder={t('customMembershipDescription')}
                   value={customMembership.description}
                   onChange={(e) => setCustomMembership(prev => ({ ...prev, description: e.target.value }))}
                   rows={3}
@@ -881,7 +881,7 @@ export default function MembershipsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  אתר אינטרנט
+                  {t('contact')}
                 </label>
                 <input
                   type="url"
@@ -895,7 +895,7 @@ export default function MembershipsPage() {
               {/* Membership Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  סוג חברות
+                  {t('membershipType')}
                 </label>
                 <div className="flex space-x-4">
                   <label className="flex items-center">
@@ -907,7 +907,7 @@ export default function MembershipsPage() {
                       onChange={(e) => setCustomMembership(prev => ({ ...prev, type: e.target.value as "free" | "paid", cost: "" }))}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">חינם</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{t('free')}</span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -918,7 +918,7 @@ export default function MembershipsPage() {
                       onChange={(e) => setCustomMembership(prev => ({ ...prev, type: e.target.value as "free" | "paid" }))}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">בתשלום</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{t('paid')}</span>
                   </label>
                 </div>
               </div>
@@ -927,7 +927,7 @@ export default function MembershipsPage() {
               {customMembership.type === "paid" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    עלות *
+                    {t('membershipCost')} *
                   </label>
                   <input
                     type="text"
@@ -942,7 +942,7 @@ export default function MembershipsPage() {
               {/* Partner Brands */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  מותגים שותפים (אופציונלי)
+                  {t('partnerBrands')} ({t('optional')})
                 </label>
                 <div className="max-h-32 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-2">
                   {availableBrands.length > 0 ? (
@@ -960,13 +960,13 @@ export default function MembershipsPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">טוען מותגים...</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('loading')}</p>
                   )}
                 </div>
                 {customMembership.partnerBrands.length > 0 && (
                   <div className="mt-2">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      נבחרו {customMembership.partnerBrands.length} מותגים: {customMembership.partnerBrands.join(', ')}
+                      {customMembership.partnerBrands.join(', ')}
                     </p>
                   </div>
                 )}
@@ -979,7 +979,7 @@ export default function MembershipsPage() {
                 variant="outline"
                 className="flex-1"
               >
-                ביטול
+                {t('cancel')}
               </Button>
               <Button
                 onClick={handleAddCustomMembership}
@@ -990,7 +990,7 @@ export default function MembershipsPage() {
                     : "bg-gray-400 text-gray-200 cursor-not-allowed"
                 }`}
               >
-                הוסף
+                {t('addMembership')}
               </Button>
             </div>
           </div>

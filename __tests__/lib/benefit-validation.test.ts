@@ -124,19 +124,19 @@ describe('Benefit Validation', () => {
 
   describe('getValidityDisplayText', () => {
     it('should return correct display text for valid types', () => {
-      expect(getValidityDisplayText('birthday_exact_date')).toBe('תקף ביום ההולדת בלבד')
-      expect(getValidityDisplayText('birthday_entire_month')).toBe('תקף לכל החודש')
-      expect(getValidityDisplayText('birthday_week_before_after')).toBe('תקף לשבוע לפני ואחרי')
+      expect(getValidityDisplayText('birthday_exact_date', 'he')).toBe('תקף ביום ההולדת בלבד')
+      expect(getValidityDisplayText('birthday_entire_month', 'he')).toBe('תקף לכל החודש')
+      expect(getValidityDisplayText('birthday_week_before_after', 'he')).toBe('תקף לשבוע לפני ואחרי')
     })
 
     it('should handle legacy types', () => {
-      expect(getValidityDisplayText('birthday_date')).toBe('תקף ביום ההולדת בלבד')
-      expect(getValidityDisplayText('birthday_month')).toBe('תקף לכל החודש')
-      expect(getValidityDisplayText('birthday_week')).toBe('תקף לשבוע לפני ואחרי')
+      expect(getValidityDisplayText('birthday_date', 'he')).toBe('תקף ביום ההולדת בלבד')
+      expect(getValidityDisplayText('birthday_month', 'he')).toBe('תקף לכל החודש')
+      expect(getValidityDisplayText('birthday_week', 'he')).toBe('תקף לשבוע לפני ואחרי')
     })
 
     it('should return default text for unknown types', () => {
-      expect(getValidityDisplayText('unknown_type')).toBe('תקף לתקופה מוגבלת')
+      expect(getValidityDisplayText('unknown_type', 'he')).toBe('תקף לתקופה מוגבלת')
     })
   })
 

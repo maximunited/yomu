@@ -10,7 +10,7 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const brand = await prisma.brand.findUnique({
@@ -27,13 +27,13 @@ export async function GET(
     });
 
     if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
+      return NextResponse.json({ message: 'benefitNotFound' }, { status: 404 });
     }
 
     return NextResponse.json(brand);
   } catch (error) {
     console.error('Error fetching brand:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
   }
 }
 
@@ -44,7 +44,7 @@ export async function PATCH(
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -68,7 +68,7 @@ export async function PATCH(
     return NextResponse.json(updatedBrand);
   } catch (error) {
     console.error('Error updating brand:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
   }
 }
 
@@ -79,7 +79,7 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     // Delete related records first
@@ -105,9 +105,9 @@ export async function DELETE(
       where: { id: params.id }
     });
 
-    return NextResponse.json({ message: 'Brand deleted successfully' });
+    return NextResponse.json({ message: 'brandDeletedSuccessfully' });
   } catch (error) {
     console.error('Error deleting brand:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
   }
 } 

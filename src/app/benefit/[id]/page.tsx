@@ -40,9 +40,9 @@ export default function BenefitDetailPage() {
         
         if (!response.ok) {
           if (response.status === 404) {
-            setError("הטבה לא נמצאה");
+            setError(t('benefitNotFound'));
           } else {
-            setError("שגיאה בטעינת ההטבה");
+            setError(t('benefitLoadError'));
           }
           return;
         }
@@ -51,7 +51,7 @@ export default function BenefitDetailPage() {
         setBenefit(data);
       } catch (error) {
         console.error("Error fetching benefit:", error);
-        setError("שגיאה בטעינת ההטבה");
+        setError(t('benefitLoadError'));
       } finally {
         setIsLoading(false);
       }
@@ -244,8 +244,8 @@ export default function BenefitDetailPage() {
                 variant="outline"
                 onClick={() => {
                   // Open email client with pre-filled subject and body
-                  const subject = encodeURIComponent(`דיווח על מידע שגוי - ${benefit.brand.name}`);
-                  const body = encodeURIComponent(`שלום,\n\nאני רוצה לדווח על מידע שגוי או חסר בהטבה הבאה:\n\nמותג: ${benefit.brand.name}\nהטבה: ${benefit.title}\nתיאור: ${benefit.description}\n\nפרטים נוספים:\n`);
+                  const subject = encodeURIComponent(`${t('reportIncorrectInfo')} - ${benefit.brand.name}`);
+                  const body = encodeURIComponent(`${t('reportEmailGreeting')}\n\n${t('reportEmailIntro')}\n\n${t('reportEmailBrand')}: ${benefit.brand.name}\n${t('reportEmailBenefit')}: ${benefit.title}\n${t('reportEmailDescription')}: ${benefit.description}\n\n${t('reportEmailMoreDetails')}\n`);
                   window.open(`mailto:support@yomu.co.il?subject=${subject}&body=${body}`, '_blank');
                 }}
                 className="w-full text-red-600 border-red-200 hover:bg-red-50"

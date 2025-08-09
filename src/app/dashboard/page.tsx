@@ -105,7 +105,7 @@ export default function DashboardPage() {
         }
       } else {
         console.log("Profile response not ok:", await profileResponse.text());
-        setErrorMessage('שגיאה בטעינת נתוני המשתמש');
+        setErrorMessage(t('profileLoadError'));
       }
       
       // Load user's memberships first
@@ -119,7 +119,7 @@ export default function DashboardPage() {
         console.log("User memberships:", userMembershipsData.length);
       } else {
         console.log("Memberships response not ok:", await membershipsResponse.text());
-        setErrorMessage('שגיאה בטעינת נתוני המשתמש');
+        setErrorMessage(t('profileLoadError'));
       }
 
       // Load all benefits
@@ -150,14 +150,14 @@ export default function DashboardPage() {
         setBenefits(userBenefits);
       } else {
         console.log("Benefits response not ok:", await benefitsResponse.text());
-        setErrorMessage('שגיאה בטעינת נתוני המשתמש');
+        setErrorMessage(t('profileLoadError'));
       }
 
       // Load used benefits
       await fetchUsedBenefits();
     } catch (error) {
       console.error("Error fetching user data:", error);
-      setErrorMessage('שגיאה בטעינת נתוני המשתמש');
+      setErrorMessage(t('profileLoadError'));
     } finally {
       setIsLoading(false);
     }
@@ -205,16 +205,16 @@ export default function DashboardPage() {
         console.log('Success response:', data);
         setUsedBenefits(prev => new Set([...prev, benefitId]));
         // Show success feedback
-        alert('Benefit marked as used successfully!');
+        alert(t('benefitUsedSuccessfully'));
       } else {
         const errorText = await response.text();
         console.error('Failed to mark benefit as used:', response.status, errorText);
         // Show user feedback
-        alert(`Failed to mark benefit as used: ${response.status} - ${errorText}`);
+        alert(`${t('internalServerError')}: ${response.status}`);
       }
     } catch (error) {
       console.error("Error marking benefit as used:", error);
-      alert(`Error marking benefit as used: ${error}`);
+      alert(t('internalServerError'));
     } finally {
       setUsedBenefitsLoading(false);
     }
@@ -238,16 +238,16 @@ export default function DashboardPage() {
           return newSet;
         });
         // Show success feedback
-        alert('Benefit unmarked successfully!');
+        alert(t('benefitUnmarkedSuccessfully'));
       } else {
         const errorText = await response.text();
         console.error('Failed to unmark benefit as used:', response.status, errorText);
         // Show user feedback
-        alert(`Failed to unmark benefit as used: ${response.status} - ${errorText}`);
+        alert(`${t('internalServerError')}: ${response.status}`);
       }
     } catch (error) {
       console.error("Error unmarking benefit as used:", error);
-      alert(`Error unmarking benefit as used: ${error}`);
+      alert(t('internalServerError'));
     } finally {
       setUsedBenefitsLoading(false);
     }

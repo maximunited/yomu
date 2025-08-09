@@ -10,7 +10,7 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const benefit = await prisma.benefit.findUnique({
@@ -22,13 +22,13 @@ export async function GET(
     });
 
     if (!benefit) {
-      return NextResponse.json({ error: 'Benefit not found' }, { status: 404 });
+      return NextResponse.json({ message: 'benefitNotFound' }, { status: 404 });
     }
 
     return NextResponse.json(benefit);
   } catch (error) {
     console.error('Error fetching benefit:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
   }
 }
 
@@ -39,7 +39,7 @@ export async function PATCH(
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -65,7 +65,7 @@ export async function PATCH(
     return NextResponse.json(updatedBenefit);
   } catch (error) {
     console.error('Error updating benefit:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
   }
 }
 
@@ -76,7 +76,7 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     // Delete related notifications first
@@ -89,9 +89,9 @@ export async function DELETE(
       where: { id: params.id }
     });
 
-    return NextResponse.json({ message: 'Benefit deleted successfully' });
+    return NextResponse.json({ message: 'benefitDeletedSuccessfully' });
   } catch (error) {
     console.error('Error deleting benefit:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
   }
 } 
