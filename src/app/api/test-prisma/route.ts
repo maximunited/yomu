@@ -8,14 +8,14 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      message: "Prisma connection successful",
+      message: "prismaConnectionSuccess",
       brandCount: brandCount
     });
   } catch (error) {
     console.error("Prisma test error:", error);
     return NextResponse.json({
       success: false,
-      message: "Prisma connection failed",
+      message: "prismaConnectionFailed",
       error: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 });
   }

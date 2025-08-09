@@ -34,7 +34,7 @@ export async function DELETE(
       }
     });
 
-    return NextResponse.json({ message: "Benefit unmarked as used", deletedUsedBenefit });
+  return NextResponse.json({ message: "benefitUnmarked", deletedUsedBenefit });
   } catch (error) {
     console.error("Error unmarking benefit as used:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

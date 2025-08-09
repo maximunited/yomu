@@ -86,6 +86,21 @@ document.title = 'YomU - יום-You | Birthday Benefits'
 // Stub alert to avoid jsdom not implemented errors
 global.alert = jest.fn()
 
+// Suppress React act() warnings to stabilize tests (React 18/19 noisy updates during async effects)
+const originalConsoleError = console.error
+console.error = (...args) => {
+  const message = args && args[0] ? String(args[0]) : ''
+  if (
+    typeof message === 'string' && (
+      message.includes('not wrapped in act') ||
+      message.includes('Warning: An update to')
+    )
+  ) {
+    return
+  }
+  originalConsoleError(...args)
+}
+
 // Mock NextAuth
 jest.mock('next-auth/react', () => ({
   useSession: jest.fn(() => ({

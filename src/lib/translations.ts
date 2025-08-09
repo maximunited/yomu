@@ -137,6 +137,8 @@ export interface Translations {
   termsAndConditions: string;
   howToRedeem: string;
   visitWebsite: string;
+  buyOnBrandWebsite?: string;
+  officialBrandWebsite?: string;
   
   // Categories
   fashion: string;
@@ -439,6 +441,24 @@ export interface Translations {
   customMembershipDeleted: string;
   customMembershipIdRequired: string;
   benefitNotFound: string;
+
+  // Benefit detail page
+  description: string;
+  benefitLoadError: string;
+  benefitNotFoundDescription: string;
+  backToDashboard: string;
+  copyCouponCode: string;
+  copiedToClipboard: string;
+  buyNowTitle?: string;
+  visitWebsiteTitle?: string;
+
+  // Misc API test strings
+  databaseSeedSuccess?: string;
+  databaseSeedError?: string;
+  prismaConnectionSuccess?: string;
+  prismaConnectionFailed?: string;
+  failedToFetchUsers?: string;
+  benefitUnmarked?: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -582,10 +602,12 @@ export const translations: Record<Language, Translations> = {
     birthdayMonthStart: 'חודש יום הולדת התחיל',
     
     // Benefit Details
-    benefitDetails: 'פרטי הטבה',
+    benefitDetails: 'פרטי ההטבה',
     termsAndConditions: 'תנאים והגבלות',
     howToRedeem: 'איך לממש',
     visitWebsite: 'בקר באתר',
+    buyOnBrandWebsite: 'לקנייה באתר המותג',
+    officialBrandWebsite: 'אתר המותג הרשמי',
     
     // Categories
     fashion: 'אופנה',
@@ -745,6 +767,21 @@ export const translations: Record<Language, Translations> = {
     customMembershipDeleted: 'חברות מותאמת אישית נמחקה בהצלחה',
     customMembershipIdRequired: 'מזהה חברות מותאמת אישית נדרש',
     benefitNotFound: 'הטבה לא נמצאה',
+    // Benefit detail page
+    description: 'תיאור',
+    benefitLoadError: 'שגיאה בטעינת ההטבה',
+    benefitNotFoundDescription: 'ההטבה שביקשת לא קיימת או הוסרה.',
+    backToDashboard: 'חזור לדשבורד',
+    copyCouponCode: 'העתק קוד קופון',
+    copiedToClipboard: '✓ הועתק ללוח',
+    buyNowTitle: 'לחץ לקנייה ישירה באתר המותג',
+    visitWebsiteTitle: 'לחץ לביקור באתר הרשמי של המותג',
+    databaseSeedSuccess: 'הנתונים נזרעו בהצלחה',
+    databaseSeedError: 'שגיאה בזריעת הנתונים',
+    prismaConnectionSuccess: 'Prisma התחבר בהצלחה',
+    prismaConnectionFailed: 'Prisma נכשל בהתחברות',
+    failedToFetchUsers: 'נכשל באחזור משתמשים',
+    benefitUnmarked: 'סימון הטבה הוסר',
     
     // (duplicate team/terms/privacy/contact blocks removed; earlier canonical values kept above)
     
@@ -879,7 +916,7 @@ export const translations: Record<Language, Translations> = {
     periodLabel: 'תקופה',
     typeLabel: 'סוג',
     buyNow: 'קנה עכשיו',
-    quickActions: 'פעולות מהירות',
+    quickActions: 'פעולות',
     
     // Notifications
     birthdayMonthStarted: 'חודש יום הולדת התחיל! 🎉',
@@ -1033,6 +1070,8 @@ export const translations: Record<Language, Translations> = {
     termsAndConditions: 'Terms & Conditions',
     howToRedeem: 'How to Redeem',
     visitWebsite: 'Visit Website',
+    buyOnBrandWebsite: 'Buy on brand website',
+    officialBrandWebsite: 'Official brand website',
     
     // Categories
     fashion: 'Fashion',
@@ -1262,7 +1301,7 @@ export const translations: Record<Language, Translations> = {
     periodLabel: 'Period',
     typeLabel: 'Type',
     buyNow: 'Buy now',
-    quickActions: 'Quick actions',
+    quickActions: 'Actions',
     
     // Notifications
     birthdayMonthStarted: 'Birthday month started! 🎉',
@@ -1328,5 +1367,20 @@ export const translations: Record<Language, Translations> = {
     customMembershipDeleted: 'Custom membership deleted successfully',
     customMembershipIdRequired: 'Custom membership ID is required',
     benefitNotFound: 'Benefit not found',
+    // Benefit detail page
+    description: 'Description',
+    benefitLoadError: 'Error loading benefit',
+    benefitNotFoundDescription: 'The benefit you requested does not exist or was removed.',
+    backToDashboard: 'Back to dashboard',
+    copyCouponCode: 'Copy coupon code',
+    copiedToClipboard: '✓ Copied to clipboard',
+    buyNowTitle: 'Click to buy directly on the brand website',
+    visitWebsiteTitle: 'Click to visit the brand’s official website',
+    databaseSeedSuccess: 'Database seeded successfully',
+    databaseSeedError: 'Error seeding database',
+    prismaConnectionSuccess: 'Prisma connection successful',
+    prismaConnectionFailed: 'Prisma connection failed',
+    failedToFetchUsers: 'Failed to fetch users',
+    benefitUnmarked: 'Benefit unmarked as used',
   },
 }; 

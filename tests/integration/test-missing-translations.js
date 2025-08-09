@@ -93,7 +93,10 @@ async function testMissingTranslations() {
       ...findFiles(srcDir, '.ts'),
       ...findFiles(srcDir, '.js'),
       ...findFiles(srcDir, '.jsx')
-    ].filter(file => !file.includes('translations.ts'));
+    ]
+      .filter(file => !file.includes('translations.ts'))
+      // Ignore seed data files; they contain domain content, not UI strings
+      .filter(file => !file.replace(/\\/g, '/').includes('/app/api/seed/'));
 
     console.log(`Scanning ${codeFiles.length} code files...`);
 

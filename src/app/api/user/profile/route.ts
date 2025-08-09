@@ -69,7 +69,7 @@ export async function PUT(request: NextRequest) {
     console.error("Error updating profile:", error);
     return NextResponse.json(
       { 
-        message: "שגיאה בעדכון הפרופיל",
+        message: "profileUpdateError",
         error: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }

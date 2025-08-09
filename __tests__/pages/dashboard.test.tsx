@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DashboardPage from '@/app/dashboard/page'
 
@@ -38,6 +38,11 @@ Object.assign(navigator, {
 })
 
 describe('DashboardPage', () => {
+  const renderDashboard = async () => {
+    await act(async () => {
+      render(<DashboardPage />)
+    })
+  }
   beforeEach(() => {
     jest.clearAllMocks()
     
@@ -100,7 +105,7 @@ describe('DashboardPage', () => {
   })
 
   it('should render dashboard with user data', async () => {
-    render(<DashboardPage />)
+    await renderDashboard()
     
     // Wait for loading to complete
     await waitFor(() => {
@@ -112,7 +117,7 @@ describe('DashboardPage', () => {
   })
 
   it('should display user memberships', async () => {
-    render(<DashboardPage />)
+    await renderDashboard()
     
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeInTheDocument()
@@ -123,7 +128,7 @@ describe('DashboardPage', () => {
   })
 
   it('should display benefits', async () => {
-    render(<DashboardPage />)
+    await renderDashboard()
     
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeInTheDocument()
@@ -135,7 +140,7 @@ describe('DashboardPage', () => {
 
   it('should handle copy to clipboard', async () => {
     const user = userEvent.setup()
-    render(<DashboardPage />)
+    await renderDashboard()
     
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeInTheDocument()
@@ -147,7 +152,7 @@ describe('DashboardPage', () => {
 
   it('should handle external link clicks', async () => {
     const user = userEvent.setup()
-    render(<DashboardPage />)
+    await renderDashboard()
     
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeInTheDocument()
@@ -157,8 +162,8 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Test User')).toBeInTheDocument()
   })
 
-  it('should show loading state initially', () => {
-    render(<DashboardPage />)
+  it('should show loading state initially', async () => {
+    await renderDashboard()
     
     // Should show loading or skeleton elements
     expect(screen.getByText('טוען...')).toBeInTheDocument()
@@ -169,7 +174,7 @@ describe('DashboardPage', () => {
     ;(global.fetch as jest.Mock)
       .mockRejectedValueOnce(new Error('API Error'))
     
-    render(<DashboardPage />)
+    await renderDashboard()
     
     // Should still render the page even with API errors
     await waitFor(() => {
@@ -178,7 +183,7 @@ describe('DashboardPage', () => {
   })
 
   it('should display benefit validity information', async () => {
-    render(<DashboardPage />)
+    await renderDashboard()
     
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeInTheDocument()
@@ -192,7 +197,7 @@ describe('DashboardPage', () => {
     const user = userEvent.setup()
     const mockSignOut = require('next-auth/react').signOut
     
-    render(<DashboardPage />)
+    await renderDashboard()
     
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeInTheDocument()
@@ -205,7 +210,7 @@ describe('DashboardPage', () => {
   })
 
   it('should display user profile information', async () => {
-    render(<DashboardPage />)
+    await renderDashboard()
     
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeInTheDocument()
@@ -242,7 +247,7 @@ describe('DashboardPage', () => {
         }),
       })
     
-    render(<DashboardPage />)
+    await renderDashboard()
     
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeInTheDocument()

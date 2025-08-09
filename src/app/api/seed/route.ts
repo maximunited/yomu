@@ -207,14 +207,14 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json({
-      message: "Database seeded successfully",
+      message: "databaseSeedSuccess",
       brandsCreated: createdBrands.length,
       benefitsCreated: sampleBenefits.length
     });
   } catch (error) {
     console.error("Error seeding database:", error);
     return NextResponse.json(
-      { message: "Error seeding database" },
+      { message: "databaseSeedError" },
       { status: 500 }
     );
   }

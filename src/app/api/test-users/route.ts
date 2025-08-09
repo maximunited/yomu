@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     console.error("Error testing users:", error);
     return NextResponse.json({
       success: false,
-      message: "Failed to fetch users",
+      message: "failedToFetchUsers",
       error: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 });
   }

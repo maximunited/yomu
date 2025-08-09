@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { 
-        message: "חברויות נשמרו בהצלחה",
+        message: "changesSavedSuccessfully",
         memberships: results.length 
       },
       { status: 200 }

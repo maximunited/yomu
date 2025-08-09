@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { ArrowLeft, Copy, ExternalLink, Calendar, Info, Gift, AlertTriangle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Benefit {
   id: string;
@@ -29,6 +30,7 @@ export default function BenefitDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchBenefit = async () => {
@@ -65,7 +67,7 @@ export default function BenefitDetailPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">טוען...</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -77,10 +79,10 @@ export default function BenefitDetailPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">הטבה לא נמצאה</h1>
-            <p className="text-gray-600 mb-6">ההטבה שביקשת לא קיימת או הוסרה.</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('benefitNotFound')}</h1>
+            <p className="text-gray-600 mb-6">{t('benefitNotFoundDescription')}</p>
             <Link href="/dashboard">
-              <Button>חזור לדשבורד</Button>
+              <Button>{t('backToDashboard')}</Button>
             </Link>
           </div>
         </div>
@@ -101,13 +103,13 @@ export default function BenefitDetailPage() {
   const getValidityText = (validityType: string) => {
     switch (validityType) {
       case "birthday_date":
-        return "תקף ביום ההולדת בלבד";
+        return t('validOnlyOnBirthday');
       case "birthday_month":
-        return "תקף לכל החודש";
+        return t('validForEntireMonth');
       case "birthday_week":
-        return "תקף לשבוע";
+        return t('validForWeek');
       default:
-        return "תקף לתקופה מוגבלת";
+        return t('validForLimitedPeriod');
     }
   };
 
@@ -120,7 +122,7 @@ export default function BenefitDetailPage() {
             <Link href="/dashboard">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="w-5 h-5 ml-1" />
-                חזור
+                {t('back')}
               </Button>
             </Link>
             <div className="flex items-center space-x-3">
@@ -163,22 +165,22 @@ export default function BenefitDetailPage() {
 
           {/* Benefit Details */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">פרטי ההטבה</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('benefitDetails')}</h2>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">תיאור</h3>
+                <h3 className="font-medium text-gray-900 mb-2">{t('description')}</h3>
                 <p className="text-gray-600">{benefit.description}</p>
               </div>
 
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">אופן המימוש</h3>
+                <h3 className="font-medium text-gray-900 mb-2">{t('howToRedeem')}</h3>
                 <p className="text-gray-600">{benefit.redemptionMethod}</p>
               </div>
 
               {benefit.promoCode && (
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-2">קוד קופון</h3>
+                  <h3 className="font-medium text-gray-900 mb-2">{t('couponCode')}</h3>
                   <div className="flex items-center space-x-2">
                     <code className="bg-purple-100 border border-purple-200 px-4 py-2 rounded-md text-lg font-mono text-purple-800 font-bold">
                       {benefit.promoCode}
@@ -188,21 +190,21 @@ export default function BenefitDetailPage() {
                       size="sm"
                       onClick={() => copyToClipboard(benefit.promoCode!)}
                       className="bg-purple-600 text-white hover:bg-purple-700"
-                      aria-label="העתק קוד קופון"
-                      title="העתק קוד קופון"
+                      aria-label={t('copyCouponCode')}
+                      title={t('copyCouponCode')}
                     >
                       <Copy className="w-4 h-4" />
                     </Button>
                   </div>
                   {copiedCode === benefit.promoCode && (
-                    <p className="text-green-600 text-sm mt-2">✓ הועתק ללוח</p>
+                    <p className="text-green-600 text-sm mt-2">{t('copiedToClipboard')}</p>
                   )}
                 </div>
               )}
 
               {benefit.termsAndConditions && (
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-2">תנאים והגבלות</h3>
+                  <h3 className="font-medium text-gray-900 mb-2">{t('termsAndConditions')}</h3>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-gray-600 text-sm">{benefit.termsAndConditions}</p>
                   </div>
@@ -213,7 +215,7 @@ export default function BenefitDetailPage() {
 
           {/* Action Buttons */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">פעולות</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('quickActions')}</h2>
             
             <div className="space-y-3">
               {benefit.url && (
@@ -221,21 +223,21 @@ export default function BenefitDetailPage() {
                   variant="default"
                   onClick={() => window.open(benefit.url, '_blank')}
                   className="w-full bg-purple-600 text-white hover:bg-purple-700"
-                  title="לחץ לקנייה ישירה באתר המותג"
+                  title={t('buyNowTitle')}
                 >
                   <ExternalLink className="w-5 h-5 ml-2" />
-                  לקנייה באתר המותג
+                  {t('buyOnBrandWebsite')}
                 </Button>
               )}
               
-              <Button
+               <Button
                 variant="outline"
                 onClick={() => window.open(benefit.brand.website, '_blank')}
                 className="w-full"
-                title="לחץ לביקור באתר הרשמי של המותג"
+                 title={t('visitWebsiteTitle')}
               >
                 <ExternalLink className="w-5 h-5 ml-2" />
-                אתר המותג הרשמי
+                 {t('officialBrandWebsite')}
               </Button>
               
               <Button
@@ -249,7 +251,7 @@ export default function BenefitDetailPage() {
                 className="w-full text-red-600 border-red-200 hover:bg-red-50"
               >
                 <AlertTriangle className="w-5 h-5 ml-2" />
-                דווח על מידע שגוי או חסר
+                {t('reportIncorrectInfo')}
               </Button>
             </div>
           </div>

@@ -54,31 +54,34 @@ jest.mock('@/contexts/DarkModeContext', () => ({
 }));
 
 // Mock the UI components
-jest.mock('@/components/ui/LanguageSwitcher', () => {
-  return function MockLanguageSwitcher() {
+jest.mock('@/components/ui/LanguageSwitcher', () => ({
+  __esModule: true,
+  default: function MockLanguageSwitcher() {
     return <button aria-label="language switcher">עברית</button>;
-  };
-});
+  },
+}));
 
-jest.mock('@/components/ui/DarkModeToggle', () => {
-  return function MockDarkModeToggle() {
+jest.mock('@/components/ui/DarkModeToggle', () => ({
+  __esModule: true,
+  default: function MockDarkModeToggle() {
     return <button aria-label="dark mode toggle">🌙</button>;
-  };
-});
+  },
+}));
 
 // Mock the PageHeader component
-jest.mock('@/components/PageHeader', () => {
-  return function MockPageHeader({ title }: { title: string }) {
+jest.mock('@/components/PageHeader', () => ({
+  __esModule: true,
+  default: function MockPageHeader({ title, showBackButton = true }: { title: string; showBackButton?: boolean }) {
     return (
       <header>
-        <div>Back</div>
+        {showBackButton && <div>Back</div>}
         <div>{title}</div>
         <button aria-label="language switcher">עברית</button>
         <button aria-label="dark mode toggle">🌙</button>
       </header>
     );
-  };
-});
+  },
+}));
 
 describe('Page Header Functionality', () => {
   it('should render page header with title', () => {

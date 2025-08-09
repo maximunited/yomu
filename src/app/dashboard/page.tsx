@@ -344,7 +344,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div role="alert" className="bg-red-50 border border-red-200 text-red-800 rounded-md p-6 max-w-md w-full">
-          <h1 className="text-xl font-bold mb-2">התרחשה בעיה</h1>
+          <h1 className="text-xl font-bold mb-2">{t('signInError')}</h1>
           <p>{errorMessage}</p>
         </div>
       </div>
@@ -532,7 +532,7 @@ export default function DashboardPage() {
 
         {/* Non-blocking error alert for used-benefits failures */}
         {usedBenefitsError && (
-          <div role="alert" aria-live="polite" className="sr-only">שגיאה</div>
+          <div role="alert" aria-live="polite" className="sr-only">{t('signInError')}</div>
         )}
 
         {/* Search and Filters Section */}
@@ -893,7 +893,7 @@ export default function DashboardPage() {
         {/* Error handling */}
         {errorMessage && (
           <div role="alert" className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mb-6">
-            <strong className="block mb-1">שגיאה</strong>
+            <strong className="block mb-1">{t('signInError')}</strong>
             <span>{errorMessage}</span>
           </div>
         )}
