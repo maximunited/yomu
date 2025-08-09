@@ -4,7 +4,7 @@ export interface BenefitValidationRule {
   validityType: string;
   description: string;
   validationLogic: (userDOB: Date, currentDate: Date) => boolean;
-  displayTextKey: string;
+  displayText: string;
 }
 
 export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
@@ -16,7 +16,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       return userDOB.getMonth() === currentDate.getMonth() && 
              userDOB.getDate() === currentDate.getDate();
     },
-    displayTextKey: "validityExactDate"
+    displayText: "תקף ביום ההולדת בלבד"
   },
   
   "birthday_entire_month": {
@@ -25,7 +25,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
     validationLogic: (userDOB: Date, currentDate: Date) => {
       return userDOB.getMonth() === currentDate.getMonth();
     },
-    displayTextKey: "validityEntireMonth"
+    displayText: "תקף לכל החודש"
   },
   
   "birthday_week_before_after": {
@@ -43,7 +43,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayTextKey: "validityWeekBeforeAfter"
+    displayText: "תקף לשבוע לפני ואחרי"
   },
   
   "birthday_weekend": {
@@ -61,7 +61,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayTextKey: "validityWeekend"
+    displayText: "תקף בסופ״ש יום ההולדת"
   },
   
   "birthday_30_days": {
@@ -79,7 +79,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayTextKey: "validity30Days"
+    displayText: "תקף 30 ימים"
   },
   
   "birthday_7_days_before": {
@@ -97,7 +97,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayTextKey: "validity7DaysBefore"
+    displayText: "תקף 7 ימים לפני"
   },
   
   "birthday_7_days_after": {
@@ -115,7 +115,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayTextKey: "validity7DaysAfter"
+    displayText: "תקף 7 ימים אחרי"
   },
   
   "birthday_3_days_before": {
@@ -133,7 +133,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayTextKey: "validity3DaysBefore"
+    displayText: "תקף 3 ימים לפני"
   },
   
   "birthday_3_days_after": {
@@ -151,7 +151,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       }
       return false;
     },
-    displayTextKey: "validity3DaysAfter"
+    displayText: "תקף 3 ימים אחרי"
   },
   
   // Anniversary benefits (for future use)
@@ -163,7 +163,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // For now, return false as anniversaryDate is not implemented
       return false;
     },
-    displayTextKey: "validityExactDate"
+    displayText: "תקף ביום ההולדת בלבד"
   },
   
   "anniversary_entire_month": {
@@ -173,7 +173,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // This would need anniversaryDate from user profile
       return false;
     },
-    displayTextKey: "validityEntireMonth"
+    displayText: "תקף לכל החודש"
   },
   
   "anniversary_week_before_after": {
@@ -183,7 +183,7 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
       // This would need anniversaryDate from user profile
       return false;
     },
-    displayTextKey: "validityWeekBeforeAfter"
+    displayText: "תקף לשבוע לפני ואחרי"
   }
 };
 
@@ -191,7 +191,17 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
 export const LEGACY_VALIDITY_TYPES: Record<string, string> = {
   "birthday_date": "birthday_exact_date",
   "birthday_month": "birthday_entire_month",
-  "birthday_week": "birthday_week_before_after"
+  "birthday_week": "birthday_week_before_after",
+  // UI/test-friendly keys
+  "validityExactDate": "birthday_exact_date",
+  "validityEntireMonth": "birthday_entire_month",
+  "validityWeekBeforeAfter": "birthday_week_before_after",
+  "validityWeekend": "birthday_weekend",
+  "validity30Days": "birthday_30_days",
+  "validity7DaysBefore": "birthday_7_days_before",
+  "validity7DaysAfter": "birthday_7_days_after",
+  "validity3DaysBefore": "birthday_3_days_before",
+  "validity3DaysAfter": "birthday_3_days_after"
 };
 
 export function validateBenefitData(benefitData: any): { isValid: boolean; errors: string[] } {
@@ -226,7 +236,7 @@ export function validateBenefitData(benefitData: any): { isValid: boolean; error
 
 export function getValidityDisplayText(validityType: string): string {
   const normalizedType = LEGACY_VALIDITY_TYPES[validityType] || validityType;
-  return VALIDITY_TYPES[normalizedType]?.displayTextKey || "validityLimitedPeriod";
+  return VALIDITY_TYPES[normalizedType]?.displayText || "תקף לתקופה מוגבלת";
 }
 
 export function isBenefitActive(benefit: any, userDOB: Date | null, currentDate: Date = new Date()): boolean {

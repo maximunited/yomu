@@ -6,11 +6,11 @@ import { Gift, Calendar, Star, Users } from "lucide-react";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
 import { DynamicYear } from "@/components/DynamicYear";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslations } from 'next-intl';
 import { useDarkMode } from "@/contexts/DarkModeContext";
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const t = useTranslations();
   const { isDarkMode } = useDarkMode();
 
   return (

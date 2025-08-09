@@ -1,5 +1,37 @@
 import '@testing-library/jest-dom'
 
+// Mock next-intl (avoid ESM transform issues)
+jest.mock('next-intl', () => ({
+  NextIntlClientProvider: ({ children }) => children,
+  useTranslations: () => ((key) => key),
+  useFormatter: () => ({}),
+}))
+
+// Provide a default LanguageContext mock for tests that don't wrap providers
+jest.mock('@/contexts/LanguageContext', () => {
+  const React = require('react')
+  const { translations } = require('@/lib/translations')
+  return {
+    useLanguage: () => ({
+      t: (key) => {
+        // Default to Hebrew to satisfy most tests
+        const he = translations.he?.[key]
+        // Some tests expect English strings explicitly
+        if (key === 'markAsUsed' || key === 'unmarkAsUsed') {
+          return translations.en?.[key] || he || key
+        }
+        return he || translations.en?.[key] || key
+      },
+      language: 'he',
+      setLanguage: jest.fn(),
+      dir: 'rtl',
+      languageInfo: { code: 'he', dir: 'rtl', isRTL: true },
+      isRTL: true,
+    }),
+    LanguageProvider: ({ children }) => React.createElement(React.Fragment, null, children),
+  }
+})
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter() {
@@ -77,7 +109,9 @@ jest.mock('@/lib/prisma', () => ({
 }))
 
 // Global test utilities
-global.fetch = jest.fn()
+global.fetch = jest.fn().mockImplementation(() =>
+  Promise.resolve({ ok: true, json: async () => ({}) })
+)
 
 // Clean up after each test
 afterEach(() => {

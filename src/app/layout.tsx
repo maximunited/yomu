@@ -4,6 +4,8 @@ import "./globals.css";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { NextIntlClientProvider } from "next-intl";
+import { DEFAULT_LOCALE, getMessages } from "@/i18n/messages";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,18 +14,23 @@ export const metadata: Metadata = {
   description: "Discover and manage your birthday benefits from all your favorite brands",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = DEFAULT_LOCALE;
+  const messages = getMessages(locale);
+
   return (
-    <html lang="he" dir="rtl">
+    <html lang={locale} dir={locale === 'he' ? 'rtl' : 'ltr'}>
       <body className={inter.className}>
         <SessionProvider>
           <DarkModeProvider>
             <LanguageProvider>
-              {children}
+              <NextIntlClientProvider locale={locale} messages={messages}>
+                {children}
+              </NextIntlClientProvider>
             </LanguageProvider>
           </DarkModeProvider>
         </SessionProvider>

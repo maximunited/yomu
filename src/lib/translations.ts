@@ -507,6 +507,11 @@ export const translations: Record<Language, Translations> = {
     customMembershipName: 'שם החברות',
     customMembershipDescription: 'תיאור',
     customMembershipCategory: 'קטגוריה',
+    selectAllMemberships: 'בחר את כל החברויות',
+    programsSelected: 'תוכניות נבחרו',
+    addMembership: 'הוסף חברות',
+    changesSavedSuccessfully: 'השינויים נשמרו בהצלחה',
+    chooseCategory: 'בחר קטגוריה',
     
     // Profile
     profileSettings: 'הגדרות פרופיל',
@@ -542,7 +547,7 @@ export const translations: Record<Language, Translations> = {
     fullySupported: 'שפות נתמכות במלואן',
     betaLanguages: 'שפות בגרסת בטא',
     betaLanguagesNote: 'שפות בגרסת בטא עשויות להיות מתורגמות חלקית',
-    account: 'חשבון',
+    
     
     // Notifications
     notificationsTitle: 'התראות',
@@ -562,7 +567,6 @@ export const translations: Record<Language, Translations> = {
     fashion: 'אופנה',
     food: 'מזון',
     health: 'בריאות',
-    homeCategory: 'בית',
     finance: 'פיננסי',
     grocery: 'מזון',
     transport: 'תחבורה',
@@ -578,9 +582,6 @@ export const translations: Record<Language, Translations> = {
     // Static Text
     backToHome: 'חזרה לדף הבית',
     termsOfUse: 'תנאי שימוש',
-    privacyPolicy: 'מדיניות פרטיות',
-    contactUs: 'צור קשר',
-    loading: 'טוען...',
     validOnlyOnBirthday: 'תקף ביום ההולדת בלבד',
     validForEntireMonth: 'תקף לכל החודש',
     validForWeek: 'תקף לשבוע',
@@ -589,25 +590,6 @@ export const translations: Record<Language, Translations> = {
     specialBirthdayDiscount: 'הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות',
     return: 'חזרה',
     activeOutOfTotal: 'פעילים מתוך',
-    selectAllMemberships: 'בחרו את כל תוכניות החברות שלכם כדי שנוכל להציג לכם את כל ההטבות ליום הולדת',
-    programsSelected: 'תוכניות נבחרו',
-    moreProgramsMoreBenefits: 'ככל שתבחרו יותר תוכניות, כך תקבלו יותר הטבות ליום הולדת',
-    addCustomMembership: 'הוסף חברות מותאמת אישית',
-    customMembershipName: 'שם החברות',
-    customMembershipDescription: 'תיאור קצר',
-    customMembershipCategory: 'בחר קטגוריה',
-    chooseCategory: 'בחר קטגוריה',
-    addMembership: 'הוסף חברות',
-    changesSavedSuccessfully: 'השינויים נשמרו בהצלחה!',
-    contactInformation: 'פרטי קשר',
-    sendMessage: 'שלח הודעה',
-    fullName: 'שם מלא',
-    subject: 'נושא',
-    message: 'הודעה',
-    workingHours: 'שעות פעילות',
-    address: 'כתובת',
-    phone: 'טלפון',
-    chooseSubject: 'בחר נושא',
     technicalSupport: 'תמיכה טכנית',
     improvementSuggestion: 'הצעת שיפור',
     bugReport: 'דיווח על באג',
@@ -615,6 +597,13 @@ export const translations: Record<Language, Translations> = {
     writeYourMessageHere: 'כתוב את הודעתך כאן...',
     enterYourFullName: 'הכנס את שמך המלא',
     yourEmail: 'your@email.com',
+    contactInformation: 'פרטי קשר',
+    subject: 'נושא',
+    message: 'הודעה',
+    workingHours: 'שעות פעילות',
+    address: 'כתובת',
+    phone: 'טלפון',
+    chooseSubject: 'בחר נושא',
     reportIncorrectInfo: 'דווח על מידע שגוי או חסר',
     thankYouForReporting: 'תודה על הדיווח!',
     weWillCheckAndUpdate: 'נבדוק את המידע ונעדכן בהקדם.',
@@ -673,6 +662,7 @@ export const translations: Record<Language, Translations> = {
     contactAddress: 'רחוב הרצל 123, תל אביב',
     contactPhone: '03-1234567',
     workingHoursValue: 'א\'-ה\' 9:00-18:00',
+    sendMessage: 'שלח הודעה',
     
     // Signin page
     welcome: 'ברוכים הבאים',
@@ -715,40 +705,7 @@ export const translations: Record<Language, Translations> = {
     apiKeyCopied: 'מפתח API הועתק',
     apiKeySaved: 'מפתח API נשמר',
     
-    // Team Members
-    leadDeveloper: 'מתכנת מוביל',
-    uxDesigner: 'עיצוב וניתוח משתמש',
-    productManager: 'ניהול מוצר',
-    contentContributors: 'תורמי תוכן',
-    contentContributorsDescription: 'האנשים שעובדים על תוכן ועיצוב של YomU',
-    qualityAssurance: 'איתור באגים ואימות תמיכה',
-    qualityAssuranceDescription: 'האנשים שעובדים על אימות תמיכה ואיתור באגים בפלטפורמה',
-    
-    // Terms Page
-    termsAcceptance: 'אימות תנאי שימוש',
-    termsAcceptanceDescription: 'אנא קרא את תנאי השימוש והסכמו אותם כדי להמשיך להשתמש בפלטפורמה',
-    serviceUsage: 'שימוש בשירות',
-    serviceUsageDescription: 'אנא שימוש בפלטפורמה בצורה חוקית ומותאמת לצרכים שלך',
-    liability: 'הגבלת חובה',
-    liabilityDescription: 'אנא שים לב שכל המידע והשירות שניתנים בפלטפורמה מוגן בכל זמן ומקום, ואין לנו חובה להציג אותם בכל זמן או בכל צורה',
-    termsChanges: 'שינויים בתנאי שימוש',
-    termsChangesDescription: 'אנו שמים לב לשינויים בתנאי השימוש ונעדכן אותם בהקדם',
-    accountCancellation: 'ביטול חשבון',
-    accountCancellationDescription: 'אם אתה רוצה לבטל את חשבון הפלטפורמה, אנא צור קשר עם צוות התמיכה שלנו ונעזור לך בכל שלב',
-    
-    // Privacy Page
-    dataCollection: 'איסוף נתונים',
-    dataCollectionDescription: 'אנו מאסים את כל הנתונים שנאספו מכל מקום בפלטפורמה, כולל מידע אישי, מידע מוגן, מידע שנאספה באופן אוטומטי ומידע שנאספה באופן ידני',
-    security: 'אבטחה',
-    securityDescription: 'אנו מבצעים מספר מדידות אבטחה כדי להבטיח שכל הנתונים והשירות שנאספו בפלטפורמה מוגן בצורה מובנית ומוגן בצורה מובנית',
-    userRights: 'זכויות משתמש',
-    userRightsDescription: 'אתה זכאי לגישה לכל הנתונים שנאספו מכל מקום בפלטפורמה, כולל זכות לגישה לגיבוי וזכות לגישה לגיבוי שנאספה באופן אוטומטי וזכות לגישה לגיבוי שנאספה באופן ידני',
-    policyUpdates: 'עדכוני מדיניות',
-    policyUpdatesDescription: 'אנו שמים לב לשינויים במדיניות פרטיות ונעדכן אותם בהקדם',
-    
-    // Contact Page
-    contactAddress: 'כתובת חברתנו',
-    contactPhone: 'טלפון חברתנו',
+    // (duplicate team/terms/privacy/contact blocks removed; earlier canonical values kept above)
     
     // Membership Types
     free: 'חינמי',
@@ -759,9 +716,14 @@ export const translations: Record<Language, Translations> = {
     
     // Search and Filter
     search: 'חיפוש',
-    searchPlaceholder: 'חפש הטבות...',
+    
     filterBy: 'סנן לפי',
     allCategories: 'כל הקטגוריות',
+    searchPlaceholder: 'חפש הטבות...',
+    
+    validityPeriod: 'תקופה חוקית',
+    allPeriods: 'כל התקופות',
+    
     quickFilters: 'סינון מהיר',
     
     // Multi-brand Partnerships
@@ -867,12 +829,8 @@ export const translations: Record<Language, Translations> = {
     searchAndFilter: 'חיפוש וסינון',
     showFilters: 'הצג סינונים',
     hideFilters: 'הסתר סינונים',
-    searchPlaceholder: 'חפש הטבות...',
     category: 'קטגוריה',
-    allCategories: 'כל הקטגוריות',
-    validityPeriod: 'תקופה חוקית',
-    allPeriods: 'כל התקופות',
-    membershipType: 'סוג חברות',
+    
     
     // Dashboard additional UI
     allTypes: 'כל הסוגים',
@@ -891,11 +849,12 @@ export const translations: Record<Language, Translations> = {
   },
   en: {
     // Navigation
-    homeCategory: 'Home',
+    home: 'Home',
+    
     dashboard: 'Dashboard',
     memberships: 'Memberships',
     profile: 'Profile',
-    notificationsTitle: 'Notifications',
+    
     signIn: 'Sign In',
     signUp: 'Sign Up',
     signOut: 'Sign Out',
@@ -974,6 +933,11 @@ export const translations: Record<Language, Translations> = {
     customMembershipName: 'Membership Name',
     customMembershipDescription: 'Description',
     customMembershipCategory: 'Category',
+    selectAllMemberships: 'Select all memberships',
+    programsSelected: 'Programs selected',
+    addMembership: 'Add membership',
+    changesSavedSuccessfully: 'Changes saved successfully',
+    chooseCategory: 'Choose category',
     
     // Profile
     profileSettings: 'Profile Settings',
@@ -1046,9 +1010,6 @@ export const translations: Record<Language, Translations> = {
     // Static Text
     backToHome: 'Back to Home',
     termsOfUse: 'Terms of Use',
-    privacyPolicy: 'Privacy Policy',
-    contactUs: 'Contact Us',
-    loading: 'Loading...',
     validOnlyOnBirthday: 'Valid only on birthday',
     validForEntireMonth: 'Valid for entire month',
     validForWeek: 'Valid for week',
@@ -1056,51 +1017,24 @@ export const translations: Record<Language, Translations> = {
     discountOnAllPurchases: '30% discount on all purchases',
     specialBirthdayDiscount: 'Special birthday discount - 30% discount on all purchases in store',
     return: 'Return',
-    manageMemberships: 'Manage Memberships',
     activeOutOfTotal: 'active out of',
-    selectAllMemberships: 'Select all your memberships so we can show you all birthday benefits',
-    programsSelected: 'programs selected',
-    moreProgramsMoreBenefits: 'The more programs you select, the more birthday benefits you\'ll get',
-    addCustomMembership: 'Add Custom Membership',
-    customMembershipName: 'Membership Name',
-    customMembershipDescription: 'Short Description',
-    customMembershipCategory: 'Choose Category',
-    chooseCategory: 'Choose Category',
-    addMembership: 'Add Membership',
-    changesSavedSuccessfully: 'Changes saved successfully!',
-    contactInformation: 'Contact Information',
-    sendMessage: 'Send Message',
-    fullName: 'Full Name',
-    subject: 'Subject',
-    message: 'Message',
-    workingHours: 'Working Hours',
-    address: 'Address',
-    phone: 'Phone',
-    chooseSubject: 'Choose Subject',
-    technicalSupport: 'Technical Support',
-    improvementSuggestion: 'Improvement Suggestion',
-    bugReport: 'Bug Report',
-    generalQuestion: 'General Question',
-    writeYourMessageHere: 'Write your message here...',
-    enterYourFullName: 'Enter your full name',
-    yourEmail: 'your@email.com',
-    benefitDetails: 'Benefit Details',
-    reportIncorrectInfo: 'Report incorrect or missing information',
-    thankYouForReporting: 'Thank you for reporting!',
-    weWillCheckAndUpdate: 'We will check the information and update it soon.',
-    notificationsTitle: 'Notifications',
-    markAllAsRead: 'Mark All as Read',
-    noNotifications: 'No notifications',
-    birthdayMonthStarted: 'Birthday month started! 🎉',
     newBenefitsAvailable: 'You have 5 new benefits available for your birthday month',
-    benefitExpiringSoon: 'Benefit expiring soon',
     benefitExpiresInDays: 'Fox benefit expires in 3 days',
-    newBenefitAvailable: 'New benefit available',
     addedNewBenefit: 'Starbucks added a new birthday benefit',
     newBenefitFrom: 'New benefit from Super-Pharm',
     hoursAgo: 'hours ago',
     daysAgo: 'days ago',
     ago: 'ago',
+    technicalSupport: 'Technical support',
+    improvementSuggestion: 'Improvement suggestion',
+    bugReport: 'Bug report',
+    generalQuestion: 'General question',
+    writeYourMessageHere: 'Write your message here...',
+    enterYourFullName: 'Enter your full name',
+    yourEmail: 'your@email.com',
+    reportIncorrectInfo: 'Report incorrect or missing information',
+    thankYouForReporting: 'Thank you for reporting!',
+    weWillCheckAndUpdate: 'We will check the information and update soon.',
     
     // About Page
     about: 'About',
@@ -1150,6 +1084,13 @@ export const translations: Record<Language, Translations> = {
     contactPhone: '03-1234567',
     workingHoursValue: 'Sun-Thu 9:00-18:00',
     sendMessage: 'Send Message',
+    contactInformation: 'Contact information',
+    subject: 'Subject',
+    message: 'Message',
+    workingHours: 'Working hours',
+    address: 'Address',
+    phone: 'Phone',
+    chooseSubject: 'Choose subject',
     
     // Membership Types
     free: 'Free',
@@ -1252,7 +1193,6 @@ export const translations: Record<Language, Translations> = {
     user: 'User',
     personalProfile: 'Personal Profile',
     appearanceAndLanguage: 'Appearance & Language',
-    account: 'Account',
     accountManagement: 'Account Management',
     helloUser: 'Hello {name}! 🎉',
     hereAreYourBirthdayBenefits: 'Here are your birthday benefits',
@@ -1268,20 +1208,17 @@ export const translations: Record<Language, Translations> = {
     searchAndFilter: 'Search & Filter',
     showFilters: 'Show Filters',
     hideFilters: 'Hide Filters',
-    searchPlaceholder: 'Search memberships...',
     category: 'Category',
-    allCategories: 'All Categories',
-    validityPeriod: 'Validity Period',
-    allPeriods: 'All Periods',
-    membershipType: 'Membership Type',
+    validityPeriod: 'Validity period',
+    allPeriods: 'All periods',
     
     // Dashboard additional UI
     allTypes: 'All Types',
     categoryLabel: 'Category',
     periodLabel: 'Period',
     typeLabel: 'Type',
-    buyNow: 'Buy Now',
-    quickActions: 'Quick Actions',
+    buyNow: 'Buy now',
+    quickActions: 'Quick actions',
     
     // Notifications
     birthdayMonthStarted: 'Birthday month started! 🎉',

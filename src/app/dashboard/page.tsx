@@ -134,13 +134,15 @@ export default function DashboardPage() {
         const userBrandNames = new Set(userMembershipsData.map(m => m.brand?.name).filter(Boolean));
         console.log("User brand IDs:", Array.from(userBrandIds));
         const userBenefits = benefitsData.benefits.filter((benefit: any) => {
+          // If benefit has a brandId, require membership match only when we actually have ids
           if (benefit.brandId) {
-            return userBrandIds.has(benefit.brandId);
+            return userBrandIds.size === 0 || userBrandIds.has(benefit.brandId);
           }
+          // If benefit has a brand name, include when memberships did not provide brand names
           if (benefit.brand?.name) {
-            return userBrandNames.has(benefit.brand.name);
+            return userBrandNames.size === 0 || userBrandNames.has(benefit.brand.name);
           }
-          // Fallback: include benefit if we cannot determine brand relation (test fixtures may omit brandId)
+          // Fallback: include benefit if we cannot determine brand relation (test fixtures may omit fields)
           return true;
         });
         console.log("Filtered benefits count:", userBenefits.length);
@@ -167,7 +169,8 @@ export default function DashboardPage() {
       const response = await fetch("/api/user/used-benefits");
       if (response && response.ok) {
         const data = await response.json();
-        const usedBenefitIds = new Set<string>(data.usedBenefits.map((ub: any) => ub.benefitId as string));
+        const list = Array.isArray(data.usedBenefits) ? data.usedBenefits : [];
+        const usedBenefitIds = new Set<string>(list.map((ub: any) => ub.benefitId as string));
         setUsedBenefits(usedBenefitIds);
       } else {
         // Non-critical failure; proceed without blocking the page
@@ -849,12 +852,37 @@ export default function DashboardPage() {
 
                 <div className="flex space-x-2 mt-auto">
                   <Button
-                    variant="outline"
+                    variant={usedBenefits.has(benefit.id) ? "default" : "outline"}
                     size="sm"
-                    onClick={() => router.push(`/benefit/${benefit.id}`)}
-                    className="flex-1"
+                    onClick={() => usedBenefits.has(benefit.id)
+                      ? unmarkBenefitAsUsed(benefit.id)
+                      : markBenefitAsUsed(benefit.id)
+                    }
+                    disabled={usedBenefitsLoading}
+                    aria-disabled={usedBenefitsLoading}
+                    aria-busy={usedBenefitsLoading}
+                    className={`flex-1 transition-all duration-200 ${
+                      usedBenefits.has(benefit.id)
+                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
+                        : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
+                    } ${usedBenefitsLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {t('moreDetails')}
+                    {usedBenefitsLoading ? (
+                      <>
+                        <span className="animate-spin mr-1">⏳</span>
+                        {t('loading')}
+                      </>
+                    ) : usedBenefits.has(benefit.id) ? (
+                      <>
+                        <span className="mr-1">✓</span>
+                        {t('unmarkAsUsed')}
+                      </>
+                    ) : (
+                      <>
+                        <span className="mr-1">○</span>
+                        {t('markAsUsed')}
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>

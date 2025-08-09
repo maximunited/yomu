@@ -5,13 +5,19 @@ import React, { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { DarkModeProvider } from '@/contexts/DarkModeContext'
 import { LanguageProvider } from '@/contexts/LanguageContext'
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages, DEFAULT_LOCALE } from '@/i18n/messages'
 
 // Custom render function that includes providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+  const locale = DEFAULT_LOCALE
+  const messages = getMessages(locale)
   return (
     <DarkModeProvider>
       <LanguageProvider>
-        {children}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </LanguageProvider>
     </DarkModeProvider>
   )

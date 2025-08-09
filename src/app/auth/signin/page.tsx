@@ -153,6 +153,12 @@ export default function SignInPage() {
                     type="checkbox"
                     checked={saveEmail}
                     onChange={(e) => setSaveEmail(e.target.checked)}
+                    onKeyDown={(e) => {
+                      if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') {
+                        e.preventDefault();
+                        setSaveEmail((prev) => !prev);
+                      }
+                    }}
                     className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5"
                   />
                   <label htmlFor="saveEmail" className={`block text-sm leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -166,6 +172,12 @@ export default function SignInPage() {
                     type="checkbox"
                     checked={keepSignedIn}
                     onChange={(e) => setKeepSignedIn(e.target.checked)}
+                    onKeyDown={(e) => {
+                      if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') {
+                        e.preventDefault();
+                        setKeepSignedIn((prev) => !prev);
+                      }
+                    }}
                     className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5"
                   />
                   <label htmlFor="keepSignedIn" className={`block text-sm leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
