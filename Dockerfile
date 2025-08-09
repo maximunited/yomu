@@ -11,7 +11,8 @@ WORKDIR /app
 # Ensure Prisma schema exists before postinstall runs generate
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
-RUN npm ci --only=production
+# Install all dependencies (including dev) for build stage
+RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
