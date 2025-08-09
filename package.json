@@ -27,7 +27,7 @@
     "admin:help": "node scripts/admin-helper.js",
     "db:seed": "node scripts/seed.js",
     "assets:brands": "node scripts/download-brand-logos.js",
-    "prepare": "husky install",
+    "prepare": "husky",
     "db:studio": "npx prisma studio",
     "commit": "cz",
     "lint:commits": "commitlint --from=HEAD~20 --to=HEAD"
@@ -49,6 +49,8 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.4.0",
+    "@commitlint/config-conventional": "^19.4.0",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6.4",
@@ -58,12 +60,10 @@
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "commitizen": "^3.0.0",
+    "cz-conventional-changelog": "^3.0.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
-    "@commitlint/cli": "^19.4.0",
-    "@commitlint/config-conventional": "^19.4.0",
-    "commitizen": "^4.3.0",
-    "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.6",
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
@@ -72,5 +72,15 @@
     "prisma": "^6.13.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "braces": "^3.0.3",
+    "micromatch": "^4.0.8",
+    "lodash": "^4.17.21",
+    "merge": "^2.1.1",
+    "minimist": "^1.2.8",
+    "shelljs": "^0.8.5",
+    "tmp": "^0.2.4",
+    "external-editor": "^3.1.0"
   }
 }
