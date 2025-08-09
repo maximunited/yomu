@@ -3,7 +3,15 @@ import '@testing-library/jest-dom'
 // Mock next-intl (avoid ESM transform issues)
 jest.mock('next-intl', () => ({
   NextIntlClientProvider: ({ children }) => children,
-  useTranslations: () => ((key) => key),
+  useTranslations: () => (key => {
+    try {
+      const { translations } = require('@/lib/translations')
+      // Default Hebrew for tests
+      return translations.he?.[key] || translations.en?.[key] || key
+    } catch {
+      return key
+    }
+  }),
   useFormatter: () => ({}),
 }))
 
@@ -74,6 +82,9 @@ if (!description) {
 description.setAttribute('content', 'Discover and manage your birthday benefits from all your favorite brands')
 
 document.title = 'YomU - יום-You | Birthday Benefits'
+
+// Stub alert to avoid jsdom not implemented errors
+global.alert = jest.fn()
 
 // Mock NextAuth
 jest.mock('next-auth/react', () => ({

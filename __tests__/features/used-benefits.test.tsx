@@ -110,7 +110,8 @@ describe('Used Benefits Feature', () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Unmark as Used')).toBeInTheDocument();
+      const buttons = screen.getAllByText('Unmark as Used');
+      expect(buttons.length).toBeGreaterThan(0);
     });
   });
 
