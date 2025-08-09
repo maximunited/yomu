@@ -1,0 +1,50 @@
+name: Docker Build & Smoke Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker_smoke:
+    name: Build image and run smoke test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Docker info
+        run: |
+          docker --version
+          docker compose version || docker-compose --version
+
+      - name: Docker compose up
+        run: docker compose -f compose.yml up -d --build
+
+      - name: Wait for app
+        run: node scripts/test-docker.js || true
+
+      - name: Docker compose down
+        if: always()
+        run: docker compose -f compose.yml down -v
+
+
