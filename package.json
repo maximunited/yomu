@@ -26,6 +26,8 @@
     "verify:docker": "npm run test:docker",
     "admin:help": "node scripts/admin-helper.js",
     "db:seed": "node scripts/seed.js",
+    "assets:brands": "node scripts/download-brand-logos.js",
+    "prepare": "husky install",
     "db:studio": "npx prisma studio",
     "commit": "cz",
     "lint:commits": "commitlint --from=HEAD~20 --to=HEAD"
