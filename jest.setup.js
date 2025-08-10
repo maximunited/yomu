@@ -135,9 +135,8 @@ jest.mock('@/lib/prisma', () => ({
 }))
 
 // Global test utilities
-global.fetch = jest.fn().mockImplementation(() =>
-  Promise.resolve({ ok: true, json: async () => ({}) })
-)
+// Provide a basic fetch mock
+global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
 
 // Clean up after each test
 afterEach(() => {
