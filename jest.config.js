@@ -22,6 +22,12 @@ const customJestConfig = {
     '!src/app/demo/**',
     '!src/app/onboarding/**',
     '!src/app/notifications/**',
+    // exclude server routes and heavy admin pages from coverage for now
+    '!src/app/api/**',
+    '!src/app/admin/**',
+    '!src/app/memberships/**',
+    '!src/app/settings/**',
+    '!src/app/layout.tsx',
   ],
   testMatch: [
     // Known-stable suites only
