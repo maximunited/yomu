@@ -33,8 +33,8 @@ export default function SignUpPage() {
       return;
     }
 
-    // Validate password length
-    if (formData.password.length < 6) {
+    // Validate password length (consistent with i18n: at least 8 chars)
+    if (formData.password.length < 8) {
       setError(t('passwordMinLength'));
       return;
     }
