@@ -36,6 +36,7 @@ const customJestConfig = {
     '<rootDir>/__tests__/features/used-benefits.test.tsx',
     '<rootDir>/__tests__/lib/benefit-validation.test.ts',
     '<rootDir>/__tests__/lib/utils.test.ts',
+    '<rootDir>/__tests__/i18n/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/__tests__/pages/signin-checkboxes.test.tsx',
     '<rootDir>/__tests__/pages/page-header*.test.tsx',
     '<rootDir>/__tests__/pages/simple-test.test.tsx',
