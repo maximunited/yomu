@@ -1,16 +1,17 @@
 describe('prisma singleton module', () => {
-  const originalEnv = process.env.NODE_ENV
+  const originalEnvObj = process.env
 
   afterEach(() => {
     jest.resetModules()
-    process.env.NODE_ENV = originalEnv
+    // restore original env object
+    Object.defineProperty(process, 'env', { value: originalEnvObj })
     // cleanup global cached instance if our real module set it
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(globalThis as any).prisma = undefined
   })
 
   it('reuses a single PrismaClient instance in non-production', () => {
-    process.env.NODE_ENV = 'test'
+    Object.defineProperty(process, 'env', { value: { ...originalEnvObj, NODE_ENV: 'test' } })
 
     let created = 0
     jest.doMock('@prisma/client', () => ({
@@ -39,7 +40,7 @@ describe('prisma singleton module', () => {
   })
 
   it('does not cache globally in production', () => {
-    process.env.NODE_ENV = 'production'
+    Object.defineProperty(process, 'env', { value: { ...originalEnvObj, NODE_ENV: 'production' } })
 
     let created = 0
     jest.doMock('@prisma/client', () => ({
