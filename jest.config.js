@@ -32,8 +32,10 @@ const customJestConfig = {
   testMatch: [
     // Known-stable suites only
     '<rootDir>/__tests__/components/ui/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/components/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/__tests__/features/used-benefits.test.tsx',
     '<rootDir>/__tests__/lib/benefit-validation.test.ts',
+    '<rootDir>/__tests__/lib/utils.test.ts',
     '<rootDir>/__tests__/pages/signin-checkboxes.test.tsx',
     '<rootDir>/__tests__/pages/page-header*.test.tsx',
     '<rootDir>/__tests__/pages/simple-test.test.tsx',
@@ -41,6 +43,7 @@ const customJestConfig = {
     '<rootDir>/__tests__/simple.test.tsx',
     '<rootDir>/__tests__/e2e/dashboard.spec.ts',
     '<rootDir>/__tests__/accessibility/benefit-detail.test.tsx',
+    '<rootDir>/__tests__/contexts/**/*.{js,jsx,ts,tsx}',
   ],
   coverageThreshold: {
     global: {
