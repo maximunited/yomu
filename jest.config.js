@@ -24,7 +24,12 @@ const customJestConfig = {
     '!src/app/notifications/**',
   ],
   testMatch: [
-    '<rootDir>/__tests__/{components,pages,lib,features,accessibility,e2e}/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/components/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/pages/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/lib/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/features/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/accessibility/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/e2e/**/*.{js,jsx,ts,tsx}',
   ],
   coverageThreshold: {
     global: {
