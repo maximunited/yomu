@@ -148,6 +148,97 @@ const predefinedBrands = [
     website: "https://www.sohocenter.co.il",
     description: "הטבת יום הולדת לחברי מועדון הלקוחות",
     category: "home"
+  },
+  {
+    name: "Lavido",
+    logoUrl: "/images/brands/lavido.png",
+    website: "https://www.lavido.com",
+    description: "A birthday gift and a discount",
+    category: "beauty"
+  },
+  {
+    name: "Cafe Greg",
+    logoUrl: "/images/brands/cafe-greg.png",
+    website: "https://www.cafegreg.co.il",
+    description: "Complimentary Belgian waffle",
+    category: "food"
+  },
+  {
+    name: "MAC Cosmetics",
+    logoUrl: "/images/brands/mac.png",
+    website: "https://www.maccosmetics.co.il",
+    description: "A special birthday gift",
+    category: "beauty"
+  },
+  {
+    name: "Isrotel",
+    logoUrl: "/images/brands/isrotel.png",
+    website: "https://www.isrotel.co.il",
+    description: "100 points, free spa entry, 20% off spa treatments, wine in room",
+    category: "travel"
+  },
+  {
+    name: "Roladin",
+    logoUrl: "/images/brands/roladin.png",
+    website: "https://www.roladin.co.il",
+    description: "An unspecified birthday gift (e.g., pastry or coffee)",
+    category: "food"
+  },
+  {
+    name: "El Al",
+    logoUrl: "/images/brands/elal.png",
+    website: "https://www.elal.co.il",
+    description: "Buy one flight ticket, get the second for 50% off + points",
+    category: "travel"
+  },
+  {
+    name: "rebar",
+    logoUrl: "/images/brands/rebar.png",
+    website: "https://www.rebar.co.il",
+    description: "A discount on a birthday drink",
+    category: "food"
+  },
+  {
+    name: "Lev Cinema",
+    logoUrl: "/images/brands/lev-cinema.png",
+    website: "https://www.lev.co.il",
+    description: "An unspecified birthday gift",
+    category: "entertainment"
+  },
+  {
+    name: "Max Brenner",
+    logoUrl: "/images/brands/max-brenner.png",
+    website: "https://www.maxbrenner.co.il",
+    description: "Complimentary hot chocolate",
+    category: "food"
+  },
+  {
+    name: "ACE Hardware",
+    logoUrl: "/images/brands/ace.png",
+    website: "https://www.ace.co.il",
+    description: "₪50 discount on a purchase of ₪299+",
+    category: "home"
+  },
+  {
+    name: "The Body Shop",
+    logoUrl: "/images/brands/body-shop.png",
+    website: "https://www.thebodyshop.co.il",
+    description: "Birthday voucher (e.g., ~₪25)",
+    category: "beauty"
+  },
+  {
+    name: "Golda",
+    logoUrl: "/images/brands/golda.png",
+    website: "https://www.golda.co.il",
+    description: "Unspecified benefit, likely bonus points",
+    category: "food"
+  },
+  {
+    name: "Dream Card",
+    logoUrl: "/images/brands/dream-card.png",
+    website: "https://www.dreamcard.co.il",
+    description: "30% discount at each participating brand",
+    category: "multi-brand"
   }
 ];
 

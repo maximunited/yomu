@@ -72,7 +72,7 @@ const predefinedBrands = [
   },
   {
     name: "באקרו - Buckaroo",
-    logoUrl: "/images/brands/bacaro.svg",
+    logoUrl: "/images/brands/buckaroo.svg",
     website: "https://www.bacaro.co.il",
     description: "מסעדה - קינוח ומנה ראשונה מתנה",
     category: "food"
@@ -120,9 +120,9 @@ const predefinedBrands = [
     category: "baby"
   },
   {
-    name: "יומנגוס",
-    logoUrl: "/images/brands/yomango.svg",
-    website: "https://www.yomango.co.il",
+    name: "יומנגס",
+    logoUrl: "/images/brands/humongous.svg",
+    website: "https://www.humongous.co.il/",
     description: "הטבות על גלידה",
     category: "food"
   },
@@ -210,6 +210,97 @@ const predefinedBrands = [
     website: "https://www.sohocenter.co.il",
     description: "הטבת יום הולדת לחברי מועדון הלקוחות",
     category: "home"
+  },
+  {
+    name: "Lavido",
+    logoUrl: "/images/brands/lavido.png",
+    website: "https://www.lavido.com",
+    description: "A birthday gift and a discount",
+    category: "beauty"
+  },
+  {
+    name: "Cafe Greg",
+    logoUrl: "/images/brands/cafe-greg.png",
+    website: "https://www.cafegreg.co.il",
+    description: "Complimentary Belgian waffle",
+    category: "food"
+  },
+  {
+    name: "MAC Cosmetics",
+    logoUrl: "/images/brands/mac.png",
+    website: "https://www.maccosmetics.co.il",
+    description: "A special birthday gift",
+    category: "beauty"
+  },
+  {
+    name: "Isrotel",
+    logoUrl: "/images/brands/isrotel.png",
+    website: "https://www.isrotel.co.il",
+    description: "100 points, free spa entry, 20% off spa treatments, wine in room",
+    category: "travel"
+  },
+  {
+    name: "Roladin",
+    logoUrl: "/images/brands/roladin.png",
+    website: "https://www.roladin.co.il",
+    description: "An unspecified birthday gift (e.g., pastry or coffee)",
+    category: "food"
+  },
+  {
+    name: "El Al",
+    logoUrl: "/images/brands/elal.png",
+    website: "https://www.elal.co.il",
+    description: "Buy one flight ticket, get the second for 50% off + points",
+    category: "travel"
+  },
+  {
+    name: "rebar",
+    logoUrl: "/images/brands/rebar.png",
+    website: "https://www.rebar.co.il",
+    description: "A discount on a birthday drink",
+    category: "food"
+  },
+  {
+    name: "Lev Cinema",
+    logoUrl: "/images/brands/lev-cinema.png",
+    website: "https://www.lev.co.il",
+    description: "An unspecified birthday gift",
+    category: "entertainment"
+  },
+  {
+    name: "Max Brenner",
+    logoUrl: "/images/brands/max-brenner.png",
+    website: "https://www.maxbrenner.co.il",
+    description: "Complimentary hot chocolate",
+    category: "food"
+  },
+  {
+    name: "ACE Hardware",
+    logoUrl: "/images/brands/ace.png",
+    website: "https://www.ace.co.il",
+    description: "₪50 discount on a purchase of ₪299+",
+    category: "home"
+  },
+  {
+    name: "The Body Shop",
+    logoUrl: "/images/brands/body-shop.png",
+    website: "https://www.thebodyshop.co.il",
+    description: "Birthday voucher (e.g., ~₪25)",
+    category: "beauty"
+  },
+  {
+    name: "Golda",
+    logoUrl: "/images/brands/golda.png",
+    website: "https://www.golda.co.il",
+    description: "Unspecified benefit, likely bonus points",
+    category: "food"
+  },
+  {
+    name: "Dream Card",
+    logoUrl: "/images/brands/dream-card.png",
+    website: "https://www.dreamcard.co.il",
+    description: "30% discount at each participating brand",
+    category: "multi-brand"
   }
 ];
 
@@ -331,7 +422,7 @@ async function seed() {
         isFree: true
       },
       {
-        brandId: createdBrands.find(b => b.name === "ג'מס - JEMS")?.id,
+        brandId: createdBrands.find(b => b.name === "ג'מס - Jem's")?.id,
         title: "חצי ליטר בירה מתנה",
         description: "חצי ליטר בירה מתנה כל החודש",
         termsAndConditions: "תקף לכל החודש הקלנדרי של יום ההולדת",
@@ -381,14 +472,170 @@ async function seed() {
       {
         brandId: createdBrands.find(b => b.name === "SOHO")?.id,
         title: "50 ₪ מתנה לקנייה בחנויות SOHO",
-        description: "שלום! לרגל יום הולדתך אנו שמחים איתך ומזמינים אותך ליהנות מ-50 ₪ מתנה לקנייה באחת מחנויות הסוהו. ההטבה בתוקף מיום ההולדת ולמשך שבועיים (ללא התניית סכום הקנייה).",
-        termsAndConditions: "ההטבה הינה אישית ואינה ניתנת להעברה. על חוגג יום ההולדת להיות נוכח בחנות בעת הרכישה ולהציג תעודה מזהה במעמד מימוש ההטבה. ההטבה תקפה בקניית מוצר במחירו המלא ואינה כוללת כפל מבצעים והטבות. ההטבה ניתנת למימוש בחנויות סוהו בלבד, ואינה ניתנת למימוש באתר האינטרנט. מותנה ברכישה ב-99 ₪ ומעלה במהלך השנה. קבלת ההטבה מותנית בהצגת ההודעה שקיבלת ב-SMS או בדואר אלקטרוני. (במידה שלא קיבלת את מספר הלקוח ניתן לפנות לשירות הלקוחות במייל service@sohocenter.co.il)",
+        description: "₪50 gift voucher. Join 'The Friends of Soho' mailing list online (Free membership).",
+        termsAndConditions: "Must have made a purchase of ₪99+ in the past year. Must present ID in-store. ההטבה הינה אישית ואינה ניתנת להעברה. ההטבה תקפה בקניית מוצר במחירו המלא ואינה כוללת כפל מבצעים והטבות. ההטבה ניתנת למימוש בחנויות סוהו בלבד. Contact: service@sohocenter.co.il",
         redemptionMethod: "in-store",
         promoCode: null,
         url: "https://www.sohocenter.co.il",
         validityType: "birthday_plus_period",
         validityDuration: 14,
         isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "Lavido")?.id,
+        title: "Birthday Gift and Discount",
+        description: "A birthday gift and a discount. Sign up for the LAVIDO Club online (Free membership).",
+        termsAndConditions: "Given with a purchase made during the birthday month. Verification Status: Verified",
+        redemptionMethod: "online",
+        promoCode: null,
+        url: "https://www.lavido.com",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "Cafe Greg")?.id,
+        title: "Complimentary Belgian Waffle",
+        description: "Complimentary Belgian waffle. Download the Cafe Greg app and register (Free membership).",
+        termsAndConditions: "Requires the purchase of a main course. Verification Status: Verified",
+        redemptionMethod: "app",
+        promoCode: null,
+        url: "https://www.cafegreg.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "MAC Cosmetics")?.id,
+        title: "Special Birthday Gift",
+        description: "A special birthday gift. Sign up for the M·A·C Lover program online or in-store (Free membership).",
+        termsAndConditions: "Must be in the 'Devoted' tier or higher. Verification Status: Verified",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.maccosmetics.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "Isrotel")?.id,
+        title: "100 Points + Spa Benefits + Wine",
+        description: "100 points, free spa entry, 20% off spa treatments, wine in room. Sign up for Chug HaShemesh (₪250 / 2 years).",
+        termsAndConditions: "Benefit applies from the second stay onwards. Verification Status: Verified",
+        redemptionMethod: "online",
+        promoCode: null,
+        url: "https://www.isrotel.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: false
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "Roladin")?.id,
+        title: "Birthday Gift",
+        description: "An unspecified birthday gift (e.g., pastry or coffee). Sign up for MY ROLADIN online or in-store via QR code (Free membership).",
+        termsAndConditions: "Must be a member for at least 3 months prior. Verification Status: Verified",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.roladin.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "El Al")?.id,
+        title: "50% Off Second Flight + Points",
+        description: "Buy one flight ticket, get the second for 50% off + points. Sign up for Frequent Flyer program ($25+ FLY CARD).",
+        termsAndConditions: "Requires TOP status or FLY CARD. Valid on specific dates. Verification Status: Verified",
+        redemptionMethod: "online",
+        promoCode: null,
+        url: "https://www.elal.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: false
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "rebar")?.id,
+        title: "Birthday Drink Discount",
+        description: "A discount on a birthday drink. Download the rebar app and register (Free membership).",
+        termsAndConditions: "Unspecified discount amount. Verification Status: Verified",
+        redemptionMethod: "app",
+        promoCode: null,
+        url: "https://www.rebar.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "Lev Cinema")?.id,
+        title: "Birthday Gift",
+        description: "An unspecified birthday gift. Purchase a ticket subscription package (Paid membership via ticket bundles).",
+        termsAndConditions: "Gift is not specified. Verification Status: Verified",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.lev.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: false
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "Max Brenner")?.id,
+        title: "Complimentary Hot Chocolate",
+        description: "Complimentary hot chocolate. Download the app (Free membership).",
+        termsAndConditions: "Based on Australian program. Requires local verification. 14 days before/after birthday. Verification Status: Requires Confirmation",
+        redemptionMethod: "app",
+        promoCode: null,
+        url: "https://www.maxbrenner.co.il",
+        validityType: "birthday_plus_period",
+        validityDuration: 14,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "ACE Hardware")?.id,
+        title: "₪50 Discount on ₪299+ Purchase",
+        description: "₪50 discount on a purchase of ₪299+. Sign up for the customer club (Unspecified membership cost).",
+        termsAndConditions: "Minimum purchase required. Verification Status: Israeli Offer Verified",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.ace.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: false
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "The Body Shop")?.id,
+        title: "Birthday Voucher",
+        description: "Birthday voucher (e.g., ~₪25). Sign up for Love Your Body online or in-store (Free membership).",
+        termsAndConditions: "Based on UK/SA programs. Value in ILS requires local verification. Verification Status: Requires Confirmation",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.thebodyshop.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "Golda")?.id,
+        title: "Birthday Bonus Points",
+        description: "Unspecified benefit, likely bonus points ('Lek'). Download the Golda app and register (Free membership).",
+        termsAndConditions: "Specific birthday benefit is not stated. Verification Status: Requires Confirmation",
+        redemptionMethod: "app",
+        promoCode: null,
+        url: "https://www.golda.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      {
+        brandId: createdBrands.find(b => b.name === "Dream Card")?.id,
+        title: "30% Discount at Participating Brands",
+        description: "30% discount at each participating brand. Sign up in-store at any participating brand or online (₪69 one-time membership).",
+        termsAndConditions: "Max purchase of ₪500 per brand. One use per brand. Participating brands: Terminal X, Billabong, Laline, The Children's Place, Aerie, American Eagle, Mango, Fox Home, Fox. Verification Status: Verified",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.dreamcard.co.il",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: false
       }
     ];
     

@@ -307,12 +307,48 @@ const benefits = [
   {
     brandName: "SOHO",
     title: "50 ₪ מתנה לקנייה בחנויות SOHO",
-    description: "שלום! לרגל יום הולדתך אנו שמחים איתך ומזמינים אותך ליהנות מ-50 ₪ מתנה לקנייה באחת מחנויות הסוהו. ההטבה בתוקף מיום ההולדת ולמשך שבועיים (ללא התניית סכום הקנייה).",
-    termsAndConditions: "ההטבה הינה אישית ואינה ניתנת להעברה. על חוגג יום ההולדת להיות נוכח בחנות בעת הרכישה ולהציג תעודה מזהה במעמד מימוש ההטבה. ההטבה תקפה בקניית מוצר במחירו המלא ואינה כוללת כפל מבצעים והטבות. ההטבה ניתנת למימוש בחנויות סוהו בלבד, ואינה ניתנת למימוש באתר האינטרנט. מותנה ברכישה ב-99 ₪ ומעלה במהלך השנה. קבלת ההטבה מותנית בהצגת ההודעה שקיבלת ב-SMS או בדואר אלקטרוני. (במידה שלא קיבלת את מספר הלקוח ניתן לפנות לשירות הלקוחות במייל service@sohocenter.co.il)",
+    description: "₪50 gift voucher. Join 'The Friends of Soho' mailing list online (Free membership).",
+    termsAndConditions: "Must have made a purchase of ₪99+ in the past year. Must present ID in-store. ההטבה הינה אישית ואינה ניתנת להעברה. ההטבה תקפה בקניית מוצר במחירו המלא ואינה כוללת כפל מבצעים והטבות. ההטבה ניתנת למימוש בחנויות סוהו בלבד. Contact: service@sohocenter.co.il",
     redemptionMethod: "הצג את ההודעה שקיבלת ב-SMS או בדואר אלקטרוני בחנות",
     promoCode: null,
     validityType: "birthday_plus_period",
     validityDuration: 14
+  },
+  
+  // Dream Card - entire month
+  {
+    brandName: "Dream Card",
+    title: "30% Discount at Participating Brands",
+    description: "30% discount at each participating brand. Sign up in-store at any participating brand or online (₪69 one-time membership).",
+    termsAndConditions: "Max purchase of ₪500 per brand. One use per brand. Participating brands: Terminal X, Billabong, Laline, The Children's Place, Aerie, American Eagle, Mango, Fox Home, Fox. Verification Status: Verified",
+    redemptionMethod: "הצג את כרטיס DREAM CARD בקופה",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  
+  // Lavido - entire month
+  {
+    brandName: "Lavido",
+    title: "Birthday Gift and Discount",
+    description: "A birthday gift and a discount. Sign up for the LAVIDO Club online (Free membership).",
+    termsAndConditions: "Given with a purchase made during the birthday month. Verification Status: Verified",
+    redemptionMethod: "Online registration required",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
+  },
+  
+  // Cafe Greg - entire month
+  {
+    brandName: "Cafe Greg",
+    title: "Complimentary Belgian Waffle",
+    description: "Complimentary Belgian waffle. Download the Cafe Greg app and register (Free membership).",
+    termsAndConditions: "Requires the purchase of a main course. Verification Status: Verified",
+    redemptionMethod: "Show app at checkout",
+    promoCode: null,
+    validityType: "birthday_entire_month",
+    validityDuration: 30
   }
 ];
 
