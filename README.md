@@ -3,6 +3,7 @@
 [![CI](https://github.com/maximunited/yomu/actions/workflows/ci.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/ci.yml)
 [![Security Audit](https://github.com/maximunited/yomu/actions/workflows/audit.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/audit.yml)
 [![Docker](https://github.com/maximunited/yomu/actions/workflows/docker.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/docker.yml)
+[![Coverage Status](https://coveralls.io/repos/github/maximunited/yomu/badge.svg)](https://coveralls.io/github/maximunited/yomu)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-maxim__united-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/maxim_united)
 
 <!-- Suggested additional badges (uncomment those you want) -->
