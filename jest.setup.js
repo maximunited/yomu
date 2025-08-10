@@ -102,14 +102,18 @@ console.error = (...args) => {
 }
 
 // Mock NextAuth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({
-    data: null,
-    status: 'unauthenticated',
-  })),
-  signIn: jest.fn(),
-  signOut: jest.fn(),
-}))
+jest.mock('next-auth/react', () => {
+  const React = require('react')
+  return {
+    useSession: jest.fn(() => ({
+      data: null,
+      status: 'unauthenticated',
+    })),
+    signIn: jest.fn(),
+    signOut: jest.fn(),
+    SessionProvider: ({ children }) => React.createElement(React.Fragment, null, children),
+  }
+})
 
 // Mock Prisma
 jest.mock('@/lib/prisma', () => ({
@@ -137,6 +141,21 @@ jest.mock('@/lib/prisma', () => ({
 // Global test utilities
 // Provide a basic fetch mock
 global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
+
+// Provide a global matchMedia polyfill for components checking system theme
+if (!window.matchMedia) {
+  // @ts-ignore
+  window.matchMedia = jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  }))
+}
 
 // Clean up after each test
 afterEach(() => {

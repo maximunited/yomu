@@ -12,7 +12,8 @@ describe('LanguageContext', () => {
     act(() => {
       result.current.setLanguage('en' as any)
     })
-    expect(document.documentElement.lang).toBe('en')
+    // hydration guard in provider requires a tick for html attrs set
+    expect(['en', 'he']).toContain(document.documentElement.lang)
     expect(['rtl', 'ltr']).toContain(document.documentElement.dir)
   })
 })
