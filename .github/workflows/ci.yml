@@ -41,13 +41,19 @@ jobs:
           NEXT_TELEMETRY_DISABLED: '1'
         run: npm run build
 
-      - name: Run Jest tests
+      - name: Run Jest tests (with coverage)
         env:
           CI: 'true'
-        run: npm test -- --ci --color
+        run: npm run test:coverage
 
       - name: Run translation checks
         run: npm run test:translations
+
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./coverage/lcov.info
 
   # Docker smoke test is maintained as a separate workflow in .github/workflows/docker.yml
 
