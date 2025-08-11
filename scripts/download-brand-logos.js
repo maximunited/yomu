@@ -39,30 +39,50 @@ function download(url, dest) {
 }
 
 async function main() {
-  const mapping = {
+  // Curated SVG or specific sources to preserve vector quality or brand-correct assets
+  const curated = {
     "McDonald's": 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mcdonalds.svg',
-    'Super-Pharm - LifeStyle': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/superu.svg',
-    Fox: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/fox.svg',
-    Isracard: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Isracard_logo.png',
     'H&M': 'https://upload.wikimedia.org/wikipedia/commons/5/53/H%26M-Logo.svg',
-    BBB: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Burgus_Burger_Bar_logo.png',
-    Shufersal: 'https://upload.wikimedia.org/wikipedia/he/0/0a/Shufersal_new_logo.png',
     KFC: 'https://upload.wikimedia.org/wikipedia/commons/5/57/KFC_logo.svg',
+    Fox: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/fox.svg',
   };
 
   let downloaded = 0;
   for (const brand of predefinedBrands) {
-    const url = mapping[brand.name];
-    if (!url) continue;
-    const logoPath = brand.logoUrl.startsWith('/') ? brand.logoUrl : `/${brand.logoUrl}`;
-    const abs = path.join(TARGET_DIR, logoPath);
-    ensureDirSync(path.dirname(abs));
+    const destRel = brand.logoUrl.startsWith('/') ? brand.logoUrl : `/${brand.logoUrl}`;
+    const destAbs = path.join(TARGET_DIR, destRel);
+    ensureDirSync(path.dirname(destAbs));
+
+    const ext = path.extname(destRel).toLowerCase();
+    let sourceUrl = null;
+
+    // Prefer curated assets when available (esp. for SVG destinations)
+    if (curated[brand.name]) {
+      sourceUrl = curated[brand.name];
+    } else {
+      // Try Clearbit logo API using the brand website domain
+      try {
+        const host = new URL(brand.website).hostname;
+        // Only attempt Clearbit when destination is a raster (png), to avoid svg/png mismatch
+        if (ext !== '.svg' && host) {
+          sourceUrl = `https://logo.clearbit.com/${host}?size=512`;
+        }
+      } catch {
+        // Ignore URL parsing issues
+      }
+    }
+
+    if (!sourceUrl) {
+      console.warn(`Skipping ${brand.name}: no suitable source for destination ${destRel}`);
+      continue;
+    }
+
     try {
-      await download(url, abs);
-      console.log(`Downloaded ${brand.name} -> ${abs}`);
+      await download(sourceUrl, destAbs);
+      console.log(`Downloaded ${brand.name} -> ${destRel}`);
       downloaded++;
     } catch (err) {
-      console.warn(`Failed to download ${brand.name}: ${err.message}`);
+      console.warn(`Failed to download ${brand.name} from ${sourceUrl}: ${err.message}`);
     }
   }
   console.log(`Done. Downloaded ${downloaded} brand logos.`);
