@@ -39,6 +39,13 @@ describe('authOptions', () => {
     expect(user).toMatchObject({ id: 'u1', email: 'a@b.com', name: 'A' })
   })
 
+  it('authorize returns null for invalid password', async () => {
+    const { prisma } = require('@/lib/prisma')
+    prisma.user.findUnique.mockResolvedValue({ id: 'u1', email: 'a@b.com', name: 'A', password: 'good' })
+    const credsProvider: any = authOptions.providers.find((p: any) => p.name === 'credentials')
+    await expect(credsProvider.authorize({ email: 'a@b.com', password: 'bad' })).resolves.toBeNull()
+  })
+
   it('jwt callback injects user fields', async () => {
     const token = await (authOptions.callbacks as any).jwt({ token: {}, user: { id: '1', email: 'e', name: 'n' } })
     expect(token).toMatchObject({ id: '1', email: 'e', name: 'n' })
@@ -53,6 +60,12 @@ describe('authOptions', () => {
     const initial = { foo: 'bar' }
     const token = await (authOptions.callbacks as any).jwt({ token: initial })
     expect(token).toEqual(initial)
+  })
+
+  it('session callback leaves session unchanged when session.user missing', async () => {
+    const initial = { user: undefined }
+    const session = await (authOptions.callbacks as any).session({ session: initial, token: { id: '1', email: 'e', name: 'n' } })
+    expect(session).toEqual(initial)
   })
 })
 
