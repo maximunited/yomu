@@ -32,7 +32,7 @@ describe('SignUpPage', () => {
     fireEvent.change(screen.getByLabelText(/^סיסמה$|^Password$/i), { target: { value: 'goodpass' } })
     fireEvent.change(screen.getByLabelText(/^אימות סיסמה$|^Confirm Password$/i), { target: { value: 'goodpass' } })
     fireEvent.click(screen.getByRole('button', { name: /^צור חשבון$|^Create Account$/i }))
-    await waitFor(() => expect(screen.getByText(/error|שגיאה/i)).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText(/error|שגיאה|שגיאה בהרשמה/i)).toBeInTheDocument())
     // restore
     // @ts-ignore
     global.fetch = originalFetch
