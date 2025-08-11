@@ -1,0 +1,34 @@
+version: '{build}'
+
+# Use Windows image with PowerShell helper `Install-Product`
+image: Visual Studio 2022
+
+# Disable default MSBuild phase
+build: off
+
+shallow_clone: true
+
+environment:
+  nodejs_version: '20'
+  NODE_ENV: test
+
+init:
+  - ps: Write-Host "Using Node.js $env:nodejs_version on $env:APPVEYOR_BUILD_WORKER_IMAGE"
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - node -v
+  - npm -v
+  - npm ci
+
+test_script:
+  - npm test -- --ci --runInBand --coverage
+
+artifacts:
+  - path: coverage\lcov.info
+    name: coverage-lcov
+
+cache:
+  - node_modules -> package-lock.json
+
+
