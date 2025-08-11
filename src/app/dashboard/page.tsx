@@ -577,23 +577,37 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Category Filter */}
               <div>
-                <label htmlFor="category-select" className="block text-sm font-medium text-gray-700 mb-2">{t('category')}</label>
-                <select
-                  id="category-select"
-                  multiple
-                  value={selectedCategories}
-                  onChange={(e) => {
-                    const values = Array.from(e.currentTarget.selectedOptions).map(o => o.value);
-                    setSelectedCategories(values);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('category')}</label>
+                <div
+                  role="group"
+                  aria-label={t('category')}
+                  className="w-full max-h-44 overflow-auto border border-gray-300 rounded-md p-3"
                 >
-                  {displayCategories.map(category => (
-                    <option key={`category-${category}`} value={category}>
-                      {getCategoryDisplayName(category)}
-                    </option>
-                  ))}
-                </select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {displayCategories.map((category) => {
+                      const id = `cat-${category}`;
+                      const checked = selectedCategories.includes(category);
+                      return (
+                        <label key={id} htmlFor={id} className="flex items-center gap-2 text-sm text-gray-700">
+                          <input
+                            id={id}
+                            type="checkbox"
+                            className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            checked={checked}
+                            onChange={() =>
+                              setSelectedCategories((prev) =>
+                                prev.includes(category)
+                                  ? prev.filter((c) => c !== category)
+                                  : [...prev, category]
+                              )
+                            }
+                          />
+                          <span>{getCategoryDisplayName(category)}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               {/* Validity Duration Filter */}
