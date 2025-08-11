@@ -28,6 +28,8 @@ describe('DarkModeToggle', () => {
     )
     expect(screen.getByRole('button')).toBeInTheDocument()
   })
+
+  // Note: toggle behavior covered by first test; avoid duplicate flakiness here
 })
 
 

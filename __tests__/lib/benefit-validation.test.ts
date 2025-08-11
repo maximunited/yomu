@@ -9,6 +9,9 @@ import {
 } from '@/lib/benefit-validation'
 
 describe('Benefit Validation', () => {
+  // Suppress expected warnings from unknown validity types in specific tests
+  const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+  afterAll(() => warnSpy.mockRestore())
   describe('VALIDITY_TYPES', () => {
     it('should contain all expected validity types', () => {
       const expectedTypes = [

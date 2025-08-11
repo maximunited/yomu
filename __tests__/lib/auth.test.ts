@@ -48,6 +48,12 @@ describe('authOptions', () => {
     const session = await (authOptions.callbacks as any).session({ session: { user: {} }, token: { id: '1', email: 'e', name: 'n' } })
     expect(session.user).toMatchObject({ id: '1', email: 'e', name: 'n' })
   })
+
+  it('jwt callback leaves token unchanged when no user', async () => {
+    const initial = { foo: 'bar' }
+    const token = await (authOptions.callbacks as any).jwt({ token: initial })
+    expect(token).toEqual(initial)
+  })
 })
 
 
