@@ -33,6 +33,7 @@ const customJestConfig = {
     // Known-stable suites only
     '<rootDir>/__tests__/components/ui/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/__tests__/components/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/components/LanguageSelector.test.tsx',
     '<rootDir>/__tests__/features/used-benefits.test.tsx',
     '<rootDir>/__tests__/lib/benefit-validation.test.ts',
     '<rootDir>/__tests__/lib/utils.test.ts',
