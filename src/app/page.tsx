@@ -49,7 +49,7 @@ export default function HomePage() {
           <h1 className={`text-5xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white`}>
             {t('heroTitle')}
           </h1>
-          <p className={`text-xl mb-8 max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          <p className={`text-xl mb-8 max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
             {t('heroDescription')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

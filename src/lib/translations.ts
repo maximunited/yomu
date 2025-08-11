@@ -265,6 +265,8 @@ export interface Translations {
   searchPlaceholder: string;
   filterBy: string;
   allCategories: string;
+  select: string;
+  multiple: string;
   quickFilters: string;
   
   // Multi-brand Partnerships
@@ -815,6 +817,8 @@ export const translations: Record<Language, Translations> = {
     
     filterBy: 'סנן לפי',
     allCategories: 'כל הקטגוריות',
+    select: 'בחר',
+    multiple: 'רב-בחירה',
     searchPlaceholder: 'חפש הטבות...',
     
     validityPeriod: 'תקופה חוקית',
@@ -1211,6 +1215,8 @@ export const translations: Record<Language, Translations> = {
     searchPlaceholder: 'Search memberships...',
     filterBy: 'Filter by',
     allCategories: 'All Categories',
+    select: 'Select',
+    multiple: 'multiple',
     quickFilters: 'Quick Filters',
     
     // Multi-brand Partnerships

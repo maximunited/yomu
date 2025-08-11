@@ -49,7 +49,7 @@ export default function MembershipsPage() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showCustomMembershipDialog, setShowCustomMembershipDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedMembershipType, setSelectedMembershipType] = useState("");
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [originalMemberships, setOriginalMemberships] = useState<Membership[]>([]);
@@ -563,7 +563,7 @@ export default function MembershipsPage() {
   const filteredMemberships = memberships.filter(membership => {
     const matchesSearch = membership.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          membership.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || membership.category === selectedCategory;
+    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(membership.category);
     const matchesMembershipType = !selectedMembershipType || membership.type === selectedMembershipType;
     return matchesSearch && matchesCategory && matchesMembershipType;
   });
@@ -643,7 +643,7 @@ export default function MembershipsPage() {
           </div>
 
           {/* Search and Filter */}
-          <div className="mb-6 space-y-4">
+          <div className="mb-6 space-y-4 font-sans">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <input
@@ -654,13 +654,16 @@ export default function MembershipsPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
                 />
               </div>
-              <div className="md:w-48">
+              <div className="md:w-64">
                 <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
+                  multiple
+                  value={selectedCategories}
+                  onChange={(e) => {
+                    const options = Array.from(e.currentTarget.selectedOptions).map(o => o.value);
+                    setSelectedCategories(options);
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600 capitalize font-sans"
                 >
-                  <option value="">{t('allCategories')}</option>
                   <option value="food">{t('food')}</option>
                   <option value="health">{t('health')}</option>
                   <option value="fashion">{t('fashion')}</option>
@@ -672,6 +675,7 @@ export default function MembershipsPage() {
                   <option value="convenience">{t('convenience')}</option>
                   <option value="baby">{t('baby')}</option>
                 </select>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('allCategories')} — {t('select')} {t('multiple') || ''}</p>
               </div>
             </div>
 
