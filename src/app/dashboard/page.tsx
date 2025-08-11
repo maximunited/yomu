@@ -59,7 +59,7 @@ export default function DashboardPage() {
   
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedValidityDuration, setSelectedValidityDuration] = useState("");
   const [selectedMembershipType, setSelectedMembershipType] = useState("");
   const [showFilters, setShowFilters] = useState(true);
@@ -283,6 +283,15 @@ export default function DashboardPage() {
     return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
 
+  const toTitleCase = (text: string) => {
+    return text
+      .toLowerCase()
+      .split(/[ _-]+/)
+      .filter(Boolean)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  };
+
   const getCategoryDisplayName = (category: string) => {
     const categoryMap = {
       fashion: t('categoryFashion'),
@@ -296,7 +305,7 @@ export default function DashboardPage() {
       transport: t('categoryTransport'),
       baby: t('categoryBaby')
     };
-    return categoryMap[category as keyof typeof categoryMap] || category;
+    return categoryMap[category as keyof typeof categoryMap] || toTitleCase(category);
   };
 
   const getValidityDurationDisplay = (validityType: string) => {
@@ -324,7 +333,7 @@ export default function DashboardPage() {
         benefit.brand.name.toLowerCase().includes(searchTerm.toLowerCase());
 
       // Category filter
-      const matchesCategory = !selectedCategory || benefit.brand.category === selectedCategory;
+      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(benefit.brand.category);
 
       // Validity duration filter
       const matchesValidityDuration = !selectedValidityDuration || 
@@ -571,11 +580,14 @@ export default function DashboardPage() {
                 <label htmlFor="category-select" className="block text-sm font-medium text-gray-700 mb-2">{t('category')}</label>
                 <select
                   id="category-select"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  multiple
+                  value={selectedCategories}
+                  onChange={(e) => {
+                    const values = Array.from(e.currentTarget.selectedOptions).map(o => o.value);
+                    setSelectedCategories(values);
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
                 >
-                                      <option key="all" value="">{t('allCategories')}</option>
                   {displayCategories.map(category => (
                     <option key={`category-${category}`} value={category}>
                       {getCategoryDisplayName(category)}
@@ -620,19 +632,19 @@ export default function DashboardPage() {
           )}
 
           {/* Active Filters Display */}
-          {(selectedCategory || selectedValidityDuration || selectedMembershipType) && (
+          {(selectedCategories.length > 0 || selectedValidityDuration || selectedMembershipType) && (
             <div className="mt-4 flex flex-wrap gap-2">
-              {selectedCategory && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
-                  {t('categoryLabel')}: {getCategoryDisplayName(selectedCategory)}
+              {selectedCategories.map((cat) => (
+                <span key={`chip-${cat}`} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+                  {t('categoryLabel')}: {getCategoryDisplayName(cat)}
                   <button
-                    onClick={() => setSelectedCategory("")}
+                    onClick={() => setSelectedCategories(prev => prev.filter(c => c !== cat))}
                     className="mr-2 text-purple-600 hover:text-purple-800"
                   >
                     ×
                   </button>
                 </span>
-              )}
+              ))}
               {selectedValidityDuration && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
                   {t('periodLabel')}: {selectedValidityDuration}

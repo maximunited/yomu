@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Gift, Calendar, Star, Copy, ExternalLink } from "lucide-react";
@@ -22,6 +23,7 @@ interface Benefit {
 
 export default function DemoPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   const mockBenefits: Benefit[] = [
     {
