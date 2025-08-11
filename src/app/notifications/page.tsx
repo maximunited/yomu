@@ -18,7 +18,7 @@ interface Notification {
 export default function NotificationsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: "1",
@@ -143,8 +143,8 @@ export default function NotificationsPage() {
                         )}
                       </div>
                       <p className="text-gray-600 mb-3">{notification.message}</p>
-                      <p className="text-sm text-gray-500">
-                        {notification.timestamp.toLocaleDateString('he-IL', {
+                       <p className="text-sm text-gray-500">
+                        {notification.timestamp.toLocaleDateString(language === 'he' ? 'he-IL' : language, {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',

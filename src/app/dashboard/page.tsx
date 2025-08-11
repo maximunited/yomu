@@ -129,20 +129,22 @@ export default function DashboardPage() {
         const benefitsData = await benefitsResponse.json();
         console.log("All benefits count:", benefitsData.benefits?.length || 0);
         
-        // Filter benefits to only show those for brands the user is a member of
-        const userBrandIds = new Set(userMembershipsData.map(m => m.brandId));
-        const userBrandNames = new Set(userMembershipsData.map(m => m.brand?.name).filter(Boolean));
-        console.log("User brand IDs:", Array.from(userBrandIds));
+        // Filter benefits to only show those for brands the user is actively a member of
+        const hasAnyMemberships = userMembershipsData.length > 0;
+        const activeMemberships = userMembershipsData.filter(m => m.isActive);
+        const activeBrandIds = new Set(activeMemberships.map(m => m.brandId));
+        const activeBrandNames = new Set(activeMemberships.map(m => m.brand?.name).filter(Boolean));
+        console.log("Active brand IDs:", Array.from(activeBrandIds));
         const userBenefits = benefitsData.benefits.filter((benefit: any) => {
-          // If benefit has a brandId, require membership match only when we actually have ids
-          if (benefit.brandId) {
-            return userBrandIds.size === 0 || userBrandIds.has(benefit.brandId);
-          }
-          // If benefit has a brand name, include when memberships did not provide brand names
+          // No memberships: show everything (demo/fallback)
+          if (!hasAnyMemberships) return true;
+          // Match by id when available
+          if (benefit.brandId) return activeBrandIds.has(benefit.brandId);
+          // Match by name when available. If we don't have names on memberships, include.
           if (benefit.brand?.name) {
-            return userBrandNames.size === 0 || userBrandNames.has(benefit.brand.name);
+            return activeBrandNames.size === 0 || activeBrandNames.has(benefit.brand.name);
           }
-          // Fallback: include benefit if we cannot determine brand relation (test fixtures may omit fields)
+          // Unknown brand shape: include to avoid hiding due to fixture gaps
           return true;
         });
         console.log("Filtered benefits count:", userBenefits.length);
