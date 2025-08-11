@@ -94,6 +94,8 @@ export async function GET(request: NextRequest) {
       redemptionMethod: benefit.redemptionMethod,
       termsAndConditions: benefit.termsAndConditions,
       isFree: benefit.isFree,
+      createdAt: benefit.createdAt,
+      updatedAt: benefit.updatedAt,
     }));
 
     return NextResponse.json({

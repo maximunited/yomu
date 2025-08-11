@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { ArrowLeft, Plus, Edit, Trash2, CheckCircle, Circle } from "lucide-react";
@@ -35,7 +35,7 @@ interface Brand {
 
 export default function MembershipsPage() {
   const { data: session, status } = useSession();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const [customMembership, setCustomMembership] = useState({
     name: "",
@@ -70,9 +70,9 @@ export default function MembershipsPage() {
       setIsLoading(true);
       try {
         // Load brands
-        const brandsResponse = await fetch('/api/brands');
-        if (brandsResponse.ok) {
-          const brands = await brandsResponse.json();
+          const brandsResponse = await fetch('/api/brands');
+          if (brandsResponse.ok) {
+            const brands = await brandsResponse.json();
           setAvailableBrands(brands);
           
           // Load user's existing memberships
@@ -85,6 +85,22 @@ export default function MembershipsPage() {
           
           // Create a set of active brand IDs for quick lookup
           const activeBrandIds = new Set(userMemberships.map((m: any) => m.brandId));
+
+          // Also fetch benefits to derive paid/free per brand when available
+          const brandPaidMap = new Map<string, boolean>();
+          try {
+            const benefitsResp = await fetch('/api/benefits');
+            if (benefitsResp.ok) {
+              const data = await benefitsResp.json();
+              const list = Array.isArray(data.benefits) ? data.benefits : [];
+              for (const b of list) {
+                if (b && b.brandId) {
+                  if (b.isFree === false) brandPaidMap.set(b.brandId, true);
+                  else if (!brandPaidMap.has(b.brandId)) brandPaidMap.set(b.brandId, false);
+                }
+              }
+            }
+          } catch {}
           
           // Convert brands to memberships format with correct active state
           const brandMemberships: Membership[] = brands.map((brand: Brand) => {
@@ -102,6 +118,11 @@ export default function MembershipsPage() {
               }
             }
             
+            // Determine paid/free: prefer backend benefits flag; fallback to description heuristic
+            const paidFromBenefits = brandPaidMap.get(brand.id);
+            const inferredPaid = paidFromBenefits !== undefined
+              ? paidFromBenefits
+              : /₪|שנה|חודשי|subscription|paid|מסלול בתשלום/i.test(brand.description || '');
             const membership: Membership = {
               id: brand.id,
               name: brand.name,
@@ -109,8 +130,8 @@ export default function MembershipsPage() {
               category: brand.category,
               isActive: activeBrandIds.has(brand.id),
               icon: brand.logoUrl,
-              type: "free" as const,
-              cost: null,
+              type: inferredPaid ? "paid" as const : "free" as const,
+              cost: inferredPaid ? (brand as any).cost ?? null : null,
               partnerBrands: partners
             };
             
@@ -359,6 +380,7 @@ export default function MembershipsPage() {
   };
 
   const handleSaveChanges = async () => {
+    const previousScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
     if (!session) {
       console.error('No session available');
       alert(t('unauthorized'));
@@ -404,6 +426,10 @@ export default function MembershipsPage() {
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
         setOriginalMemberships(memberships); // Update original memberships after successful save
+        // Restore scroll position to avoid jump after resorting
+        if (typeof window !== 'undefined') {
+          window.scrollTo(0, previousScrollY);
+        }
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to save memberships:', response.status, errorData);
@@ -568,6 +594,26 @@ export default function MembershipsPage() {
     return matchesSearch && matchesCategory && matchesMembershipType;
   });
 
+  // Sort: active first based on original saved state to avoid reordering on toggle,
+  // then alphabetical within groups using current language collator
+  const originalActiveMap = useMemo(() => {
+    const map = new Map<string, boolean>();
+    originalMemberships.forEach((m) => map.set(m.id, m.isActive));
+    return map;
+  }, [originalMemberships]);
+
+  const sortedMemberships = useMemo(() => {
+    const collator = new Intl.Collator(language);
+    return [...filteredMemberships].sort((a, b) => {
+      const aActive = originalActiveMap.get(a.id) ?? a.isActive;
+      const bActive = originalActiveMap.get(b.id) ?? b.isActive;
+      if (aActive !== bActive) {
+        return aActive ? -1 : 1;
+      }
+      return collator.compare(a.name, b.name);
+    });
+  }, [filteredMemberships, originalActiveMap, language]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -600,7 +646,7 @@ export default function MembershipsPage() {
             </div>
             <div className="flex items-center space-x-4 relative">
               <span className="text-sm text-gray-600 dark:text-gray-300">
-                {t('activeOutOfTotal')} {memberships.length}
+                {activeCount} {t('activeOutOfTotal')} {memberships.length}
               </span>
               <div className="relative">
                 <Button
@@ -617,7 +663,7 @@ export default function MembershipsPage() {
                 
                 {/* Success Message - positioned under save button */}
                 {showSuccessMessage && (
-                  <div className="absolute top-full left-0 mt-2 bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded-md shadow-lg text-sm whitespace-nowrap z-50">
+                  <div className="absolute top-full right-0 mt-2 bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded-md shadow-lg text-sm whitespace-nowrap z-50">
                     <div className="flex items-center space-x-2">
                       <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
@@ -655,26 +701,36 @@ export default function MembershipsPage() {
                 />
               </div>
               <div className="md:w-64">
-                <select
-                  multiple
-                  value={selectedCategories}
-                  onChange={(e) => {
-                    const options = Array.from(e.currentTarget.selectedOptions).map(o => o.value);
-                    setSelectedCategories(options);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600 capitalize font-sans"
-                >
-                  <option value="food">{t('food')}</option>
-                  <option value="health">{t('health')}</option>
-                  <option value="fashion">{t('fashion')}</option>
-                  <option value="transport">{t('transport')}</option>
-                  <option value="home">{t('homeCategory')}</option>
-                  <option value="finance">{t('finance')}</option>
-                  <option value="grocery">{t('grocery')}</option>
-                  <option value="entertainment">{t('entertainment')}</option>
-                  <option value="convenience">{t('convenience')}</option>
-                  <option value="baby">{t('baby')}</option>
-                </select>
+                <div className="w-full max-h-40 overflow-auto border border-gray-300 dark:border-gray-600 rounded-md p-2 font-sans">
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      { key: 'food', label: t('food') },
+                      { key: 'health', label: t('health') },
+                      { key: 'fashion', label: t('fashion') },
+                      { key: 'transport', label: t('transport') },
+                      { key: 'home', label: t('homeCategory') },
+                      { key: 'finance', label: t('finance') },
+                      { key: 'grocery', label: t('grocery') },
+                      { key: 'entertainment', label: t('entertainment') },
+                      { key: 'convenience', label: t('convenience') },
+                      { key: 'baby', label: t('baby') },
+                    ].map(({ key, label }) => (
+                      <label key={key} className="flex items-center text-sm capitalize">
+                        <input
+                          type="checkbox"
+                          className="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          checked={selectedCategories.includes(key)}
+                          onChange={() =>
+                            setSelectedCategories(prev =>
+                              prev.includes(key) ? prev.filter(c => c !== key) : [...prev, key]
+                            )
+                          }
+                        />
+                        <span className="text-gray-700 dark:text-gray-300">{label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('allCategories')} — {t('select')} {t('multiple') || ''}</p>
               </div>
             </div>
@@ -716,7 +772,7 @@ export default function MembershipsPage() {
 
           {/* Memberships Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {filteredMemberships.map((membership) => (
+            {sortedMemberships.map((membership) => (
               <div
                 key={membership.id}
                 className={`bg-white dark:bg-gray-800 rounded-lg p-4 border-2 transition-all cursor-pointer flex flex-col h-full ${
@@ -777,11 +833,11 @@ export default function MembershipsPage() {
                   </span>
                   <div className="flex items-center space-x-2">
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      membership.type === "free" 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-orange-100 text-orange-800"
+                      membership.type === "paid" 
+                        ? "bg-orange-100 text-orange-800" 
+                        : "bg-green-100 text-green-800"
                     }`}>
-                      {membership.type === "free" ? t('free') : t('paid')}
+                      {membership.type === "paid" ? t('paid') : t('free')}
                     </span>
                     {membership.cost && (
                       <span className="text-xs text-gray-500 dark:text-gray-400">

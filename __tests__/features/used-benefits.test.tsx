@@ -13,6 +13,7 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
   }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 // Mock fetch

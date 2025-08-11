@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Gift, Calendar, Star, Bell, Copy, ExternalLink, ShoppingBag, User, Search, Filter, Moon, Shield, LogOut } from "lucide-react";
+import { Gift, Calendar, Star, Bell, Copy, ExternalLink, ShoppingBag, User, Search, Filter, Moon, Shield, LogOut, Sparkles } from "lucide-react";
 import { isBenefitActive, getUpcomingBenefits, getValidityDisplayText } from "@/lib/benefit-validation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Translations } from "@/lib/translations";
@@ -50,7 +50,7 @@ interface UserMembership {
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [userMemberships, setUserMemberships] = useState<UserMembership[]>([]);
   const [userDOB, setUserDOB] = useState<Date | null>(null);
@@ -64,6 +64,7 @@ export default function DashboardPage() {
   const [selectedMembershipType, setSelectedMembershipType] = useState("");
   const [recentlyAddedOnly, setRecentlyAddedOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const searchParams = useSearchParams();
   
   // Used benefits state
   const [usedBenefits, setUsedBenefits] = useState<Set<string>>(new Set());
@@ -82,6 +83,17 @@ export default function DashboardPage() {
       fetchUserData();
     }
   }, [status]);
+
+  // Apply query-parameter driven filters (e.g., from notifications)
+  useEffect(() => {
+    const recent = searchParams?.get('recent');
+    if (recent) {
+      setSelectedCategories([]);
+      setSelectedValidityDuration("");
+      setSelectedMembershipType("");
+      setRecentlyAddedOnly(true);
+    }
+  }, [searchParams]);
 
   const fetchUserData = async () => {
     try {
@@ -207,8 +219,7 @@ export default function DashboardPage() {
         const data = await response.json();
         console.log('Success response:', data);
         setUsedBenefits(prev => new Set([...prev, benefitId]));
-        // Show success feedback
-        alert(t('benefitUsedSuccessfully'));
+        // Inline UI indicates success by turning the button green; no blocking alert
       } else {
         const errorText = await response.text();
         console.error('Failed to mark benefit as used:', response.status, errorText);
@@ -240,8 +251,7 @@ export default function DashboardPage() {
           newSet.delete(benefitId);
           return newSet;
         });
-        // Show success feedback
-        alert(t('benefitUnmarkedSuccessfully'));
+        // Inline UI indicates success by reverting the button style; no alert
       } else {
         const errorText = await response.text();
         console.error('Failed to unmark benefit as used:', response.status, errorText);
@@ -266,8 +276,55 @@ export default function DashboardPage() {
   };
 
   const getValidityText = (benefit: Benefit) => {
-    const key = getValidityDisplayText(benefit.validityType) as keyof Translations;
-    return t(key);
+    return getValidityDisplayText(benefit.validityType, language as any);
+  };
+
+  const containsHebrew = (text: string | undefined) => /[\u0590-\u05FF]/.test(text || "");
+
+  const getCategoryGenericDescription = (category: string): string => {
+    switch (category) {
+      case 'fashion':
+        return t('brandDescriptionFashion');
+      case 'food':
+        return t('brandDescriptionFood');
+      case 'health':
+        return t('brandDescriptionHealth');
+      case 'home':
+        return t('brandDescriptionHome');
+      case 'finance':
+        return t('brandDescriptionFinance');
+      case 'grocery':
+        return t('brandDescriptionGrocery');
+      case 'entertainment':
+        return t('categoryEntertainment');
+      case 'convenience':
+        return t('categoryConvenience');
+      default:
+        return '';
+    }
+  };
+
+  const getBenefitDescription = (benefit: Benefit): string => {
+    const desc = benefit.description || '';
+    // If UI language is English and description appears Hebrew, use a generic per-category description
+    if (language === 'en' && containsHebrew(desc)) {
+      return getCategoryGenericDescription(benefit.brand.category);
+    }
+    // If UI language is Hebrew and description appears English, also use generic per-category description
+    if (language === 'he' && !containsHebrew(desc) && desc.trim() !== '') {
+      return getCategoryGenericDescription(benefit.brand.category);
+    }
+    return desc;
+  };
+
+  const isRecentlyAdded = (benefit: Benefit): boolean => {
+    const createdAt = (benefit as any).createdAt ? new Date((benefit as any).createdAt) : undefined;
+    if (!createdAt || isNaN(createdAt.getTime())) {
+      return false;
+    }
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return createdAt >= thirtyDaysAgo;
   };
 
   const getCategoryColor = (category: string) => {
@@ -368,7 +425,7 @@ export default function DashboardPage() {
   // If we have a fatal error, prefer showing it immediately
   if (errorMessage) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div role="alert" className="bg-red-50 border border-red-200 text-red-800 rounded-md p-6 max-w-md w-full">
           <h1 className="text-xl font-bold mb-2">{t('signInError')}</h1>
           <p>{errorMessage}</p>
@@ -379,7 +436,7 @@ export default function DashboardPage() {
 
   if (status === "loading" || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600">{t('loading')}</p>
@@ -440,16 +497,16 @@ export default function DashboardPage() {
   const displayCategories = allCategories.length > 0 ? allCategories : fallbackCategories;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <Gift className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">YomU</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">YomU</span>
             </div>
             <div className="flex items-center space-x-4">
               {/* Global polite status region for screen readers (keeps a loading announcement available) */}
@@ -647,17 +704,36 @@ export default function DashboardPage() {
 
               {/* Membership Type Filter */}
               <div>
-                <label htmlFor="membership-type-select" className="block text-sm font-medium text-gray-700 mb-2">{t('membershipType')}</label>
-                <select
-                  id="membership-type-select"
-                  value={selectedMembershipType}
-                  onChange={(e) => setSelectedMembershipType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
-                >
-                                      <option key="all-types" value="">{t('allTypes')}</option>
-                    <option key="free" value="free">{t('free')}</option>
-                    <option key="paid" value="paid">{t('paid')}</option>
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('membershipType')}</label>
+                <div className="inline-flex gap-2">
+                  <Button
+                    variant={selectedMembershipType === '' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedMembershipType('')}
+                    className="whitespace-nowrap"
+                    aria-pressed={selectedMembershipType === ''}
+                  >
+                    {t('allTypes')}
+                  </Button>
+                  <Button
+                    variant={selectedMembershipType === 'free' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedMembershipType('free')}
+                    className="whitespace-nowrap"
+                    aria-pressed={selectedMembershipType === 'free'}
+                  >
+                    {t('free')}
+                  </Button>
+                  <Button
+                    variant={selectedMembershipType === 'paid' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedMembershipType('paid')}
+                    className="whitespace-nowrap"
+                    aria-pressed={selectedMembershipType === 'paid'}
+                  >
+                    {t('paid')}
+                  </Button>
+                </div>
               </div>
 
               {/* Recently Added */}
@@ -765,7 +841,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Category Tag */}
-                <div className="mb-3 flex flex-wrap gap-2">
+                <div className="mb-3 flex flex-wrap gap-2 items-center">
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(benefit.brand.category)}`}>
                     {getCategoryDisplayName(benefit.brand.category)}
                   </span>
@@ -773,6 +849,16 @@ export default function DashboardPage() {
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
                     {benefit.isFree ? t('free') : t('paid')}
                   </span>
+                  {isRecentlyAdded(benefit) && (
+                    <span
+                      title={t('recentlyAdded')}
+                      aria-label={t('recentlyAdded')}
+                      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      {t('recentlyAdded')}
+                    </span>
+                  )}
                   {/* Used Status */}
                   {usedBenefits.has(benefit.id) && (
                     <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
@@ -785,7 +871,7 @@ export default function DashboardPage() {
                   {benefit.title}
                 </h4>
                 <p className="text-gray-600 text-sm mb-4 flex-grow">
-                  {benefit.description}
+                  {getBenefitDescription(benefit)}
                 </p>
 
                 {benefit.promoCode && (
@@ -817,7 +903,7 @@ export default function DashboardPage() {
                     disabled={usedBenefitsLoading}
                     aria-disabled={usedBenefitsLoading}
                     aria-busy={usedBenefitsLoading}
-                    className={`flex-1 transition-all duration-200 ${
+                    className={`flex-1 transition-all duration-200 whitespace-nowrap min-w-[10rem] ${
                       usedBenefits.has(benefit.id) 
                         ? 'bg-green-600 hover:bg-green-700 text-white shadow-md' 
                         : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
@@ -901,21 +987,31 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Category Tag */}
-                <div className="mb-3">
+                <div className="mb-3 flex flex-wrap gap-2 items-center">
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(benefit.brand.category)}`}>
                     {getCategoryDisplayName(benefit.brand.category)}
                   </span>
                   {/* Membership Type Label */}
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mr-2 ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${benefit.isFree ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
                     {benefit.isFree ? t('free') : t('paid')}
                   </span>
+                  {isRecentlyAdded(benefit) && (
+                    <span
+                      title={t('recentlyAdded')}
+                      aria-label={t('recentlyAdded')}
+                      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      {t('recentlyAdded')}
+                    </span>
+                  )}
                 </div>
                 
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
                   {benefit.title}
                 </h4>
                 <p className="text-gray-600 text-sm mb-4 flex-grow">
-                  {benefit.description}
+                  {getBenefitDescription(benefit)}
                 </p>
 
                 <div className="flex space-x-2 mt-auto">
@@ -929,7 +1025,7 @@ export default function DashboardPage() {
                     disabled={usedBenefitsLoading}
                     aria-disabled={usedBenefitsLoading}
                     aria-busy={usedBenefitsLoading}
-                    className={`flex-1 transition-all duration-200 ${
+                    className={`flex-1 transition-all duration-200 whitespace-nowrap min-w-[10rem] ${
                       usedBenefits.has(benefit.id)
                         ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
                         : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'

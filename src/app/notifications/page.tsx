@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Bell, Check, X } from "lucide-react";
+import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Notification {
@@ -156,12 +157,12 @@ export default function NotificationsPage() {
                           ))}
                           {notification.relatedBenefits.length > 2 && (
                             <div className="mt-1">
-                              <a
-                                href="/dashboard"
+                              <Link
+                                href="/dashboard?recent=1"
                                 className="text-purple-700 hover:text-purple-900 underline"
                               >
                                 {t('andMore').replace('{count}', String(notification.relatedBenefits.length - 2))}
-                              </a>
+                              </Link>
                             </div>
                           )}
                         </div>
