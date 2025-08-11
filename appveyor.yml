@@ -3,8 +3,9 @@ version: '{build}'
 # Use Windows image with PowerShell helper `Install-Product`
 image: Visual Studio 2022
 
-# Disable default MSBuild phase
-build: off
+# Switch to script mode (overrides default MSBuild)
+build_script:
+  - npm test -- --ci --runInBand --coverage
 
 shallow_clone: true
 
@@ -21,8 +22,6 @@ install:
   - npm -v
   - npm ci
 
-test_script:
-  - npm test -- --ci --runInBand --coverage
 
 artifacts:
   - path: coverage\lcov.info
