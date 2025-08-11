@@ -13,6 +13,7 @@ interface Notification {
   type: "info" | "warning" | "success";
   timestamp: Date;
   isRead: boolean;
+  relatedBenefits?: { id: string; brand: string; title: string }[];
 }
 
 export default function NotificationsPage() {
@@ -43,6 +44,11 @@ export default function NotificationsPage() {
       type: "info",
       timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
       isRead: true,
+      relatedBenefits: [
+        { id: 'b1', brand: 'Super-Pharm', title: 'Birthday 30% off' },
+        { id: 'b2', brand: 'Starbucks', title: 'Free drink' },
+        { id: 'b3', brand: 'H&M', title: 'Gift above 300₪' },
+      ],
     },
   ]);
 
@@ -143,6 +149,23 @@ export default function NotificationsPage() {
                         )}
                       </div>
                       <p className="text-gray-600 mb-3">{notification.message}</p>
+                      {notification.relatedBenefits && notification.relatedBenefits.length > 0 && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-md p-3 mb-3 text-sm text-gray-700">
+                          {notification.relatedBenefits.slice(0,2).map((b) => (
+                            <div key={b.id} className="truncate">• {b.brand} — {b.title}</div>
+                          ))}
+                          {notification.relatedBenefits.length > 2 && (
+                            <div className="mt-1">
+                              <a
+                                href="/dashboard"
+                                className="text-purple-700 hover:text-purple-900 underline"
+                              >
+                                {t('andMore').replace('{count}', String(notification.relatedBenefits.length - 2))}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
                        <p className="text-sm text-gray-500">
                         {notification.timestamp.toLocaleDateString(language === 'he' ? 'he-IL' : language, {
                           year: 'numeric',

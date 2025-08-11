@@ -268,6 +268,10 @@ export interface Translations {
   select: string;
   multiple: string;
   quickFilters: string;
+  // Recency
+  recentlyAdded: string;
+  recentlyAddedFilter: string;
+  andMore: string; // expects {count}
   
   // Multi-brand Partnerships
   includesAccessTo: string;
@@ -825,6 +829,9 @@ export const translations: Record<Language, Translations> = {
     allPeriods: 'כל התקופות',
     
     quickFilters: 'סינון מהיר',
+    recentlyAdded: 'נוספו לאחרונה',
+    recentlyAddedFilter: 'נוספו לאחרונה',
+    andMore: 'ועוד {count}',
     
     // Multi-brand Partnerships
     includesAccessTo: 'כולל גישה ל',
@@ -1218,6 +1225,9 @@ export const translations: Record<Language, Translations> = {
     select: 'Select',
     multiple: 'multiple',
     quickFilters: 'Quick Filters',
+    recentlyAdded: 'Recently added',
+    recentlyAddedFilter: 'Recently added',
+    andMore: 'and {count} more',
     
     // Multi-brand Partnerships
     includesAccessTo: 'includes access to',

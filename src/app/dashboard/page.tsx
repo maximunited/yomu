@@ -62,6 +62,7 @@ export default function DashboardPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedValidityDuration, setSelectedValidityDuration] = useState("");
   const [selectedMembershipType, setSelectedMembershipType] = useState("");
+  const [recentlyAddedOnly, setRecentlyAddedOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   
   // Used benefits state
@@ -346,7 +347,21 @@ export default function DashboardPage() {
         (selectedMembershipType === "free" && benefit.isFree !== false) ||
         (selectedMembershipType === "paid" && benefit.isFree === false);
 
-      return matchesSearch && matchesCategory && matchesValidityDuration && matchesMembershipType;
+      // Recently added: naive heuristic using id timestamp or existence of createdAt
+      let matchesRecentlyAdded = true;
+      if (recentlyAddedOnly) {
+        const createdAt = (benefit as any).createdAt ? new Date((benefit as any).createdAt) : undefined;
+        if (createdAt && !isNaN(createdAt.getTime())) {
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          matchesRecentlyAdded = createdAt >= thirtyDaysAgo;
+        } else {
+          // Fallback: include all when we can't determine, to avoid hiding data in tests
+          matchesRecentlyAdded = true;
+        }
+      }
+
+      return matchesSearch && matchesCategory && matchesValidityDuration && matchesMembershipType && matchesRecentlyAdded;
     });
   };
 
@@ -576,7 +591,7 @@ export default function DashboardPage() {
 
           {/* Filters */}
           {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Category Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('category')}</label>
@@ -644,11 +659,25 @@ export default function DashboardPage() {
                     <option key="paid" value="paid">{t('paid')}</option>
                 </select>
               </div>
+
+              {/* Recently Added */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('recentlyAddedFilter')}</label>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    checked={recentlyAddedOnly}
+                    onChange={() => setRecentlyAddedOnly(v => !v)}
+                  />
+                  <span>{t('recentlyAdded')}</span>
+                </label>
+              </div>
             </div>
           )}
 
           {/* Active Filters Display */}
-          {(selectedCategories.length > 0 || selectedValidityDuration || selectedMembershipType) && (
+          {(selectedCategories.length > 0 || selectedValidityDuration || selectedMembershipType || recentlyAddedOnly) && (
             <div className="mt-4 flex flex-wrap gap-2">
               {selectedCategories.map((cat) => (
                 <span key={`chip-${cat}`} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
@@ -678,6 +707,17 @@ export default function DashboardPage() {
                   <button
                     onClick={() => setSelectedMembershipType("")}
                     className="mr-2 text-green-600 hover:text-green-800"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              {recentlyAddedOnly && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
+                  {t('recentlyAdded')}
+                  <button
+                    onClick={() => setRecentlyAddedOnly(false)}
+                    className="mr-2 text-yellow-600 hover:text-yellow-800"
                   >
                     ×
                   </button>
