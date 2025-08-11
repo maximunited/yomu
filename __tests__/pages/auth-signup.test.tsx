@@ -37,6 +37,27 @@ describe('SignUpPage', () => {
     // @ts-ignore
     global.fetch = originalFetch
   })
+
+  it('redirects to onboarding on successful signup + auto-login', async () => {
+    const { signIn } = require('next-auth/react')
+    ;(signIn as jest.Mock).mockResolvedValueOnce({ ok: true })
+    const originalFetch = global.fetch
+    // @ts-ignore
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
+    const nav = require('next/navigation')
+    const push = jest.fn()
+    jest.spyOn(nav, 'useRouter').mockReturnValue({ push } as any)
+    const Wrapper = ({ children }: any) => <DarkModeProvider>{children}</DarkModeProvider>
+    render(<SignUpPage />, { wrapper: Wrapper as any })
+    fireEvent.change(screen.getByLabelText(/^אימייל$|^Email$/i), { target: { value: 'a@b.com' } })
+    fireEvent.change(screen.getByLabelText(/^סיסמה$|^Password$/i), { target: { value: 'goodpass' } })
+    fireEvent.change(screen.getByLabelText(/^אימות סיסמה$|^Confirm Password$/i), { target: { value: 'goodpass' } })
+    fireEvent.click(screen.getByRole('button', { name: /^צור חשבון$|^Create Account$/i }))
+    await waitFor(() => expect(push).toHaveBeenCalledWith('/onboarding'))
+    // restore
+    // @ts-ignore
+    global.fetch = originalFetch
+  })
 })
 
 

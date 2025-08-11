@@ -67,6 +67,30 @@ describe('AdminForm', () => {
       validityDuration: 30,
     })
   })
+
+  it('renders edit mode with prefilled values and submits update', async () => {
+    const onSave = jest.fn()
+    const item = {
+      id: 'b1',
+      name: 'Brand X',
+      logoUrl: '/x.png',
+      website: 'https://x.com',
+      description: 'Desc',
+      category: 'food',
+      isActive: true,
+    }
+    render(
+      <AdminForm
+        type="brand"
+        item={item as any}
+        onSave={onSave}
+        onCancel={() => {}}
+      />
+    )
+    // submit without changes
+    fireEvent.click(screen.getByRole('button', { name: /update/i }))
+    expect(onSave).toHaveBeenCalled()
+  })
 })
 
 
