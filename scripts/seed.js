@@ -63,10 +63,12 @@ const predefinedBrands = [
   },
   {
     name: "BBB",
-    logoUrl: "/images/brands/bbb.png",
-    website: "https://www.bbb.co.il",
-    description: "הטבות על מוצרי בית",
-    category: "home"
+    // Inline SVG to ensure logo is available; replace with real asset if added under public/images/brands
+    logoUrl:
+      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' rx='16' ry='16' fill='%23000'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='28' fill='%23fff'>BBB</text></svg>",
+    website: "https://www.burgus.co.il/",
+    description: "רשת מסעדות המבורגרים (BBB) – הטבות יום הולדת במסעדות הרשת",
+    category: "food"
   },
   {
     name: "Shufersal",

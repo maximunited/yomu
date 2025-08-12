@@ -349,7 +349,10 @@ export default function DashboardPage() {
       entertainment: "bg-indigo-100 text-indigo-800",
       convenience: "bg-teal-100 text-teal-800",
       transport: "bg-blue-100 text-blue-800",
-      baby: "bg-rose-100 text-rose-800"
+      baby: "bg-rose-100 text-rose-800",
+      travel: "bg-cyan-100 text-cyan-800",
+      beauty: "bg-pink-100 text-pink-800",
+      multi: "bg-gray-100 text-gray-800"
     };
     return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
@@ -374,7 +377,10 @@ export default function DashboardPage() {
       entertainment: t('categoryEntertainment'),
       convenience: t('categoryConvenience'),
       transport: t('categoryTransport'),
-      baby: t('categoryBaby')
+      baby: t('categoryBaby'),
+      travel: toTitleCase('travel'),
+      beauty: toTitleCase('beauty'),
+      multi: toTitleCase('multi')
     };
     return categoryMap[category as keyof typeof categoryMap] || toTitleCase(category);
   };
@@ -505,7 +511,17 @@ export default function DashboardPage() {
     'entertainment', 'convenience', 'transport', 'baby'
   ];
   
-  const displayCategories = allCategories.length > 0 ? allCategories : fallbackCategories;
+  // Sort categories by localized display name for a better UX
+  const displayCategories = (allCategories.length > 0 ? allCategories : fallbackCategories)
+    .slice()
+    .sort((a, b) => getCategoryDisplayName(a).localeCompare(getCategoryDisplayName(b)));
+
+  // Membership summary count: prefer user's active memberships; if none, fallback to available brands
+  const activeMembershipCount = userMemberships.filter(m => m.isActive).length;
+  const availableBrandCount = new Set(
+    benefits.map((b: any) => b.brandId || b.brand?.id || b.brand?.name).filter(Boolean)
+  ).size;
+  const membershipCountDisplay = activeMembershipCount > 0 ? activeMembershipCount : availableBrandCount;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -614,7 +630,7 @@ export default function DashboardPage() {
                               <span className="text-sm font-medium text-gray-700">{t('activeMemberships')}</span>
             </div>
             <div className="text-2xl font-bold text-purple-600">
-              {userMemberships.filter(m => m.isActive).length}
+              {membershipCountDisplay}
             </div>
             <Link href="/memberships">
               <Button variant="outline" size="sm" className="mt-2">
@@ -836,12 +852,21 @@ export default function DashboardPage() {
               }`}
               >
                 <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={benefit.brand.logoUrl}
-                      alt={benefit.brand.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-white">
+                    {benefit.brand.logoUrl?.startsWith('data:image/svg') ? (
+                      <img
+                        src={benefit.brand.logoUrl}
+                        alt={benefit.brand.name}
+                        className="w-full h-full object-contain"
+                        style={{ imageRendering: 'auto' }}
+                      />
+                    ) : (
+                      <img
+                        src={benefit.brand.logoUrl}
+                        alt={benefit.brand.name}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">{benefit.brand.name}</h3>

@@ -88,6 +88,7 @@ export default function MembershipsPage() {
 
           // Also fetch benefits to derive paid/free per brand when available
           const brandPaidMap = new Map<string, boolean>();
+          const brandsWithBenefits = new Set<string>();
           try {
             const benefitsResp = await fetch('/api/benefits');
             if (benefitsResp.ok) {
@@ -97,6 +98,12 @@ export default function MembershipsPage() {
                 if (b && b.brandId) {
                   if (b.isFree === false) brandPaidMap.set(b.brandId, true);
                   else if (!brandPaidMap.has(b.brandId)) brandPaidMap.set(b.brandId, false);
+                  brandsWithBenefits.add(b.brandId);
+                }
+                // Fallbacks when brandId missing but brand object exists
+                const candidate = (b && b.brand && (b.brand.id || b.brand.name)) as string | undefined;
+                if (candidate) {
+                  brandsWithBenefits.add(candidate);
                 }
               }
             }
@@ -128,7 +135,7 @@ export default function MembershipsPage() {
               name: brand.name,
               description: description,
               category: brand.category,
-              isActive: activeBrandIds.has(brand.id),
+              isActive: activeBrandIds.has(brand.id) || brandsWithBenefits.has(brand.id) || brandsWithBenefits.has(brand.name),
               icon: brand.logoUrl,
               type: inferredPaid ? "paid" as const : "free" as const,
               cost: inferredPaid ? (brand as any).cost ?? null : null,
@@ -501,7 +508,10 @@ export default function MembershipsPage() {
       grocery: "bg-pink-100 text-pink-800",
       entertainment: "bg-indigo-100 text-indigo-800",
       convenience: "bg-teal-100 text-teal-800",
-      baby: "bg-rose-100 text-rose-800"
+      baby: "bg-rose-100 text-rose-800",
+      travel: "bg-cyan-100 text-cyan-800",
+      beauty: "bg-pink-100 text-pink-800",
+      multi: "bg-gray-100 text-gray-800"
     };
     return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
@@ -568,6 +578,12 @@ export default function MembershipsPage() {
         return t('convenience');
       case 'baby':
         return t('baby');
+      case 'travel':
+        return 'Travel';
+      case 'beauty':
+        return 'Beauty';
+      case 'multi':
+        return 'Multi-brand';
       default:
         return category; // fallback to the original category name if no translation
     }
@@ -785,11 +801,11 @@ export default function MembershipsPage() {
                 {/* Header with icon, title, description, and checkbox */}
                 <div className="flex items-start justify-between mb-3 flex-grow">
                   <div className="flex items-start space-x-3 flex-grow">
-                    {membership.icon.startsWith('/') ? (
+                    {membership.icon.startsWith('/') || membership.icon.startsWith('data:image') ? (
                       <img
                         src={membership.icon}
                         alt={membership.name}
-                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                        className="w-8 h-8 rounded-full object-contain bg-white flex-shrink-0"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';

@@ -46,7 +46,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className={`text-5xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white`}>
+          <h1 className={`text-5xl md:text-6xl font-bold mb-6 !text-gray-900 dark:text-white`}>
             {t('heroTitle')}
           </h1>
           <p className={`text-xl mb-8 max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
