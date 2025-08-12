@@ -328,6 +328,34 @@ yomu/
 └── package.json               # Dependencies
 ```
 
+## 📦 Database Seeding
+
+We use a single, unified seed entry point that covers brands, partnerships, and benefits.
+
+- Main script: `scripts/seed.js`
+- Run locally:
+
+```bash
+# Prisma generate + schema push (first run)
+npx prisma generate && npx prisma db push
+
+# Seed everything (clears existing data)
+npm run db:seed
+```
+
+What it does:
+- Clears `benefits`, `userMemberships`, and `brands`
+- Creates all brands (including Nono & Mimi and Giraffe)
+- Creates brand partnerships (e.g., Nono & Mimi ↔ Giraffe)
+- Seeds a comprehensive set of benefits (including co-branded examples)
+
+Advanced: partial brand/benefit imports
+- Use `scripts/admin-helper.js` to import/export JSON for brands/benefits without wiping the DB.
+
+Production/Shared envs
+- Prefer running seed only on fresh databases
+- For updates, use the Admin UI or the admin helper instead of reseeding
+
 ## 🔧 Configuration
 
 ### Environment Variables
