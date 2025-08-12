@@ -343,11 +343,29 @@ npx prisma generate && npx prisma db push
 npm run db:seed
 ```
 
-What it does:
-- Clears `benefits`, `userMemberships`, and `brands`
-- Creates all brands (including Nono & Mimi and Giraffe)
-- Creates brand partnerships (e.g., Nono & Mimi ↔ Giraffe)
+Modes:
+- Fresh install (wipe + seed):
+  ```bash
+  node scripts/seed.js --mode=fresh
+  ```
+- Upsert/update without wipe (safe for existing DBs):
+  ```bash
+  node scripts/seed.js --mode=upsert
+  ```
+- Seed a subset of brands only (comma-separated):
+  ```bash
+  node scripts/seed.js --mode=upsert --brands="Giraffe,Nono & Mimi"
+  ```
+
+What it does (fresh):
+- Clears `benefits`, `userMemberships`, `brand_partnerships`, and `brands`
+- Creates all brands and partnerships
 - Seeds a comprehensive set of benefits (including co-branded examples)
+
+What it does (upsert):
+- Does NOT wipe data
+- Upserts brands by name and benefits by (brandId + title)
+- Creates missing partnerships if needed
 
 Advanced: partial brand/benefit imports
 - Use `scripts/admin-helper.js` to import/export JSON for brands/benefits without wiping the DB.

@@ -3,7 +3,12 @@
  * --------------------------------------
  * Purpose: Seed ALL brands, partnerships, and benefits in one place.
  * How to run:
- *   - npm run db:seed  (maps to: node scripts/seed.js)
+ *   - Fresh install (wipe + seed):
+ *       node scripts/seed.js --mode=fresh
+ *   - Safe update (no wipe, upsert brands/benefits/partnerships):
+ *       node scripts/seed.js --mode=upsert
+ *   - Limit to specific brands (comma-separated):
+ *       node scripts/seed.js --mode=upsert --brands="Giraffe,Nono & Mimi"
  * What it does:
  *   - Clears existing data (benefits, memberships, brands)
  *   - Creates brands (including co-brands like Nono & Mimi and Giraffe)
@@ -358,36 +363,71 @@ async function seed() {
     console.log('Cleared existing data');
     
     // Create brands
-    console.log('Creating brands...');
-    const createdBrands = await Promise.all(
-      predefinedBrands.map(async (brand) => {
-        const created = await prisma.brand.create({
-          data: brand
-        });
-        console.log(`Created brand: ${brand.name}`);
-        return created;
-      })
-    );
+  // Args
+  const rawArgs = process.argv.slice(2);
+  const args = rawArgs.reduce((acc, arg) => {
+    const [k, v] = arg.replace(/^--/, '').split('=');
+    acc[k] = v === undefined ? true : v;
+    return acc;
+  }, {});
+  const mode = (args.mode || 'fresh').toLowerCase(); // 'fresh' | 'upsert'
+  const brandFilter = (args.brands || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const shouldIncludeBrand = (name) =>
+    brandFilter.length === 0 || brandFilter.includes(name);
+
+  // Optional wipe on fresh
+  if (mode === 'fresh') {
+    console.log('Mode: fresh. Clearing existing data...');
+    await prisma.benefit.deleteMany();
+    await prisma.userMembership.deleteMany();
+    await prisma.brandPartnership.deleteMany();
+    await prisma.brand.deleteMany();
+  } else {
+    console.log('Mode: upsert. Existing data will be updated/created without wiping.');
+  }
+
+  console.log('Creating/updating brands...');
+  async function upsertBrandByName(brand) {
+    if (!shouldIncludeBrand(brand.name)) return null;
+    const existing = await prisma.brand.findFirst({ where: { name: brand.name } });
+    if (existing) {
+      const updated = await prisma.brand.update({ where: { id: existing.id }, data: brand });
+      console.log(`Updated brand: ${brand.name}`);
+      return updated;
+    }
+    const created = await prisma.brand.create({ data: brand });
+    console.log(`Created brand: ${brand.name}`);
+    return created;
+  }
+
+  const createdBrands = (await Promise.all(
+    predefinedBrands.map((b) => upsertBrandByName(b))
+  )).filter(Boolean);
     
     console.log(`Created ${createdBrands.length} brands`);
 
     // Create brand partnerships (co-branding)
     const nono = createdBrands.find(b => b.name === 'Nono & Mimi');
     const giraffe = createdBrands.find(b => b.name === 'Giraffe');
-    if (nono && giraffe) {
+    if (nono && giraffe && shouldIncludeBrand('Nono & Mimi') || shouldIncludeBrand('Giraffe')) {
       // Ensure unique pair once (A->B)
-      try {
-        await prisma.brandPartnership.create({
-          data: { brandAId: nono.id, brandBId: giraffe.id }
-        });
+      const existing = await prisma.brandPartnership.findFirst({
+        where: { brandAId: nono.id, brandBId: giraffe.id }
+      });
+      if (!existing) {
+        await prisma.brandPartnership.create({ data: { brandAId: nono.id, brandBId: giraffe.id } });
         console.log('Created partnership: Nono & Mimi ↔ Giraffe');
-      } catch (e) {
-        console.warn('Partnership may already exist or failed to create:', e?.message);
+      } else {
+        console.log('Partnership already exists: Nono & Mimi ↔ Giraffe');
       }
     }
     
     // Create benefits with updated specifications
-    console.log('Creating benefits...');
+    console.log('Creating/updating benefits...');
     const sampleBenefits = [
       {
         brandId: createdBrands.find(b => b.name === "McDonald's")?.id,
@@ -719,13 +759,28 @@ async function seed() {
     
     await Promise.all(
       sampleBenefits.map(async (benefit) => {
-        if (benefit.brandId) {
-          const created = await prisma.benefit.create({
-            data: benefit
-          });
+        if (!benefit.brandId) return null;
+        // Respect --brands filter by checking the brand name
+        const brand = await prisma.brand.findUnique({ where: { id: benefit.brandId } });
+        if (!brand || !shouldIncludeBrand(brand.name)) return null;
+
+        // Upsert by (brandId + title)
+        const existing = await prisma.benefit.findFirst({
+          where: { brandId: benefit.brandId, title: benefit.title }
+        });
+        if (mode === 'fresh') {
+          const created = await prisma.benefit.create({ data: benefit });
           console.log(`Created benefit: ${benefit.title}`);
           return created;
         }
+        if (existing) {
+          const updated = await prisma.benefit.update({ where: { id: existing.id }, data: benefit });
+          console.log(`Updated benefit: ${benefit.title}`);
+          return updated;
+        }
+        const created = await prisma.benefit.create({ data: benefit });
+        console.log(`Created benefit: ${benefit.title}`);
+        return created;
       })
     );
     
