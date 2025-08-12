@@ -1,3 +1,17 @@
+/**
+ * Unified Seeding Script
+ * --------------------------------------
+ * Purpose: Seed ALL brands, partnerships, and benefits in one place.
+ * How to run:
+ *   - npm run db:seed  (maps to: node scripts/seed.js)
+ * What it does:
+ *   - Clears existing data (benefits, memberships, brands)
+ *   - Creates brands (including co-brands like Nono & Mimi and Giraffe)
+ *   - Creates a brand partnership (Nono & Mimi ↔ Giraffe)
+ *   - Seeds benefits, including a co-branded sample and a Giraffe-specific benefit
+ * Notes:
+ *   - Inline SVGs are used for new logos to avoid missing assets. Replace with files in public/images/brands/ when available.
+ */
 const { PrismaClient } = require('@prisma/client');
 
 console.log('Starting seed script...');
@@ -356,6 +370,21 @@ async function seed() {
     );
     
     console.log(`Created ${createdBrands.length} brands`);
+
+    // Create brand partnerships (co-branding)
+    const nono = createdBrands.find(b => b.name === 'Nono & Mimi');
+    const giraffe = createdBrands.find(b => b.name === 'Giraffe');
+    if (nono && giraffe) {
+      // Ensure unique pair once (A->B)
+      try {
+        await prisma.brandPartnership.create({
+          data: { brandAId: nono.id, brandBId: giraffe.id }
+        });
+        console.log('Created partnership: Nono & Mimi ↔ Giraffe');
+      } catch (e) {
+        console.warn('Partnership may already exist or failed to create:', e?.message);
+      }
+    }
     
     // Create benefits with updated specifications
     console.log('Creating benefits...');
@@ -664,11 +693,24 @@ async function seed() {
       {
         brandId: createdBrands.find(b => b.name === "Nono & Mimi")?.id,
         title: "הטבה משותפת Nono & Giraffe",
-        description: "קינוח מתנה בהצגת ת.ז בחודש יום ההולדת בסניפים משתתפים",
-        termsAndConditions: "בתוקף בחודש יום ההולדת, בהזמנה מעל 80₪, לא כולל כפל מבצעים",
+        description: "קינוח מתנה או בקבוק יין בהצגת ת.ז בחודש יום ההולדת בסניפים משתתפים",
+        termsAndConditions: "בתוקף בחודש יום ההולדת, בהזמנה מעל 80₪, לא כולל כפל מבצעים; הבחירה בין קינוח או בקבוק יין בהתאם לסניף ולמלאי",
         redemptionMethod: "in-store",
         promoCode: null,
         url: "https://nonomimi.com",
+        validityType: "birthday_entire_month",
+        validityDuration: 30,
+        isFree: true
+      },
+      // Giraffe specific: dessert or a wine bottle
+      {
+        brandId: createdBrands.find(b => b.name === "Giraffe")?.id,
+        title: "קינוח או בקבוק יין מתנה",
+        description: "בחודש יום ההולדת, בהצגת תעודה מזהה, תהנו מקינוח מתנה או בקבוק יין",
+        termsAndConditions: "מימוש פעם אחת בלבד במהלך חודש יום ההולדת, בהזמנה מעל 80₪, בכפוף למלאי ובסניפים משתתפים",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.giraffe.co.il/",
         validityType: "birthday_entire_month",
         validityDuration: 30,
         isFree: true

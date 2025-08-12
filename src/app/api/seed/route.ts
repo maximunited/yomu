@@ -280,6 +280,15 @@ export async function POST(request: NextRequest) {
       })
     );
 
+    // Optional: create partnership (Nono & Mimi ↔ Giraffe)
+    const nono = createdBrands.find(b => b.name === 'Nono & Mimi');
+    const giraffe = createdBrands.find(b => b.name === 'Giraffe');
+    if (nono && giraffe) {
+      try {
+        await prisma.brandPartnership.create({ data: { brandAId: nono.id, brandBId: giraffe.id } });
+      } catch {}
+    }
+
     // Create some sample benefits
     const sampleBenefits = [
       {
@@ -308,11 +317,23 @@ export async function POST(request: NextRequest) {
       {
         brandId: createdBrands.find(b => b.name === "Nono & Mimi")?.id,
         title: "הטבה משותפת Nono & Giraffe",
-        description: "קינוח מתנה בהצגת ת.ז בחודש יום ההולדת בסניפים משתתפים",
-        termsAndConditions: "בתוקף בחודש יום ההולדת, בהזמנה מעל 80₪, לא כולל כפל מבצעים",
+        description: "קינוח מתנה או בקבוק יין בהצגת ת.ז בחודש יום ההולדת בסניפים משתתפים",
+        termsAndConditions: "בתוקף בחודש יום ההולדת, בהזמנה מעל 80₪, לא כולל כפל מבצעים; הבחירה בין קינוח או בקבוק יין בהתאם לסניף ולמלאי",
         redemptionMethod: "in-store",
         promoCode: null,
         url: "https://nonomimi.com",
+        validityType: "birthday_entire_month",
+        validityDuration: 30
+      },
+      // Giraffe specific: dessert or a wine bottle
+      {
+        brandId: createdBrands.find(b => b.name === "Giraffe")?.id,
+        title: "קינוח או בקבוק יין מתנה",
+        description: "בחודש יום ההולדת, בהצגת תעודה מזהה, תהנו מקינוח מתנה או בקבוק יין",
+        termsAndConditions: "מימוש פעם אחת בלבד במהלך חודש יום ההולדת, בהזמנה מעל 80₪, בכפוף למלאי ובסניפים משתתפים",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.giraffe.co.il/",
         validityType: "birthday_entire_month",
         validityDuration: 30
       }
