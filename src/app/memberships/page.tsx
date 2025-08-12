@@ -359,22 +359,7 @@ export default function MembershipsPage() {
     }
   }, [session]);
 
-  // Don't render anything while checking authentication
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">{t('loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render if not authenticated
-  if (status === "unauthenticated") {
-    return null;
-  }
+  // Note: Do not early-return before all hooks are called. Authentication gates are placed later.
 
   const toggleMembership = (id: string) => {
     setMemberships(prev => 
@@ -630,6 +615,22 @@ export default function MembershipsPage() {
     });
   }, [filteredMemberships, originalActiveMap, language]);
 
+  // Authentication gates (placed after hooks to keep hook order stable)
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">{t('loading')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return null;
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -720,34 +721,27 @@ export default function MembershipsPage() {
                 <div className="w-full max-h-40 overflow-auto border border-gray-300 dark:border-gray-600 rounded-md p-2 font-sans">
                   <div className="grid grid-cols-1 gap-2">
                     {[
-                      { key: 'food', label: t('food') },
-                      { key: 'health', label: t('health') },
-                      { key: 'fashion', label: t('fashion') },
-                      { key: 'transport', label: t('transport') },
-                      { key: 'home', label: t('homeCategory') },
-                      { key: 'finance', label: t('finance') },
-                      { key: 'grocery', label: t('grocery') },
-                      { key: 'entertainment', label: t('entertainment') },
-                      { key: 'convenience', label: t('convenience') },
-                      { key: 'baby', label: t('baby') },
-                    ].map(({ key, label }) => (
-                      <label key={key} className="flex items-center text-sm capitalize">
-                        <input
-                          type="checkbox"
-                          className="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                          checked={selectedCategories.includes(key)}
-                          onChange={() =>
-                            setSelectedCategories(prev =>
-                              prev.includes(key) ? prev.filter(c => c !== key) : [...prev, key]
-                            )
-                          }
-                        />
-                        <span className="text-gray-700 dark:text-gray-300">{label}</span>
-                      </label>
-                    ))}
+                      'food','health','fashion','transport','home','finance','grocery','entertainment','convenience','baby'
+                    ]
+                      .map((key) => ({ key, label: getCategoryDisplayName(key) }))
+                      .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase(), undefined, { sensitivity: 'base' }))
+                      .map(({ key, label }) => (
+                        <label key={key} className="flex items-center text-sm capitalize">
+                          <input
+                            type="checkbox"
+                            className="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            checked={selectedCategories.includes(key)}
+                            onChange={() =>
+                              setSelectedCategories(prev =>
+                                prev.includes(key) ? prev.filter(c => c !== key) : [...prev, key]
+                              )
+                            }
+                          />
+                          <span className="text-gray-700 dark:text-gray-300">{label}</span>
+                        </label>
+                      ))}
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('allCategories')} — {t('select')} {t('multiple') || ''}</p>
               </div>
             </div>
 

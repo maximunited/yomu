@@ -514,7 +514,15 @@ export default function DashboardPage() {
   // Sort categories by localized display name for a better UX
   const displayCategories = (allCategories.length > 0 ? allCategories : fallbackCategories)
     .slice()
-    .sort((a, b) => getCategoryDisplayName(a).localeCompare(getCategoryDisplayName(b)));
+    .sort((a, b) =>
+      getCategoryDisplayName(a)
+        .toLowerCase()
+        .localeCompare(
+          getCategoryDisplayName(b).toLowerCase(),
+          undefined,
+          { sensitivity: 'base' }
+        )
+    );
 
   // Membership summary count: prefer user's active memberships; if none, fallback to available brands
   const activeMembershipCount = userMemberships.filter(m => m.isActive).length;
