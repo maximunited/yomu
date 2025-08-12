@@ -589,10 +589,10 @@ export default function DashboardPage() {
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {t('helloUser').replace('{name}', session?.user?.name || t('user'))}
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
             {t('hereAreYourBirthdayBenefits')}
           </p>
           
@@ -691,7 +691,7 @@ export default function DashboardPage() {
                   id="validity-select"
                   value={selectedValidityDuration}
                   onChange={(e) => setSelectedValidityDuration(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white font-sans"
                 >
                                       <option key="all-durations" value="">{t('allPeriods')}</option>
                   {allValidityDurations.map(duration => (
@@ -808,8 +808,8 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <Star className="w-6 h-6 text-purple-600" />
-              <h2 className="text-2xl font-bold text-gray-900">{t('activeNow')}</h2>
-              <span className="text-sm text-gray-500">({filteredActiveBenefits.length})</span>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('activeNow')}</h2>
+              <span className="text-sm text-gray-500 dark:text-gray-400">({filteredActiveBenefits.length})</span>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -958,8 +958,8 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <Calendar className="w-6 h-6 text-orange-600" />
-              <h2 className="text-2xl font-bold text-gray-900">{t('comingSoon')}</h2>
-              <span className="text-sm text-gray-500">({filteredUpcomingBenefits.length})</span>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('comingSoon')}</h2>
+              <span className="text-sm text-gray-500 dark:text-gray-400">({filteredUpcomingBenefits.length})</span>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1068,8 +1068,8 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <Gift className="w-6 h-6 text-green-600" />
-                <h2 className="text-2xl font-bold text-gray-900">{t('usedBenefitsHistory')}</h2>
-                <span className="text-sm text-gray-500">({usedBenefits.size})</span>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('usedBenefitsHistory')}</h2>
+                <span className="text-sm text-gray-500 dark:text-gray-400">({usedBenefits.size})</span>
               </div>
             </div>
             <div className="bg-white rounded-xl shadow-lg p-6">
