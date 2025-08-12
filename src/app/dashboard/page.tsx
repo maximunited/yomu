@@ -317,6 +317,17 @@ export default function DashboardPage() {
     return desc;
   };
 
+  const getBenefitTitle = (benefit: Benefit): string => {
+    const title = benefit.title || '';
+    if (language === 'en' && containsHebrew(title)) {
+      return getCategoryGenericDescription(benefit.brand.category) || 'Benefit';
+    }
+    if (language === 'he' && !containsHebrew(title) && title.trim() !== '') {
+      return getCategoryGenericDescription(benefit.brand.category) || title;
+    }
+    return title;
+  };
+
   const isRecentlyAdded = (benefit: Benefit): boolean => {
     const createdAt = (benefit as any).createdAt ? new Date((benefit as any).createdAt) : undefined;
     if (!createdAt || isNaN(createdAt.getTime())) {
@@ -868,7 +879,7 @@ export default function DashboardPage() {
                 </div>
                 
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
-                  {benefit.title}
+                  {getBenefitTitle(benefit)}
                 </h4>
                 <p className="text-gray-600 text-sm mb-4 flex-grow">
                   {getBenefitDescription(benefit)}
@@ -1008,7 +1019,7 @@ export default function DashboardPage() {
                 </div>
                 
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
-                  {benefit.title}
+                  {getBenefitTitle(benefit)}
                 </h4>
                 <p className="text-gray-600 text-sm mb-4 flex-grow">
                   {getBenefitDescription(benefit)}

@@ -59,6 +59,28 @@ const predefinedBrands = [
     category: "food"
   },
   {
+    name: "Nono & Mimi",
+    logoUrl:
+      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' rx='16' ry='16' fill='%23000'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='32' fill='%23fff'>NM</text></svg>",
+    website: "https://nonomimi.com",
+    description: "הטבות במסעדות נונו & מימי",
+    category: "food",
+    actionUrl: "https://nonomimi.com",
+    actionType: "website",
+    actionLabel: "הזמנה באתר Nono&Mimi"
+  },
+  {
+    name: "Giraffe",
+    logoUrl:
+      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' rx='16' ry='16' fill='%23f59e0b'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='36' fill='%23000'>G</text></svg>",
+    website: "https://www.giraffe.co.il/",
+    description: "הטבות במסעדות ג'ירף",
+    category: "food",
+    actionUrl: "https://www.giraffe.co.il/",
+    actionType: "website",
+    actionLabel: "הזמנה באתר Giraffe"
+  },
+  {
     name: "אסקייפרום",
     logoUrl: "/images/brands/escape-room.svg",
     website: "https://www.escape-room.co.il",
@@ -280,6 +302,18 @@ export async function POST(request: NextRequest) {
         promoCode: null,
         url: "https://www.super-pharm.co.il/birthday",
         validityType: "birthday_month",
+        validityDuration: 30
+      },
+      // Co-branded example between Nono & Mimi and Giraffe
+      {
+        brandId: createdBrands.find(b => b.name === "Nono & Mimi")?.id,
+        title: "הטבה משותפת Nono & Giraffe",
+        description: "קינוח מתנה בהצגת ת.ז בחודש יום ההולדת בסניפים משתתפים",
+        termsAndConditions: "בתוקף בחודש יום ההולדת, בהזמנה מעל 80₪, לא כולל כפל מבצעים",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://nonomimi.com",
+        validityType: "birthday_entire_month",
         validityDuration: 30
       }
     ];
