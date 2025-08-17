@@ -9,6 +9,13 @@ export interface BenefitValidationRule {
 }
 
 export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
+  // Always valid (year-round)
+  "always": {
+    validityType: "always",
+    description: "Valid anytime (year-round)",
+    validationLogic: () => true,
+    displayText: "validForLimitedPeriod"
+  },
   // Birthday benefits
   "birthday_exact_date": {
     validityType: "birthday_exact_date",

@@ -82,6 +82,16 @@ const predefinedBrands = [
     actionLabel: "הזמנה באתר Giraffe"
   },
   {
+    name: "Minna Tomei",
+    logoUrl: "/images/brands/minna-tomei.png",
+    website: "https://www.minna-tomei.co.il",
+    description: "מועדון לקוחות Minna Tomei",
+    category: "food",
+    actionUrl: "https://www.minna-tomei.co.il/members/",
+    actionType: "website",
+    actionLabel: "הצטרפות למועדון Minna Tomei"
+  },
+  {
     name: "אסקייפרום",
     logoUrl: "/images/brands/escape-room.svg",
     website: "https://www.escape-room.co.il",
@@ -302,6 +312,30 @@ export async function POST(request: NextRequest) {
         url: "https://www.mcdonalds.co.il/birthday",
         validityType: "birthday_date",
         validityDuration: 1
+      },
+      // Minna Tomei: Free sushi roll during birthday month
+      {
+        brandId: createdBrands.find(b => b.name === "Minna Tomei")?.id,
+        title: "רול סושי לבחירה מתנה בעסקה מעל 50 שקלים",
+        description: "למימוש חד פעמי בחודש יום ההולדת בהצגת ת.ז; הרול הזול מבין הרולים בעסקה",
+        termsAndConditions: "למימוש חד פעמי | תקף בחודש הקלנדרי של יום ההולדת | הרול הזול מבין הרולים בעסקה",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.minna-tomei.co.il/members/",
+        validityType: "birthday_entire_month",
+        validityDuration: 30
+      },
+      // Minna Tomei: 5% points accumulation (year-round)
+      {
+        brandId: createdBrands.find(b => b.name === "Minna Tomei")?.id,
+        title: "5% צבירת נקודות",
+        description: "צבירת 5% נקודות בכל ביקור לחברי מועדון Minna Tomei",
+        termsAndConditions: "לפי תקנון המועדון באתר",
+        redemptionMethod: "in-store",
+        promoCode: null,
+        url: "https://www.minna-tomei.co.il/members/",
+        validityType: "always",
+        validityDuration: null
       },
       {
         brandId: createdBrands.find(b => b.name === "Super-Pharm - LifeStyle")?.id,

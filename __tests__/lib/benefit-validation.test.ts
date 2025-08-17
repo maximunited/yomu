@@ -15,6 +15,7 @@ describe('Benefit Validation', () => {
   describe('VALIDITY_TYPES', () => {
     it('should contain all expected validity types', () => {
       const expectedTypes = [
+        'always',
         'birthday_exact_date',
         'birthday_entire_month',
         'birthday_week_before_after',
@@ -217,6 +218,24 @@ describe('Benefit Validation', () => {
     })
   })
 
+  describe('always validity type', () => {
+    it('should always return true for always validity type', () => {
+      const benefit = { validityType: 'always' }
+      const userDOB = new Date('1990-06-15')
+      
+      // Should be active regardless of date
+      const anyDate = new Date('2024-01-01')
+      expect(isBenefitActive(benefit, userDOB, anyDate)).toBe(true)
+      
+      const anotherDate = new Date('2024-12-31')
+      expect(isBenefitActive(benefit, userDOB, anotherDate)).toBe(true)
+      
+      // Should work with any valid date when user has DOB
+      const birthdayDate = new Date('2024-06-15')
+      expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true)
+    })
+  })
+
   describe('getUpcomingBenefits', () => {
     const userDOB = new Date('1990-06-15') // June 15th
 
@@ -266,6 +285,7 @@ describe('Benefit Validation', () => {
       expect(ALL_VALIDITY_TYPES).toContain('birthday_exact_date')
       expect(ALL_VALIDITY_TYPES).toContain('birthday_entire_month')
       expect(ALL_VALIDITY_TYPES).toContain('birthday_week_before_after')
+      expect(ALL_VALIDITY_TYPES).toContain('always')
       expect(ALL_VALIDITY_TYPES).toContain('anniversary_exact_date')
     })
 

@@ -387,6 +387,7 @@ export default function DashboardPage() {
 
   const getValidityDurationDisplay = (validityType: string) => {
     const durationMap = {
+      "always": t('validityLimitedPeriod'),
       "birthday_exact_date": t('validityExactDate'),
       "birthday_entire_month": t('validityEntireMonth'),
       "birthday_week_before_after": t('validityWeekBeforeAfter'),

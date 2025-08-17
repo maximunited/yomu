@@ -45,10 +45,16 @@ async function main() {
     'H&M': 'https://upload.wikimedia.org/wikipedia/commons/5/53/H%26M-Logo.svg',
     KFC: 'https://upload.wikimedia.org/wikipedia/commons/5/57/KFC_logo.svg',
     Fox: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/fox.svg',
+    'Minna Tomei': 'https://logo.clearbit.com/minna-tomei.co.il?size=512',
   };
 
   let downloaded = 0;
   for (const brand of predefinedBrands) {
+    // Skip inline data URIs; those are intentional placeholders
+    if (brand.logoUrl && typeof brand.logoUrl === 'string' && brand.logoUrl.startsWith('data:')) {
+      console.warn(`Skipping ${brand.name}: inline logo URL (data URI)`);
+      continue;
+    }
     const destRel = brand.logoUrl.startsWith('/') ? brand.logoUrl : `/${brand.logoUrl}`;
     const destAbs = path.join(TARGET_DIR, destRel);
     ensureDirSync(path.dirname(destAbs));
