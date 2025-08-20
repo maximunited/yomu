@@ -87,16 +87,15 @@ export default function MembershipsPage() {
 
           // Load user's existing memberships
           const userMembershipsResponse = await fetch("/api/user/memberships");
-          let userMemberships: any[] = [];
+          let userMemberships: Array<{ brandId: string; isActive: boolean }> =
+            [];
           if (userMembershipsResponse.ok) {
             const userData = await userMembershipsResponse.json();
             userMemberships = userData.memberships || [];
           }
 
           // Create a set of active brand IDs for quick lookup
-          const activeBrandIds = new Set(
-            userMemberships.map((m: any) => m.brandId),
-          );
+          const activeBrandIds = new Set(userMemberships.map((m) => m.brandId));
 
           // Also fetch benefits to derive paid/free per brand when available
           const brandPaidMap = new Map<string, boolean>();
@@ -382,7 +381,7 @@ export default function MembershipsPage() {
     if (session) {
       loadData();
     }
-  }, [session]);
+  }, [session, memberships, t]);
 
   // Note: Do not early-return before all hooks are called. Authentication gates are placed later.
 

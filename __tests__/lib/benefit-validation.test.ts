@@ -131,7 +131,7 @@ describe("Benefit Validation", () => {
         brandId: "brand-1",
         redemptionMethod: "code",
         validityType: "birthday_exact_date",
-        validityDuration: "not_a_number",
+        validityDuration: "not_a_number" as any,
       };
 
       const result = validateBenefitData(invalidBenefit);

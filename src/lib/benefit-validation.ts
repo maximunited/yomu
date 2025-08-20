@@ -214,7 +214,14 @@ export const LEGACY_VALIDITY_TYPES: Record<string, string> = {
   validity3DaysAfter: "birthday_3_days_after",
 };
 
-export function validateBenefitData(benefitData: any): {
+export function validateBenefitData(benefitData: {
+  title?: string;
+  validityType?: string;
+  validityDuration?: number;
+  redemptionMethod?: string;
+  termsAndConditions?: string;
+  [key: string]: unknown;
+}): {
   isValid: boolean;
   errors: string[];
 } {

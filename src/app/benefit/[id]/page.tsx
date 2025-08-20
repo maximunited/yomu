@@ -69,7 +69,7 @@ export default function BenefitDetailPage() {
     if (params.id) {
       fetchBenefit();
     }
-  }, [params.id]);
+  }, [params.id, t]);
 
   if (isLoading) {
     return (
@@ -114,7 +114,7 @@ export default function BenefitDetailPage() {
   };
 
   const getValidityText = (validityType: string) => {
-    return getValidityDisplayText(validityType, language as any);
+    return getValidityDisplayText(validityType, language as "he" | "en");
   };
 
   return (

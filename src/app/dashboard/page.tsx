@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -174,21 +175,30 @@ export default function DashboardPage() {
           activeMemberships.map((m) => m.brand?.name).filter(Boolean),
         );
         console.log("Active brand IDs:", Array.from(activeBrandIds));
-        const userBenefits = benefitsData.benefits.filter((benefit: any) => {
-          // No memberships: show everything (demo/fallback)
-          if (!hasAnyMemberships) return true;
-          // Match by id when available
-          if (benefit.brandId) return activeBrandIds.has(benefit.brandId);
-          // Match by name when available. If we don't have names on memberships, include.
-          if (benefit.brand?.name) {
-            return (
-              activeBrandNames.size === 0 ||
-              activeBrandNames.has(benefit.brand.name)
-            );
-          }
-          // Unknown brand shape: include to avoid hiding due to fixture gaps
-          return true;
-        });
+        const userBenefits = benefitsData.benefits.filter(
+          (benefit: {
+            brandId?: string;
+            brand?: { name: string };
+            validityType: string;
+            id: string;
+            title: string;
+            description: string;
+          }) => {
+            // No memberships: show everything (demo/fallback)
+            if (!hasAnyMemberships) return true;
+            // Match by id when available
+            if (benefit.brandId) return activeBrandIds.has(benefit.brandId);
+            // Match by name when available. If we don't have names on memberships, include.
+            if (benefit.brand?.name) {
+              return (
+                activeBrandNames.size === 0 ||
+                activeBrandNames.has(benefit.brand.name)
+              );
+            }
+            // Unknown brand shape: include to avoid hiding due to fixture gaps
+            return true;
+          },
+        );
         console.log("Filtered benefits count:", userBenefits.length);
 
         setBenefits(userBenefits);
@@ -215,7 +225,7 @@ export default function DashboardPage() {
         const data = await response.json();
         const list = Array.isArray(data.usedBenefits) ? data.usedBenefits : [];
         const usedBenefitIds = new Set<string>(
-          list.map((ub: any) => ub.benefitId as string),
+          list.map((ub: { benefitId: string }) => ub.benefitId),
         );
         setUsedBenefits(usedBenefitIds);
       } else {
@@ -620,7 +630,10 @@ export default function DashboardPage() {
   ).length;
   const availableBrandCount = new Set(
     benefits
-      .map((b: any) => b.brandId || b.brand?.id || b.brand?.name)
+      .map(
+        (b: { brandId?: string; brand?: { id?: string; name?: string } }) =>
+          b.brandId || b.brand?.id || b.brand?.name,
+      )
       .filter(Boolean),
   ).size;
   const membershipCountDisplay =
@@ -657,9 +670,11 @@ export default function DashboardPage() {
                 <button className="flex items-center space-x-2 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg px-3 py-2 transition-colors border-2 border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500">
                   <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center overflow-hidden">
                     {userProfilePicture ? (
-                      <img
+                      <Image
                         src={userProfilePicture}
                         alt="Profile"
+                        width={32}
+                        height={32}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -1187,9 +1202,11 @@ export default function DashboardPage() {
               >
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
+                    <Image
                       src={benefit.brand.logoUrl}
                       alt={benefit.brand.name}
+                      width={48}
+                      height={48}
                       className="w-full h-full object-cover"
                     />
                   </div>

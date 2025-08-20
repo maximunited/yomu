@@ -1,15 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import {
-  ArrowLeft,
-  Mail,
-  Phone,
-  MapPin,
-  Clock,
-  MessageCircle,
-} from "lucide-react";
+import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useDarkMode } from "@/contexts/DarkModeContext";
 import PageHeader from "@/components/PageHeader";

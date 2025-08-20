@@ -9,7 +9,8 @@
       "Bash(npm run lint:*)",
       "Bash(npx tsc:*)",
       "Bash(pre-commit migrate-config:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

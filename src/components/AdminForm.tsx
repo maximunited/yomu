@@ -46,7 +46,10 @@ export default function AdminForm({
     onSave(formData);
   };
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (
+    field: string,
+    value: string | boolean | number | undefined,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -380,9 +383,9 @@ export default function AdminForm({
                   <input
                     id="benefit-validityDuration"
                     type="number"
-                    value={
-                      ((formData as Benefit).validityDuration ?? "") as any
-                    }
+                    value={(
+                      (formData as Benefit).validityDuration ?? ""
+                    ).toString()}
                     onChange={(e) => {
                       const val = e.target.value;
                       handleChange(

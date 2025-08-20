@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const brands = await prisma.brand.findMany({
       where: {
@@ -30,7 +30,15 @@ export async function GET(request: NextRequest) {
         id: string;
         name: string;
         isActive: boolean;
-        [key: string]: any;
+        logoUrl: string;
+        category: string;
+        description: string | null;
+        website: string;
+        actionUrl: string | null;
+        actionType: string | null;
+        actionLabel: string | null;
+        createdAt: Date;
+        updatedAt: Date;
       }> = [];
 
       // Add partners where this brand is brandA
