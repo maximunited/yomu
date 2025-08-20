@@ -157,18 +157,64 @@ describe("Benefit Validation", () => {
       expect(getValidityDisplayText("birthday_date", "he")).toBe(
         "תקף ביום ההולדת בלבד",
       );
-      expect(getValidityDisplayText("birthday_month", "he")).toBe(
-        "תקף לכל החודש",
+      expect(getValidityDisplayText("validity1Week", "he")).toBe(
+        "תקף לתקופה מוגבלת",
       );
-      expect(getValidityDisplayText("birthday_week", "he")).toBe(
-        "תקף לשבוע לפני ואחרי",
+      expect(getValidityDisplayText("validity3DaysBefore", "he")).toBe(
+        "3 ימים לפני",
+      );
+      expect(getValidityDisplayText("validity3DaysAfter", "he")).toBe(
+        "3 ימים אחרי",
       );
     });
 
-    it("should return default text for unknown types", () => {
+    it("should handle English translations", () => {
+      expect(getValidityDisplayText("birthday_exact_date", "en")).toBe(
+        "Valid only on birthday",
+      );
+      expect(getValidityDisplayText("birthday_entire_month", "en")).toBe(
+        "Valid for entire month",
+      );
+    });
+
+    it("should return fallback for unknown types", () => {
       expect(getValidityDisplayText("unknown_type", "he")).toBe(
         "תקף לתקופה מוגבלת",
       );
+      expect(getValidityDisplayText("unknown_type", "en")).toBe(
+        "Valid for limited period",
+      );
+    });
+  });
+
+  describe("Anniversary benefit validation", () => {
+    it("should handle anniversary exact date", () => {
+      const benefit = { validityType: "anniversary_exact_date" };
+
+      // Mock current date to be anniversary date
+      const mockDate = new Date("2023-06-15");
+      const userDOB = new Date("1990-01-01");
+
+      expect(isBenefitActive(benefit, userDOB, mockDate)).toBe(false);
+      expect(getUpcomingBenefits(benefit, userDOB, mockDate)).toBe(false);
+    });
+
+    it("should handle anniversary entire month", () => {
+      const benefit = { validityType: "anniversary_entire_month" };
+      const userDOB = new Date("1990-01-01");
+      const mockDate = new Date("2023-06-15");
+
+      expect(isBenefitActive(benefit, userDOB, mockDate)).toBe(false);
+      expect(getUpcomingBenefits(benefit, userDOB, mockDate)).toBe(false);
+    });
+
+    it("should handle anniversary week before and after", () => {
+      const benefit = { validityType: "anniversary_week_before_after" };
+      const userDOB = new Date("1990-01-01");
+      const mockDate = new Date("2023-06-15");
+
+      expect(isBenefitActive(benefit, userDOB, mockDate)).toBe(false);
+      expect(getUpcomingBenefits(benefit, userDOB, mockDate)).toBe(false);
     });
   });
 

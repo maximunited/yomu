@@ -21,7 +21,7 @@ describe("authOptions", () => {
 
   it("authorize returns null for missing credentials", async () => {
     const credsProvider: any = authOptions.providers.find(
-      (p: any) => p.name === "credentials",
+      (p: any) => p.id === "credentials",
     );
     await expect(credsProvider.authorize(undefined)).resolves.toBeNull();
   });
@@ -30,7 +30,7 @@ describe("authOptions", () => {
     const { prisma } = require("@/lib/prisma");
     prisma.user.findUnique.mockResolvedValue(null);
     const credsProvider: any = authOptions.providers.find(
-      (p: any) => p.name === "credentials",
+      (p: any) => p.id === "credentials",
     );
     await expect(
       credsProvider.authorize({ email: "a@b.com", password: "x" }),
@@ -46,7 +46,7 @@ describe("authOptions", () => {
       password: "good",
     });
     const credsProvider: any = authOptions.providers.find(
-      (p: any) => p.name === "credentials",
+      (p: any) => p.id === "credentials",
     );
     const user = await credsProvider.authorize({
       email: "a@b.com",
@@ -64,7 +64,7 @@ describe("authOptions", () => {
       password: "good",
     });
     const credsProvider: any = authOptions.providers.find(
-      (p: any) => p.name === "credentials",
+      (p: any) => p.id === "credentials",
     );
     await expect(
       credsProvider.authorize({ email: "a@b.com", password: "bad" }),
