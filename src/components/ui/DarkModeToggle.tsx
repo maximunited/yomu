@@ -10,11 +10,11 @@ interface DarkModeToggleProps {
   className?: string;
 }
 
-export function DarkModeToggle({ 
-  variant = "outline", 
-  size = "sm", 
+export function DarkModeToggle({
+  variant = "outline",
+  size = "sm",
   showText = false,
-  className = ""
+  className = "",
 }: DarkModeToggleProps) {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
@@ -32,10 +32,8 @@ export function DarkModeToggle({
         <Moon className="w-4 h-4 text-gray-600 dark:text-gray-300" />
       )}
       {showText && (
-        <span className="mr-2">
-          {isDarkMode ? "Light Mode" : "Dark Mode"}
-        </span>
+        <span className="mr-2">{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
       )}
     </Button>
   );
-} 
+}

@@ -1,35 +1,37 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
 async function testPartnerships() {
   try {
-    console.log('🧪 Testing partnership functionality...\n');
+    console.log("🧪 Testing partnership functionality...\n");
 
     // 1. Get all partnerships
     const partnerships = await prisma.brandPartnership.findMany({
       include: {
         brandA: { select: { name: true, category: true } },
-        brandB: { select: { name: true, category: true } }
-      }
+        brandB: { select: { name: true, category: true } },
+      },
     });
 
-    console.log('📊 Current partnerships:');
-    partnerships.forEach(p => {
-      console.log(`  ${p.brandA.name} (${p.brandA.category}) ↔ ${p.brandB.name} (${p.brandB.category})`);
+    console.log("📊 Current partnerships:");
+    partnerships.forEach((p) => {
+      console.log(
+        `  ${p.brandA.name} (${p.brandA.category}) ↔ ${p.brandB.name} (${p.brandB.category})`,
+      );
     });
 
     // 2. Test membership creation for Giraffe (should also create Nono&Mimi membership)
     const giraffeBrand = await prisma.brand.findFirst({
-      where: { name: { contains: 'Giraffe' } }
+      where: { name: { contains: "Giraffe" } },
     });
 
     const nonoMimiBrand = await prisma.brand.findFirst({
-      where: { name: { contains: 'Nono' } }
+      where: { name: { contains: "Nono" } },
     });
 
     if (!giraffeBrand || !nonoMimiBrand) {
-      console.log('❌ Could not find Giraffe or Nono&Mimi brands');
+      console.log("❌ Could not find Giraffe or Nono&Mimi brands");
       return;
     }
 
@@ -40,7 +42,7 @@ async function testPartnerships() {
     // 3. Get first user for testing
     const testUser = await prisma.user.findFirst();
     if (!testUser) {
-      console.log('❌ No test user found');
+      console.log("❌ No test user found");
       return;
     }
 
@@ -48,29 +50,31 @@ async function testPartnerships() {
 
     // 4. Clear existing memberships for clean test
     await prisma.userMembership.deleteMany({
-      where: { userId: testUser.id }
+      where: { userId: testUser.id },
     });
 
-    console.log('\n🧹 Cleared existing memberships');
+    console.log("\n🧹 Cleared existing memberships");
 
     // 5. Create membership for Giraffe only (should auto-create Nono&Mimi)
-    console.log('\n🎯 Creating Giraffe membership (should auto-create Nono&Mimi)...');
-    
+    console.log(
+      "\n🎯 Creating Giraffe membership (should auto-create Nono&Mimi)...",
+    );
+
     // Simulate the API call logic
     const brand = await prisma.brand.findUnique({
       where: { id: giraffeBrand.id },
       include: {
         partnershipsFrom: {
           include: {
-            brandB: true
-          }
+            brandB: true,
+          },
         },
         partnershipsTo: {
           include: {
-            brandA: true
-          }
-        }
-      }
+            brandA: true,
+          },
+        },
+      },
     });
 
     // Create main membership
@@ -79,17 +83,17 @@ async function testPartnerships() {
         userId: testUser.id,
         brandId: brand.id,
         isActive: true,
-      }
+      },
     });
 
     console.log(`  ✅ Created membership for ${brand.name}`);
 
     // Get partner brands
     const partnerBrands = [];
-    brand.partnershipsFrom.forEach(partnership => {
+    brand.partnershipsFrom.forEach((partnership) => {
       partnerBrands.push(partnership.brandB);
     });
-    brand.partnershipsTo.forEach(partnership => {
+    brand.partnershipsTo.forEach((partnership) => {
       partnerBrands.push(partnership.brandA);
     });
 
@@ -100,51 +104,54 @@ async function testPartnerships() {
           userId: testUser.id,
           brandId: partnerBrand.id,
           isActive: true,
-        }
+        },
       });
-      console.log(`  ✅ Auto-created partnership membership for ${partnerBrand.name}`);
+      console.log(
+        `  ✅ Auto-created partnership membership for ${partnerBrand.name}`,
+      );
     }
 
     // 6. Verify results
-    console.log('\n📋 Final verification:');
+    console.log("\n📋 Final verification:");
     const finalMemberships = await prisma.userMembership.findMany({
-      where: { 
+      where: {
         userId: testUser.id,
-        isActive: true 
+        isActive: true,
       },
       include: {
-        brand: { select: { name: true } }
-      }
+        brand: { select: { name: true } },
+      },
     });
 
     console.log(`  User has ${finalMemberships.length} active memberships:`);
-    finalMemberships.forEach(m => {
+    finalMemberships.forEach((m) => {
       console.log(`    - ${m.brand.name}`);
     });
 
     // 7. Test action URLs
-    console.log('\n🔗 Action URLs for brands:');
+    console.log("\n🔗 Action URLs for brands:");
     const brandsWithActions = await prisma.brand.findMany({
       where: {
-        actionUrl: { not: null }
+        actionUrl: { not: null },
       },
       select: {
         name: true,
         category: true,
         actionType: true,
         actionLabel: true,
-        actionUrl: true
-      }
+        actionUrl: true,
+      },
     });
 
-    brandsWithActions.forEach(brand => {
-      console.log(`  ${brand.name} (${brand.category}): ${brand.actionLabel} -> ${brand.actionUrl}`);
+    brandsWithActions.forEach((brand) => {
+      console.log(
+        `  ${brand.name} (${brand.category}): ${brand.actionLabel} -> ${brand.actionUrl}`,
+      );
     });
 
-    console.log('\n🎉 Partnership test completed successfully!');
-
+    console.log("\n🎉 Partnership test completed successfully!");
   } catch (error) {
-    console.error('❌ Test failed:', error);
+    console.error("❌ Test failed:", error);
   } finally {
     await prisma.$disconnect();
   }

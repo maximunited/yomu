@@ -4,20 +4,18 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password, dateOfBirth, anniversaryDate } = await request.json();
+    const { name, email, password, dateOfBirth, anniversaryDate } =
+      await request.json();
 
     // Validation
     if (!name || !email || !password || !dateOfBirth) {
-      return NextResponse.json(
-        { message: "missingFields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "missingFields" }, { status: 400 });
     }
 
     if (password.length < 6) {
       return NextResponse.json(
         { message: "passwordTooShort" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { message: "userAlreadyExists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -51,17 +49,17 @@ export async function POST(request: NextRequest) {
     const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json(
-      { 
+      {
         message: "userCreatedSuccessfully",
-        user: userWithoutPassword 
+        user: userWithoutPassword,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
       { message: "internalServerError" },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

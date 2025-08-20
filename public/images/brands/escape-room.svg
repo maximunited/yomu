@@ -4,4 +4,4 @@
   <text x="50" y="45" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="white">ROOM</text>
   <circle cx="50" cy="70" r="8" fill="#E74C3C"/>
   <text x="50" y="75" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="white">60</text>
-</svg> 
+</svg>

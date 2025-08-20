@@ -1,47 +1,48 @@
-import '@testing-library/jest-dom'
+import "@testing-library/jest-dom";
 
 // Mock next-intl (avoid ESM transform issues)
-jest.mock('next-intl', () => ({
+jest.mock("next-intl", () => ({
   NextIntlClientProvider: ({ children }) => children,
-  useTranslations: () => (key => {
+  useTranslations: () => (key) => {
     try {
-      const { translations } = require('@/lib/translations')
+      const { translations } = require("@/lib/translations");
       // Default Hebrew for tests
-      return translations.he?.[key] || translations.en?.[key] || key
+      return translations.he?.[key] || translations.en?.[key] || key;
     } catch {
-      return key
+      return key;
     }
-  }),
+  },
   useFormatter: () => ({}),
-}))
+}));
 
 // Provide a default LanguageContext mock for tests that don't wrap providers
-jest.mock('@/contexts/LanguageContext', () => {
-  const React = require('react')
-  const { translations } = require('@/lib/translations')
+jest.mock("@/contexts/LanguageContext", () => {
+  const React = require("react");
+  const { translations } = require("@/lib/translations");
   return {
     useLanguage: () => ({
       t: (key) => {
         // Default to Hebrew to satisfy most tests
-        const he = translations.he?.[key]
+        const he = translations.he?.[key];
         // Some tests expect English strings explicitly
-        if (key === 'markAsUsed' || key === 'unmarkAsUsed') {
-          return translations.en?.[key] || he || key
+        if (key === "markAsUsed" || key === "unmarkAsUsed") {
+          return translations.en?.[key] || he || key;
         }
-        return he || translations.en?.[key] || key
+        return he || translations.en?.[key] || key;
       },
-      language: 'he',
+      language: "he",
       setLanguage: jest.fn(),
-      dir: 'rtl',
-      languageInfo: { code: 'he', dir: 'rtl', isRTL: true },
+      dir: "rtl",
+      languageInfo: { code: "he", dir: "rtl", isRTL: true },
       isRTL: true,
     }),
-    LanguageProvider: ({ children }) => React.createElement(React.Fragment, null, children),
-  }
-})
+    LanguageProvider: ({ children }) =>
+      React.createElement(React.Fragment, null, children),
+  };
+});
 
 // Mock Next.js router
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter() {
     return {
       push: jest.fn(),
@@ -50,73 +51,76 @@ jest.mock('next/navigation', () => ({
       back: jest.fn(),
       forward: jest.fn(),
       refresh: jest.fn(),
-    }
+    };
   },
   useSearchParams() {
-    return new URLSearchParams()
+    return new URLSearchParams();
   },
   usePathname() {
-    return '/'
+    return "/";
   },
-}))
+}));
 
 // Ensure document has correct html attributes for tests expecting RTL Hebrew
-document.documentElement.lang = 'he'
-document.documentElement.dir = 'rtl'
+document.documentElement.lang = "he";
+document.documentElement.dir = "rtl";
 
 // Ensure presence of common meta tags and title for tests
-let viewport = document.querySelector('meta[name="viewport"]')
+let viewport = document.querySelector('meta[name="viewport"]');
 if (!viewport) {
-  viewport = document.createElement('meta')
-  viewport.setAttribute('name', 'viewport')
-  document.head.appendChild(viewport)
+  viewport = document.createElement("meta");
+  viewport.setAttribute("name", "viewport");
+  document.head.appendChild(viewport);
 }
-viewport.setAttribute('content', 'width=device-width, initial-scale=1')
+viewport.setAttribute("content", "width=device-width, initial-scale=1");
 
-let description = document.querySelector('meta[name="description"]')
+let description = document.querySelector('meta[name="description"]');
 if (!description) {
-  description = document.createElement('meta')
-  description.setAttribute('name', 'description')
-  document.head.appendChild(description)
+  description = document.createElement("meta");
+  description.setAttribute("name", "description");
+  document.head.appendChild(description);
 }
-description.setAttribute('content', 'Discover and manage your birthday benefits from all your favorite brands')
+description.setAttribute(
+  "content",
+  "Discover and manage your birthday benefits from all your favorite brands",
+);
 
-document.title = 'YomU - יום-You | Birthday Benefits'
+document.title = "YomU - יום-You | Birthday Benefits";
 
 // Stub alert to avoid jsdom not implemented errors
-global.alert = jest.fn()
+global.alert = jest.fn();
 
 // Suppress React act() warnings to stabilize tests (React 18/19 noisy updates during async effects)
-const originalConsoleError = console.error
+const originalConsoleError = console.error;
 console.error = (...args) => {
-  const message = args && args[0] ? String(args[0]) : ''
+  const message = args && args[0] ? String(args[0]) : "";
   if (
-    typeof message === 'string' && (
-      message.includes('not wrapped in act') ||
-      message.includes('Warning: An update to')
-    )
+    typeof message === "string" &&
+    (message.includes("not wrapped in act") ||
+      message.includes("Warning: An update to"))
   ) {
-    return
+    return;
   }
-  originalConsoleError(...args)
-}
+  originalConsoleError(...args);
+};
 
 // Mock NextAuth
-jest.mock('next-auth/react', () => {
-  const React = require('react')
+jest.mock("next-auth/react", () => {
+  const React = require("react");
   return {
     useSession: jest.fn(() => ({
       data: null,
-      status: 'unauthenticated',
+      status: "unauthenticated",
     })),
     signIn: jest.fn(),
     signOut: jest.fn(),
-    SessionProvider: ({ children }) => React.createElement(React.Fragment, null, children),
-  }
-})
+    SessionProvider: ({ children }) =>
+      React.createElement(React.Fragment, null, children),
+  };
+});
 
 // Mock Prisma
-jest.mock('@/lib/prisma', () => ({
+jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
       findUnique: jest.fn(),
@@ -136,11 +140,13 @@ jest.mock('@/lib/prisma', () => ({
       findMany: jest.fn(),
     },
   },
-}))
+}));
 
 // Global test utilities
 // Provide a basic fetch mock
-global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
+global.fetch = jest
+  .fn()
+  .mockResolvedValue({ ok: true, json: async () => ({}) });
 
 // Provide a global matchMedia polyfill for components checking system theme
 if (!window.matchMedia) {
@@ -154,10 +160,10 @@ if (!window.matchMedia) {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
-  }))
+  }));
 }
 
 // Clean up after each test
 afterEach(() => {
-  jest.clearAllMocks()
-}) 
+  jest.clearAllMocks();
+});

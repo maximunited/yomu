@@ -7,21 +7,25 @@ The Used Benefits feature allows users to mark which benefits they have used, pr
 ## Features
 
 ### 1. Mark Benefits as Used
+
 - Users can mark any benefit as "used" by clicking the "Mark as Used" button on benefit cards
 - This creates a record in the database with the current timestamp
 - The benefit card will show a visual indicator that it has been used
 
 ### 2. Unmark Benefits as Used
+
 - Users can unmark benefits as used by clicking the "Unmark as Used" button
 - This removes the used benefit record from the database
 - The benefit card will no longer show the used indicator
 
 ### 3. Used Benefits History
+
 - A dedicated section shows all benefits that have been marked as used
 - Displays the brand name, benefit title, and usage date
 - Users can quickly unmark benefits from this history section
 
 ### 4. Visual Indicators
+
 - Used benefits show a gray badge with "Used on [date]"
 - Used benefits have a different button style (filled vs outline)
 - The used benefits history section only appears when there are used benefits
@@ -29,6 +33,7 @@ The Used Benefits feature allows users to mark which benefits they have used, pr
 ## Database Schema
 
 ### UsedBenefit Model
+
 ```prisma
 model UsedBenefit {
   id          String   @id @default(cuid())
@@ -49,28 +54,33 @@ model UsedBenefit {
 ## API Endpoints
 
 ### GET /api/user/used-benefits
+
 - Returns all used benefits for the current user
 - Includes benefit and brand information
 - Ordered by usage date (most recent first)
 
 ### POST /api/user/used-benefits
+
 - Marks a benefit as used
 - Body: `{ benefitId: string, notes?: string }`
 - Creates or updates the used benefit record
 
 ### DELETE /api/user/used-benefits/[id]
+
 - Unmarks a benefit as used
 - Deletes the used benefit record for the specified benefit ID
 
 ## UI Components
 
 ### Dashboard Integration
+
 - Used benefits functionality is integrated into the main dashboard
 - Benefit cards show "Mark as Used" or "Unmark as Used" buttons
 - Used benefits display a visual indicator
 - Used benefits history section appears when there are used benefits
 
 ### Translation Support
+
 - All text is translatable using the existing i18n system
 - Hebrew and English translations are provided
 - Translation keys include:
@@ -102,16 +112,19 @@ model UsedBenefit {
 ## Technical Implementation
 
 ### State Management
+
 - Uses React state to track used benefits
 - Fetches used benefits on component mount
 - Updates state when marking/unmarking benefits
 
 ### API Integration
+
 - RESTful API endpoints for CRUD operations
 - Proper error handling and loading states
 - Authentication required for all operations
 
 ### Database Relations
+
 - UsedBenefit model has relations to User and Benefit models
 - Unique constraint prevents duplicate used benefit records
 - Cascade deletes ensure data consistency
@@ -127,10 +140,11 @@ model UsedBenefit {
 ## Testing
 
 The feature includes comprehensive tests covering:
+
 - Marking benefits as used
 - Unmarking benefits as used
 - API integration
 - UI state management
 - Visual indicators
 
-Run tests with: `npm test -- --testPathPattern=used-benefits.test.tsx` 
+Run tests with: `npm test -- --testPathPattern=used-benefits.test.tsx`

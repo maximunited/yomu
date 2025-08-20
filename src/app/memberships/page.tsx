@@ -3,7 +3,14 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { ArrowLeft, Plus, Edit, Trash2, CheckCircle, Circle } from "lucide-react";
+import {
+  ArrowLeft,
+  Plus,
+  Edit,
+  Trash2,
+  CheckCircle,
+  Circle,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useRouter } from "next/navigation";
@@ -44,15 +51,18 @@ export default function MembershipsPage() {
     url: "",
     type: "free" as "free" | "paid",
     cost: "",
-    partnerBrands: [] as string[]
+    partnerBrands: [] as string[],
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [showCustomMembershipDialog, setShowCustomMembershipDialog] = useState(false);
+  const [showCustomMembershipDialog, setShowCustomMembershipDialog] =
+    useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedMembershipType, setSelectedMembershipType] = useState("");
   const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [originalMemberships, setOriginalMemberships] = useState<Membership[]>([]);
+  const [originalMemberships, setOriginalMemberships] = useState<Membership[]>(
+    [],
+  );
   const [availableBrands, setAvailableBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -70,45 +80,50 @@ export default function MembershipsPage() {
       setIsLoading(true);
       try {
         // Load brands
-          const brandsResponse = await fetch('/api/brands');
-          if (brandsResponse.ok) {
-            const brands = await brandsResponse.json();
+        const brandsResponse = await fetch("/api/brands");
+        if (brandsResponse.ok) {
+          const brands = await brandsResponse.json();
           setAvailableBrands(brands);
-          
+
           // Load user's existing memberships
-          const userMembershipsResponse = await fetch('/api/user/memberships');
+          const userMembershipsResponse = await fetch("/api/user/memberships");
           let userMemberships: any[] = [];
           if (userMembershipsResponse.ok) {
             const userData = await userMembershipsResponse.json();
             userMemberships = userData.memberships || [];
           }
-          
+
           // Create a set of active brand IDs for quick lookup
-          const activeBrandIds = new Set(userMemberships.map((m: any) => m.brandId));
+          const activeBrandIds = new Set(
+            userMemberships.map((m: any) => m.brandId),
+          );
 
           // Also fetch benefits to derive paid/free per brand when available
           const brandPaidMap = new Map<string, boolean>();
           const brandsWithBenefits = new Set<string>();
           try {
-            const benefitsResp = await fetch('/api/benefits');
+            const benefitsResp = await fetch("/api/benefits");
             if (benefitsResp.ok) {
               const data = await benefitsResp.json();
               const list = Array.isArray(data.benefits) ? data.benefits : [];
               for (const b of list) {
                 if (b && b.brandId) {
                   if (b.isFree === false) brandPaidMap.set(b.brandId, true);
-                  else if (!brandPaidMap.has(b.brandId)) brandPaidMap.set(b.brandId, false);
+                  else if (!brandPaidMap.has(b.brandId))
+                    brandPaidMap.set(b.brandId, false);
                   brandsWithBenefits.add(b.brandId);
                 }
                 // Fallbacks when brandId missing but brand object exists
-                const candidate = (b && b.brand && (b.brand.id || b.brand.name)) as string | undefined;
+                const candidate = (b &&
+                  b.brand &&
+                  (b.brand.id || b.brand.name)) as string | undefined;
                 if (candidate) {
                   brandsWithBenefits.add(candidate);
                 }
               }
             }
           } catch {}
-          
+
           // Convert brands to memberships format with correct active state
           const brandMemberships: Membership[] = brands.map((brand: Brand) => {
             // Build description with partnership info
@@ -117,44 +132,54 @@ export default function MembershipsPage() {
             if (partners.length > 0) {
               if (partners.length <= 2) {
                 // Show full names for small partnerships
-                const partnerNames = partners.map(partner => partner.name).join(', ');
-                description += ` | ${t('includesAccessTo')}: ${partnerNames}`;
+                const partnerNames = partners
+                  .map((partner) => partner.name)
+                  .join(", ");
+                description += ` | ${t("includesAccessTo")}: ${partnerNames}`;
               } else {
                 // Show count for larger partnerships to keep UI clean
-                description += ` | ${t('includesAccessTo')} ${partners.length} ${t('additionalBrands')}`;
+                description += ` | ${t("includesAccessTo")} ${
+                  partners.length
+                } ${t("additionalBrands")}`;
               }
             }
-            
+
             // Determine paid/free: prefer backend benefits flag; fallback to description heuristic
             const paidFromBenefits = brandPaidMap.get(brand.id);
-            const inferredPaid = paidFromBenefits !== undefined
-              ? paidFromBenefits
-              : /₪|שנה|חודשי|subscription|paid|מסלול בתשלום/i.test(brand.description || '');
+            const inferredPaid =
+              paidFromBenefits !== undefined
+                ? paidFromBenefits
+                : /₪|שנה|חודשי|subscription|paid|מסלול בתשלום/i.test(
+                    brand.description || "",
+                  );
             const membership: Membership = {
               id: brand.id,
               name: brand.name,
               description: description,
               category: brand.category,
-              isActive: activeBrandIds.has(brand.id) || brandsWithBenefits.has(brand.id) || brandsWithBenefits.has(brand.name),
+              isActive:
+                activeBrandIds.has(brand.id) ||
+                brandsWithBenefits.has(brand.id) ||
+                brandsWithBenefits.has(brand.name),
               icon: brand.logoUrl,
-              type: inferredPaid ? "paid" as const : "free" as const,
-              cost: inferredPaid ? (brand as any).cost ?? null : null,
-              partnerBrands: partners
+              type: inferredPaid ? ("paid" as const) : ("free" as const),
+              cost: inferredPaid ? ((brand as any).cost ?? null) : null,
+              partnerBrands: partners,
             };
-            
+
             // Only add partnerCount if there are actually partners
             if (partners.length > 0) {
               membership.partnerCount = partners.length;
             }
-            
+
             return membership;
           });
-          
+
           setMemberships(brandMemberships);
           setOriginalMemberships(brandMemberships); // Initialize original memberships
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error("Error loading data:", error);
         // Fallback to mock data if API fails
         setMemberships([
           {
@@ -165,7 +190,7 @@ export default function MembershipsPage() {
             isActive: true,
             icon: "/images/brands/mcdonalds.png",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "2",
@@ -175,7 +200,7 @@ export default function MembershipsPage() {
             isActive: true,
             icon: "/images/brands/super-pharm.png",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "3",
@@ -185,7 +210,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/fox.png",
             type: "paid",
-            cost: "₪99/שנה"
+            cost: "₪99/שנה",
           },
           {
             id: "4",
@@ -195,7 +220,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/isracard.png",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "5",
@@ -205,7 +230,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/hm.png",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "6",
@@ -215,7 +240,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/bbb.png",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "7",
@@ -225,7 +250,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/shufersal.png",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "8",
@@ -235,7 +260,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/kfc.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "9",
@@ -245,7 +270,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/escape-room.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "10",
@@ -255,7 +280,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/bacaro.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "11",
@@ -265,7 +290,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/shegev.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "12",
@@ -275,7 +300,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/james.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "13",
@@ -285,7 +310,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/prague.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "14",
@@ -295,7 +320,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/mika.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "15",
@@ -305,7 +330,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/menam.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "16",
@@ -315,7 +340,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/shilav.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "17",
@@ -325,7 +350,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/yomango.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "18",
@@ -335,7 +360,7 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/m32.svg",
             type: "free",
-            cost: null
+            cost: null,
           },
           {
             id: "19",
@@ -345,8 +370,8 @@ export default function MembershipsPage() {
             isActive: false,
             icon: "/images/brands/libira.svg",
             type: "free",
-            cost: null
-          }
+            cost: null,
+          },
         ]);
         setOriginalMemberships(memberships); // Ensure original memberships are set even on fallback
       } finally {
@@ -362,33 +387,33 @@ export default function MembershipsPage() {
   // Note: Do not early-return before all hooks are called. Authentication gates are placed later.
 
   const toggleMembership = (id: string) => {
-    setMemberships(prev => 
-      prev.map(membership => 
-        membership.id === id 
+    setMemberships((prev) =>
+      prev.map((membership) =>
+        membership.id === id
           ? { ...membership, isActive: !membership.isActive }
-          : membership
-      )
+          : membership,
+      ),
     );
   };
 
   const handleSaveChanges = async () => {
-    const previousScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+    const previousScrollY = typeof window !== "undefined" ? window.scrollY : 0;
     if (!session) {
-      console.error('No session available');
-      alert(t('unauthorized'));
-      router.push('/auth/signin');
+      console.error("No session available");
+      alert(t("unauthorized"));
+      router.push("/auth/signin");
       return;
     }
-    
+
     setIsSaving(true);
     try {
       const activeBrandIds = memberships
-        .filter(m => m.isActive && !m.id.startsWith('custom-'))
-        .map(m => m.id);
+        .filter((m) => m.isActive && !m.id.startsWith("custom-"))
+        .map((m) => m.id);
 
       const activeCustomMemberships = memberships
-        .filter(m => m.isActive && m.id.startsWith('custom-'))
-        .map(m => ({
+        .filter((m) => m.isActive && m.id.startsWith("custom-"))
+        .map((m) => ({
           name: m.name,
           description: m.description,
           category: m.category,
@@ -397,57 +422,68 @@ export default function MembershipsPage() {
           cost: m.cost,
         }));
 
-      console.log('Saving memberships:', { activeBrandIds, activeCustomMemberships });
+      console.log("Saving memberships:", {
+        activeBrandIds,
+        activeCustomMemberships,
+      });
 
-      const response = await fetch('/api/user/memberships', {
-        method: 'POST',
+      const response = await fetch("/api/user/memberships", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           brandIds: activeBrandIds,
-          customMemberships: activeCustomMemberships
+          customMemberships: activeCustomMemberships,
         }),
       });
 
-      console.log('Response status:', response.status);
+      console.log("Response status:", response.status);
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Save successful:', result);
+        console.log("Save successful:", result);
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
         setOriginalMemberships(memberships); // Update original memberships after successful save
         // Restore scroll position to avoid jump after resorting
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           window.scrollTo(0, previousScrollY);
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Failed to save memberships:', response.status, errorData);
-        
+        console.error(
+          "Failed to save memberships:",
+          response.status,
+          errorData,
+        );
+
         if (response.status === 401) {
-          alert(t('unauthorized'));
-          router.push('/auth/signin');
+          alert(t("unauthorized"));
+          router.push("/auth/signin");
         } else if (response.status === 500) {
-          alert(t('internalServerError'));
+          alert(t("internalServerError"));
         } else {
-          alert(t('profileUpdateError'));
+          alert(t("profileUpdateError"));
         }
       }
     } catch (error) {
-      console.error('Error saving memberships:', error);
-      alert(t('internalServerError'));
+      console.error("Error saving memberships:", error);
+      alert(t("internalServerError"));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleAddCustomMembership = () => {
-    if (customMembership.name && customMembership.description && customMembership.category) {
+    if (
+      customMembership.name &&
+      customMembership.description &&
+      customMembership.category
+    ) {
       // Create partner brands array from available brands based on selected names
-      const selectedPartnerBrands = availableBrands.filter(brand => 
-        customMembership.partnerBrands.includes(brand.name)
+      const selectedPartnerBrands = availableBrands.filter((brand) =>
+        customMembership.partnerBrands.includes(brand.name),
       );
 
       const newMembership: Membership = {
@@ -458,26 +494,32 @@ export default function MembershipsPage() {
         isActive: false,
         icon: "/images/brands/restaurant.svg",
         type: customMembership.type,
-        cost: customMembership.type === "paid" && customMembership.cost ? customMembership.cost : null,
-        partnerBrands: selectedPartnerBrands
+        cost:
+          customMembership.type === "paid" && customMembership.cost
+            ? customMembership.cost
+            : null,
+        partnerBrands: selectedPartnerBrands,
       };
-      
+
       // Only add partnerCount if there are actually partners
       if (selectedPartnerBrands.length > 0) {
         newMembership.partnerCount = selectedPartnerBrands.length;
       }
 
-      setMemberships(prev => [...prev, newMembership]);
+      setMemberships((prev) => [...prev, newMembership]);
       // Also update originalMemberships to include the new membership as inactive
-      setOriginalMemberships(prev => [...prev, { ...newMembership, isActive: false }]);
-      setCustomMembership({ 
-        name: "", 
-        description: "", 
-        category: "", 
-        url: "", 
-        type: "free", 
-        cost: "", 
-        partnerBrands: [] 
+      setOriginalMemberships((prev) => [
+        ...prev,
+        { ...newMembership, isActive: false },
+      ]);
+      setCustomMembership({
+        name: "",
+        description: "",
+        category: "",
+        url: "",
+        type: "free",
+        cost: "",
+        partnerBrands: [],
       });
       setShowCustomMembershipDialog(false);
     }
@@ -496,79 +538,85 @@ export default function MembershipsPage() {
       baby: "bg-rose-100 text-rose-800",
       travel: "bg-cyan-100 text-cyan-800",
       beauty: "bg-pink-100 text-pink-800",
-      multi: "bg-gray-100 text-gray-800"
+      multi: "bg-gray-100 text-gray-800",
     };
-    return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800";
+    return (
+      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
+    );
   };
 
   const hasChanges = () => {
     if (originalMemberships.length === 0) return false;
-    
+
     // Check if any existing memberships have changed their active state
     const existingMembershipsChanged = memberships.some((current, index) => {
       const original = originalMemberships[index];
       return original && current.isActive !== original.isActive;
     });
-    
+
     // Check if any new custom memberships have been added and are active
-    const newActiveMemberships = memberships.filter(m => 
-      !originalMemberships.some(original => original.id === m.id) && m.isActive
+    const newActiveMemberships = memberships.filter(
+      (m) =>
+        !originalMemberships.some((original) => original.id === m.id) &&
+        m.isActive,
     );
-    
+
     return existingMembershipsChanged || newActiveMemberships.length > 0;
   };
 
   const isCustomMembershipFormValid = () => {
-    const basicFieldsValid = customMembership.name.trim() !== "" && 
-                            customMembership.description.trim() !== "" && 
-                            customMembership.category !== "";
-    
+    const basicFieldsValid =
+      customMembership.name.trim() !== "" &&
+      customMembership.description.trim() !== "" &&
+      customMembership.category !== "";
+
     // If it's a paid membership, cost is required
-    const costValid = customMembership.type === "free" || 
-                     (customMembership.type === "paid" && customMembership.cost.trim() !== "");
-    
+    const costValid =
+      customMembership.type === "free" ||
+      (customMembership.type === "paid" && customMembership.cost.trim() !== "");
+
     return basicFieldsValid && costValid;
   };
 
   const handlePartnerBrandToggle = (brandName: string) => {
-    setCustomMembership(prev => ({
+    setCustomMembership((prev) => ({
       ...prev,
       partnerBrands: prev.partnerBrands.includes(brandName)
-        ? prev.partnerBrands.filter(name => name !== brandName)
-        : [...prev.partnerBrands, brandName]
+        ? prev.partnerBrands.filter((name) => name !== brandName)
+        : [...prev.partnerBrands, brandName],
     }));
   };
 
   const getCategoryDisplayName = (category: string) => {
     // Always check translations first
     switch (category) {
-      case 'food':
-        return t('food');
-      case 'health':
-        return t('health');
-      case 'fashion':
-        return t('fashion');
-      case 'transport':
-        return t('transport');
-      case 'home':
-        return t('homeCategory');
-      case 'finance':
-      case 'financial':
-        return t('finance');
-      case 'grocery':
-        return t('grocery');
-      case 'entertainment':
-        return t('entertainment');
-      case 'convenience':
-        return t('convenience');
-      case 'baby':
-        return t('baby');
-      case 'travel':
-        return 'Travel';
-      case 'beauty':
-        return 'Beauty';
-      case 'multi':
-        return 'Multi-brand';
+      case "food":
+        return t("food");
+      case "health":
+        return t("health");
+      case "fashion":
+        return t("fashion");
+      case "transport":
+        return t("transport");
+      case "home":
+        return t("homeCategory");
+      case "finance":
+      case "financial":
+        return t("finance");
+      case "grocery":
+        return t("grocery");
+      case "entertainment":
+        return t("entertainment");
+      case "convenience":
+        return t("convenience");
+      case "baby":
+        return t("baby");
+      case "travel":
+        return "Travel";
+      case "beauty":
+        return "Beauty";
+      case "multi":
+        return "Multi-brand";
       default:
         return category; // fallback to the original category name if no translation
     }
@@ -576,22 +624,26 @@ export default function MembershipsPage() {
 
   const handleBackNavigation = () => {
     if (hasChanges()) {
-      if (confirm(t('unsavedChangesWarning'))) {
-        router.push('/dashboard');
+      if (confirm(t("unsavedChangesWarning"))) {
+        router.push("/dashboard");
       }
     } else {
-      router.push('/dashboard');
+      router.push("/dashboard");
     }
   };
 
-  const activeCount = memberships.filter(m => m.isActive).length;
+  const activeCount = memberships.filter((m) => m.isActive).length;
 
   // Filter memberships based on search, category, and membership type
-  const filteredMemberships = memberships.filter(membership => {
-    const matchesSearch = membership.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         membership.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(membership.category);
-    const matchesMembershipType = !selectedMembershipType || membership.type === selectedMembershipType;
+  const filteredMemberships = memberships.filter((membership) => {
+    const matchesSearch =
+      membership.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      membership.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(membership.category);
+    const matchesMembershipType =
+      !selectedMembershipType || membership.type === selectedMembershipType;
     return matchesSearch && matchesCategory && matchesMembershipType;
   });
 
@@ -621,7 +673,9 @@ export default function MembershipsPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">{t('loading')}</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">
+            {t("loading")}
+          </p>
         </div>
       </div>
     );
@@ -637,7 +691,9 @@ export default function MembershipsPage() {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">{t('loading')}</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">
+              {t("loading")}
+            </p>
           </div>
         </div>
       </div>
@@ -651,19 +707,21 @@ export default function MembershipsPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handleBackNavigation}
               >
                 <ArrowLeft className="w-4 h-4 ml-1" />
-                {t('back')}
+                {t("back")}
               </Button>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">{t('manageMemberships')}</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
+                {t("manageMemberships")}
+              </span>
             </div>
             <div className="flex items-center space-x-4 relative">
               <span className="text-sm text-gray-600 dark:text-gray-300">
-                {activeCount} {t('activeOutOfTotal')} {memberships.length}
+                {activeCount} {t("activeOutOfTotal")} {memberships.length}
               </span>
               <div className="relative">
                 <Button
@@ -675,9 +733,9 @@ export default function MembershipsPage() {
                       : "bg-purple-600 hover:bg-purple-700 text-white"
                   }`}
                 >
-                  {isSaving ? t('saving') : t('saveChanges')}
+                  {isSaving ? t("saving") : t("saveChanges")}
                 </Button>
-                
+
                 {/* Success Message - positioned under save button */}
                 {showSuccessMessage && (
                   <div className="absolute top-full right-0 mt-2 bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded-md shadow-lg text-sm whitespace-nowrap z-50">
@@ -685,7 +743,7 @@ export default function MembershipsPage() {
                       <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
                       </div>
-                      <span>{t('changesSavedSuccessfully')}</span>
+                      <span>{t("changesSavedSuccessfully")}</span>
                     </div>
                   </div>
                 )}
@@ -701,7 +759,7 @@ export default function MembershipsPage() {
           {/* Instructions */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800 text-sm">
-              {t('membershipsDescription')}
+              {t("membershipsDescription")}
             </p>
           </div>
 
@@ -711,7 +769,7 @@ export default function MembershipsPage() {
               <div className="flex-1">
                 <input
                   type="text"
-                  placeholder={t('searchPlaceholder')}
+                  placeholder={t("searchPlaceholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
@@ -721,23 +779,48 @@ export default function MembershipsPage() {
                 <div className="w-full max-h-40 overflow-auto border border-gray-300 dark:border-gray-600 rounded-md p-2 font-sans">
                   <div className="grid grid-cols-1 gap-2">
                     {[
-                      'food','health','fashion','transport','home','finance','grocery','entertainment','convenience','baby'
+                      "food",
+                      "health",
+                      "fashion",
+                      "transport",
+                      "home",
+                      "finance",
+                      "grocery",
+                      "entertainment",
+                      "convenience",
+                      "baby",
                     ]
-                      .map((key) => ({ key, label: getCategoryDisplayName(key) }))
-                      .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase(), undefined, { sensitivity: 'base' }))
+                      .map((key) => ({
+                        key,
+                        label: getCategoryDisplayName(key),
+                      }))
+                      .sort((a, b) =>
+                        a.label
+                          .toLowerCase()
+                          .localeCompare(b.label.toLowerCase(), undefined, {
+                            sensitivity: "base",
+                          }),
+                      )
                       .map(({ key, label }) => (
-                        <label key={key} className="flex items-center text-sm capitalize">
+                        <label
+                          key={key}
+                          className="flex items-center text-sm capitalize"
+                        >
                           <input
                             type="checkbox"
                             className="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                             checked={selectedCategories.includes(key)}
                             onChange={() =>
-                              setSelectedCategories(prev =>
-                                prev.includes(key) ? prev.filter(c => c !== key) : [...prev, key]
+                              setSelectedCategories((prev) =>
+                                prev.includes(key)
+                                  ? prev.filter((c) => c !== key)
+                                  : [...prev, key],
                               )
                             }
                           />
-                          <span className="text-gray-700 dark:text-gray-300">{label}</span>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {label}
+                          </span>
                         </label>
                       ))}
                   </div>
@@ -750,32 +833,32 @@ export default function MembershipsPage() {
               <button
                 onClick={() => setSelectedMembershipType("")}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedMembershipType === "" 
-                    ? "bg-purple-600 text-white" 
+                  selectedMembershipType === ""
+                    ? "bg-purple-600 text-white"
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
               >
-                {t('allTypes')}
+                {t("allTypes")}
               </button>
               <button
                 onClick={() => setSelectedMembershipType("free")}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedMembershipType === "free" 
-                    ? "bg-purple-600 text-white" 
+                  selectedMembershipType === "free"
+                    ? "bg-purple-600 text-white"
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
               >
-                {t('free')}
+                {t("free")}
               </button>
               <button
                 onClick={() => setSelectedMembershipType("paid")}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedMembershipType === "paid" 
-                    ? "bg-purple-600 text-white" 
+                  selectedMembershipType === "paid"
+                    ? "bg-purple-600 text-white"
                     : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 }`}
               >
-                {t('paid')}
+                {t("paid")}
               </button>
             </div>
           </div>
@@ -795,18 +878,21 @@ export default function MembershipsPage() {
                 {/* Header with icon, title, description, and checkbox */}
                 <div className="flex items-start justify-between mb-3 flex-grow">
                   <div className="flex items-start space-x-3 flex-grow">
-                    {membership.icon.startsWith('/') || membership.icon.startsWith('data:image') ? (
+                    {membership.icon.startsWith("/") ||
+                    membership.icon.startsWith("data:image") ? (
                       <img
                         src={membership.icon}
                         alt={membership.name}
                         className="w-8 h-8 rounded-full object-contain bg-white flex-shrink-0"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
+                          target.style.display = "none";
                         }}
                       />
                     ) : (
-                      <span className="text-2xl flex-shrink-0">{membership.icon}</span>
+                      <span className="text-2xl flex-shrink-0">
+                        {membership.icon}
+                      </span>
                     )}
                     <div className="flex-grow min-w-0">
                       <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
@@ -815,16 +901,20 @@ export default function MembershipsPage() {
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         {membership.description}
                       </p>
-                      {membership.partnerCount && membership.partnerCount > 0 && membership.partnerCount > 2 && (
-                        <details className="mt-2">
-                          <summary className="text-xs text-purple-600 cursor-pointer hover:text-purple-800">
-                            {t('showBrandList')} ({membership.partnerCount})
-                          </summary>
-                          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            {membership.partnerBrands?.map(partner => partner.name).join(' • ')}
-                          </div>
-                        </details>
-                      )}
+                      {membership.partnerCount &&
+                        membership.partnerCount > 0 &&
+                        membership.partnerCount > 2 && (
+                          <details className="mt-2">
+                            <summary className="text-xs text-purple-600 cursor-pointer hover:text-purple-800">
+                              {t("showBrandList")} ({membership.partnerCount})
+                            </summary>
+                            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              {membership.partnerBrands
+                                ?.map((partner) => partner.name)
+                                .join(" • ")}
+                            </div>
+                          </details>
+                        )}
                     </div>
                   </div>
                   <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
@@ -838,16 +928,22 @@ export default function MembershipsPage() {
 
                 {/* Tags section - always at bottom */}
                 <div className="flex items-center justify-between mt-auto pt-3">
-                  <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(membership.category)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(
+                      membership.category,
+                    )}`}
+                  >
                     {getCategoryDisplayName(membership.category)}
                   </span>
                   <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      membership.type === "paid" 
-                        ? "bg-orange-100 text-orange-800" 
-                        : "bg-green-100 text-green-800"
-                    }`}>
-                      {membership.type === "paid" ? t('paid') : t('free')}
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        membership.type === "paid"
+                          ? "bg-orange-100 text-orange-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {membership.type === "paid" ? t("paid") : t("free")}
                     </span>
                     {membership.cost && (
                       <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -860,13 +956,11 @@ export default function MembershipsPage() {
             ))}
           </div>
 
-
-
           {/* Floating Add Button */}
           <button
             onClick={() => setShowCustomMembershipDialog(true)}
             className="fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-20"
-            aria-label={t('addCustomMembership')}
+            aria-label={t("addCustomMembership")}
           >
             <Plus className="w-6 h-6" />
           </button>
@@ -875,7 +969,7 @@ export default function MembershipsPage() {
 
       {/* Custom Membership Dialog */}
       {showCustomMembershipDialog && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
@@ -886,7 +980,7 @@ export default function MembershipsPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t('addCustomMembership')}
+                {t("addCustomMembership")}
               </h3>
               <button
                 onClick={() => setShowCustomMembershipDialog(false)}
@@ -895,55 +989,70 @@ export default function MembershipsPage() {
                 ✕
               </button>
             </div>
-            
+
             <div className="space-y-6">
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('customMembershipName')} *
+                    {t("customMembershipName")} *
                   </label>
                   <input
                     type="text"
-                    placeholder={t('customMembershipName')}
+                    placeholder={t("customMembershipName")}
                     value={customMembership.name}
-                    onChange={(e) => setCustomMembership(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) =>
+                      setCustomMembership((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('categoryLabel')} *
+                    {t("categoryLabel")} *
                   </label>
                   <select
                     value={customMembership.category}
-                    onChange={(e) => setCustomMembership(prev => ({ ...prev, category: e.target.value }))}
+                    onChange={(e) =>
+                      setCustomMembership((prev) => ({
+                        ...prev,
+                        category: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
                   >
-                    <option value="">{t('chooseCategory')}</option>
-                    <option value="food">{t('food')}</option>
-                    <option value="health">{t('health')}</option>
-                    <option value="fashion">{t('fashion')}</option>
-                    <option value="transport">{t('transport')}</option>
-                    <option value="home">{t('homeCategory')}</option>
-                    <option value="finance">{t('finance')}</option>
-                    <option value="grocery">{t('grocery')}</option>
-                    <option value="entertainment">{t('entertainment')}</option>
-                    <option value="convenience">{t('convenience')}</option>
-                    <option value="baby">{t('baby')}</option>
+                    <option value="">{t("chooseCategory")}</option>
+                    <option value="food">{t("food")}</option>
+                    <option value="health">{t("health")}</option>
+                    <option value="fashion">{t("fashion")}</option>
+                    <option value="transport">{t("transport")}</option>
+                    <option value="home">{t("homeCategory")}</option>
+                    <option value="finance">{t("finance")}</option>
+                    <option value="grocery">{t("grocery")}</option>
+                    <option value="entertainment">{t("entertainment")}</option>
+                    <option value="convenience">{t("convenience")}</option>
+                    <option value="baby">{t("baby")}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('customMembershipDescription')} *
+                  {t("customMembershipDescription")} *
                 </label>
                 <textarea
-                  placeholder={t('customMembershipDescription')}
+                  placeholder={t("customMembershipDescription")}
                   value={customMembership.description}
-                  onChange={(e) => setCustomMembership(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setCustomMembership((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
                 />
@@ -951,13 +1060,18 @@ export default function MembershipsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('contact')}
+                  {t("contact")}
                 </label>
                 <input
                   type="url"
                   placeholder="https://example.com"
                   value={customMembership.url}
-                  onChange={(e) => setCustomMembership(prev => ({ ...prev, url: e.target.value }))}
+                  onChange={(e) =>
+                    setCustomMembership((prev) => ({
+                      ...prev,
+                      url: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
                 />
               </div>
@@ -965,7 +1079,7 @@ export default function MembershipsPage() {
               {/* Membership Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('membershipType')}
+                  {t("membershipType")}
                 </label>
                 <div className="flex space-x-4">
                   <label className="flex items-center">
@@ -974,10 +1088,18 @@ export default function MembershipsPage() {
                       name="membershipType"
                       value="free"
                       checked={customMembership.type === "free"}
-                      onChange={(e) => setCustomMembership(prev => ({ ...prev, type: e.target.value as "free" | "paid", cost: "" }))}
+                      onChange={(e) =>
+                        setCustomMembership((prev) => ({
+                          ...prev,
+                          type: e.target.value as "free" | "paid",
+                          cost: "",
+                        }))
+                      }
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{t('free')}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {t("free")}
+                    </span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -985,10 +1107,17 @@ export default function MembershipsPage() {
                       name="membershipType"
                       value="paid"
                       checked={customMembership.type === "paid"}
-                      onChange={(e) => setCustomMembership(prev => ({ ...prev, type: e.target.value as "free" | "paid" }))}
+                      onChange={(e) =>
+                        setCustomMembership((prev) => ({
+                          ...prev,
+                          type: e.target.value as "free" | "paid",
+                        }))
+                      }
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{t('paid')}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {t("paid")}
+                    </span>
                   </label>
                 </div>
               </div>
@@ -997,13 +1126,18 @@ export default function MembershipsPage() {
               {customMembership.type === "paid" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('membershipCost')} *
+                    {t("membershipCost")} *
                   </label>
                   <input
                     type="text"
                     placeholder="₪99/שנה"
                     value={customMembership.cost}
-                    onChange={(e) => setCustomMembership(prev => ({ ...prev, cost: e.target.value }))}
+                    onChange={(e) =>
+                      setCustomMembership((prev) => ({
+                        ...prev,
+                        cost: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
                   />
                 </div>
@@ -1012,7 +1146,7 @@ export default function MembershipsPage() {
               {/* Partner Brands */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('partnerBrands')} ({t('optional')})
+                  {t("partnerBrands")} ({t("optional")})
                 </label>
                 <div className="max-h-32 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-2">
                   {availableBrands.length > 0 ? (
@@ -1021,35 +1155,43 @@ export default function MembershipsPage() {
                         <label key={brand.id} className="flex items-center">
                           <input
                             type="checkbox"
-                            checked={customMembership.partnerBrands.includes(brand.name)}
-                            onChange={() => handlePartnerBrandToggle(brand.name)}
+                            checked={customMembership.partnerBrands.includes(
+                              brand.name,
+                            )}
+                            onChange={() =>
+                              handlePartnerBrandToggle(brand.name)
+                            }
                             className="mr-2"
                           />
-                          <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{brand.name}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                            {brand.name}
+                          </span>
                         </label>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('loading')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {t("loading")}
+                    </p>
                   )}
                 </div>
                 {customMembership.partnerBrands.length > 0 && (
                   <div className="mt-2">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {customMembership.partnerBrands.join(', ')}
+                      {customMembership.partnerBrands.join(", ")}
                     </p>
                   </div>
                 )}
               </div>
             </div>
-            
+
             <div className="flex space-x-3 mt-6">
               <Button
                 onClick={() => setShowCustomMembershipDialog(false)}
                 variant="outline"
                 className="flex-1"
               >
-                {t('cancel')}
+                {t("cancel")}
               </Button>
               <Button
                 onClick={handleAddCustomMembership}
@@ -1060,7 +1202,7 @@ export default function MembershipsPage() {
                     : "bg-gray-400 text-gray-200 cursor-not-allowed"
                 }`}
               >
-                {t('addMembership')}
+                {t("addMembership")}
               </Button>
             </div>
           </div>
@@ -1068,4 +1210,4 @@ export default function MembershipsPage() {
       )}
     </div>
   );
-} 
+}

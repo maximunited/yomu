@@ -4,7 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
-import { Check, Gift, ShoppingBag, Coffee, Car, Plane, Heart } from "lucide-react";
+import {
+  Check,
+  Gift,
+  ShoppingBag,
+  Coffee,
+  Car,
+  Plane,
+  Heart,
+} from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Brand {
@@ -21,71 +29,71 @@ const popularBrands: Brand[] = [
     name: "Fox",
     logoUrl: "/images/brands/fox.png",
     category: "fashion",
-    description: "brandDescriptionFashion"
+    description: "brandDescriptionFashion",
   },
   {
     id: "super-pharm-lifestyle",
     name: "Super-Pharm - LifeStyle",
     logoUrl: "/images/brands/super-pharm.png",
     category: "health",
-    description: "brandDescriptionHealth"
+    description: "brandDescriptionHealth",
   },
   {
     id: "mcdonalds",
     name: "McDonald's",
     logoUrl: "/images/brands/mcdonalds.png",
     category: "food",
-    description: "brandDescriptionFood"
+    description: "brandDescriptionFood",
   },
   {
     id: "bbb",
     name: "BBB",
     logoUrl: "/images/brands/bbb.png",
     category: "home",
-    description: "brandDescriptionHome"
+    description: "brandDescriptionHome",
   },
   {
     id: "hm",
     name: "H&M",
     logoUrl: "/images/brands/hm.png",
     category: "fashion",
-    description: "brandDescriptionFashion"
+    description: "brandDescriptionFashion",
   },
   {
     id: "isracard",
     name: "Isracard",
     logoUrl: "/images/brands/isracard.png",
     category: "finance",
-    description: "brandDescriptionFinance"
+    description: "brandDescriptionFinance",
   },
   {
     id: "max",
     name: "Max",
     logoUrl: "/images/brands/max.png",
     category: "fashion",
-    description: "brandDescriptionFashion"
+    description: "brandDescriptionFashion",
   },
   {
     id: "starbucks",
     name: "Starbucks",
     logoUrl: "/images/brands/starbucks.png",
     category: "food",
-    description: "brandDescriptionCoffee"
+    description: "brandDescriptionCoffee",
   },
   {
     id: "shufersal",
     name: "Shufersal",
     logoUrl: "/images/brands/shufersal.png",
     category: "grocery",
-    description: "brandDescriptionGrocery"
+    description: "brandDescriptionGrocery",
   },
   {
     id: "coffee-shop",
     name: "Coffee Shop",
     logoUrl: "/images/brands/coffee-shop.svg",
     category: "food",
-    description: "brandDescriptionCoffee"
-  }
+    description: "brandDescriptionCoffee",
+  },
 ];
 
 const categoryIcons = {
@@ -116,23 +124,23 @@ export default function OnboardingPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('loading')}</p>
+          <p className="text-gray-600">{t("loading")}</p>
         </div>
       </div>
     );
   }
 
   const handleBrandToggle = (brandId: string) => {
-    setSelectedBrands(prev => 
-      prev.includes(brandId) 
-        ? prev.filter(id => id !== brandId)
-        : [...prev, brandId]
+    setSelectedBrands((prev) =>
+      prev.includes(brandId)
+        ? prev.filter((id) => id !== brandId)
+        : [...prev, brandId],
     );
   };
 
   const handleSubmit = async () => {
     if (selectedBrands.length === 0) {
-      alert(t('onboardingSelectAtLeastOne'));
+      alert(t("onboardingSelectAtLeastOne"));
       return;
     }
 
@@ -151,11 +159,11 @@ export default function OnboardingPage() {
       if (response.ok) {
         router.push("/dashboard");
       } else {
-        throw new Error(t('onboardingSaveError'));
+        throw new Error(t("onboardingSaveError"));
       }
     } catch (error) {
       console.error("Error saving memberships:", error);
-      alert(t('onboardingSaveError'));
+      alert(t("onboardingSaveError"));
     } finally {
       setIsLoading(false);
     }
@@ -173,10 +181,10 @@ export default function OnboardingPage() {
             <span className="text-2xl font-bold text-gray-900">YomU</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {t('onboardingTitle')}
+            {t("onboardingTitle")}
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            {t('onboardingDescription')}
+            {t("onboardingDescription")}
           </p>
         </div>
 
@@ -184,7 +192,9 @@ export default function OnboardingPage() {
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {popularBrands.map((brand) => {
-              const IconComponent = categoryIcons[brand.category as keyof typeof categoryIcons] || Gift;
+              const IconComponent =
+                categoryIcons[brand.category as keyof typeof categoryIcons] ||
+                Gift;
               const isSelected = selectedBrands.includes(brand.id);
 
               return (
@@ -202,7 +212,7 @@ export default function OnboardingPage() {
                       <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
-                  
+
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                       <img
@@ -229,7 +239,10 @@ export default function OnboardingPage() {
           {/* Action Buttons */}
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600">
-              {t('onboardingSelectedCount').replace('{count}', selectedBrands.length.toString())}
+              {t("onboardingSelectedCount").replace(
+                "{count}",
+                selectedBrands.length.toString(),
+              )}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -237,14 +250,16 @@ export default function OnboardingPage() {
                 disabled={isLoading || selectedBrands.length === 0}
                 className="px-8 py-3"
               >
-                {isLoading ? t('onboardingSaving') : t('onboardingContinueToDashboard')}
+                {isLoading
+                  ? t("onboardingSaving")
+                  : t("onboardingContinueToDashboard")}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push("/dashboard")}
                 className="px-8 py-3"
               >
-                {t('onboardingSkipForNow')}
+                {t("onboardingSkipForNow")}
               </Button>
             </div>
           </div>
@@ -252,4 +267,4 @@ export default function OnboardingPage() {
       </div>
     </div>
   );
-} 
+}

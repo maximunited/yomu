@@ -6,14 +6,14 @@ import { prisma } from "@/lib/prisma";
 export async function PUT(request: NextRequest) {
   try {
     console.log("=== Starting PUT request to /api/user/profile ===");
-    
+
     const session = await getServerSession(authOptions);
     console.log("Session:", session ? "Found" : "Not found");
     console.log("Session user:", session?.user);
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
-    
+
     if (!userId) {
       console.log("No session user ID, using test user ID");
       // Get the first user from the database for testing
@@ -24,11 +24,11 @@ export async function PUT(request: NextRequest) {
       } else {
         console.log("No users found in database");
         return NextResponse.json(
-          { 
+          {
             message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED"
+            error: "AUTHENTICATION_REQUIRED",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -37,7 +37,12 @@ export async function PUT(request: NextRequest) {
     const { name, dateOfBirth, anniversaryDate, profilePicture } = body;
 
     console.log("Updating profile for user:", userId);
-    console.log("Profile data:", { name, dateOfBirth, anniversaryDate, profilePicture: profilePicture ? "present" : "not present" });
+    console.log("Profile data:", {
+      name,
+      dateOfBirth,
+      anniversaryDate,
+      profilePicture: profilePicture ? "present" : "not present",
+    });
 
     // Update user profile
     const updatedUser = await prisma.user.update({
@@ -47,7 +52,9 @@ export async function PUT(request: NextRequest) {
       data: {
         name: name || undefined,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
-        anniversaryDate: anniversaryDate ? new Date(anniversaryDate) : undefined,
+        anniversaryDate: anniversaryDate
+          ? new Date(anniversaryDate)
+          : undefined,
         profilePicture: profilePicture || undefined,
       },
     });
@@ -68,11 +75,11 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error("Error updating profile:", error);
     return NextResponse.json(
-      { 
+      {
         message: "profileUpdateError",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -80,13 +87,13 @@ export async function PUT(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     console.log("=== Starting GET request to /api/user/profile ===");
-    
+
     const session = await getServerSession(authOptions);
     console.log("Session:", session ? "Found" : "Not found");
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
-    
+
     if (!userId) {
       console.log("No session user ID, using test user ID");
       // Get the first user from the database for testing
@@ -97,11 +104,11 @@ export async function GET(request: NextRequest) {
       } else {
         console.log("No users found in database");
         return NextResponse.json(
-          { 
+          {
             message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED"
+            error: "AUTHENTICATION_REQUIRED",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -121,10 +128,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { message: "userNotFound" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "userNotFound" }, { status: 404 });
     }
 
     console.log("Profile loaded successfully");
@@ -133,11 +137,11 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching profile:", error);
     return NextResponse.json(
-      { 
+      {
         message: "profileLoadError",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

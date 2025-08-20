@@ -25,5 +25,3 @@ export interface Benefit {
   isFree: boolean;
   isActive: boolean;
 }
-
-

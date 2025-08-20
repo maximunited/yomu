@@ -6,14 +6,14 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     console.log("=== Starting POST request to /api/user/memberships ===");
-    
+
     const session = await getServerSession(authOptions);
     console.log("Session:", session ? "Found" : "Not found");
     console.log("Session user:", session?.user);
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
-    
+
     if (!userId) {
       console.log("No session user ID, using test user ID");
       // Get the first user from the database for testing
@@ -24,11 +24,11 @@ export async function POST(request: NextRequest) {
       } else {
         console.log("No users found in database");
         return NextResponse.json(
-          { 
+          {
             message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED"
+            error: "AUTHENTICATION_REQUIRED",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -61,15 +61,15 @@ export async function POST(request: NextRequest) {
             include: {
               partnershipsFrom: {
                 include: {
-                  brandB: true
-                }
+                  brandB: true,
+                },
               },
               partnershipsTo: {
                 include: {
-                  brandA: true
-                }
-              }
-            }
+                  brandA: true,
+                },
+              },
+            },
           });
 
           if (!brand) {
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
               userId_brandId: {
                 userId: userId,
                 brandId: brand.id,
-              }
+              },
             },
             update: {
               isActive: true,
@@ -94,35 +94,39 @@ export async function POST(request: NextRequest) {
               userId: userId,
               brandId: brand.id,
               isActive: true,
-            }
+            },
           });
-          
+
           membershipsToCreate.push(mainMembership);
 
           // Get all partner brands (bidirectional partnerships)
           const partnerBrands = [];
-          
+
           // Add brands where this brand is brandA in partnerships
-          brand.partnershipsFrom.forEach(partnership => {
+          brand.partnershipsFrom.forEach((partnership) => {
             partnerBrands.push(partnership.brandB);
           });
-          
+
           // Add brands where this brand is brandB in partnerships
-          brand.partnershipsTo.forEach(partnership => {
+          brand.partnershipsTo.forEach((partnership) => {
             partnerBrands.push(partnership.brandA);
           });
 
           // Create memberships for partner brands
           if (partnerBrands.length > 0) {
-            console.log(`Creating partnership memberships for ${brand.name} ↔ ${partnerBrands.map(p => p.name).join(', ')}`);
-            
+            console.log(
+              `Creating partnership memberships for ${
+                brand.name
+              } ↔ ${partnerBrands.map((p) => p.name).join(", ")}`,
+            );
+
             for (const partnerBrand of partnerBrands) {
               const partnerMembership = await prisma.userMembership.upsert({
                 where: {
                   userId_brandId: {
                     userId: userId,
                     brandId: partnerBrand.id,
-                  }
+                  },
                 },
                 update: {
                   isActive: true,
@@ -131,18 +135,18 @@ export async function POST(request: NextRequest) {
                   userId: userId,
                   brandId: partnerBrand.id,
                   isActive: true,
-                }
+                },
               });
-              
+
               membershipsToCreate.push(partnerMembership);
             }
           }
 
           return membershipsToCreate;
-        })
+        }),
       );
 
-      results.push(...brandMemberships.filter(m => m !== null).flat());
+      results.push(...brandMemberships.filter((m) => m !== null).flat());
     }
 
     // Handle custom memberships
@@ -151,7 +155,11 @@ export async function POST(request: NextRequest) {
 
       const customMembershipResults = await Promise.all(
         customMemberships.map(async (customMembership) => {
-          if (!customMembership.name || !customMembership.description || !customMembership.category) {
+          if (
+            !customMembership.name ||
+            !customMembership.description ||
+            !customMembership.category
+          ) {
             console.log("Invalid custom membership data:", customMembership);
             return null;
           }
@@ -167,7 +175,7 @@ export async function POST(request: NextRequest) {
               type: customMembership.type || "free",
               cost: customMembership.cost || null,
               isActive: true,
-            }
+            },
           });
 
           // Create user membership for the custom membership
@@ -176,33 +184,33 @@ export async function POST(request: NextRequest) {
               userId: userId,
               customMembershipId: createdCustomMembership.id,
               isActive: true,
-            }
+            },
           });
 
           return userMembership;
-        })
+        }),
       );
 
-      results.push(...customMembershipResults.filter(m => m !== null));
+      results.push(...customMembershipResults.filter((m) => m !== null));
     }
 
     console.log(`Created ${results.length} memberships`);
 
     return NextResponse.json(
-      { 
+      {
         message: "changesSavedSuccessfully",
-        memberships: results.length 
+        memberships: results.length,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error saving memberships:", error);
     return NextResponse.json(
-      { 
+      {
         message: "internalServerError",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -210,13 +218,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     console.log("=== Starting GET request to /api/user/memberships ===");
-    
+
     const session = await getServerSession(authOptions);
     console.log("Session:", session ? "Found" : "Not found");
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
-    
+
     if (!userId) {
       console.log("No session user ID, using test user ID");
       // Get the first user from the database for testing
@@ -227,11 +235,11 @@ export async function GET(request: NextRequest) {
       } else {
         console.log("No users found in database");
         return NextResponse.json(
-          { 
+          {
             message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED"
+            error: "AUTHENTICATION_REQUIRED",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -261,23 +269,28 @@ export async function GET(request: NextRequest) {
     });
 
     // Transform custom memberships to match brand membership format
-    const transformedCustomMemberships = customMemberships.map(membership => ({
-      id: membership.customMembership!.id,
-      brandId: membership.customMembership!.id,
-      isActive: membership.isActive,
-      brand: {
+    const transformedCustomMemberships = customMemberships.map(
+      (membership) => ({
         id: membership.customMembership!.id,
-        name: membership.customMembership!.name,
-        logoUrl: membership.customMembership!.icon,
-        website: "",
-        description: membership.customMembership!.description,
-        category: membership.customMembership!.category,
-        type: membership.customMembership!.type,
-        cost: membership.customMembership!.cost,
-      },
-    }));
+        brandId: membership.customMembership!.id,
+        isActive: membership.isActive,
+        brand: {
+          id: membership.customMembership!.id,
+          name: membership.customMembership!.name,
+          logoUrl: membership.customMembership!.icon,
+          website: "",
+          description: membership.customMembership!.description,
+          category: membership.customMembership!.category,
+          type: membership.customMembership!.type,
+          cost: membership.customMembership!.cost,
+        },
+      }),
+    );
 
-    const allMemberships = [...brandMemberships, ...transformedCustomMemberships];
+    const allMemberships = [
+      ...brandMemberships,
+      ...transformedCustomMemberships,
+    ];
 
     console.log(`Found ${allMemberships.length} memberships`);
 
@@ -285,11 +298,11 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching memberships:", error);
     return NextResponse.json(
-      { 
+      {
         message: "internalServerError",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

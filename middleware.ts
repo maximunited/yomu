@@ -1,14 +1,12 @@
-import createMiddleware from 'next-intl/middleware';
-import { locales, defaultLocale } from './i18n';
+import createMiddleware from "next-intl/middleware";
+import { locales, defaultLocale } from "./i18n";
 
 export default createMiddleware({
   locales,
-  defaultLocale
+  defaultLocale,
 });
 
 export const config = {
   // Skip API routes, static files and Next.js internals
-  matcher: ['/((?!api|_next|.*\..*).*)']
+  matcher: ["/((?!api|_next|.*..*).*)"],
 };
-
-

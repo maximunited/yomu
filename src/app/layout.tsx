@@ -12,7 +12,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "YomU - יום-You | Birthday Benefits",
-  description: "Discover and manage your birthday benefits from all your favorite brands",
+  description:
+    "Discover and manage your birthday benefits from all your favorite brands",
 };
 
 export default async function RootLayout({
@@ -24,7 +25,7 @@ export default async function RootLayout({
   const messages = getMessages(locale);
 
   return (
-    <html lang={locale} dir={locale === 'he' ? 'rtl' : 'ltr'}>
+    <html lang={locale} dir={locale === "he" ? "rtl" : "ltr"}>
       <body className={inter.className}>
         <SessionProvider>
           <DarkModeProvider>

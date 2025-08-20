@@ -37,7 +37,7 @@ This document provides instructions for running YomU using Docker or Podman with
    ```bash
    # Production mode
    docker-compose up -d
-   
+
    # Development mode (with hot reload)
    docker-compose --profile dev up -d
    ```
@@ -67,7 +67,7 @@ This document provides instructions for running YomU using Docker or Podman with
    ```bash
    # Production mode
    podman-compose up -d
-   
+
    # Development mode (with hot reload)
    podman-compose --profile dev up -d
    ```
@@ -265,7 +265,7 @@ Changes to your code will automatically trigger hot reload.
    ```bash
    # Check what's using the port
    lsof -i :3000
-   
+
    # Stop conflicting services
    docker-compose down
    ```
@@ -275,7 +275,7 @@ Changes to your code will automatically trigger hot reload.
    ```bash
    # Check database container
    docker-compose logs db
-   
+
    # Restart database
    docker-compose restart db
    ```

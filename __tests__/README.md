@@ -128,12 +128,12 @@ describe('Button', () => {
   it('should handle click events', async () => {
     const handleClick = jest.fn()
     const user = userEvent.setup()
-    
+
     render(<Button onClick={handleClick}>Click me</Button>)
-    
+
     const button = screen.getByRole('button', { name: 'Click me' })
     await user.click(button)
-    
+
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
 })
@@ -142,37 +142,37 @@ describe('Button', () => {
 ### API Route Testing
 
 ```typescript
-import { NextRequest } from 'next/server'
-import { GET } from '@/app/api/benefits/route'
+import { NextRequest } from "next/server";
+import { GET } from "@/app/api/benefits/route";
 
-describe('/api/benefits', () => {
-  it('should return benefits when authenticated', async () => {
+describe("/api/benefits", () => {
+  it("should return benefits when authenticated", async () => {
     // Mock dependencies
     mockGetServerSession.mockResolvedValue({
-      user: { id: 'user-1' },
-    })
-    
-    const request = new NextRequest('http://localhost:3000/api/benefits')
-    const response = await GET(request)
-    const data = await response.json()
-    
-    expect(response.status).toBe(200)
-    expect(data.benefits).toBeDefined()
-  })
-})
+      user: { id: "user-1" },
+    });
+
+    const request = new NextRequest("http://localhost:3000/api/benefits");
+    const response = await GET(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.benefits).toBeDefined();
+  });
+});
 ```
 
 ### E2E Testing
 
 ```typescript
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test";
 
-test('should display dashboard elements', async ({ page }) => {
-  await page.goto('/dashboard')
-  
-  await expect(page.getByText('ברוכים הבאים')).toBeVisible()
-  await expect(page.getByText('הטבות פעילות')).toBeVisible()
-})
+test("should display dashboard elements", async ({ page }) => {
+  await page.goto("/dashboard");
+
+  await expect(page.getByText("ברוכים הבאים")).toBeVisible();
+  await expect(page.getByText("הטבות פעילות")).toBeVisible();
+});
 ```
 
 ## Mocking Strategy
@@ -181,35 +181,34 @@ test('should display dashboard elements', async ({ page }) => {
 
 ```typescript
 // Mock fetch responses
-global.fetch = jest.fn()
-  .mockResolvedValueOnce({
-    ok: true,
-    json: async () => ({ user: mockUser }),
-  })
+global.fetch = jest.fn().mockResolvedValueOnce({
+  ok: true,
+  json: async () => ({ user: mockUser }),
+});
 ```
 
 ### Authentication Mocks
 
 ```typescript
 // Mock NextAuth session
-jest.mock('next-auth/react', () => ({
+jest.mock("next-auth/react", () => ({
   useSession: jest.fn(() => ({
     data: { user: mockUser },
-    status: 'authenticated',
+    status: "authenticated",
   })),
-}))
+}));
 ```
 
 ### Database Mocks
 
 ```typescript
 // Mock Prisma client
-jest.mock('@/lib/prisma', () => ({
+jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: { findUnique: jest.fn() },
     benefit: { findMany: jest.fn() },
   },
-}))
+}));
 ```
 
 ## Test Utilities
@@ -226,7 +225,7 @@ render(<MyComponent />)
 ### Mock Data
 
 ```typescript
-import { mockUser, mockBenefit, mockBrand } from '@/__tests__/utils/test-utils'
+import { mockUser, mockBenefit, mockBrand } from "@/__tests__/utils/test-utils";
 
 // Use consistent mock data across tests
 ```
@@ -234,12 +233,12 @@ import { mockUser, mockBenefit, mockBrand } from '@/__tests__/utils/test-utils'
 ### Setup Helpers
 
 ```typescript
-import { setupMockFetch, setupMockSession } from '@/__tests__/utils/test-utils'
+import { setupMockFetch, setupMockSession } from "@/__tests__/utils/test-utils";
 
 beforeEach(() => {
-  setupMockFetch()
-  setupMockSession()
-})
+  setupMockFetch();
+  setupMockSession();
+});
 ```
 
 ## Best Practices

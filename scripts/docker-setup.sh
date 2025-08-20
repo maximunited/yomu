@@ -51,7 +51,7 @@ check_compose() {
         print_error "${COMPOSE_CMD_ARRAY[0]} is not installed"
         exit 1
     fi
-    
+
     # Check if compose plugin is available
     if ! "${COMPOSE_CMD_ARRAY[0]}" compose version &> /dev/null; then
         print_error "${COMPOSE_CMD_ARRAY[0]} compose is not available"
@@ -157,7 +157,7 @@ backup_database() {
     mkdir -p "${backup_dir}"
     timestamp=$(date +%Y%m%d_%H%M%S)
     backup_file="${backup_dir}/backup_${timestamp}.db"
-    
+
     print_status "Creating database backup..."
     "${COMPOSE_CMD_ARRAY[@]}" exec db sqlite3 /data/dev.db ".backup /data/backup_${timestamp}.db"
     "${CONTAINER_RUNTIME}" cp yomu-db:"/data/backup_${timestamp}.db" "${backup_file}"
@@ -171,12 +171,12 @@ restore_database() {
         print_error "Please specify backup file path"
         exit 1
     fi
-    
+
     if [ ! -f "${backup_file}" ]; then
         print_error "Backup file not found: ${backup_file}"
         exit 1
     fi
-    
+
     print_status "Restoring database from: ${backup_file}"
     "${CONTAINER_RUNTIME}" cp "${backup_file}" yomu-db:/data/dev.db
     print_success "Database restored"
@@ -214,11 +214,11 @@ show_help() {
 main() {
     local command=$1
     local option=$2
-    
+
     # Check container runtime
     check_container_runtime
     check_compose
-    
+
     case ${command} in
         "setup")
             setup_env
@@ -268,4 +268,4 @@ main() {
 }
 
 # Run main function with all arguments
-main "$@" 
+main "$@"

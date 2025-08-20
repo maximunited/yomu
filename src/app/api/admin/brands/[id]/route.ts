@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
     }
 
     const brand = await prisma.brand.findUnique({
@@ -18,37 +18,40 @@ export async function GET(
       include: {
         benefits: true,
         partnershipsTo: {
-          include: { brandA: true }
+          include: { brandA: true },
         },
         partnershipsFrom: {
-          include: { brandB: true }
-        }
-      }
+          include: { brandB: true },
+        },
+      },
     });
 
     if (!brand) {
-      return NextResponse.json({ message: 'benefitNotFound' }, { status: 404 });
+      return NextResponse.json({ message: "benefitNotFound" }, { status: 404 });
     }
 
     return NextResponse.json(brand);
   } catch (error) {
-    console.error('Error fetching brand:', error);
-    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
+    console.error("Error fetching brand:", error);
+    return NextResponse.json(
+      { message: "internalServerError" },
+      { status: 500 },
+    );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    
+
     const updatedBrand = await prisma.brand.update({
       where: { id: params.id },
       data: {
@@ -61,53 +64,56 @@ export async function PATCH(
         actionType: body.actionType,
         actionLabel: body.actionLabel,
         isActive: body.isActive,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     return NextResponse.json(updatedBrand);
   } catch (error) {
-    console.error('Error updating brand:', error);
-    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
+    console.error("Error updating brand:", error);
+    return NextResponse.json(
+      { message: "internalServerError" },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
     }
 
     // Delete related records first
     await prisma.benefit.deleteMany({
-      where: { brandId: params.id }
+      where: { brandId: params.id },
     });
 
     await prisma.brandPartnership.deleteMany({
       where: {
-        OR: [
-          { brandAId: params.id },
-          { brandBId: params.id }
-        ]
-      }
+        OR: [{ brandAId: params.id }, { brandBId: params.id }],
+      },
     });
 
     await prisma.userMembership.deleteMany({
-      where: { brandId: params.id }
+      where: { brandId: params.id },
     });
 
     // Delete the brand
     await prisma.brand.delete({
-      where: { id: params.id }
+      where: { id: params.id },
     });
 
-    return NextResponse.json({ message: 'brandDeletedSuccessfully' });
+    return NextResponse.json({ message: "brandDeletedSuccessfully" });
   } catch (error) {
-    console.error('Error deleting brand:', error);
-    return NextResponse.json({ message: 'internalServerError' }, { status: 500 });
+    console.error("Error deleting brand:", error);
+    return NextResponse.json(
+      { message: "internalServerError" },
+      { status: 500 },
+    );
   }
-} 
+}

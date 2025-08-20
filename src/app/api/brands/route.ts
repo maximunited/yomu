@@ -10,33 +10,33 @@ export async function GET(request: NextRequest) {
       include: {
         partnershipsFrom: {
           include: {
-            brandB: true
-          }
+            brandB: true,
+          },
         },
         partnershipsTo: {
           include: {
-            brandA: true
-          }
-        }
+            brandA: true,
+          },
+        },
       },
       orderBy: {
-        name: 'asc',
+        name: "asc",
       },
     });
 
     // Transform brands to include partner brands in a usable format
-    const transformedBrands = brands.map(brand => {
+    const transformedBrands = brands.map((brand) => {
       const partnerBrands = [];
-      
+
       // Add partners where this brand is brandA
-      brand.partnershipsFrom.forEach(partnership => {
+      brand.partnershipsFrom.forEach((partnership) => {
         if (partnership.brandB && partnership.brandB.isActive) {
           partnerBrands.push(partnership.brandB);
         }
       });
-      
+
       // Add partners where this brand is brandB
-      brand.partnershipsTo.forEach(partnership => {
+      brand.partnershipsTo.forEach((partnership) => {
         if (partnership.brandA && partnership.brandA.isActive) {
           partnerBrands.push(partnership.brandA);
         }
@@ -47,16 +47,16 @@ export async function GET(request: NextRequest) {
         partnerBrands,
         // Keep old field names for backward compatibility during transition
         childBrands: partnerBrands,
-        parentBrand: null
+        parentBrand: null,
       };
     });
 
     return NextResponse.json(transformedBrands);
   } catch (error) {
     console.error("Error fetching brands:", error);
-  return NextResponse.json(
-    { message: "internalServerError" },
-    { status: 500 }
-  );
+    return NextResponse.json(
+      { message: "internalServerError" },
+      { status: 500 },
+    );
   }
-} 
+}

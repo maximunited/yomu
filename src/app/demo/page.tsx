@@ -32,13 +32,13 @@ export default function DemoPage() {
       description: "הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות",
       brand: {
         name: "Fox",
-        logoUrl: "/images/brands/fox.png"
+        logoUrl: "/images/brands/fox.png",
       },
       promoCode: "BDAY30",
       url: "https://fox.co.il",
       validityType: "birthday_month",
       redemptionMethod: "קוד קופון",
-      termsAndConditions: "הטבה תקפה לחודש יום ההולדת בלבד"
+      termsAndConditions: "הטבה תקפה לחודש יום ההולדת בלבד",
     },
     {
       id: "2",
@@ -46,11 +46,11 @@ export default function DemoPage() {
       description: "קפה חינם ביום ההולדת שלך",
       brand: {
         name: "Starbucks",
-        logoUrl: "/images/brands/starbucks.png"
+        logoUrl: "/images/brands/starbucks.png",
       },
       validityType: "birthday_date",
       redemptionMethod: "אוטומטי באפליקציה",
-      termsAndConditions: "תקף ביום ההולדת בלבד"
+      termsAndConditions: "תקף ביום ההולדת בלבד",
     },
     {
       id: "3",
@@ -58,13 +58,13 @@ export default function DemoPage() {
       description: "הנחה של 50 ₪ על קנייה מעל 200 ₪",
       brand: {
         name: "Super-Pharm",
-        logoUrl: "/images/brands/super-pharm.png"
+        logoUrl: "/images/brands/super-pharm.png",
       },
       promoCode: "BDAY50",
       url: "https://super-pharm.co.il",
       validityType: "birthday_month",
       redemptionMethod: "קוד קופון",
-      termsAndConditions: "תקף לחודש יום ההולדת"
+      termsAndConditions: "תקף לחודש יום ההולדת",
     },
     {
       id: "4",
@@ -72,14 +72,14 @@ export default function DemoPage() {
       description: "מתנה חינם על קנייה מעל 300 ₪",
       brand: {
         name: "H&M",
-        logoUrl: "/images/brands/hm.png"
+        logoUrl: "/images/brands/hm.png",
       },
       promoCode: "GIFT2024",
       url: "https://hm.com/il",
       validityType: "birthday_month",
       redemptionMethod: "קוד קופון",
-      termsAndConditions: "תקף לחודש יום ההולדת"
-    }
+      termsAndConditions: "תקף לחודש יום ההולדת",
+    },
   ];
 
   const copyToClipboard = async (text: string) => {
@@ -95,18 +95,22 @@ export default function DemoPage() {
   const getValidityText = (benefit: Benefit) => {
     switch (benefit.validityType) {
       case "birthday_date":
-        return t('validOnlyOnBirthday');
+        return t("validOnlyOnBirthday");
       case "birthday_month":
-        return t('validForEntireMonth');
+        return t("validForEntireMonth");
       case "birthday_week":
-        return t('validForWeek');
+        return t("validForWeek");
       default:
-        return t('validForLimitedPeriod');
+        return t("validForLimitedPeriod");
     }
   };
 
-  const activeBenefits = mockBenefits.filter(b => b.validityType === "birthday_month");
-  const upcomingBenefits = mockBenefits.filter(b => b.validityType === "birthday_date");
+  const activeBenefits = mockBenefits.filter(
+    (b) => b.validityType === "birthday_month",
+  );
+  const upcomingBenefits = mockBenefits.filter(
+    (b) => b.validityType === "birthday_date",
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -121,9 +125,11 @@ export default function DemoPage() {
               <span className="text-xl font-bold text-gray-900">YomU</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">{t('demo') || 'דמו'}</span>
+              <span className="text-sm text-gray-500">
+                {t("demo") || "דמו"}
+              </span>
               <Link href="/auth/signup">
-                <Button size="sm">{t('getStarted')}</Button>
+                <Button size="sm">{t("getStarted")}</Button>
               </Link>
             </div>
           </div>
@@ -135,18 +141,18 @@ export default function DemoPage() {
         {/* Welcome Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t('welcome')} YomU! 🎉
+            {t("welcome")} YomU! 🎉
           </h1>
           <p className="text-gray-600 mb-4">
-            {t('hereAreYourBirthdayBenefits')}
+            {t("hereAreYourBirthdayBenefits")}
           </p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-md mx-auto">
             <Link
               href="/about"
               className="text-sm text-yellow-800 underline hover:text-yellow-900 focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded"
-              aria-label={t('learnMore')}
+              aria-label={t("learnMore")}
             >
-              💡 {t('learnMore')}
+              💡 {t("learnMore")}
             </Link>
           </div>
         </div>
@@ -155,11 +161,16 @@ export default function DemoPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <Star className="w-6 h-6 text-purple-600" />
-            <h2 className="text-2xl font-bold text-gray-900">{t('activeNow')}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {t("activeNow")}
+            </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeBenefits.map((benefit) => (
-              <div key={benefit.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div
+                key={benefit.id}
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+              >
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <img
@@ -169,13 +180,15 @@ export default function DemoPage() {
                     />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{benefit.brand.name}</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      {benefit.brand.name}
+                    </h3>
                     <span className="text-sm text-purple-600 font-medium">
                       {getValidityText(benefit)}
                     </span>
                   </div>
                 </div>
-                
+
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
                   {benefit.title}
                 </h4>
@@ -185,7 +198,9 @@ export default function DemoPage() {
 
                 {benefit.promoCode && (
                   <div className="flex items-center space-x-2 mb-4">
-                    <span className="text-sm text-gray-700 font-medium">{t('couponCode')}:</span>
+                    <span className="text-sm text-gray-700 font-medium">
+                      {t("couponCode")}:
+                    </span>
                     <code className="bg-purple-100 border border-purple-200 px-3 py-2 rounded-md text-sm font-mono text-purple-800 font-bold">
                       {benefit.promoCode}
                     </code>
@@ -193,10 +208,16 @@ export default function DemoPage() {
                       variant="default"
                       size="sm"
                       onClick={() => copyToClipboard(benefit.promoCode!)}
-                      className={copiedCode === benefit.promoCode ? "bg-green-600 text-white" : "bg-purple-600 text-white hover:bg-purple-700"}
+                      className={
+                        copiedCode === benefit.promoCode
+                          ? "bg-green-600 text-white"
+                          : "bg-purple-600 text-white hover:bg-purple-700"
+                      }
                     >
                       {copiedCode === benefit.promoCode ? (
-                        <span className="text-sm font-medium">{t('copied')}</span>
+                        <span className="text-sm font-medium">
+                          {t("copied")}
+                        </span>
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
@@ -209,11 +230,11 @@ export default function DemoPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => window.open(benefit.url, '_blank')}
+                      onClick={() => window.open(benefit.url, "_blank")}
                       className="flex-1"
                     >
                       <ExternalLink className="w-4 h-4 ml-1" />
-                      {t('buyNow')}
+                      {t("buyNow")}
                     </Button>
                   )}
                 </div>
@@ -226,11 +247,16 @@ export default function DemoPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <Calendar className="w-6 h-6 text-orange-600" />
-            <h2 className="text-2xl font-bold text-gray-900">{t('comingSoon')}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {t("comingSoon")}
+            </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {upcomingBenefits.map((benefit) => (
-              <div key={benefit.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow opacity-75">
+              <div
+                key={benefit.id}
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow opacity-75"
+              >
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <img
@@ -240,13 +266,15 @@ export default function DemoPage() {
                     />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{benefit.brand.name}</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      {benefit.brand.name}
+                    </h3>
                     <span className="text-sm text-orange-600 font-medium">
                       {getValidityText(benefit)}
                     </span>
                   </div>
                 </div>
-                
+
                 <h4 className="font-bold text-lg text-gray-900 mb-2">
                   {benefit.title}
                 </h4>
@@ -260,7 +288,7 @@ export default function DemoPage() {
                     size="sm"
                     className="flex-1 opacity-50 cursor-not-allowed"
                   >
-                    {t('moreDetails')}
+                    {t("moreDetails")}
                   </Button>
                 </div>
               </div>
@@ -271,20 +299,18 @@ export default function DemoPage() {
         {/* Call to Action */}
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            {t('getStarted')}
+            {t("getStarted")}
           </h3>
-          <p className="text-gray-600 mb-6">
-            {t('signUpNow')}
-          </p>
+          <p className="text-gray-600 mb-6">{t("signUpNow")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup">
               <Button size="lg" className="px-8 py-3">
-                {t('signUpNow')}
+                {t("signUpNow")}
               </Button>
             </Link>
             <Link href="/auth/signin">
               <Button variant="outline" size="lg" className="px-8 py-3">
-                {t('alreadyHaveAccount')}
+                {t("alreadyHaveAccount")}
               </Button>
             </Link>
           </div>
@@ -292,4 +318,4 @@ export default function DemoPage() {
       </main>
     </div>
   );
-} 
+}

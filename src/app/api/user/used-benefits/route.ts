@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -18,15 +18,15 @@ export async function GET(request: NextRequest) {
           include: {
             benefit: {
               include: {
-                brand: true
-              }
-            }
+                brand: true,
+              },
+            },
           },
           orderBy: {
-            usedAt: 'desc'
-          }
-        }
-      }
+            usedAt: "desc",
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -36,14 +36,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ usedBenefits: user.usedBenefits });
   } catch (error) {
     console.error("Error fetching used benefits:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -51,11 +54,14 @@ export async function POST(request: NextRequest) {
     const { benefitId, notes } = await request.json();
 
     if (!benefitId) {
-      return NextResponse.json({ error: "Benefit ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Benefit ID is required" },
+        { status: 400 },
+      );
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -64,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // Check if benefit exists
     const benefit = await prisma.benefit.findUnique({
-      where: { id: benefitId }
+      where: { id: benefitId },
     });
 
     if (!benefit) {
@@ -76,30 +82,33 @@ export async function POST(request: NextRequest) {
       where: {
         userId_benefitId: {
           userId: user.id,
-          benefitId: benefitId
-        }
+          benefitId: benefitId,
+        },
       },
       update: {
         usedAt: new Date(),
-        notes: notes || null
+        notes: notes || null,
       },
       create: {
         userId: user.id,
         benefitId: benefitId,
-        notes: notes || null
+        notes: notes || null,
       },
       include: {
         benefit: {
           include: {
-            brand: true
-          }
-        }
-      }
+            brand: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({ usedBenefit });
   } catch (error) {
     console.error("Error marking benefit as used:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
-} 
+}

@@ -4,4 +4,4 @@
   <text x="50" y="55" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="white">BEER</text>
   <circle cx="50" cy="75" r="6" fill="white"/>
   <text x="50" y="79" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="#FF8C00">500ml</text>
-</svg> 
+</svg>

@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { ChevronDownIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { 
-  getAvailableLanguages, 
-  getFullySupportedLanguages, 
+import { useState, useRef, useEffect } from "react";
+import { ChevronDownIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
+import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  getAvailableLanguages,
+  getFullySupportedLanguages,
   getBetaLanguages,
-  type LanguageCode 
-} from '@/lib/languages';
+  type LanguageCode,
+} from "@/lib/languages";
 
 interface LanguageSelectorProps {
-  variant?: 'button' | 'dropdown' | 'compact';
+  variant?: "button" | "dropdown" | "compact";
   showBeta?: boolean;
   className?: string;
 }
 
-export default function LanguageSelector({ 
-  variant = 'dropdown', 
+export default function LanguageSelector({
+  variant = "dropdown",
   showBeta = false,
-  className = '' 
+  className = "",
 }: LanguageSelectorProps) {
   const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -28,24 +28,31 @@ export default function LanguageSelector({
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const availableLanguages = showBeta ? getAvailableLanguages() : getFullySupportedLanguages();
-  const currentLanguage = availableLanguages.find(lang => lang.code === language);
+  const availableLanguages = showBeta
+    ? getAvailableLanguages()
+    : getFullySupportedLanguages();
+  const currentLanguage = availableLanguages.find(
+    (lang) => lang.code === language,
+  );
 
   const handleLanguageChange = (newLanguage: LanguageCode) => {
     setLanguage(newLanguage);
     setIsOpen(false);
   };
 
-  if (variant === 'button') {
+  if (variant === "button") {
     return (
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -60,7 +67,7 @@ export default function LanguageSelector({
     );
   }
 
-  if (variant === 'compact') {
+  if (variant === "compact") {
     return (
       <div className="relative" ref={dropdownRef}>
         <button
@@ -79,7 +86,9 @@ export default function LanguageSelector({
                   key={lang.code}
                   onClick={() => handleLanguageChange(lang.code)}
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center justify-between ${
-                    language === lang.code ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
+                    language === lang.code
+                      ? "bg-purple-50 text-purple-700"
+                      : "text-gray-700"
                   }`}
                 >
                   <div className="flex items-center space-x-2">
@@ -112,7 +121,7 @@ export default function LanguageSelector({
       >
         <div className="flex items-center space-x-3">
           <GlobeAltIcon className="w-4 h-4 text-gray-500" />
-          <span>{t('language')}</span>
+          <span>{t("language")}</span>
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-base">{currentLanguage?.flag}</span>
@@ -126,21 +135,25 @@ export default function LanguageSelector({
           <div className="py-1">
             {/* Fully supported languages */}
             <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              {t('fullySupported')}
+              {t("fullySupported")}
             </div>
             {getFullySupportedLanguages().map((lang) => (
               <button
                 key={lang.code}
                 onClick={() => handleLanguageChange(lang.code)}
                 className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 flex items-center justify-between ${
-                  language === lang.code ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
+                  language === lang.code
+                    ? "bg-purple-50 text-purple-700"
+                    : "text-gray-700"
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <span className="text-lg">{lang.flag}</span>
                   <div className="flex flex-col">
                     <span className="font-medium">{lang.name}</span>
-                    <span className="text-xs text-gray-500">{lang.englishName}</span>
+                    <span className="text-xs text-gray-500">
+                      {lang.englishName}
+                    </span>
                   </div>
                 </div>
                 {language === lang.code && (
@@ -154,14 +167,16 @@ export default function LanguageSelector({
               <>
                 <div className="border-t border-gray-200 my-2"></div>
                 <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {t('betaLanguages')}
+                  {t("betaLanguages")}
                 </div>
                 {getBetaLanguages().map((lang) => (
                   <button
                     key={lang.code}
                     onClick={() => handleLanguageChange(lang.code)}
                     className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 flex items-center justify-between ${
-                      language === lang.code ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
+                      language === lang.code
+                        ? "bg-purple-50 text-purple-700"
+                        : "text-gray-700"
                     }`}
                   >
                     <div className="flex items-center space-x-3">
@@ -173,7 +188,9 @@ export default function LanguageSelector({
                             Beta
                           </span>
                         </div>
-                        <span className="text-xs text-gray-500">{lang.englishName}</span>
+                        <span className="text-xs text-gray-500">
+                          {lang.englishName}
+                        </span>
                       </div>
                     </div>
                     {language === lang.code && (
@@ -188,4 +205,4 @@ export default function LanguageSelector({
       )}
     </div>
   );
-} 
+}

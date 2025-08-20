@@ -6,13 +6,13 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   try {
     console.log("=== Starting GET request to /api/benefits ===");
-    
+
     const session = await getServerSession(authOptions);
     console.log("Session:", session ? "Found" : "Not found");
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
-    
+
     if (!userId) {
       console.log("No session user ID, using test user ID");
       // Get the first user from the database for testing
@@ -23,11 +23,11 @@ export async function GET(request: NextRequest) {
       } else {
         console.log("No users found in database");
         return NextResponse.json(
-          { 
+          {
             message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED"
+            error: "AUTHENTICATION_REQUIRED",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Transform benefits to match the expected format
-    const transformedBenefits = benefits.map(benefit => ({
+    const transformedBenefits = benefits.map((benefit) => ({
       id: benefit.id,
       title: benefit.title,
       description: benefit.description,
@@ -100,13 +100,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       benefits: transformedBenefits,
-      memberships: userMemberships.length
+      memberships: userMemberships.length,
     });
   } catch (error) {
     console.error("Error fetching benefits:", error);
     return NextResponse.json(
       { message: "internalServerError" },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

@@ -3,7 +3,13 @@
     "allow": [
       "Bash(npm run test:*)",
       "Bash(npm test:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(claude update:*)",
+      "Bash(pre-commit run:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pre-commit migrate-config:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

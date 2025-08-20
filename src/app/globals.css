@@ -25,6 +25,11 @@ body {
 }
 
 /* Ensure native form controls use the same font as the rest of the UI */
-select, option, optgroup, input, textarea, button {
+select,
+option,
+optgroup,
+input,
+textarea,
+button {
   font-family: inherit;
 }

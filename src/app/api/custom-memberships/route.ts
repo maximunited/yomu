@@ -7,26 +7,20 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     let userId = session?.user?.id;
-    
+
     if (!userId) {
       const testUser = await prisma.user.findFirst();
       if (testUser) {
         userId = testUser.id;
       } else {
-        return NextResponse.json(
-          { message: "unauthorized" },
-          { status: 401 }
-        );
+        return NextResponse.json({ message: "unauthorized" }, { status: 401 });
       }
     }
 
     const { customMembershipId, benefit } = await request.json();
 
     if (!customMembershipId || !benefit) {
-      return NextResponse.json(
-        { message: "missingFields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "missingFields" }, { status: 400 });
     }
 
     // Verify the custom membership belongs to the user
@@ -40,7 +34,7 @@ export async function POST(request: NextRequest) {
     if (!customMembership) {
       return NextResponse.json(
         { message: "customMembershipNotFound" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -69,7 +63,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating custom benefit:", error);
     return NextResponse.json(
       { message: "internalServerError" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -78,16 +72,13 @@ export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     let userId = session?.user?.id;
-    
+
     if (!userId) {
       const testUser = await prisma.user.findFirst();
       if (testUser) {
         userId = testUser.id;
       } else {
-        return NextResponse.json(
-          { message: "unauthorized" },
-          { status: 401 }
-        );
+        return NextResponse.json({ message: "unauthorized" }, { status: 401 });
       }
     }
 
@@ -96,7 +87,7 @@ export async function PUT(request: NextRequest) {
     if (!customMembershipId) {
       return NextResponse.json(
         { message: "customMembershipIdRequired" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -111,7 +102,7 @@ export async function PUT(request: NextRequest) {
     if (!customMembership) {
       return NextResponse.json(
         { message: "customMembershipNotFound" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -129,7 +120,7 @@ export async function PUT(request: NextRequest) {
     console.error("Error updating custom membership:", error);
     return NextResponse.json(
       { message: "internalServerError" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -138,26 +129,23 @@ export async function DELETE(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     let userId = session?.user?.id;
-    
+
     if (!userId) {
       const testUser = await prisma.user.findFirst();
       if (testUser) {
         userId = testUser.id;
       } else {
-        return NextResponse.json(
-          { message: "unauthorized" },
-          { status: 401 }
-        );
+        return NextResponse.json({ message: "unauthorized" }, { status: 401 });
       }
     }
 
     const { searchParams } = new URL(request.url);
-    const customMembershipId = searchParams.get('id');
+    const customMembershipId = searchParams.get("id");
 
     if (!customMembershipId) {
       return NextResponse.json(
         { message: "customMembershipIdRequired" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -172,7 +160,7 @@ export async function DELETE(request: NextRequest) {
     if (!customMembership) {
       return NextResponse.json(
         { message: "customMembershipNotFound" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -188,7 +176,7 @@ export async function DELETE(request: NextRequest) {
     console.error("Error deleting custom membership:", error);
     return NextResponse.json(
       { message: "internalServerError" },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

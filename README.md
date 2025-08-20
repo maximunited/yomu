@@ -24,6 +24,7 @@
 <!-- [![Security Audit](https://github.com/maximunited/yomu/actions/workflows/audit.yml/badge.svg)](https://github.com/maximunited/yomu/actions/workflows/audit.yml) -->
 
 <!-- Repo metadata badges -->
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/maximunited/yomu/issues)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org)
@@ -157,7 +158,7 @@ YomU (יום-You) is a mobile-first web application that aggregates and displays
    ```bash
    # Production mode
    ./scripts/docker-setup.sh start
-   
+
    # Development mode (with hot reload)
    ./scripts/docker-setup.sh start-dev
    ```
@@ -344,6 +345,7 @@ npm run db:seed
 ```
 
 Modes:
+
 - Fresh install (wipe + seed):
   ```bash
   node scripts/seed.js --mode=fresh
@@ -358,19 +360,23 @@ Modes:
   ```
 
 What it does (fresh):
+
 - Clears `benefits`, `userMemberships`, `brand_partnerships`, and `brands`
 - Creates all brands and partnerships
 - Seeds a comprehensive set of benefits (including co-branded examples)
 
 What it does (upsert):
+
 - Does NOT wipe data
 - Upserts brands by name and benefits by (brandId + title)
 - Creates missing partnerships if needed
 
 Advanced: partial brand/benefit imports
+
 - Use `scripts/admin-helper.js` to import/export JSON for brands/benefits without wiping the DB.
 
 Production/Shared envs
+
 - Prefer running seed only on fresh databases
 - For updates, use the Admin UI or the admin helper instead of reseeding
 

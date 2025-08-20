@@ -5,4 +5,4 @@
   <text x="50" y="60" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="white">HAMBURGERS</text>
   <circle cx="50" cy="80" r="6" fill="white"/>
   <text x="50" y="84" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="#8B0000">🍔</text>
-</svg> 
+</svg>

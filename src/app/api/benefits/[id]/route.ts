@@ -3,12 +3,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
     const benefitId = id;
-    
+
     const benefit = await prisma.benefit.findUnique({
       where: {
         id: benefitId,
@@ -28,10 +28,7 @@ export async function GET(
     });
 
     if (!benefit) {
-      return NextResponse.json(
-        { message: "benefitNotFound" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "benefitNotFound" }, { status: 404 });
     }
 
     // Transform to match expected format
@@ -57,7 +54,7 @@ export async function GET(
     console.error("Error fetching benefit:", error);
     return NextResponse.json(
       { message: "internalServerError" },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

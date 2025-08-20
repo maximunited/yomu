@@ -6,21 +6,21 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { 
-  ArrowLeft, 
-  User, 
-  Mail, 
-  Calendar, 
-  Moon, 
-  Sun, 
-  LogOut, 
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Calendar,
+  Moon,
+  Sun,
+  LogOut,
   Camera,
   Save,
   Bell,
   Shield,
   Globe,
   Key,
-  Copy
+  Copy,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -43,12 +43,12 @@ export default function SettingsPage() {
     email: session?.user?.email || "",
     dateOfBirth: "",
     anniversaryDate: "",
-    profilePicture: ""
+    profilePicture: "",
   });
   const [notifications, setNotifications] = useState({
     email: true,
     push: true,
-    sms: false
+    sms: false,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -60,7 +60,7 @@ export default function SettingsPage() {
     // Check for saved dark mode preference
     const savedDarkMode = localStorage.getItem("darkMode") === "true";
     setIsDarkMode(savedDarkMode);
-    
+
     // Apply dark mode to document
     if (savedDarkMode) {
       document.documentElement.classList.add("dark");
@@ -69,34 +69,38 @@ export default function SettingsPage() {
     // Load profile data
     const loadProfile = async () => {
       try {
-        const response = await fetch('/api/user/profile');
+        const response = await fetch("/api/user/profile");
         if (response.ok) {
           const data = await response.json();
-          setProfile(prev => ({
+          setProfile((prev) => ({
             ...prev,
             ...data.user,
             // Convert null dates to empty strings for React inputs
-            dateOfBirth: data.user.dateOfBirth ? new Date(data.user.dateOfBirth).toISOString().split('T')[0] : '',
-            anniversaryDate: data.user.anniversaryDate ? new Date(data.user.anniversaryDate).toISOString().split('T')[0] : '',
+            dateOfBirth: data.user.dateOfBirth
+              ? new Date(data.user.dateOfBirth).toISOString().split("T")[0]
+              : "",
+            anniversaryDate: data.user.anniversaryDate
+              ? new Date(data.user.anniversaryDate).toISOString().split("T")[0]
+              : "",
           }));
         }
       } catch (error) {
-        console.error('Error loading profile:', error);
+        console.error("Error loading profile:", error);
       }
     };
 
     loadProfile();
-    
+
     // Load API key
     const loadApiKey = async () => {
       try {
-        const response = await fetch('/api/user/api-key');
+        const response = await fetch("/api/user/api-key");
         if (response.ok) {
           const data = await response.json();
           setApiKey(data.apiKey);
         }
       } catch (error) {
-        console.error('Error loading API key:', error);
+        console.error("Error loading API key:", error);
       }
     };
 
@@ -107,7 +111,7 @@ export default function SettingsPage() {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
     localStorage.setItem("darkMode", newDarkMode.toString());
-    
+
     if (newDarkMode) {
       document.documentElement.classList.add("dark");
     } else {
@@ -118,10 +122,10 @@ export default function SettingsPage() {
   const handleSaveProfile = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: profile.name,
@@ -134,21 +138,25 @@ export default function SettingsPage() {
       if (response.ok) {
         const data = await response.json();
         // Update the profile with the saved data
-        setProfile(prev => ({
+        setProfile((prev) => ({
           ...prev,
           ...data.user,
           // Convert null dates to empty strings for React inputs
-          dateOfBirth: data.user.dateOfBirth ? new Date(data.user.dateOfBirth).toISOString().split('T')[0] : '',
-          anniversaryDate: data.user.anniversaryDate ? new Date(data.user.anniversaryDate).toISOString().split('T')[0] : '',
+          dateOfBirth: data.user.dateOfBirth
+            ? new Date(data.user.dateOfBirth).toISOString().split("T")[0]
+            : "",
+          anniversaryDate: data.user.anniversaryDate
+            ? new Date(data.user.anniversaryDate).toISOString().split("T")[0]
+            : "",
         }));
         setIsEditing(false);
         // Show success message (you could add a toast notification here)
       } else {
-        console.error('Failed to save profile');
+        console.error("Failed to save profile");
         // Show error message
       }
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error("Error saving profile:", error);
       // Show error message
     } finally {
       setIsSaving(false);
@@ -159,17 +167,19 @@ export default function SettingsPage() {
     signOut({ callbackUrl: "/" });
   };
 
-  const handleProfilePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePictureChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const newProfilePicture = e.target?.result as string;
-        setProfile(prev => ({
+        setProfile((prev) => ({
           ...prev,
-          profilePicture: newProfilePicture
+          profilePicture: newProfilePicture,
         }));
-        
+
         // Auto-save the profile picture immediately
         saveProfilePicture(newProfilePicture);
       };
@@ -179,10 +189,10 @@ export default function SettingsPage() {
 
   const saveProfilePicture = async (profilePicture: string) => {
     try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: profile.name,
@@ -193,14 +203,14 @@ export default function SettingsPage() {
       });
 
       if (response.ok) {
-        console.log('Profile picture saved successfully');
+        console.log("Profile picture saved successfully");
         // Could add a toast notification here
       } else {
-        console.error('Failed to save profile picture');
+        console.error("Failed to save profile picture");
         // Could add error notification here
       }
     } catch (error) {
-      console.error('Error saving profile picture:', error);
+      console.error("Error saving profile picture:", error);
       // Could add error notification here
     }
   };
@@ -208,10 +218,10 @@ export default function SettingsPage() {
   const handleSaveApiKey = async () => {
     setIsApiKeySaving(true);
     try {
-      const response = await fetch('/api/user/api-key', {
-        method: 'PUT',
+      const response = await fetch("/api/user/api-key", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ apiKey }),
       });
@@ -220,7 +230,7 @@ export default function SettingsPage() {
         setIsApiKeyEditing(false);
       }
     } catch (error) {
-      console.error('Error saving API key:', error);
+      console.error("Error saving API key:", error);
     } finally {
       setIsApiKeySaving(false);
     }
@@ -231,7 +241,7 @@ export default function SettingsPage() {
       await navigator.clipboard.writeText(apiKey);
       // You could add a toast notification here
     } catch (error) {
-      console.error('Error copying API key:', error);
+      console.error("Error copying API key:", error);
     }
   };
 
@@ -245,10 +255,12 @@ export default function SettingsPage() {
               <Link href="/dashboard">
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="w-4 h-4 ml-1" />
-                  {t('back')}
+                  {t("back")}
                 </Button>
               </Link>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">{t('settings')}</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
+                {t("settings")}
+              </span>
             </div>
           </div>
         </div>
@@ -257,12 +269,16 @@ export default function SettingsPage() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          
           {/* Profile Section */}
-          <div id="profile" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div
+            id="profile"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+          >
             <div className="flex items-center space-x-3 mb-6">
               <User className="w-6 h-6 text-purple-600" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('profile')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {t("profile")}
+              </h2>
             </div>
 
             {/* Profile Picture */}
@@ -270,9 +286,9 @@ export default function SettingsPage() {
               <div className="relative">
                 <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
                   {profile.profilePicture ? (
-                    <img 
-                      src={profile.profilePicture} 
-                      alt="Profile" 
+                    <img
+                      src={profile.profilePicture}
+                      alt="Profile"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -292,8 +308,12 @@ export default function SettingsPage() {
                 </label>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900 dark:text-white">{t('profilePicture')}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{t('clickToChange')}</p>
+                <h3 className="font-medium text-gray-900 dark:text-white">
+                  {t("profilePicture")}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t("clickToChange")}
+                </p>
               </div>
             </div>
 
@@ -301,11 +321,13 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('fullName')}
+                  {t("fullName")}
                 </label>
                 <Input
                   value={profile.name}
-                  onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   disabled={!isEditing}
                   className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                 />
@@ -313,37 +335,49 @@ export default function SettingsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('email')}
+                  {t("email")}
                 </label>
                 <Input
                   value={profile.email}
                   disabled
                   className="bg-gray-100 dark:bg-gray-700 dark:text-gray-400"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('emailPermanent')}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {t("emailPermanent")}
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('dateOfBirth')}
+                    {t("dateOfBirth")}
                   </label>
                   <Input
                     type="date"
                     value={profile.dateOfBirth}
-                    onChange={(e) => setProfile(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((prev) => ({
+                        ...prev,
+                        dateOfBirth: e.target.value,
+                      }))
+                    }
                     disabled={!isEditing}
                     className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('anniversaryDate')} ({t('optional')})
+                    {t("anniversaryDate")} ({t("optional")})
                   </label>
                   <Input
                     type="date"
                     value={profile.anniversaryDate}
-                    onChange={(e) => setProfile(prev => ({ ...prev, anniversaryDate: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((prev) => ({
+                        ...prev,
+                        anniversaryDate: e.target.value,
+                      }))
+                    }
                     disabled={!isEditing}
                     className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                   />
@@ -354,23 +388,23 @@ export default function SettingsPage() {
                 {!isEditing ? (
                   <Button onClick={() => setIsEditing(true)}>
                     <User className="w-4 h-4 ml-2" />
-                    {t('editProfile')}
+                    {t("editProfile")}
                   </Button>
                 ) : (
                   <>
-                    <Button 
+                    <Button
                       onClick={handleSaveProfile}
                       disabled={isSaving}
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <Save className="w-4 h-4 ml-2" />
-                      {isSaving ? t('saving') : t('saveChanges')}
+                      {isSaving ? t("saving") : t("saveChanges")}
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => setIsEditing(false)}
                     >
-                      {t('cancel')}
+                      {t("cancel")}
                     </Button>
                   </>
                 )}
@@ -379,16 +413,21 @@ export default function SettingsPage() {
           </div>
 
           {/* API Key Section */}
-          <div id="api-key" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div
+            id="api-key"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+          >
             <div className="flex items-center space-x-3 mb-6">
               <Key className="w-6 h-6 text-purple-600" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('apiKey')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {t("apiKey")}
+              </h2>
             </div>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('apiKey')}
+                  {t("apiKey")}
                 </label>
                 <div className="flex items-center space-x-2">
                   <Input
@@ -404,11 +443,11 @@ export default function SettingsPage() {
                     className="flex items-center space-x-2"
                   >
                     <Copy className="w-4 h-4" />
-                    {t('copyApiKey')}
+                    {t("copyApiKey")}
                   </Button>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {t('apiKeyDescription')}
+                  {t("apiKeyDescription")}
                 </p>
               </div>
 
@@ -416,26 +455,26 @@ export default function SettingsPage() {
                 {!isApiKeyEditing ? (
                   <Button onClick={() => setIsApiKeyEditing(true)}>
                     <Key className="w-4 h-4 ml-2" />
-                    {t('editApiKey')}
+                    {t("editApiKey")}
                   </Button>
                 ) : (
                   <>
-                    <Button 
+                    <Button
                       onClick={handleSaveApiKey}
                       disabled={isApiKeySaving}
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <Save className="w-4 h-4 ml-2" />
-                      {isApiKeySaving ? t('saving') : t('saveApiKey')}
+                      {isApiKeySaving ? t("saving") : t("saveApiKey")}
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => {
                         setIsApiKeyEditing(false);
                         setApiKey("key123"); // Reset to default
                       }}
                     >
-                      {t('cancel')}
+                      {t("cancel")}
                     </Button>
                   </>
                 )}
@@ -444,24 +483,41 @@ export default function SettingsPage() {
           </div>
 
           {/* Appearance Section */}
-          <div id="appearance" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div
+            id="appearance"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+          >
             <div className="flex items-center space-x-3 mb-6">
-              {isDarkMode ? <Moon className="w-6 h-6 text-purple-600" /> : <Sun className="w-6 h-6 text-purple-600" />}
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('appearance')}</h2>
+              {isDarkMode ? (
+                <Moon className="w-6 h-6 text-purple-600" />
+              ) : (
+                <Sun className="w-6 h-6 text-purple-600" />
+              )}
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {t("appearance")}
+              </h2>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium text-gray-900 dark:text-white">{t('darkMode')}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{t('darkModeDescription')}</p>
+                <h3 className="font-medium text-gray-900 dark:text-white">
+                  {t("darkMode")}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t("darkModeDescription")}
+                </p>
               </div>
               <Button
                 variant="outline"
                 onClick={toggleDarkMode}
                 className="flex items-center space-x-2"
               >
-                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                <span>{isDarkMode ? t('lightMode') : t('darkMode')}</span>
+                {isDarkMode ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+                <span>{isDarkMode ? t("lightMode") : t("darkMode")}</span>
               </Button>
             </div>
           </div>
@@ -470,42 +526,62 @@ export default function SettingsPage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
             <div className="flex items-center space-x-3 mb-6">
               <Globe className="w-6 h-6 text-purple-600" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('language')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {t("language")}
+              </h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <h3 className="font-medium text-gray-900 dark:text-white mb-2">{t('interfaceLanguage')}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('languageDescription')}</p>
+                <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                  {t("interfaceLanguage")}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  {t("languageDescription")}
+                </p>
                 <LanguageSelector variant="dropdown" showBeta={true} />
               </div>
-              
+
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('betaLanguagesNote')}
+                  {t("betaLanguagesNote")}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Notification Settings */}
-          <div id="notifications" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div
+            id="notifications"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+          >
             <div className="flex items-center space-x-3 mb-6">
               <Bell className="w-6 h-6 text-purple-600" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('notifications')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {t("notifications")}
+              </h2>
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">{t('emailNotifications')}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('emailNotificationsDescription')}</p>
+                  <h3 className="font-medium text-gray-900 dark:text-white">
+                    {t("emailNotifications")}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t("emailNotificationsDescription")}
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     checked={notifications.email}
-                    onChange={(e) => setNotifications(prev => ({ ...prev, email: e.target.checked }))}
+                    onChange={(e) =>
+                      setNotifications((prev) => ({
+                        ...prev,
+                        email: e.target.checked,
+                      }))
+                    }
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
@@ -514,14 +590,23 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">{t('pushNotifications')}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('pushNotificationsDescription')}</p>
+                  <h3 className="font-medium text-gray-900 dark:text-white">
+                    {t("pushNotifications")}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t("pushNotificationsDescription")}
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     checked={notifications.push}
-                    onChange={(e) => setNotifications(prev => ({ ...prev, push: e.target.checked }))}
+                    onChange={(e) =>
+                      setNotifications((prev) => ({
+                        ...prev,
+                        push: e.target.checked,
+                      }))
+                    }
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
@@ -530,14 +615,23 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">{t('smsNotifications')}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('smsNotificationsDescription')}</p>
+                  <h3 className="font-medium text-gray-900 dark:text-white">
+                    {t("smsNotifications")}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t("smsNotificationsDescription")}
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     checked={notifications.sms}
-                    onChange={(e) => setNotifications(prev => ({ ...prev, sms: e.target.checked }))}
+                    onChange={(e) =>
+                      setNotifications((prev) => ({
+                        ...prev,
+                        sms: e.target.checked,
+                      }))
+                    }
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
@@ -547,41 +641,46 @@ export default function SettingsPage() {
           </div>
 
           {/* Account Actions */}
-          <div id="account" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div
+            id="account"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+          >
             <div className="flex items-center space-x-3 mb-6">
               <Shield className="w-6 h-6 text-purple-600" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('account')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {t("account")}
+              </h2>
             </div>
 
             <div className="space-y-4">
               <Link href="/privacy">
                 <Button variant="outline" className="w-full justify-start">
                   <Shield className="w-4 h-4 ml-2" />
-                  {t('privacyPolicy')}
+                  {t("privacyPolicy")}
                 </Button>
               </Link>
-              
+
               <Link href="/terms">
                 <Button variant="outline" className="w-full justify-start">
                   <Shield className="w-4 h-4 ml-2" />
-                  {t('termsOfService')}
+                  {t("termsOfService")}
                 </Button>
               </Link>
-              
+
               <Link href="/contact">
                 <Button variant="outline" className="w-full justify-start">
                   <Mail className="w-4 h-4 ml-2" />
-                  {t('contact')}
+                  {t("contact")}
                 </Button>
               </Link>
-              
+
               <Button
                 variant="outline"
                 onClick={handleLogout}
                 className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <LogOut className="w-4 h-4 ml-2" />
-                {t('logout')}
+                {t("logout")}
               </Button>
             </div>
           </div>
@@ -589,4 +688,4 @@ export default function SettingsPage() {
       </main>
     </div>
   );
-} 
+}

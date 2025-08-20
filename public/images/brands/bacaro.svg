@@ -3,4 +3,4 @@
   <text x="50" y="35" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">BACARO</text>
   <text x="50" y="55" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="white">RESTAURANT</text>
   <circle cx="50" cy="75" r="3" fill="#FFD700"/>
-</svg> 
+</svg>

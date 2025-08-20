@@ -5,11 +5,11 @@ import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -17,7 +17,7 @@ export async function DELETE(
     const { id: benefitId } = await params;
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -29,14 +29,20 @@ export async function DELETE(
       where: {
         userId_benefitId: {
           userId: user.id,
-          benefitId: benefitId
-        }
-      }
+          benefitId: benefitId,
+        },
+      },
     });
 
-  return NextResponse.json({ message: "benefitUnmarked", deletedUsedBenefit });
+    return NextResponse.json({
+      message: "benefitUnmarked",
+      deletedUsedBenefit,
+    });
   } catch (error) {
     console.error("Error unmarking benefit as used:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
-} 
+}

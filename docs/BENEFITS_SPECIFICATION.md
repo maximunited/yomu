@@ -10,24 +10,24 @@ Benefits are categorized by their validity period relative to a user's birthday 
 
 ### Birthday Benefits
 
-| Validity Type | Description | When Active | Display Text |
-|---------------|-------------|-------------|--------------|
-| `birthday_exact_date` | Only valid on the exact birthday date | Exact birthday date only | "תקף ביום ההולדת בלבד" |
-| `birthday_entire_month` | Valid for the entire birthday month | Entire birthday month | "תקף לכל החודש" |
-| `birthday_week_before_after` | Valid for a week before and after the birthday | 7 days before to 7 days after birthday | "תקף לשבוע לפני ואחרי" |
-| `birthday_weekend` | Valid for the weekend of the birthday | 2 days before to 2 days after birthday | "תקף לשבוע של יום ההולדת" |
-| `birthday_30_days` | Valid for 30 days from the birthday | 30 days before to 30 days after birthday | "תקף ל-30 ימים" |
-| `birthday_7_days_before` | Valid for 7 days before the birthday | 7 days before birthday only | "תקף ל-7 ימים לפני" |
-| `birthday_7_days_after` | Valid for 7 days after the birthday | 7 days after birthday only | "תקף ל-7 ימים אחרי" |
-| `birthday_3_days_before` | Valid for 3 days before the birthday | 3 days before birthday only | "תקף ל-3 ימים לפני" |
-| `birthday_3_days_after` | Valid for 3 days after the birthday | 3 days after birthday only | "תקף ל-3 ימים אחרי" |
+| Validity Type                | Description                                    | When Active                              | Display Text              |
+| ---------------------------- | ---------------------------------------------- | ---------------------------------------- | ------------------------- |
+| `birthday_exact_date`        | Only valid on the exact birthday date          | Exact birthday date only                 | "תקף ביום ההולדת בלבד"    |
+| `birthday_entire_month`      | Valid for the entire birthday month            | Entire birthday month                    | "תקף לכל החודש"           |
+| `birthday_week_before_after` | Valid for a week before and after the birthday | 7 days before to 7 days after birthday   | "תקף לשבוע לפני ואחרי"    |
+| `birthday_weekend`           | Valid for the weekend of the birthday          | 2 days before to 2 days after birthday   | "תקף לשבוע של יום ההולדת" |
+| `birthday_30_days`           | Valid for 30 days from the birthday            | 30 days before to 30 days after birthday | "תקף ל-30 ימים"           |
+| `birthday_7_days_before`     | Valid for 7 days before the birthday           | 7 days before birthday only              | "תקף ל-7 ימים לפני"       |
+| `birthday_7_days_after`      | Valid for 7 days after the birthday            | 7 days after birthday only               | "תקף ל-7 ימים אחרי"       |
+| `birthday_3_days_before`     | Valid for 3 days before the birthday           | 3 days before birthday only              | "תקף ל-3 ימים לפני"       |
+| `birthday_3_days_after`      | Valid for 3 days after the birthday            | 3 days after birthday only               | "תקף ל-3 ימים אחרי"       |
 
 ### Anniversary Benefits (Future Use)
 
-| Validity Type | Description | When Active | Display Text |
-|---------------|-------------|-------------|--------------|
-| `anniversary_exact_date` | Only valid on the exact anniversary date | Exact anniversary date only | "תקף ביום השנה בלבד" |
-| `anniversary_entire_month` | Valid for the entire anniversary month | Entire anniversary month | "תקף לכל חודש השנה" |
+| Validity Type                   | Description                                       | When Active                               | Display Text                    |
+| ------------------------------- | ------------------------------------------------- | ----------------------------------------- | ------------------------------- |
+| `anniversary_exact_date`        | Only valid on the exact anniversary date          | Exact anniversary date only               | "תקף ביום השנה בלבד"            |
+| `anniversary_entire_month`      | Valid for the entire anniversary month            | Entire anniversary month                  | "תקף לכל חודש השנה"             |
 | `anniversary_week_before_after` | Valid for a week before and after the anniversary | 7 days before to 7 days after anniversary | "תקף לשבוע לפני ואחרי יום השנה" |
 
 ## Adding New Benefits
@@ -120,14 +120,14 @@ Benefits appear in the "Coming Soon" section when:
 Use the validation system to test benefit data:
 
 ```javascript
-import { validateBenefitData } from '@/lib/benefit-validation';
+import { validateBenefitData } from "@/lib/benefit-validation";
 
 const benefitData = {
   title: "Test Benefit",
   description: "Test description",
   brandId: "brand-id",
   redemptionMethod: "Test method",
-  validityType: "birthday_entire_month"
+  validityType: "birthday_entire_month",
 };
 
 const validation = validateBenefitData(benefitData);
@@ -139,9 +139,9 @@ console.log(validation.isValid, validation.errors);
 Test if a benefit is active for a user:
 
 ```javascript
-import { isBenefitActive } from '@/lib/benefit-validation';
+import { isBenefitActive } from "@/lib/benefit-validation";
 
-const userDOB = new Date('1990-08-15');
+const userDOB = new Date("1990-08-15");
 const currentDate = new Date();
 const isActive = isBenefitActive(benefit, userDOB, currentDate);
 ```
@@ -206,4 +206,4 @@ For questions about adding benefits or the validation system, refer to:
 
 - `src/lib/benefit-validation.ts` - Core validation logic
 - `scripts/seed-with-validation.js` - Example seeding script
-- Dashboard filtering logic in `src/app/dashboard/page.tsx` 
+- Dashboard filtering logic in `src/app/dashboard/page.tsx`
