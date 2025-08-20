@@ -135,6 +135,23 @@ When working with benefits, always use the validation functions from `src/lib/be
 
 ## Development Workflow
 
+### CRITICAL: Whitespace Prevention Protocol
+
+**MANDATORY BEFORE ANY FILE EDIT:**
+
+1. **Inspect Read output carefully** - Remove ALL trailing spaces from copied text
+2. **Verify Edit parameters** - Both `old_string` and `new_string` must have NO trailing whitespace
+3. **Check line endings** - Ensure proper newline handling without trailing spaces
+4. **Double-check before submit** - Mentally verify no spaces after line content
+
+**Common failure patterns:**
+
+- Copying text from Read output that contains trailing spaces
+- Adding spaces after final characters when editing
+- Inconsistent tab/space mixing
+
+**Prevention rule: ALWAYS manually strip trailing whitespace from Edit tool parameters**
+
 ### Code Quality and Pre-commit Guidelines
 
 **IMPORTANT**: This project uses pre-commit hooks that automatically fix code formatting and run quality checks. Follow these guidelines to prevent commit failures:
