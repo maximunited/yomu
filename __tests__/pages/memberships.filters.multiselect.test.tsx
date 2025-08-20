@@ -26,7 +26,7 @@ describe("MembershipsPage category multi-select filter + styling", () => {
 
     // Multi-select element
     const select = await screen
-      .findByDisplayValue([], { exact: false })
+      .findByDisplayValue("", { exact: false })
       .catch(() => {
         // fallback: query by role 'listbox' which is used for multiple selects
         return screen.getByRole("listbox");

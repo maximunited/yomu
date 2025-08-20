@@ -264,12 +264,15 @@ export function getValidityDisplayText(
   const normalizedType = LEGACY_VALIDITY_TYPES[validityType] || validityType;
   const keyOrText =
     VALIDITY_TYPES[normalizedType]?.displayText || "validForLimitedPeriod";
-  const translationMap = translations[language] as Record<string, string>;
+  const translationMap = translations[language] as unknown as Record<
+    string,
+    string
+  >;
   return translationMap[keyOrText] || keyOrText;
 }
 
 export function isBenefitActive(
-  benefit: any,
+  benefit: { validityType: string },
   userDOB: Date | null,
   currentDate: Date = new Date(),
 ): boolean {
@@ -288,7 +291,7 @@ export function isBenefitActive(
 }
 
 export function getUpcomingBenefits(
-  benefit: any,
+  benefit: { validityType: string },
   userDOB: Date | null,
   currentDate: Date = new Date(),
 ): boolean {

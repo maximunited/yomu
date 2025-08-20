@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -13,8 +13,9 @@ export async function GET(
       return NextResponse.json({ message: "unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const benefit = await prisma.benefit.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         brand: true,
         notifications: true,
@@ -37,7 +38,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -46,9 +47,10 @@ export async function PATCH(
     }
 
     const body = await request.json();
+    const { id } = await params;
 
     const updatedBenefit = await prisma.benefit.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title: body.title,
         description: body.description,
@@ -77,7 +79,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -85,14 +87,16 @@ export async function DELETE(
       return NextResponse.json({ message: "unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
+
     // Delete related notifications first
     await prisma.notification.deleteMany({
-      where: { benefitId: params.id },
+      where: { benefitId: id },
     });
 
     // Delete the benefit
     await prisma.benefit.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "benefitDeletedSuccessfully" });

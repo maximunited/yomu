@@ -59,11 +59,11 @@ describe("Dashboard membership summary count", () => {
       ).toBeInTheDocument(),
     );
     // The count element is the next div with purple text; we assert it eventually reflects non-zero
-    const countEl = await screen.findByText(
-      (_, node) =>
-        node?.textContent === node?.textContent &&
-        node?.className?.includes("text-purple-600"),
-    );
+    const countEl = await screen.findByText((_, node) => {
+      return Boolean(
+        node?.textContent && node?.className?.includes("text-purple-600"),
+      );
+    });
     expect(countEl.textContent).not.toBe("0");
   });
 });

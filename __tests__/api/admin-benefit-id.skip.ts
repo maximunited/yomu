@@ -27,7 +27,7 @@ describe.skip("/api/admin/benefits/[id]", () => {
       method: "PATCH",
       body: JSON.stringify({ isActive: false }),
     } as any) as any;
-    const res = await PATCH(req, { params: { id: "b1" } });
+    const res = await PATCH(req, { params: Promise.resolve({ id: "b1" }) });
     const json = await res.json();
     expect(res.status).toBe(200);
     expect(json).toMatchObject({ id: "b1", isActive: false });
@@ -41,7 +41,7 @@ describe.skip("/api/admin/benefits/[id]", () => {
     const req = new Request("http://localhost", {
       method: "DELETE",
     } as any) as any;
-    const res = await DELETE(req, { params: { id: "b2" } });
+    const res = await DELETE(req, { params: Promise.resolve({ id: "b2" }) });
     expect(res.status).toBe(200);
   });
 });

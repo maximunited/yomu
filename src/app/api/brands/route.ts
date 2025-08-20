@@ -26,7 +26,12 @@ export async function GET(request: NextRequest) {
 
     // Transform brands to include partner brands in a usable format
     const transformedBrands = brands.map((brand) => {
-      const partnerBrands = [];
+      const partnerBrands: Array<{
+        id: string;
+        name: string;
+        isActive: boolean;
+        [key: string]: any;
+      }> = [];
 
       // Add partners where this brand is brandA
       brand.partnershipsFrom.forEach((partnership) => {

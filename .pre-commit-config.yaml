@@ -35,6 +35,13 @@ repos:
         types_or: [javascript, jsx, ts, tsx]
         pass_filenames: false
 
+      - id: type-check
+        name: TypeScript Check
+        entry: npx tsc --noEmit
+        language: system
+        types_or: [ts, tsx]
+        pass_filenames: false
+
       - id: test
         name: Run Tests
         entry: npm test

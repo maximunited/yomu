@@ -9,9 +9,10 @@ const defaultConfig = require("i18n").default as any;
 const { defaultLocale } = require("i18n");
 
 describe("next-intl app router config", () => {
-  it("exports default config with locales", async () => {
-    const cfg = await defaultConfig({});
-    expect(Array.isArray(cfg.locales)).toBe(true);
-    expect(cfg.locales).toContain(defaultLocale);
+  it("exports default config with locale and messages", async () => {
+    const cfg = await defaultConfig({ requestLocale: Promise.resolve("he") });
+    expect(typeof cfg.locale).toBe("string");
+    expect(cfg.locale).toBe("he");
+    expect(typeof cfg.messages).toBe("object");
   });
 });

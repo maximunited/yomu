@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -13,8 +13,9 @@ export async function GET(
       return NextResponse.json({ message: "unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const brand = await prisma.brand.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         benefits: true,
         partnershipsTo: {
@@ -42,7 +43,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -51,9 +52,10 @@ export async function PATCH(
     }
 
     const body = await request.json();
+    const { id } = await params;
 
     const updatedBrand = await prisma.brand.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name,
         logoUrl: body.logoUrl,
@@ -80,7 +82,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -88,24 +90,26 @@ export async function DELETE(
       return NextResponse.json({ message: "unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
+
     // Delete related records first
     await prisma.benefit.deleteMany({
-      where: { brandId: params.id },
+      where: { brandId: id },
     });
 
     await prisma.brandPartnership.deleteMany({
       where: {
-        OR: [{ brandAId: params.id }, { brandBId: params.id }],
+        OR: [{ brandAId: id }, { brandBId: id }],
       },
     });
 
     await prisma.userMembership.deleteMany({
-      where: { brandId: params.id },
+      where: { brandId: id },
     });
 
     // Delete the brand
     await prisma.brand.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "brandDeletedSuccessfully" });

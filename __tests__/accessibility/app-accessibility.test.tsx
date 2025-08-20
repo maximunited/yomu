@@ -111,7 +111,9 @@ describe("Application Accessibility", () => {
       render(<HomePage />);
 
       // Test tab navigation through interactive elements
-      const interactiveElements = screen.getAllByRole("button", "link");
+      const buttons = screen.queryAllByRole("button");
+      const links = screen.queryAllByRole("link");
+      const interactiveElements = [...buttons, ...links];
       expect(interactiveElements.length).toBeGreaterThan(0);
 
       // Focus first element
@@ -378,7 +380,9 @@ describe("Application Accessibility", () => {
     it("should have proper focus management", () => {
       render(<HomePage />);
 
-      const interactiveElements = screen.getAllByRole("button", "link");
+      const buttons = screen.queryAllByRole("button");
+      const links = screen.queryAllByRole("link");
+      const interactiveElements = [...buttons, ...links];
 
       interactiveElements.forEach((element) => {
         element.focus();

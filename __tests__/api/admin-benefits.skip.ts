@@ -19,7 +19,7 @@ describe.skip("/api/admin/benefits", () => {
     (prismaClient.prisma.benefit.findMany as jest.Mock).mockResolvedValueOnce([
       { id: "x1" },
     ]);
-    const res = await GET_LIST(new Request("http://localhost") as any);
+    const res = await GET_LIST();
     const json = await res.json();
     expect(res.status).toBe(200);
     expect(json).toEqual([{ id: "x1" }]);

@@ -7,7 +7,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { translations } from "@/lib/translations";
+import { translations, Language } from "@/lib/translations";
 import {
   LanguageCode,
   detectUserLanguage,
@@ -60,7 +60,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = (key: keyof typeof translations.he): string => {
     // Fallback chain: current language -> English -> Hebrew -> key
-    const currentTranslation = translations[language]?.[key];
+    const currentTranslation = translations[language as Language]?.[key];
     if (currentTranslation) return currentTranslation;
 
     const englishTranslation = translations.en?.[key];

@@ -6,7 +6,12 @@ export const locales = ["he", "en"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "he";
 
-export default getRequestConfig(() => ({
-  locales: Array.from(locales) as unknown as string[],
-  defaultLocale,
-}));
+export default getRequestConfig(async ({ requestLocale }) => {
+  const locale = (await requestLocale) || defaultLocale;
+  return {
+    locale,
+    messages: (await import(`./src/i18n/messages`)).getMessages(
+      locale as Locale,
+    ),
+  };
+});

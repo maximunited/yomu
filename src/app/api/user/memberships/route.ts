@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
           membershipsToCreate.push(mainMembership);
 
           // Get all partner brands (bidirectional partnerships)
-          const partnerBrands = [];
+          const partnerBrands: Array<{ id: string; name: string }> = [];
 
           // Add brands where this brand is brandA in partnerships
           brand.partnershipsFrom.forEach((partnership) => {
