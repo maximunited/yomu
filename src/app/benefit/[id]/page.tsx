@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -41,35 +41,35 @@ export default function BenefitDetailPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const { t, language } = useLanguage();
 
-  useEffect(() => {
-    const fetchBenefit = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(`/api/benefits/${params.id}`);
+  const fetchBenefit = useCallback(async () => {
+    if (!params.id) return;
 
-        if (!response.ok) {
-          if (response.status === 404) {
-            setError(t("benefitNotFound"));
-          } else {
-            setError(t("benefitLoadError"));
-          }
-          return;
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/benefits/${params.id}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError("Benefit not found");
+        } else {
+          setError("Failed to load benefit");
         }
-
-        const data = await response.json();
-        setBenefit(data);
-      } catch (error) {
-        console.error("Error fetching benefit:", error);
-        setError(t("benefitLoadError"));
-      } finally {
-        setIsLoading(false);
+        return;
       }
-    };
 
-    if (params.id) {
-      fetchBenefit();
+      const data = await response.json();
+      setBenefit(data);
+    } catch (error) {
+      console.error("Error fetching benefit:", error);
+      setError("Failed to load benefit");
+    } finally {
+      setIsLoading(false);
     }
-  }, [params.id, t]);
+  }, [params.id]);
+
+  useEffect(() => {
+    fetchBenefit();
+  }, [fetchBenefit]);
 
   if (isLoading) {
     return (
