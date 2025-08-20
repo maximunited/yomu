@@ -13,13 +13,15 @@ const customJestConfig = {
     "<rootDir>/.next/",
     "<rootDir>/node_modules/",
     "<rootDir>/__tests__/utils/",
-    "<rootDir>/__tests__/api/",
     "<rootDir>/__tests__/pages/dashboard.test.tsx",
   ],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   moduleDirectories: ["node_modules", "<rootDir>"],
+  transformIgnorePatterns: [
+    "node_modules/(?!(jose|openid-client|oauth4webapi)/)",
+  ],
   collectCoverageFrom: [
     "src/**/*.{js,jsx,ts,tsx}",
     "!src/**/*.d.ts",
@@ -38,6 +40,11 @@ const customJestConfig = {
     "<rootDir>/__tests__/lib/utils.test.ts",
     "<rootDir>/__tests__/lib/languages.test.ts",
     "<rootDir>/__tests__/lib/auth-placeholder.test.ts",
+    "<rootDir>/__tests__/lib/translations.test.ts",
+    "<rootDir>/__tests__/lib/prisma.test.ts",
+    "<rootDir>/__tests__/lib/auth.test.ts",
+    "<rootDir>/__tests__/lib/utils.cn.edge.test.ts",
+    "<rootDir>/__tests__/lib/utils.cn.objects-arrays.test.ts",
     "<rootDir>/__tests__/i18n/**/*.{js,jsx,ts,tsx}",
     "<rootDir>/__tests__/contexts/**/*.{js,jsx,ts,tsx}",
     "<rootDir>/__tests__/pages/signin-checkboxes.test.tsx",
@@ -50,8 +57,16 @@ const customJestConfig = {
     "<rootDir>/__tests__/accessibility/benefit-detail.test.tsx",
     "<rootDir>/__tests__/features/used-benefits.test.tsx",
     "<rootDir>/__tests__/pages/notifications.render.test.tsx",
-    // Enhanced page tests for coverage improvement (temporarily excluded while fixing provider issues)
-    // "<rootDir>/__tests__/pages/home.render.test.tsx",
+    // Enhanced page tests for coverage improvement (re-enabling after fixing provider issues)
+    "<rootDir>/__tests__/pages/home.render.test.tsx",
+    "<rootDir>/__tests__/pages/about.render.test.tsx",
+    // API tests for missing coverage
+    "<rootDir>/__tests__/api/benefits.test.ts",
+    "<rootDir>/__tests__/api/brands.test.ts",
+    "<rootDir>/__tests__/api/user-memberships.test.ts",
+    "<rootDir>/__tests__/api/benefit-by-id.test.ts",
+    "<rootDir>/__tests__/api/custom-memberships.test.ts",
+    // Additional page tests (still fixing provider issues)
     // "<rootDir>/__tests__/pages/settings.render.test.tsx",
     // "<rootDir>/__tests__/pages/onboarding.render.test.tsx",
     // "<rootDir>/__tests__/pages/demo.render.test.tsx",

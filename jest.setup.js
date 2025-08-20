@@ -148,6 +148,92 @@ global.fetch = jest
   .fn()
   .mockResolvedValue({ ok: true, json: async () => ({}) });
 
+// Polyfill for Web API objects used in Next.js API routes
+global.Request = class Request {
+  constructor(input, init) {
+    this.url = typeof input === "string" ? input : input.url;
+    this.method = init?.method || "GET";
+    this.headers = new Headers(init?.headers);
+    this.body = init?.body;
+  }
+
+  async json() {
+    return JSON.parse(this.body || "{}");
+  }
+};
+
+global.Response = class Response {
+  constructor(body, init) {
+    this.body = body;
+    this.status = init?.status || 200;
+    this.headers = new Headers(init?.headers);
+  }
+
+  async json() {
+    return JSON.parse(this.body || "{}");
+  }
+};
+
+global.Headers = class Headers {
+  constructor(init) {
+    this.map = new Map();
+    if (init) {
+      if (init instanceof Headers) {
+        init.map.forEach((value, key) => this.map.set(key, value));
+      } else if (Array.isArray(init)) {
+        init.forEach(([key, value]) => this.map.set(key, value));
+      } else {
+        Object.entries(init).forEach(([key, value]) =>
+          this.map.set(key, value),
+        );
+      }
+    }
+  }
+
+  get(name) {
+    return this.map.get(name.toLowerCase());
+  }
+
+  set(name, value) {
+    this.map.set(name.toLowerCase(), value);
+  }
+};
+
+global.URL = class URL {
+  constructor(url, base) {
+    this.href = url;
+    this.searchParams = new URLSearchParams();
+    if (url.includes("?")) {
+      const [, query] = url.split("?");
+      this.searchParams = new URLSearchParams(query);
+    }
+  }
+};
+
+global.URLSearchParams = class URLSearchParams {
+  constructor(init) {
+    this.params = new Map();
+    if (typeof init === "string") {
+      init.split("&").forEach((pair) => {
+        const [key, value] = pair.split("=");
+        if (key)
+          this.params.set(
+            decodeURIComponent(key),
+            decodeURIComponent(value || ""),
+          );
+      });
+    }
+  }
+
+  get(name) {
+    return this.params.get(name);
+  }
+
+  set(name, value) {
+    this.params.set(name, value);
+  }
+};
+
 // Provide a global matchMedia polyfill for components checking system theme
 if (!window.matchMedia) {
   // @ts-ignore

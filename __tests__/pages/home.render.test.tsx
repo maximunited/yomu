@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import HomePage from "@/app/page";
+import { DarkModeProvider } from "@/contexts/DarkModeContext";
 
 // Mock next/navigation
 jest.mock("next/navigation", () => ({
@@ -20,11 +21,15 @@ jest.mock("next-auth/react", () => ({
   signIn: jest.fn(),
 }));
 
+const renderWithProviders = (component: React.ReactElement) => {
+  return render(<DarkModeProvider>{component}</DarkModeProvider>);
+};
+
 describe("HomePage (render)", () => {
   it("renders and shows auth links", () => {
-    render(<HomePage />);
-    // header brand
-    expect(screen.getByText(/YomU/)).toBeInTheDocument();
+    renderWithProviders(<HomePage />);
+    // header brand (get all occurrences and verify at least one exists)
+    expect(screen.getAllByText(/YomU/)).toHaveLength(3); // header, logo, footer
     // auth links
     const links = screen.getAllByRole("link");
     const hrefs = links.map((l) => l.getAttribute("href"));
@@ -33,7 +38,7 @@ describe("HomePage (render)", () => {
   });
 
   it("renders main content sections", () => {
-    render(<HomePage />);
+    renderWithProviders(<HomePage />);
 
     // Should have main headings
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
@@ -44,7 +49,7 @@ describe("HomePage (render)", () => {
   });
 
   it("has proper navigation structure", () => {
-    render(<HomePage />);
+    renderWithProviders(<HomePage />);
 
     // Should have navigation elements
     const navLinks = screen.getAllByRole("link");
@@ -56,7 +61,7 @@ describe("HomePage (render)", () => {
   });
 
   it("displays call-to-action elements", () => {
-    render(<HomePage />);
+    renderWithProviders(<HomePage />);
 
     // Should have sign up/sign in CTAs
     expect(screen.getByText(/התחבר/i)).toBeInTheDocument();
@@ -64,7 +69,7 @@ describe("HomePage (render)", () => {
   });
 
   it("should be accessible to screen readers", () => {
-    render(<HomePage />);
+    renderWithProviders(<HomePage />);
 
     // Should have proper ARIA labels and roles
     const mainContent = screen.getByRole("main");
