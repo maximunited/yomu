@@ -13,6 +13,7 @@
 # testing
 /coverage
 /.nyc_output
+/tests/coverage
 
 # jest artifacts
 jest-results.json

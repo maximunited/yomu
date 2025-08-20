@@ -10,17 +10,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` - Create production build
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run test` - Run Jest unit tests (selective suite for stability)
+- `npm run test` - Run Jest unit tests from tests/unit/ directory
 - `npm run test:watch` - Run Jest in watch mode
 - `npm run test:coverage` - Run tests with coverage report
-- `npm run test:e2e` - Run Playwright end-to-end tests
+- `npm run test:e2e` - Run Playwright end-to-end tests from tests/e2e/ directory
 
 ### Integration Testing
 
-- `npm run test:partnerships` - Test multi-brand partnerships
-- `npm run test:api` - Test API endpoints
-- `npm run test:translations` - Validate translation completeness
-- `npm run test:connection` - Test database connectivity
+- `npm run test:partnerships` - Test multi-brand partnerships (tests/integration/)
+- `npm run test:api` - Test API endpoints (tests/integration/api/)
+- `npm run test:translations` - Validate translation completeness (tests/integration/)
+- `npm run test:connection` - Test database connectivity (tests/integration/)
 - `npm run test:docker` - Validate Docker setup
 
 ### Database Operations
@@ -49,6 +49,54 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `./scripts/docker-setup.sh start` - Start production containers
 - `./scripts/docker-setup.sh start-dev` - Start development containers
 - `./scripts/docker-setup.sh init-db` - Initialize database in containers
+
+## Project Structure
+
+This project follows modern industry standards for file organization:
+
+```
+yomu/
+├── src/                        # Source code
+│   ├── app/                    # Next.js App Router pages and API routes
+│   ├── components/             # React components
+│   │   ├── ui/                 # Reusable UI components
+│   │   └── providers/          # Context providers
+│   ├── contexts/               # React context definitions
+│   ├── lib/                    # Utility functions and configurations
+│   ├── types/                  # TypeScript type definitions
+│   └── i18n/                   # Internationalization files
+├── tests/                      # All test files
+│   ├── unit/                   # Unit tests (Jest)
+│   │   ├── components/         # Component tests
+│   │   ├── lib/                # Library function tests
+│   │   ├── pages/              # Page component tests
+│   │   ├── contexts/           # Context tests
+│   │   └── i18n/               # Translation tests
+│   ├── integration/            # Integration tests
+│   │   └── api/                # API endpoint tests
+│   ├── e2e/                    # End-to-end tests (Playwright)
+│   └── utils/                  # Test utilities and helpers
+├── scripts/                    # Build and deployment scripts
+├── prisma/                     # Database schema and migrations
+├── public/                     # Static assets
+├── docs/                       # Documentation
+└── [config files]             # Jest, ESLint, Playwright, etc.
+```
+
+### Test Organization
+
+- **Unit Tests**: `tests/unit/` - Fast, isolated tests for individual components and functions
+- **Integration Tests**: `tests/integration/` - Tests that verify components working together
+- **E2E Tests**: `tests/e2e/` - Full application workflow tests
+- **Test Utils**: `tests/utils/` - Shared test helpers and utilities
+
+### Key Directories
+
+- **src/app/**: Next.js 15 App Router structure with nested layouts and API routes
+- **src/components/**: Reusable React components with proper separation of UI and business logic
+- **src/lib/**: Core utilities including auth, database, translations, and validation logic
+- **scripts/**: Database seeding, admin tools, and deployment scripts
+- **prisma/**: Database schema, migrations, and development database
 
 ## Architecture Overview
 

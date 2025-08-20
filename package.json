@@ -19,7 +19,7 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:partnerships": "node tests/integration/final-multi-brand-test.js",
-    "test:api": "node tests/api/test-api.js",
+    "test:api": "node tests/integration/api/test-api.js",
     "test:translations": "node tests/integration/test-missing-translations.js",
     "test:connection": "node tests/integration/test-connection.js",
     "test:docker": "node scripts/test-docker.js",
