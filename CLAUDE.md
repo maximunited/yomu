@@ -135,15 +135,49 @@ When working with benefits, always use the validation functions from `src/lib/be
 
 ## Development Workflow
 
-### Running Tests Before Commits
+### Code Quality and Pre-commit Guidelines
 
-Always run the following commands before committing changes:
+**IMPORTANT**: This project uses pre-commit hooks that automatically fix code formatting and run quality checks. Follow these guidelines to prevent commit failures:
+
+#### Pre-commit Hook Rules
+
+- **Trailing Whitespace**: All trailing whitespace is automatically removed
+- **End of File**: Files must end with a single newline
+- **Prettier Formatting**: Code is automatically formatted according to .prettierrc
+- **ESLint**: All linting issues must be resolved
+- **TypeScript**: Code must compile without errors
+- **Tests**: All tests must pass before commit
+
+#### Before Making Changes
+
+1. **Clean trailing whitespace**: Use your editor's "trim trailing whitespace" feature
+2. **Ensure proper file endings**: Files should end with a newline
+3. **Run linting**: `npm run lint` to catch issues early
+4. **Verify tests pass**: `npm run test` for unit tests
+
+#### Common Issue Prevention
+
+- **React Hook Dependencies**: Always include all dependencies in useEffect/useCallback dependency arrays
+- **Translation Keys**: When testing translation functions, use the actual values from the translation files
+- **Provider Wrapping**: Page components using contexts (DarkMode, Language) need proper test providers
+- **API Route Parameters**: Next.js 15 uses Promise-based params: `{ params: Promise<{ id: string }> }`
+
+#### Running Tests Before Commits
 
 ```bash
 npm run lint          # Fix linting issues
 npm run test          # Run unit tests
+npm run test:coverage # Check coverage improvements
 npm run test:e2e      # Run end-to-end tests (optional but recommended)
 ```
+
+#### Commit Process
+
+1. Stage changes: `git add .`
+2. Commit: `git commit -m "message"`
+3. Pre-commit hooks will automatically run and may modify files
+4. If hooks make changes, they're automatically included in the commit
+5. Push: `git push`
 
 ### Working with Benefits
 
@@ -186,14 +220,30 @@ When modifying the Prisma schema:
 
 ### Testing
 
-- **Jest Configuration**: Uses selective test suite for stability (see jest.config.js)
-- **Coverage**: Set to 15% threshold for branches/functions/lines/statements
+- **Jest Configuration**: Enhanced configuration for improved coverage (73%+)
+- **Coverage Targets**: 15% minimum threshold, current achievement ~73%
 - **Test Structure**: Unit tests in `__tests__/` directory with category-based organization
+- **Coverage Inclusions**: Most source files included, only auth-specific API routes excluded
 - **E2E Testing**: Playwright with desktop (Chrome, Firefox, Safari) and mobile (Chrome, Safari) browsers
 - **Integration Tests**: Specialized tests for partnerships, API endpoints, translations, and Docker
 - **Test Utilities**: Reusable test helpers in `__tests__/utils/test-utils.tsx`
 - **Accessibility Testing**: Dedicated accessibility tests for key components
-- **Excluded Paths**: Admin pages, server routes, and demo pages excluded from coverage
+
+#### Test Coverage Strategy
+
+- **Core Libraries**: lib/auth.ts, lib/benefit-validation.ts, lib/utils.ts heavily tested
+- **Page Components**: Comprehensive tests for home, settings, onboarding, demo, memberships
+- **UI Components**: Complete coverage for reusable components in components/ui/
+- **Context Providers**: DarkModeContext, LanguageContext tested with multiple scenarios
+- **API Endpoints**: Most user-facing endpoints tested (auth-specific routes excluded)
+
+#### Test Writing Guidelines
+
+- **Component Tests**: Use proper provider wrapping for components using contexts
+- **Hook Dependencies**: Mock useEffect dependencies correctly to prevent infinite loops
+- **Translation Testing**: Use actual translation values, not hardcoded expectations
+- **Async Testing**: Use waitFor() for components with loading states
+- **Provider Identification**: Use 'id' field for NextAuth providers, not 'name'
 
 ### Docker Support
 
@@ -201,3 +251,104 @@ When modifying the Prisma schema:
 - Docker Compose with development and production profiles
 - SQLite database with persistent volumes
 - Supports both Docker and Podman
+
+## Troubleshooting Common Issues
+
+### Test Failures
+
+#### "useDarkMode must be used within a DarkModeProvider"
+
+**Problem**: Page components using `useDarkMode` hook fail in tests
+**Solution**: Wrap test components with proper providers or mock the hook
+
+```tsx
+// Mock the hook in test files
+jest.mock("@/contexts/DarkModeContext", () => ({
+  useDarkMode: () => ({ isDarkMode: false, toggleDarkMode: jest.fn() }),
+}));
+```
+
+#### "Maximum update depth exceeded" / React Infinite Loop
+
+**Problem**: useEffect dependencies cause infinite re-renders
+**Solution**: Use useCallback for stable function references
+
+```tsx
+// Bad - causes infinite loop
+useEffect(() => {
+  fetchData();
+}, [t]); // translation function is unstable
+
+// Good - stable reference
+const fetchData = useCallback(async () => {
+  // fetch logic
+}, [params.id]); // only stable dependencies
+```
+
+#### "Cannot read properties of undefined (reading 'authorize')"
+
+**Problem**: NextAuth provider not found in tests
+**Solution**: Use 'id' field instead of 'name' to find providers
+
+```tsx
+// Bad
+const provider = authOptions.providers.find((p) => p.name === "credentials");
+
+// Good
+const provider = authOptions.providers.find((p) => p.id === "credentials");
+```
+
+### Pre-commit Hook Failures
+
+#### Trailing Whitespace
+
+**Problem**: `trim trailing whitespace.....Failed`
+**Solution**: Configure your editor to remove trailing whitespace on save, or run:
+
+```bash
+# Manual fix (project-wide)
+find . -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | xargs sed -i 's/[[:space:]]*$//'
+```
+
+#### End of File Issues
+
+**Problem**: `fix end of files.....Failed`
+**Solution**: Ensure files end with exactly one newline character
+
+#### Prettier Formatting
+
+**Problem**: `prettier.....Failed`
+**Solution**: Run Prettier before committing:
+
+```bash
+npm run format  # or npx prettier --write .
+```
+
+### Coverage Issues
+
+#### Low Coverage on Existing Files
+
+**Problem**: Files showing 0% coverage despite having tests
+**Solution**: Check Jest configuration - ensure files are included in `collectCoverageFrom`
+
+#### Tests Not Running
+
+**Problem**: Tests exist but aren't executed during coverage
+**Solution**: Verify `testMatch` patterns in jest.config.js include your test files
+
+### Next.js 15 API Routes
+
+#### Parameter Type Errors
+
+**Problem**: API route params cause TypeScript errors
+**Solution**: Use Promise-based params format:
+
+```tsx
+// Old Next.js format
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+
+// Next.js 15 format
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+}
+```
