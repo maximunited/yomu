@@ -354,6 +354,315 @@ describe("Benefit Validation", () => {
     });
   });
 
+  describe("Additional birthday validation types", () => {
+    const userDOB = new Date("1990-06-15"); // June 15th
+
+    describe("birthday_weekend", () => {
+      it("should validate birthday weekend correctly", () => {
+        const benefit = { validityType: "birthday_weekend" };
+
+        // On birthday
+        const birthdayDate = new Date("2024-06-15");
+        expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true);
+
+        // 2 days before
+        const twoDaysBefore = new Date("2024-06-13");
+        expect(isBenefitActive(benefit, userDOB, twoDaysBefore)).toBe(true);
+
+        // 2 days after
+        const twoDaysAfter = new Date("2024-06-17");
+        expect(isBenefitActive(benefit, userDOB, twoDaysAfter)).toBe(true);
+
+        // 3 days before (should be false)
+        const threeDaysBefore = new Date("2024-06-12");
+        expect(isBenefitActive(benefit, userDOB, threeDaysBefore)).toBe(false);
+
+        // 3 days after (should be false)
+        const threeDaysAfter = new Date("2024-06-18");
+        expect(isBenefitActive(benefit, userDOB, threeDaysAfter)).toBe(false);
+
+        // Different month
+        const differentMonth = new Date("2024-07-15");
+        expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+      });
+    });
+
+    describe("birthday_30_days", () => {
+      it("should validate 30 days period correctly", () => {
+        const benefit = { validityType: "birthday_30_days" };
+
+        // On birthday
+        const birthdayDate = new Date("2024-06-15");
+        expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true);
+
+        // 30 days before
+        const thirtyDaysBefore = new Date("2024-05-16");
+        expect(isBenefitActive(benefit, userDOB, thirtyDaysBefore)).toBe(false); // Different month
+
+        // Within same month, 14 days before
+        const fourteenDaysBefore = new Date("2024-06-01");
+        expect(isBenefitActive(benefit, userDOB, fourteenDaysBefore)).toBe(
+          true,
+        );
+
+        // Different month
+        const differentMonth = new Date("2024-07-15");
+        expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+      });
+    });
+
+    describe("birthday_7_days_before", () => {
+      it("should validate 7 days before correctly", () => {
+        const benefit = { validityType: "birthday_7_days_before" };
+
+        // On birthday
+        const birthdayDate = new Date("2024-06-15");
+        expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true);
+
+        // 7 days before
+        const sevenDaysBefore = new Date("2024-06-08");
+        expect(isBenefitActive(benefit, userDOB, sevenDaysBefore)).toBe(true);
+
+        // 1 day after birthday (should be false)
+        const dayAfter = new Date("2024-06-16");
+        expect(isBenefitActive(benefit, userDOB, dayAfter)).toBe(false);
+
+        // 8 days before (should be false)
+        const eightDaysBefore = new Date("2024-06-07");
+        expect(isBenefitActive(benefit, userDOB, eightDaysBefore)).toBe(false);
+
+        // Different month
+        const differentMonth = new Date("2024-07-15");
+        expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+      });
+    });
+
+    describe("birthday_7_days_after", () => {
+      it("should validate 7 days after correctly", () => {
+        const benefit = { validityType: "birthday_7_days_after" };
+
+        // On birthday
+        const birthdayDate = new Date("2024-06-15");
+        expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true);
+
+        // 7 days after
+        const sevenDaysAfter = new Date("2024-06-22");
+        expect(isBenefitActive(benefit, userDOB, sevenDaysAfter)).toBe(true);
+
+        // 1 day before birthday (should be false)
+        const dayBefore = new Date("2024-06-14");
+        expect(isBenefitActive(benefit, userDOB, dayBefore)).toBe(false);
+
+        // 8 days after (should be false)
+        const eightDaysAfter = new Date("2024-06-23");
+        expect(isBenefitActive(benefit, userDOB, eightDaysAfter)).toBe(false);
+
+        // Different month
+        const differentMonth = new Date("2024-07-15");
+        expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+      });
+    });
+
+    describe("birthday_3_days_before", () => {
+      it("should validate 3 days before correctly", () => {
+        const benefit = { validityType: "birthday_3_days_before" };
+
+        // On birthday
+        const birthdayDate = new Date("2024-06-15");
+        expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true);
+
+        // 3 days before
+        const threeDaysBefore = new Date("2024-06-12");
+        expect(isBenefitActive(benefit, userDOB, threeDaysBefore)).toBe(true);
+
+        // 1 day after birthday (should be false)
+        const dayAfter = new Date("2024-06-16");
+        expect(isBenefitActive(benefit, userDOB, dayAfter)).toBe(false);
+
+        // 4 days before (should be false)
+        const fourDaysBefore = new Date("2024-06-11");
+        expect(isBenefitActive(benefit, userDOB, fourDaysBefore)).toBe(false);
+
+        // Different month
+        const differentMonth = new Date("2024-07-15");
+        expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+      });
+    });
+
+    describe("birthday_3_days_after", () => {
+      it("should validate 3 days after correctly", () => {
+        const benefit = { validityType: "birthday_3_days_after" };
+
+        // On birthday
+        const birthdayDate = new Date("2024-06-15");
+        expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true);
+
+        // 3 days after
+        const threeDaysAfter = new Date("2024-06-18");
+        expect(isBenefitActive(benefit, userDOB, threeDaysAfter)).toBe(true);
+
+        // 1 day before birthday (should be false)
+        const dayBefore = new Date("2024-06-14");
+        expect(isBenefitActive(benefit, userDOB, dayBefore)).toBe(false);
+
+        // 4 days after (should be false)
+        const fourDaysAfter = new Date("2024-06-19");
+        expect(isBenefitActive(benefit, userDOB, fourDaysAfter)).toBe(false);
+
+        // Different month
+        const differentMonth = new Date("2024-07-15");
+        expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+      });
+    });
+  });
+
+  describe("Edge cases and validation", () => {
+    it("should handle empty benefit data", () => {
+      const result = validateBenefitData({});
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("Title is required");
+      expect(result.errors).toContain("Description is required");
+      expect(result.errors).toContain("Brand ID is required");
+      expect(result.errors).toContain("Redemption method is required");
+      expect(result.errors).toContain("Validity type is required");
+    });
+
+    it("should handle benefit data with undefined fields", () => {
+      const result = validateBenefitData({
+        title: undefined,
+        description: undefined,
+        brandId: undefined,
+        redemptionMethod: undefined,
+        validityType: undefined,
+      });
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toHaveLength(5);
+    });
+
+    it("should accept valid validity duration as number", () => {
+      const validBenefit = {
+        title: "Test Benefit",
+        description: "Test Description",
+        brandId: "brand-1",
+        redemptionMethod: "code",
+        validityType: "birthday_exact_date",
+        validityDuration: 30,
+      };
+
+      const result = validateBenefitData(validBenefit);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject invalid validity duration types", () => {
+      const invalidTypes = ["string", [], {}, true];
+
+      invalidTypes.forEach((invalidDuration) => {
+        const invalidBenefit = {
+          title: "Test Benefit",
+          description: "Test Description",
+          brandId: "brand-1",
+          redemptionMethod: "code",
+          validityType: "birthday_exact_date",
+          validityDuration: invalidDuration as any,
+        };
+
+        const result = validateBenefitData(invalidBenefit);
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain("Validity duration must be a number");
+      });
+    });
+
+    it("should accept falsy validity duration values", () => {
+      const falsyValues = [false, 0, "", null, undefined];
+
+      falsyValues.forEach((falsyValue) => {
+        const benefit = {
+          title: "Test Benefit",
+          description: "Test Description",
+          brandId: "brand-1",
+          redemptionMethod: "code",
+          validityType: "birthday_exact_date",
+          validityDuration: falsyValue as any,
+        };
+
+        const result = validateBenefitData(benefit);
+        // Should not complain about validity duration for falsy values
+        const hasValidityDurationError = result.errors.some((error) =>
+          error.includes("Validity duration must be a number"),
+        );
+        expect(hasValidityDurationError).toBe(false);
+      });
+    });
+
+    it("should accept undefined validity duration", () => {
+      const validBenefit = {
+        title: "Test Benefit",
+        description: "Test Description",
+        brandId: "brand-1",
+        redemptionMethod: "code",
+        validityType: "birthday_exact_date",
+        // validityDuration is undefined (not provided)
+      };
+
+      const result = validateBenefitData(validBenefit);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should handle all legacy validity type mappings", () => {
+      const legacyMappings = [
+        "validityExactDate",
+        "validityEntireMonth",
+        "validityWeekBeforeAfter",
+        "validityWeekend",
+        "validity30Days",
+        "validity7DaysBefore",
+        "validity7DaysAfter",
+        "validity3DaysBefore",
+        "validity3DaysAfter",
+      ];
+
+      legacyMappings.forEach((legacyType) => {
+        const benefit = {
+          title: "Test Benefit",
+          description: "Test Description",
+          brandId: "brand-1",
+          redemptionMethod: "code",
+          validityType: legacyType,
+        };
+
+        const result = validateBenefitData(benefit);
+        expect(result.isValid).toBe(true);
+        expect(result.errors).toHaveLength(0);
+      });
+    });
+
+    it("should return fallback display text for unmapped legacy types", () => {
+      // Test a legacy type that doesn't exist in LEGACY_VALIDITY_TYPES
+      expect(getValidityDisplayText("nonexistent_legacy_type", "he")).toBe(
+        "תקף לתקופה מוגבלת",
+      );
+      expect(getValidityDisplayText("nonexistent_legacy_type", "en")).toBe(
+        "Valid for limited period",
+      );
+    });
+
+    it("should handle missing validity type in benefit data", () => {
+      const benefit = {
+        title: "Test Benefit",
+        description: "Test Description",
+        brandId: "brand-1",
+        redemptionMethod: "code",
+        // Missing validityType
+      };
+
+      const result = validateBenefitData(benefit);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("Validity type is required");
+    });
+  });
+
   describe("ALL_VALIDITY_TYPES", () => {
     it("should contain all validity types", () => {
       expect(ALL_VALIDITY_TYPES).toContain("birthday_exact_date");
