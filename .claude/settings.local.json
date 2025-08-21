@@ -17,7 +17,8 @@
       "Bash(rm:*)",
       "Bash(git commit:*)",
       "Bash(npm outdated:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx playwright test:*)"
     ],
     "deny": []
   }

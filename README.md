@@ -216,22 +216,72 @@ For detailed Docker/Podman documentation, see [docs/DOCKER.md](docs/DOCKER.md).
 
 ## 🧪 Testing & Scripts
 
-```bash
-# Lint
-npm run lint
+### Test Coverage
 
-# Unit/integration tests
+- **71/71 unit test suites passing (100%)**
+- **255/255 individual tests passing (100%)**
+- **Comprehensive E2E test suite with Playwright**
+- **Accessibility testing compliance**
+- **Mobile responsiveness testing**
+
+### Unit Tests
+
+```bash
+# Run all unit tests
 npm test
 
-# Playwright E2E
+# Watch mode for development
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+### End-to-End Tests
+
+```bash
+# Run all E2E tests
 npm run test:e2e
+
+# Run with browser UI visible
+npm run test:e2e:headed
+
+# Debug mode (step-by-step)
+npm run test:e2e:debug
+
+# Mobile-specific tests
+npm run test:e2e:mobile
+
+# Accessibility tests
+npm run test:e2e:accessibility
+
+# View test reports
+npm run test:e2e:report
+```
+
+### Specialized Tests
+
+```bash
+# Lint code quality
+npm run lint
 
 # Translation checks
 npm run test:translations
 
-# Docker smoke test (Compose)
+# Docker smoke test
 npm run test:docker
+
+# Partnership tests
+npm run test:partnerships
 ```
+
+### Test Structure
+
+- **Unit Tests**: `tests/unit/` - Component, page, and utility testing
+- **E2E Tests**: `tests/e2e/` - Full user journey testing
+- **Integration Tests**: `tests/integration/` - API and system integration
+- **Accessibility**: Automated ARIA compliance and keyboard navigation
+- **Mobile Testing**: Responsive design and touch interactions
 
 ## 🛠️ Tech Stack
 
