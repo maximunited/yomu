@@ -180,7 +180,7 @@ export default function MembershipsPage() {
       } catch (error) {
         console.error("Error loading data:", error);
         // Fallback to mock data if API fails
-        setMemberships([
+        const fallbackMemberships: Membership[] = [
           {
             id: "1",
             name: "McDonald's",
@@ -371,8 +371,9 @@ export default function MembershipsPage() {
             type: "free",
             cost: null,
           },
-        ]);
-        setOriginalMemberships(memberships); // Ensure original memberships are set even on fallback
+        ];
+        setMemberships(fallbackMemberships);
+        setOriginalMemberships(fallbackMemberships); // Use the same fallback data
       } finally {
         setIsLoading(false);
       }
@@ -381,7 +382,7 @@ export default function MembershipsPage() {
     if (session) {
       loadData();
     }
-  }, [session, memberships, t]);
+  }, [session, t]);
 
   // Note: Do not early-return before all hooks are called. Authentication gates are placed later.
 

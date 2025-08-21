@@ -6,11 +6,11 @@ import { Gift, Calendar, Star, Users } from "lucide-react";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
 import { DynamicYear } from "@/components/DynamicYear";
-import { useTranslations } from "next-intl";
 import { useDarkMode } from "@/contexts/DarkModeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function HomePage() {
-  const t = useTranslations();
+  const { t } = useLanguage();
   const { isDarkMode } = useDarkMode();
 
   return (
@@ -58,7 +58,9 @@ export default function HomePage() {
       <main className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto">
           <h1
-            className={`text-5xl md:text-6xl font-bold mb-6 !text-gray-900 dark:text-white`}
+            className={`text-5xl md:text-6xl font-bold mb-6 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
           >
             {t("heroTitle")}
           </h1>

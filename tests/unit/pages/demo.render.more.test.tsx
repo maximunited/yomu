@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "../../utils/test-helpers";
 import DemoPage from "@/app/demo/page";
 
 describe("DemoPage extra assertions", () => {
