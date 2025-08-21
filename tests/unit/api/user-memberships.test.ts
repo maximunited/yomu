@@ -94,7 +94,7 @@ describe("/api/user/memberships", () => {
       mockGetServerSession.mockResolvedValue(null);
       prisma.user.findFirst.mockResolvedValue({ id: "testuser" });
 
-      const mockMemberships = [];
+      const mockMemberships: any[] = [];
       prisma.userMembership.findMany.mockResolvedValue(mockMemberships);
 
       const request = new NextRequest(

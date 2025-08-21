@@ -54,7 +54,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This project follows modern industry standards for file organization:
 
-```
+```text
 yomu/
 ├── src/                        # Source code
 │   ├── app/                    # Next.js App Router pages and API routes
@@ -198,7 +198,9 @@ When working with benefits, always use the validation functions from `src/lib/be
 - Adding spaces after final characters when editing
 - Inconsistent tab/space mixing
 
-**Prevention rule: ALWAYS manually strip trailing whitespace from Edit tool parameters**
+### Prevention Rule
+
+ALWAYS manually strip trailing whitespace from Edit tool parameters
 
 ### Code Quality and Pre-commit Guidelines
 
@@ -287,11 +289,11 @@ When modifying the Prisma schema:
 
 - **Jest Configuration**: Enhanced configuration for improved coverage (73%+)
 - **Coverage Targets**: 15% minimum threshold, current achievement ~73%
-- **Test Structure**: Unit tests in `__tests__/` directory with category-based organization
+- **Test Structure**: Unit tests in `tests/unit/` directory with category-based organization
 - **Coverage Inclusions**: Most source files included, only auth-specific API routes excluded
 - **E2E Testing**: Playwright with desktop (Chrome, Firefox, Safari) and mobile (Chrome, Safari) browsers
 - **Integration Tests**: Specialized tests for partnerships, API endpoints, translations, and Docker
-- **Test Utilities**: Reusable test helpers in `__tests__/utils/test-utils.tsx`
+- **Test Utilities**: Reusable test helpers in `tests/utils/test-helpers.tsx`
 - **Accessibility Testing**: Dedicated accessibility tests for key components
 
 #### Test Coverage Strategy

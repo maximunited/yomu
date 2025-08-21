@@ -1,5 +1,4 @@
 import { GET } from "@/app/api/brands/route";
-import { NextRequest } from "next/server";
 
 // Mock Prisma
 jest.mock("@/lib/prisma", () => ({
@@ -30,8 +29,7 @@ describe("/api/brands", () => {
 
     prisma.brand.findMany.mockResolvedValue(mockBrands);
 
-    const request = new NextRequest("http://localhost:3000/api/brands");
-    const response = await GET(request);
+    const response = await GET();
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -45,8 +43,7 @@ describe("/api/brands", () => {
   it("should handle database errors", async () => {
     prisma.brand.findMany.mockRejectedValue(new Error("Database error"));
 
-    const request = new NextRequest("http://localhost:3000/api/brands");
-    const response = await GET(request);
+    const response = await GET();
 
     expect(response.status).toBe(500);
   });
@@ -63,10 +60,7 @@ describe("/api/brands", () => {
 
     prisma.brand.findMany.mockResolvedValue(mockBrands);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/brands?category=food",
-    );
-    const response = await GET(request);
+    const response = await GET();
 
     expect(response.status).toBe(200);
     expect(prisma.brand.findMany).toHaveBeenCalledWith({

@@ -54,14 +54,17 @@ This project uses automated pre-commit hooks that enforce code quality. Understa
 ### Test Organization
 
 ```
-__tests__/
-├── components/         # UI component tests
-├── lib/               # Core library tests
-├── pages/             # Page component tests
-├── contexts/          # React context tests
-├── i18n/              # Internationalization tests
-├── accessibility/     # A11y specific tests
-└── e2e/              # End-to-end tests
+tests/
+├── unit/               # Unit tests (Jest)
+│   ├── components/     # UI component tests
+│   ├── lib/           # Core library tests
+│   ├── pages/         # Page component tests
+│   ├── contexts/      # React context tests
+│   ├── i18n/          # Internationalization tests
+│   └── accessibility/ # A11y specific tests
+├── integration/        # Integration tests (shell scripts)
+├── e2e/               # End-to-end tests (Playwright)
+└── utils/             # Test utilities
 ```
 
 ### Common Testing Patterns

@@ -10,9 +10,9 @@ describe("middleware config", () => {
       getRequestConfig: (factory: any) => factory,
     }));
 
-    const { locales, defaultLocale } = require("../../i18n");
+    const { locales, defaultLocale } = require("../../../i18n");
     // Load the middleware module after mocking dependency
-    const mw = require("../../middleware").default;
+    const mw = require("../../../middleware").default;
     expect(typeof mw).toBe("function");
     expect(createMw).toHaveBeenCalledWith({ locales, defaultLocale });
   });

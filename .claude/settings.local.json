@@ -14,7 +14,10 @@
       "Bash(mv:*)",
       "Bash(mkdir:*)",
       "Bash(cp:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git commit:*)",
+      "Bash(npm outdated:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }

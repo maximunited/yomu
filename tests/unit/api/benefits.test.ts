@@ -11,6 +11,12 @@ jest.mock("@/lib/auth", () => ({
 // Mock Prisma
 jest.mock("@/lib/prisma", () => ({
   prisma: {
+    user: {
+      findFirst: jest.fn(),
+    },
+    userMembership: {
+      findMany: jest.fn(),
+    },
     benefit: {
       findMany: jest.fn(),
     },
@@ -18,7 +24,6 @@ jest.mock("@/lib/prisma", () => ({
 }));
 
 import { GET } from "@/app/api/benefits/route";
-import { NextRequest } from "next/server";
 
 describe("/api/benefits", () => {
   const { prisma } = require("@/lib/prisma");
@@ -28,61 +33,65 @@ describe("/api/benefits", () => {
   });
 
   it("should return benefits list", async () => {
+    const mockUser = { id: "testuser" };
+    const mockMemberships = [];
     const mockBenefits = [
       {
         id: "1",
         title: "Birthday Discount",
         description: "10% off on birthday",
+        brandId: "brand1",
         validityType: "birthday_exact_date",
+        validityDuration: 1,
+        redemptionMethod: "in-store",
+        isFree: true,
+        promoCode: null,
+        termsAndConditions: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         brand: {
+          id: "brand1",
           name: "Test Brand",
           logoUrl: "https://example.com/logo.png",
+          website: "https://example.com",
+          category: "food",
+          actionUrl: null,
+          actionType: null,
+          actionLabel: null,
         },
       },
     ];
 
+    prisma.user.findFirst.mockResolvedValue(mockUser);
+    prisma.userMembership.findMany.mockResolvedValue(mockMemberships);
     prisma.benefit.findMany.mockResolvedValue(mockBenefits);
 
-    const request = new NextRequest("http://localhost:3000/api/benefits");
-    const response = await GET(request);
+    const response = await GET();
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data).toEqual(mockBenefits);
-    expect(prisma.benefit.findMany).toHaveBeenCalledWith({
-      include: { brand: true },
-    });
+    expect(data.benefits).toBeDefined();
+    expect(data.memberships).toBe(0);
+    expect(data.benefits).toHaveLength(1);
+    expect(data.benefits[0].title).toBe("Birthday Discount");
   });
 
   it("should handle database errors", async () => {
-    prisma.benefit.findMany.mockRejectedValue(new Error("Database error"));
+    prisma.user.findFirst.mockResolvedValue({ id: "testuser" });
+    prisma.userMembership.findMany.mockRejectedValue(
+      new Error("Database error"),
+    );
 
-    const request = new NextRequest("http://localhost:3000/api/benefits");
-    const response = await GET(request);
+    const response = await GET();
 
     expect(response.status).toBe(500);
   });
 
-  it("should filter benefits by brand if brandId provided", async () => {
-    const mockBenefits = [
-      {
-        id: "1",
-        title: "Birthday Discount",
-        brandId: "brand1",
-      },
-    ];
+  it("should return 401 when no user found", async () => {
+    prisma.user.findFirst.mockResolvedValue(null);
 
-    prisma.benefit.findMany.mockResolvedValue(mockBenefits);
+    const response = await GET();
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/benefits?brandId=brand1",
-    );
-    const response = await GET(request);
-
-    expect(response.status).toBe(200);
-    expect(prisma.benefit.findMany).toHaveBeenCalledWith({
-      where: { brandId: "brand1" },
-      include: { brand: true },
-    });
+    expect(response.status).toBe(401);
   });
 });

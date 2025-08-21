@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "../../utils/test-helpers";
 import userEvent from "@testing-library/user-event";
 import BenefitDetailPage from "@/app/benefit/[id]/page";
 

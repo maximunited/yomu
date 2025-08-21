@@ -14,24 +14,27 @@ The testing setup includes:
 ## Test Structure
 
 ```text
-__tests__/
-├── api/                    # API route tests
-│   ├── benefits.test.ts
-│   └── user/
-│       └── profile.test.ts
-├── components/             # Component tests
-│   └── ui/
-│       ├── Button.test.tsx
-│       └── Input.test.tsx
-├── lib/                    # Utility function tests
-│   └── benefit-validation.test.ts
-├── pages/                  # Page integration tests
-│   └── dashboard.test.tsx
-├── e2e/                    # End-to-end tests
+tests/
+├── unit/                   # Unit tests (Jest)
+│   ├── api/                # API route tests
+│   │   ├── benefits.test.ts
+│   │   └── user/
+│   │       └── profile.test.ts
+│   ├── components/         # Component tests
+│   │   └── ui/
+│   │       ├── Button.test.tsx
+│   │       └── Input.test.tsx
+│   ├── lib/                # Utility function tests
+│   │   └── benefit-validation.test.ts
+│   ├── pages/              # Page integration tests
+│   │   └── dashboard.test.tsx
+│   └── README.md          # This file
+├── integration/            # Integration tests (shell scripts)
+│   └── test-*.js
+├── e2e/                    # End-to-end tests (Playwright)
 │   └── dashboard.spec.ts
-├── utils/                  # Test utilities
-│   └── test-utils.tsx
-└── README.md              # This file
+└── utils/                  # Test utilities
+    └── test-helpers.tsx
 ```
 
 ## Running Tests
@@ -49,7 +52,7 @@ npm run test:watch
 npm run test:coverage
 
 # Run specific test file
-npm test -- __tests__/api/benefits.test.ts
+npm test -- tests/unit/api/benefits.test.ts
 
 # Run tests matching a pattern
 npm test -- --testNamePattern="Button"
@@ -87,7 +90,7 @@ Unit tests focus on individual functions and components in isolation.
 - Form validation logic
 - Date calculations
 
-**Location:** `__tests__/components/`, `__tests__/lib/`
+**Location:** `tests/unit/components/`, `tests/unit/lib/`
 
 ### 2. Integration Tests
 
@@ -100,7 +103,7 @@ Integration tests verify that different parts of the application work together c
 - Authentication flow
 - Component interactions
 
-**Location:** `__tests__/api/`, `__tests__/pages/`
+**Location:** `tests/unit/api/`, `tests/unit/pages/`
 
 ### 3. End-to-End Tests
 
@@ -113,7 +116,7 @@ E2E tests simulate real user interactions across the entire application.
 - Benefit browsing and redemption
 - Responsive design testing
 
-**Location:** `__tests__/e2e/`
+**Location:** `tests/e2e/`
 
 ## Testing Patterns
 
@@ -216,7 +219,7 @@ jest.mock("@/lib/prisma", () => ({
 ### Custom Render Function
 
 ```typescript
-import { render } from '@/__tests__/utils/test-utils'
+import { render } from '../utils/test-helpers'
 
 // Includes all providers automatically
 render(<MyComponent />)
@@ -225,7 +228,7 @@ render(<MyComponent />)
 ### Mock Data
 
 ```typescript
-import { mockUser, mockBenefit, mockBrand } from "@/__tests__/utils/test-utils";
+import { mockUser, mockBenefit, mockBrand } from "../utils/test-helpers";
 
 // Use consistent mock data across tests
 ```
@@ -233,7 +236,7 @@ import { mockUser, mockBenefit, mockBrand } from "@/__tests__/utils/test-utils";
 ### Setup Helpers
 
 ```typescript
-import { setupMockFetch, setupMockSession } from "@/__tests__/utils/test-utils";
+import { setupMockFetch, setupMockSession } from "../utils/test-helpers";
 
 beforeEach(() => {
   setupMockFetch();

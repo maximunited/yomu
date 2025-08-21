@@ -40,15 +40,13 @@ describe("BenefitDetailPage error + actions", () => {
     render(<BenefitDetailPage />);
     await waitFor(() => expect(screen.getByText("Brand")).toBeInTheDocument());
 
-    // Buy button
-    const buyBtn = screen.getByRole("button", { name: /buy|קנה|רכישה/i });
+    // Buy button - look for the actual Hebrew text
+    const buyBtn = screen.getByRole("button", { name: /לקנייה באתר המותג/i });
     fireEvent.click(buyBtn);
     expect(openSpy).toHaveBeenCalled();
 
     // Official site button
-    const siteBtn = screen
-      .getAllByRole("button")
-      .find((b) => /official|רשמי|website/i.test(b.textContent || ""))!;
+    const siteBtn = screen.getByRole("button", { name: /אתר המותג הרשמי/i });
     fireEvent.click(siteBtn);
     expect(openSpy).toHaveBeenCalled();
     openSpy.mockRestore();

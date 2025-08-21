@@ -13,7 +13,7 @@ Successfully reorganized the project structure to follow modern industry standar
 
 ### After (Industry Standard)
 
-```
+```text
 yomu/
 ├── .github/                    # GitHub workflows and templates
 ├── .vscode/                    # VS Code workspace settings

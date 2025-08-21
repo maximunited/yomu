@@ -10,9 +10,11 @@ describe("SettingsPage toggles", () => {
     fireEvent.click(darkToggle);
 
     // API key edit flow
-    const editBtn = screen.getByRole("button", { name: /edit api key|עריכת/i });
+    const editBtn = screen.getByRole("button", { name: /ערוך מפתח API/i });
     fireEvent.click(editBtn);
-    const saveBtn = screen.getByRole("button", { name: /save api key|שמירה/i });
+
+    // After clicking edit, look for save button
+    const saveBtn = screen.getByRole("button", { name: /שמור|save/i });
     fireEvent.click(saveBtn);
   });
 });

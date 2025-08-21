@@ -216,6 +216,8 @@ export const LEGACY_VALIDITY_TYPES: Record<string, string> = {
 
 export function validateBenefitData(benefitData: {
   title?: string;
+  description?: string;
+  brandId?: string;
   validityType?: string;
   validityDuration?: number;
   redemptionMethod?: string;

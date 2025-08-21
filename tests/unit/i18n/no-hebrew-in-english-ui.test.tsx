@@ -10,7 +10,7 @@ jest.mock("@/lib/languages", () => {
   return { ...actual, DEFAULT_LANGUAGE: "en" as const };
 });
 
-import { render, screen } from "__tests__/utils/test-helpers";
+import { render, screen } from "../../utils/test-helpers";
 import DashboardPage from "@/app/dashboard/page";
 
 // Hebrew validity phrases that should not appear when UI is English

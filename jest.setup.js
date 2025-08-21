@@ -151,10 +151,39 @@ global.fetch = jest
 // Polyfill for Web API objects used in Next.js API routes
 global.Request = class Request {
   constructor(input, init) {
-    this.url = typeof input === "string" ? input : input.url;
-    this.method = init?.method || "GET";
-    this.headers = new Headers(init?.headers);
-    this.body = init?.body;
+    const url = typeof input === "string" ? input : input.url;
+    const method = init?.method || "GET";
+    const headers = new Headers(init?.headers);
+    const body = init?.body;
+
+    // Use property descriptors to make properties compatible with NextRequest
+    Object.defineProperty(this, "url", {
+      value: url,
+      writable: false,
+      enumerable: true,
+      configurable: false,
+    });
+
+    Object.defineProperty(this, "method", {
+      value: method,
+      writable: false,
+      enumerable: true,
+      configurable: false,
+    });
+
+    Object.defineProperty(this, "headers", {
+      value: headers,
+      writable: false,
+      enumerable: true,
+      configurable: false,
+    });
+
+    Object.defineProperty(this, "body", {
+      value: body,
+      writable: false,
+      enumerable: true,
+      configurable: false,
+    });
   }
 
   async json() {
@@ -171,6 +200,16 @@ global.Response = class Response {
 
   async json() {
     return JSON.parse(this.body || "{}");
+  }
+
+  static json(data, init) {
+    return new Response(JSON.stringify(data), {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...init?.headers,
+      },
+    });
   }
 };
 
@@ -197,16 +236,87 @@ global.Headers = class Headers {
   set(name, value) {
     this.map.set(name.toLowerCase(), value);
   }
+
+  entries() {
+    return this.map.entries();
+  }
+
+  keys() {
+    return this.map.keys();
+  }
+
+  values() {
+    return this.map.values();
+  }
+
+  has(name) {
+    return this.map.has(name.toLowerCase());
+  }
+
+  delete(name) {
+    return this.map.delete(name.toLowerCase());
+  }
+
+  forEach(callback, thisArg) {
+    this.map.forEach(callback, thisArg);
+  }
 };
 
 global.URL = class URL {
   constructor(url, base) {
-    this.href = url;
+    const urlString = String(url);
+    this.href = urlString;
+    this.origin = "http://localhost:3000";
+    this.protocol = "http:";
+    this.host = "localhost:3000";
+    this.hostname = "localhost";
+    this.port = "3000";
+    this.pathname = "/";
+    this.search = "";
+    this.hash = "";
+
+    // Parse the URL string
+    try {
+      if (urlString.includes("://")) {
+        const [protocol, rest] = urlString.split("://");
+        this.protocol = protocol + ":";
+
+        let remaining = rest;
+        if (remaining.includes("/")) {
+          const [hostPart, pathPart] = remaining.split("/", 2);
+          this.host = hostPart;
+          this.pathname = "/" + pathPart;
+        } else {
+          this.host = remaining;
+        }
+
+        if (this.host.includes(":")) {
+          [this.hostname, this.port] = this.host.split(":");
+        } else {
+          this.hostname = this.host;
+          this.port = "";
+        }
+
+        this.origin = `${this.protocol}//${this.host}`;
+      }
+    } catch (e) {
+      // Fallback for malformed URLs
+    }
+
     this.searchParams = new URLSearchParams();
-    if (url.includes("?")) {
-      const [, query] = url.split("?");
+    if (urlString.includes("?")) {
+      const [, query] = urlString.split("?");
+      this.search = "?" + query;
       this.searchParams = new URLSearchParams(query);
     }
+  }
+
+  toString() {
+    return this.href;
+  }
+
+  toJSON() {
+    return this.href;
   }
 };
 
