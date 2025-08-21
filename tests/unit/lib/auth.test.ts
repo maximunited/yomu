@@ -267,7 +267,7 @@ describe("authOptions", () => {
   it("should have debug mode based on NODE_ENV", () => {
     // Test that debug is a boolean value
     expect(typeof authOptions.debug).toBe("boolean");
-    
+
     // In test environment, debug should be false (NODE_ENV !== "development")
     expect(authOptions.debug).toBe(false);
   });

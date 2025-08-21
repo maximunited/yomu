@@ -1,10 +1,10 @@
-import createMiddleware from "next-intl/middleware";
-import { locales, defaultLocale } from "./i18n";
+import { NextRequest, NextResponse } from "next/server";
 
-export default createMiddleware({
-  locales,
-  defaultLocale,
-});
+export function middleware(request: NextRequest) {
+  // Simple middleware that just passes through requests
+  // Language switching is now handled client-side by LanguageContext
+  return NextResponse.next();
+}
 
 export const config = {
   // Skip API routes, static files and Next.js internals
