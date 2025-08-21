@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "../../utils/test-helpers";
 import userEvent from "@testing-library/user-event";
 import DemoPage from "@/app/demo/page";
 

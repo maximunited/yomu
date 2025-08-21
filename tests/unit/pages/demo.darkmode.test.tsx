@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "../../utils/test-helpers";
+import { render, screen } from "@testing-library/react";
 import DemoPage from "@/app/demo/page";
 
 // Mock the DarkModeContext
@@ -30,8 +30,16 @@ describe("DemoPage Dark Mode Integration", () => {
 
     // Check for light mode background classes
     const mainContainer = screen.getByRole("main").parentElement;
-    expect(mainContainer).toHaveClass("from-purple-50", "via-pink-50", "to-orange-50");
-    expect(mainContainer).not.toHaveClass("from-gray-900", "via-gray-800", "to-gray-900");
+    expect(mainContainer).toHaveClass(
+      "from-purple-50",
+      "via-pink-50",
+      "to-orange-50",
+    );
+    expect(mainContainer).not.toHaveClass(
+      "from-gray-900",
+      "via-gray-800",
+      "to-gray-900",
+    );
   });
 
   it("should render with dark mode styling", () => {
@@ -43,8 +51,16 @@ describe("DemoPage Dark Mode Integration", () => {
 
     // Check for dark mode background classes
     const mainContainer = screen.getByRole("main").parentElement;
-    expect(mainContainer).toHaveClass("from-gray-900", "via-gray-800", "to-gray-900");
-    expect(mainContainer).not.toHaveClass("from-purple-50", "via-pink-50", "to-orange-50");
+    expect(mainContainer).toHaveClass(
+      "from-gray-900",
+      "via-gray-800",
+      "to-gray-900",
+    );
+    expect(mainContainer).not.toHaveClass(
+      "from-purple-50",
+      "via-pink-50",
+      "to-orange-50",
+    );
   });
 
   it("should have dark mode toggle in header", () => {
@@ -104,7 +120,7 @@ describe("DemoPage Dark Mode Integration", () => {
 
     // Look for benefit cards (they contain brand names)
     const benefitCards = screen.getAllByText(/fox|starbucks|super-pharm|h&m/i);
-    
+
     if (benefitCards.length > 0) {
       // Check that benefit cards exist (content will vary)
       expect(benefitCards.length).toBeGreaterThan(0);
@@ -165,10 +181,10 @@ describe("DemoPage Dark Mode Integration", () => {
 
     // Check for main content
     expect(screen.getByRole("main")).toBeInTheDocument();
-    
+
     // Check for header
     expect(screen.getByRole("banner")).toBeInTheDocument();
-    
+
     // Check that links have proper structure
     const links = screen.getAllByRole("link");
     expect(links.length).toBeGreaterThan(0);

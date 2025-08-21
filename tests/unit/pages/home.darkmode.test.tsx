@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "../../utils/test-helpers";
+import { render, screen } from "@testing-library/react";
 import HomePage from "@/app/page";
 
 // Mock the DarkModeContext
@@ -14,7 +14,8 @@ jest.mock("@/contexts/LanguageContext", () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         heroTitle: "Never Miss a Birthday Deal Again",
-        heroDescription: "Track your birthday benefits from all your favorite brands in one place",
+        heroDescription:
+          "Track your birthday benefits from all your favorite brands in one place",
         feature1Title: "Track Benefits",
         feature1Description: "Keep track of all your birthday benefits",
         feature2Title: "Never Miss",
@@ -22,7 +23,7 @@ jest.mock("@/contexts/LanguageContext", () => ({
         feature3Title: "Save Money",
         feature3Description: "Make the most of your special day",
         statsBrands: "Brands",
-        statsBenefits: "Benefits", 
+        statsBenefits: "Benefits",
         statsUsers: "Users",
         statsSaved: "Saved",
         signIn: "Sign In",
@@ -54,7 +55,7 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
     render(<HomePage />);
 
     const heroTitle = screen.getByText("Never Miss a Birthday Deal Again");
-    
+
     // Should have text-gray-900 for light mode
     expect(heroTitle).toHaveClass("text-gray-900");
     expect(heroTitle).not.toHaveClass("text-white");
@@ -68,7 +69,7 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
     render(<HomePage />);
 
     const heroTitle = screen.getByText("Never Miss a Birthday Deal Again");
-    
+
     // Should have text-white for dark mode
     expect(heroTitle).toHaveClass("text-white");
     expect(heroTitle).not.toHaveClass("text-gray-900");
@@ -82,7 +83,7 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
     render(<HomePage />);
 
     const heroTitle = screen.getByText("Never Miss a Birthday Deal Again");
-    
+
     // Should not have the problematic hardcoded classes
     expect(heroTitle).not.toHaveClass("!text-gray-900");
     expect(heroTitle).not.toHaveClass("dark:text-white");
@@ -118,7 +119,7 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
     render(<HomePage />);
 
     const heroDescription = screen.getByText(/Track your birthday benefits/);
-    
+
     // Hero description should also have proper dark mode styling
     expect(heroDescription).toHaveClass("text-gray-300");
   });
@@ -147,7 +148,9 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
     const darkHeroTitle = screen.getByText("Never Miss a Birthday Deal Again");
     expect(darkHeroTitle).toHaveClass("text-white");
 
-    const darkHeroDescription = screen.getByText(/Track your birthday benefits/);
+    const darkHeroDescription = screen.getByText(
+      /Track your birthday benefits/,
+    );
     expect(darkHeroDescription).toHaveClass("text-gray-300");
   });
 
@@ -162,7 +165,7 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
     const heroTitle = screen.getByRole("heading", { level: 1 });
     expect(heroTitle).toBeInTheDocument();
     expect(heroTitle).toHaveClass("text-white");
-    
+
     // Should not have conflicting color classes
     const classNames = heroTitle.className;
     expect(classNames).not.toMatch(/!text-gray-900/);
@@ -180,8 +183,8 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
     const mainContainer = document.querySelector(".min-h-screen");
     expect(mainContainer).toHaveClass(
       "from-gray-900",
-      "via-gray-800", 
-      "to-gray-900"
+      "via-gray-800",
+      "to-gray-900",
     );
   });
 
@@ -197,7 +200,7 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
     expect(mainContainer).toHaveClass(
       "from-purple-50",
       "via-pink-50",
-      "to-orange-50"
+      "to-orange-50",
     );
   });
 
@@ -208,9 +211,11 @@ describe("HomePage Hero Title Dark Mode Fix", () => {
 
     render(<HomePage />);
 
-    const featureTitles = screen.getAllByText(/Track Benefits|Never Miss|Save Money/);
-    
-    featureTitles.forEach(title => {
+    const featureTitles = screen.getAllByText(
+      /Track Benefits|Never Miss|Save Money/,
+    );
+
+    featureTitles.forEach((title) => {
       expect(title).toHaveClass("text-white");
       expect(title).not.toHaveClass("text-gray-900");
     });

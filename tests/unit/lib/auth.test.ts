@@ -272,6 +272,134 @@ describe("authOptions", () => {
     expect(authOptions.debug).toBe(false);
   });
 
+  it("should handle JWT callback with user data", async () => {
+    const mockUser = {
+      id: "user123",
+      email: "test@example.com",
+      name: "Test User",
+    };
+    const mockToken = {};
+
+    if (authOptions.callbacks?.jwt) {
+      const result = await authOptions.callbacks.jwt({
+        token: mockToken,
+        user: mockUser,
+        account: null,
+        profile: undefined,
+        isNewUser: false,
+        trigger: "signIn",
+      });
+
+      expect(result.id).toBe("user123");
+      expect(result.email).toBe("test@example.com");
+      expect(result.name).toBe("Test User");
+    }
+  });
+
+  it("should handle JWT callback without user data", async () => {
+    const mockToken = {
+      id: "existing",
+      email: "existing@test.com",
+      name: "Existing",
+    };
+
+    if (authOptions.callbacks?.jwt) {
+      const result = await authOptions.callbacks.jwt({
+        token: mockToken,
+        user: undefined,
+        account: null,
+        profile: undefined,
+        isNewUser: false,
+        trigger: "update",
+      });
+
+      expect(result).toEqual(mockToken);
+    }
+  });
+
+  it("should handle session callback with token data", async () => {
+    const mockSession = {
+      user: { id: "", email: "", name: "" },
+      expires: "2024-12-31",
+    };
+    const mockToken = {
+      id: "token123",
+      email: "token@example.com",
+      name: "Token User",
+    };
+
+    if (authOptions.callbacks?.session) {
+      const result = await authOptions.callbacks.session({
+        session: mockSession,
+        token: mockToken,
+        user: mockSession.user,
+      });
+
+      expect(result.user.id).toBe("token123");
+      expect(result.user.email).toBe("token@example.com");
+      expect(result.user.name).toBe("Token User");
+    }
+  });
+
+  it("should handle session callback without token", async () => {
+    const mockSession = {
+      user: { id: "original", email: "original@test.com", name: "Original" },
+      expires: "2024-12-31",
+    };
+
+    if (authOptions.callbacks?.session) {
+      const result = await authOptions.callbacks.session({
+        session: mockSession,
+        token: undefined,
+        user: mockSession.user,
+      });
+
+      expect(result).toEqual(mockSession);
+    }
+  });
+
+  it("should handle authorize with invalid password", async () => {
+    const { prisma } = require("@/lib/prisma");
+    prisma.user.findUnique.mockResolvedValue({
+      id: "u1",
+      email: "test@example.com",
+      name: "Test User",
+      password: "bad", // This won't match with bcrypt mock
+    });
+
+    const credsProvider: any = authOptions.providers.find(
+      (p: any) => p.id === "credentials",
+    );
+    const result = await credsProvider.authorize({
+      email: "test@example.com",
+      password: "wrong",
+    });
+
+    expect(result).toBeNull();
+  });
+
+  it("should handle authorize with missing email", async () => {
+    const credsProvider: any = authOptions.providers.find(
+      (p: any) => p.id === "credentials",
+    );
+    const result = await credsProvider.authorize({
+      password: "test",
+    });
+
+    expect(result).toBeNull();
+  });
+
+  it("should handle authorize with missing password", async () => {
+    const credsProvider: any = authOptions.providers.find(
+      (p: any) => p.id === "credentials",
+    );
+    const result = await credsProvider.authorize({
+      email: "test@example.com",
+    });
+
+    expect(result).toBeNull();
+  });
+
   it("jwt callback should preserve existing token fields", async () => {
     const existingToken = {
       existing: "field",
