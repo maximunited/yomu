@@ -1,0 +1,17 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="brownGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A0522D;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#brownGradient)" rx="12"/>
+  <ellipse cx="60" cy="45" rx="25" ry="15" fill="#D2691E"/>
+  <path d="M40 50 Q50 40 60 50 Q70 40 80 50" stroke="#654321" stroke-width="3" fill="none"/>
+  <circle cx="50" cy="45" r="3" fill="#654321"/>
+  <circle cx="70" cy="45" r="3" fill="#654321"/>
+  <rect x="45" y="60" width="30" height="8" fill="#D2691E" rx="4"/>
+  <text x="60" y="85" font-family="Georgia, serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#F4E4BC">BUCKAROO</text>
+  <text x="60" y="98" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#DEB887">באקרו</text>
+  <text x="60" y="108" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="#CD853F">RESTAURANT</text>
+</svg>

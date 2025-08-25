@@ -63,9 +63,7 @@ const predefinedBrands = [
   },
   {
     name: "BBB",
-    // Inline SVG to ensure logo is available; replace with real asset if added under public/images/brands
-    logoUrl:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' rx='16' ry='16' fill='%23000'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='28' fill='%23fff'>BBB</text></svg>",
+    logoUrl: "/images/brands/bbb.png",
     website: "https://www.burgus.co.il/",
     description: "רשת מסעדות המבורגרים (BBB) – הטבות יום הולדת במסעדות הרשת",
     category: "food",
@@ -86,9 +84,7 @@ const predefinedBrands = [
   },
   {
     name: "Nono & Mimi",
-    // Simple inline SVG logo placeholder to avoid missing assets
-    logoUrl:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' rx='16' ry='16' fill='%23000'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='32' fill='%23fff'>NM</text></svg>",
+    logoUrl: "/images/brands/nono-mimi.png",
     website: "https://nonomimi.com",
     description: "הטבות במסעדות נונו & מימי",
     category: "food",
@@ -98,8 +94,7 @@ const predefinedBrands = [
   },
   {
     name: "Giraffe",
-    logoUrl:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' rx='16' ry='16' fill='%23f59e0b'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='36' fill='%23000'>G</text></svg>",
+    logoUrl: "/images/brands/giraffe.png",
     website: "https://www.giraffe.co.il/",
     description: "הטבות במסעדות ג'ירף",
     category: "food",
@@ -120,7 +115,7 @@ const predefinedBrands = [
   {
     name: "אסקייפרום",
     logoUrl: "/images/brands/escape-room.svg",
-    website: "https://www.escape-room.co.il",
+    website: "https://www.escaperoom.co.il",
     description: "חדרי בריחה - 50 שח הנחה בחודש יומולדת",
     category: "entertainment",
   },
@@ -141,7 +136,7 @@ const predefinedBrands = [
   {
     name: "ג'מס - Jem's",
     logoUrl: "/images/brands/james.svg",
-    website: "https://www.james.co.il",
+    website: "https://www.jems.co.il",
     description: "חצי ליטר בירה מתנה",
     category: "food",
   },

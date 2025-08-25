@@ -18,7 +18,12 @@
       "Bash(git commit:*)",
       "Bash(npm outdated:*)",
       "Bash(npm run build:*)",
-      "Bash(npx playwright test:*)"
+      "Bash(npx playwright test:*)",
+      "Bash(npx jest:*)",
+      "Bash(npm run assets:brands:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:www.facebook.com)"
     ],
     "deny": []
   }
