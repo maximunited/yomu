@@ -30,7 +30,7 @@ describe("MembershipsPage useEffect Dependencies", () => {
     (global.fetch as jest.Mock).mockImplementation((...args) => {
       fetchCallCount++;
       const url = args[0];
-      
+
       if (url.includes("/api/brands")) {
         return Promise.resolve({
           ok: true,
@@ -45,7 +45,7 @@ describe("MembershipsPage useEffect Dependencies", () => {
           ],
         });
       }
-      
+
       if (url.includes("/api/user/memberships")) {
         return Promise.resolve({
           ok: true,
@@ -60,7 +60,7 @@ describe("MembershipsPage useEffect Dependencies", () => {
           }),
         });
       }
-      
+
       if (url.includes("/api/benefits")) {
         return Promise.resolve({
           ok: true,
@@ -103,7 +103,7 @@ describe("MembershipsPage useEffect Dependencies", () => {
     const initialFetchCount = fetchCallCount;
 
     // Wait a bit more to ensure no additional calls
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Should not have excessive calls (proving no infinite loop)
     // Initial load makes 3 calls (/api/brands, /api/user/memberships, /api/benefits)
@@ -124,7 +124,7 @@ describe("MembershipsPage useEffect Dependencies", () => {
     const initialFetchCount = fetchCallCount;
 
     // Wait longer to ensure no continuous re-fetching
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     // Should not have excessive additional fetch calls
     expect(fetchCallCount).toBeLessThan(35); // No infinite loop
@@ -161,7 +161,7 @@ describe("MembershipsPage useEffect Dependencies", () => {
     const afterSessionChangeFetchCount = fetchCallCount;
 
     // Wait to ensure no infinite loop after session change
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Should not continue growing excessively after session change
     expect(fetchCallCount).toBeLessThan(40); // No infinite loop
@@ -176,12 +176,12 @@ describe("MembershipsPage useEffect Dependencies", () => {
     const { unmount } = render(<MembershipsPage />);
 
     // Wait for initial attempts to be made
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     const initialFetchCount = fetchCallCount;
 
     // Wait to ensure fallback doesn't cause additional fetches
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Should not have excessive additional calls after fallback
     expect(fetchCallCount).toBeLessThan(10);
@@ -191,7 +191,9 @@ describe("MembershipsPage useEffect Dependencies", () => {
 
   it("should maintain consistent originalMemberships state", async () => {
     // Mock console.error to suppress expected error logs from fallback
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     // Mock fetch to fail for testing fallback consistency
     (global.fetch as jest.Mock).mockRejectedValue(new Error("API Error"));
@@ -199,10 +201,10 @@ describe("MembershipsPage useEffect Dependencies", () => {
     const { unmount } = render(<MembershipsPage />);
 
     // Wait for component to mount and attempts to be made
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     // Wait to ensure state is stable
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Should not cause infinite re-renders - some retries are expected
     const finalFetchCount = fetchCallCount;

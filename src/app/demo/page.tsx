@@ -117,31 +117,43 @@ export default function DemoPage() {
   );
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDarkMode
-        ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
-        : "bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50"
-    }`}>
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        isDarkMode
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+          : "bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50"
+      }`}
+    >
       {/* Header */}
-      <header className={`shadow-sm border-b ${
-        isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-      }`}>
+      <header
+        className={`shadow-sm border-b ${
+          isDarkMode
+            ? "bg-gray-800 border-gray-700"
+            : "bg-white border-gray-200"
+        }`}
+      >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <Gift className="w-6 h-6 text-white" />
               </div>
-              <span className={`text-xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}>YomU</span>
+              <span
+                className={`text-xl font-bold ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                YomU
+              </span>
             </div>
             <div className="flex items-center space-x-4">
               <DarkModeToggle />
               <LanguageSwitcher />
-              <span className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
-              }`}>
+              <span
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 {t("demo") || "דמו"}
               </span>
               <Link href="/auth/signup">
@@ -156,14 +168,16 @@ export default function DemoPage() {
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="text-center mb-8">
-          <h1 className={`text-3xl font-bold mb-2 ${
-            isDarkMode ? "text-white" : "text-gray-900"
-          }`}>
+          <h1
+            className={`text-3xl font-bold mb-2 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
             {t("welcome")} YomU! 🎉
           </h1>
-          <p className={`mb-4 ${
-            isDarkMode ? "text-gray-300" : "text-gray-600"
-          }`}>
+          <p
+            className={`mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}
+          >
             {t("hereAreYourBirthdayBenefits")}
           </p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-md mx-auto">
@@ -181,9 +195,11 @@ export default function DemoPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <Star className="w-6 h-6 text-purple-600" />
-            <h2 className={`text-2xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}>
+            <h2
+              className={`text-2xl font-bold ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
               {t("activeNow")}
             </h2>
           </div>
@@ -204,9 +220,11 @@ export default function DemoPage() {
                     />
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}>
+                    <h3
+                      className={`font-semibold ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       {benefit.brand.name}
                     </h3>
                     <span className="text-sm text-purple-600 font-medium">
@@ -215,22 +233,28 @@ export default function DemoPage() {
                   </div>
                 </div>
 
-                <h4 className={`font-bold text-lg mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>
+                <h4
+                  className={`font-bold text-lg mb-2 ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {benefit.title}
                 </h4>
-                <p className={`text-sm mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}>
+                <p
+                  className={`text-sm mb-4 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
                   {benefit.description}
                 </p>
 
                 {benefit.promoCode && (
                   <div className="flex items-center space-x-2 mb-4">
-                    <span className={`text-sm font-medium ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}>
+                    <span
+                      className={`text-sm font-medium ${
+                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       {t("couponCode")}:
                     </span>
                     <code className="bg-purple-100 border border-purple-200 px-3 py-2 rounded-md text-sm font-mono text-purple-800 font-bold">
@@ -279,9 +303,11 @@ export default function DemoPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <Calendar className="w-6 h-6 text-orange-600" />
-            <h2 className={`text-2xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}>
+            <h2
+              className={`text-2xl font-bold ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
               {t("comingSoon")}
             </h2>
           </div>
@@ -302,9 +328,11 @@ export default function DemoPage() {
                     />
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}>
+                    <h3
+                      className={`font-semibold ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       {benefit.brand.name}
                     </h3>
                     <span className="text-sm text-orange-600 font-medium">
@@ -313,14 +341,18 @@ export default function DemoPage() {
                   </div>
                 </div>
 
-                <h4 className={`font-bold text-lg mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>
+                <h4
+                  className={`font-bold text-lg mb-2 ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {benefit.title}
                 </h4>
-                <p className={`text-sm mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}>
+                <p
+                  className={`text-sm mb-4 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
                   {benefit.description}
                 </p>
 
@@ -339,17 +371,23 @@ export default function DemoPage() {
         </div>
 
         {/* Call to Action */}
-        <div className={`rounded-xl shadow-lg p-8 text-center ${
-          isDarkMode ? "bg-gray-800" : "bg-white"
-        }`}>
-          <h3 className={`text-2xl font-bold mb-4 ${
-            isDarkMode ? "text-white" : "text-gray-900"
-          }`}>
+        <div
+          className={`rounded-xl shadow-lg p-8 text-center ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
+        >
+          <h3
+            className={`text-2xl font-bold mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
             {t("getStarted")}
           </h3>
-          <p className={`mb-6 ${
-            isDarkMode ? "text-gray-300" : "text-gray-600"
-          }`}>{t("signUpNow")}</p>
+          <p
+            className={`mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}
+          >
+            {t("signUpNow")}
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup">
               <Button size="lg" className="px-8 py-3">
