@@ -72,17 +72,19 @@ export default function SettingsPage() {
         const response = await fetch("/api/user/profile");
         if (response.ok) {
           const data = await response.json();
-          setProfile((prev) => ({
-            ...prev,
-            ...data.user,
-            // Convert null dates to empty strings for React inputs
-            dateOfBirth: data.user.dateOfBirth
-              ? new Date(data.user.dateOfBirth).toISOString().split("T")[0]
-              : "",
-            anniversaryDate: data.user.anniversaryDate
-              ? new Date(data.user.anniversaryDate).toISOString().split("T")[0]
-              : "",
-          }));
+          if (data.user) {
+            setProfile((prev) => ({
+              ...prev,
+              ...data.user,
+              // Convert null dates to empty strings for React inputs
+              dateOfBirth: data.user.dateOfBirth
+                ? new Date(data.user.dateOfBirth).toISOString().split("T")[0]
+                : "",
+              anniversaryDate: data.user.anniversaryDate
+                ? new Date(data.user.anniversaryDate).toISOString().split("T")[0]
+                : "",
+            }));
+          }
         }
       } catch (error) {
         console.error("Error loading profile:", error);
@@ -120,6 +122,12 @@ export default function SettingsPage() {
   };
 
   const handleSaveProfile = async () => {
+    // Validate required fields
+    if (!profile.name.trim()) {
+      console.error("Name is required");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const response = await fetch("/api/user/profile", {

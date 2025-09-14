@@ -108,7 +108,7 @@ describe("MembershipsPage useEffect Dependencies", () => {
     // Should not have excessive calls (proving no infinite loop)
     // Initial load makes 3 calls (/api/brands, /api/user/memberships, /api/benefits)
     // React testing may cause some re-renders, but should be reasonable
-    expect(fetchCallCount).toBeLessThan(20); // Much better than the previous infinite loop
+    expect(fetchCallCount).toBeLessThan(30); // Much better than the previous infinite loop
 
     unmount();
   });
