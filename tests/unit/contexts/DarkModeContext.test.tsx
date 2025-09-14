@@ -1,8 +1,8 @@
-import { renderHook, act } from "@testing-library/react";
-import { DarkModeProvider, useDarkMode } from "@/contexts/DarkModeContext";
+import { renderHook, act } from '@testing-library/react';
+import { DarkModeProvider, useDarkMode } from '@/contexts/DarkModeContext';
 
 // Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
     matches: false,
@@ -16,15 +16,15 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
-describe("DarkModeContext", () => {
+describe('DarkModeContext', () => {
   beforeEach(() => {
     localStorage.clear();
-    document.documentElement.classList.remove("dark");
+    document.documentElement.classList.remove('dark');
     jest.clearAllMocks();
   });
 
-  describe("Toggle Functionality", () => {
-    it("toggles dark mode and persists to localStorage", () => {
+  describe('Toggle Functionality', () => {
+    it('toggles dark mode and persists to localStorage', () => {
       const wrapper = ({ children }: any) => (
         <DarkModeProvider>{children}</DarkModeProvider>
       );
@@ -35,17 +35,17 @@ describe("DarkModeContext", () => {
       });
 
       expect(result.current.isDarkMode).toBe(false);
-      expect(localStorage.getItem("darkMode")).toBe("false");
+      expect(localStorage.getItem('darkMode')).toBe('false');
 
       act(() => {
         result.current.toggleDarkMode();
       });
 
       expect(result.current.isDarkMode).toBe(true);
-      expect(localStorage.getItem("darkMode")).toBe("true");
+      expect(localStorage.getItem('darkMode')).toBe('true');
     });
 
-    it("toggles from light to dark and back", () => {
+    it('toggles from light to dark and back', () => {
       const wrapper = ({ children }: any) => (
         <DarkModeProvider>{children}</DarkModeProvider>
       );
@@ -71,9 +71,9 @@ describe("DarkModeContext", () => {
     });
   });
 
-  describe("Persistence", () => {
-    it("loads saved dark mode preference from localStorage", () => {
-      localStorage.setItem("darkMode", "true");
+  describe('Persistence', () => {
+    it('loads saved dark mode preference from localStorage', () => {
+      localStorage.setItem('darkMode', 'true');
 
       const wrapper = ({ children }: any) => (
         <DarkModeProvider>{children}</DarkModeProvider>
@@ -83,8 +83,8 @@ describe("DarkModeContext", () => {
       expect(result.current.isDarkMode).toBe(true);
     });
 
-    it("loads saved light mode preference from localStorage", () => {
-      localStorage.setItem("darkMode", "false");
+    it('loads saved light mode preference from localStorage', () => {
+      localStorage.setItem('darkMode', 'false');
 
       const wrapper = ({ children }: any) => (
         <DarkModeProvider>{children}</DarkModeProvider>
@@ -94,9 +94,9 @@ describe("DarkModeContext", () => {
       expect(result.current.isDarkMode).toBe(false);
     });
 
-    it("defaults to system preference when no saved preference", () => {
+    it('defaults to system preference when no saved preference', () => {
       (window.matchMedia as jest.Mock).mockImplementation((query) => ({
-        matches: query === "(prefers-color-scheme: dark)",
+        matches: query === '(prefers-color-scheme: dark)',
         media: query,
         onchange: null,
         addListener: jest.fn(),
@@ -114,7 +114,7 @@ describe("DarkModeContext", () => {
       expect(result.current.isDarkMode).toBe(true);
     });
 
-    it("persists changes to localStorage", () => {
+    it('persists changes to localStorage', () => {
       const wrapper = ({ children }: any) => (
         <DarkModeProvider>{children}</DarkModeProvider>
       );
@@ -124,18 +124,18 @@ describe("DarkModeContext", () => {
         result.current.setDarkMode(true);
       });
 
-      expect(localStorage.getItem("darkMode")).toBe("true");
+      expect(localStorage.getItem('darkMode')).toBe('true');
 
       act(() => {
         result.current.setDarkMode(false);
       });
 
-      expect(localStorage.getItem("darkMode")).toBe("false");
+      expect(localStorage.getItem('darkMode')).toBe('false');
     });
   });
 
-  describe("DOM Manipulation", () => {
-    it("adds dark class to document element when dark mode is enabled", () => {
+  describe('DOM Manipulation', () => {
+    it('adds dark class to document element when dark mode is enabled', () => {
       const wrapper = ({ children }: any) => (
         <DarkModeProvider>{children}</DarkModeProvider>
       );
@@ -145,11 +145,11 @@ describe("DarkModeContext", () => {
         result.current.setDarkMode(true);
       });
 
-      expect(document.documentElement.classList.contains("dark")).toBe(true);
+      expect(document.documentElement.classList.contains('dark')).toBe(true);
     });
 
-    it("removes dark class from document element when dark mode is disabled", () => {
-      document.documentElement.classList.add("dark");
+    it('removes dark class from document element when dark mode is disabled', () => {
+      document.documentElement.classList.add('dark');
 
       const wrapper = ({ children }: any) => (
         <DarkModeProvider>{children}</DarkModeProvider>
@@ -160,22 +160,22 @@ describe("DarkModeContext", () => {
         result.current.setDarkMode(false);
       });
 
-      expect(document.documentElement.classList.contains("dark")).toBe(false);
+      expect(document.documentElement.classList.contains('dark')).toBe(false);
     });
   });
 
-  describe("Error Handling", () => {
-    it("throws error when used outside of provider", () => {
+  describe('Error Handling', () => {
+    it('throws error when used outside of provider', () => {
       expect(() => {
         renderHook(() => useDarkMode());
-      }).toThrow("useDarkMode must be used within a DarkModeProvider");
+      }).toThrow('useDarkMode must be used within a DarkModeProvider');
     });
   });
 
-  describe("System Preference Detection", () => {
-    it("respects system dark mode preference", () => {
+  describe('System Preference Detection', () => {
+    it('respects system dark mode preference', () => {
       (window.matchMedia as jest.Mock).mockImplementation((query) => ({
-        matches: query === "(prefers-color-scheme: dark)",
+        matches: query === '(prefers-color-scheme: dark)',
         media: query,
         onchange: null,
         addListener: jest.fn(),
@@ -193,7 +193,7 @@ describe("DarkModeContext", () => {
       expect(result.current.isDarkMode).toBe(true);
     });
 
-    it("respects system light mode preference", () => {
+    it('respects system light mode preference', () => {
       (window.matchMedia as jest.Mock).mockImplementation((query) => ({
         matches: false,
         media: query,

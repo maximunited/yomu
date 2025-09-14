@@ -1,10 +1,10 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function simpleTest() {
   try {
-    console.log("Testing Prisma connection...");
+    console.log('Testing Prisma connection...');
 
     const userCount = await prisma.user.count();
     console.log(`Users in database: ${userCount}`);
@@ -15,7 +15,7 @@ async function simpleTest() {
     const brandCount = await prisma.brand.count();
     console.log(`Brands in database: ${brandCount}`);
   } catch (error) {
-    console.error("Error:", error);
+    console.error('Error:', error);
   } finally {
     await prisma.$disconnect();
   }

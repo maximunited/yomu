@@ -1,13 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function testUiPartnerships() {
   try {
-    console.log("🧪 Testing UI partnership display...\n");
+    console.log('🧪 Testing UI partnership display...\n');
 
     // 1. Test the brands API response that the memberships page uses
-    console.log("1️⃣ Testing brands API response for memberships page:");
+    console.log('1️⃣ Testing brands API response for memberships page:');
 
     const brands = await prisma.brand.findMany({
       where: { isActive: true },
@@ -15,7 +15,7 @@ async function testUiPartnerships() {
         partnershipsFrom: { include: { brandB: true } },
         partnershipsTo: { include: { brandA: true } },
       },
-      orderBy: { name: "asc" },
+      orderBy: { name: 'asc' },
     });
 
     // Transform brands like the API does
@@ -59,7 +59,7 @@ async function testUiPartnerships() {
       let description = brand.description;
       const partners = brand.partnerBrands || brand.childBrands || [];
       if (partners.length > 0) {
-        const partnerNames = partners.map((partner) => partner.name).join(", ");
+        const partnerNames = partners.map((partner) => partner.name).join(', ');
         description += ` | כולל גישה ל: ${partnerNames}`;
       }
 
@@ -70,29 +70,29 @@ async function testUiPartnerships() {
         category: brand.category,
         isActive: activeBrandIds.has(brand.id),
         icon: brand.logoUrl,
-        type: "free",
+        type: 'free',
         cost: null,
         partnerCount: partners.length,
       };
     });
 
-    console.log("How memberships page will display partnerships:");
+    console.log('How memberships page will display partnerships:');
     brandMemberships
       .filter((b) => b.partnerCount > 0)
       .forEach((membership) => {
-        const status = membership.isActive ? "✅ ACTIVE" : "❌ inactive";
+        const status = membership.isActive ? '✅ ACTIVE' : '❌ inactive';
         console.log(`\n${status} ${membership.name} (${membership.category})`);
         console.log(`  Description: ${membership.description}`);
 
         if (membership.description.length > 100) {
           console.log(
-            `  ⚠️  Description is long (${membership.description.length} chars) - might be truncated in UI`,
+            `  ⚠️  Description is long (${membership.description.length} chars) - might be truncated in UI`
           );
         }
       });
 
     // 2. Test benefits display
-    console.log("\n2️⃣ Testing benefits display on dashboard:");
+    console.log('\n2️⃣ Testing benefits display on dashboard:');
 
     const benefits = await prisma.benefit.findMany({
       where: { isActive: true },
@@ -115,11 +115,11 @@ async function testUiPartnerships() {
     // Filter to user's memberships
     const userBrandIds = new Set(userMemberships.map((m) => m.brandId));
     const userBenefits = benefits.filter((benefit) =>
-      userBrandIds.has(benefit.brandId),
+      userBrandIds.has(benefit.brandId)
     );
 
     console.log(
-      `User has access to ${userBenefits.length} benefits from ${userMemberships.length} memberships:`,
+      `User has access to ${userBenefits.length} benefits from ${userMemberships.length} memberships:`
     );
 
     const benefitsByBrand = {};
@@ -133,54 +133,53 @@ async function testUiPartnerships() {
     Object.entries(benefitsByBrand).forEach(([brandName, brandBenefits]) => {
       console.log(`\n  ${brandName} (${brandBenefits.length} benefits):`);
       brandBenefits.forEach((benefit) => {
-        const actionText = benefit.brand.actionLabel || "לקנייה";
+        const actionText = benefit.brand.actionLabel || 'לקנייה';
         console.log(`    - ${benefit.title} [${actionText}]`);
       });
     });
 
     // 3. Test partnership display recommendations
-    console.log("\n3️⃣ UI improvement recommendations:");
+    console.log('\n3️⃣ UI improvement recommendations:');
 
     const brandsWithManyPartners = brandMemberships.filter(
-      (b) => b.partnerCount > 2,
+      (b) => b.partnerCount > 2
     );
 
     if (brandsWithManyPartners.length > 0) {
-      console.log("\nBrands with 3+ partners (may need better UI display):");
+      console.log('\nBrands with 3+ partners (may need better UI display):');
       brandsWithManyPartners.forEach((brand) => {
         console.log(`  ${brand.name}: ${brand.partnerCount} partners`);
         console.log(
-          `    Current description length: ${brand.description.length} chars`,
+          `    Current description length: ${brand.description.length} chars`
         );
 
         // Suggest improvements
         if (brand.description.length > 120) {
           console.log(
-            `    💡 Suggestion: Show partner count instead of full names`,
+            `    💡 Suggestion: Show partner count instead of full names`
           );
           console.log(
-            `    💡 Alternative: "כולל גישה ל-${brand.partnerCount} מותגים נוספים"`,
+            `    💡 Alternative: "כולל גישה ל-${brand.partnerCount} מותגים נוספים"`
           );
         }
       });
     }
 
     // 4. Test a more complex scenario: Create a 5-brand network
-    console.log("\n4️⃣ Testing even larger partnership network:");
+    console.log('\n4️⃣ Testing even larger partnership network:');
 
     // Find some more brands to create a larger network
     const allBrands = await prisma.brand.findMany({
-      where: { isActive: true, category: "food" },
+      where: { isActive: true, category: 'food' },
       select: { id: true, name: true },
     });
 
     console.log(`Available food brands: ${allBrands.length}`);
 
     // Create a 5-brand food network by adding one more brand
-    const existingFoodPartners = ["KFC", "McDonald", "באקרו", "יומנגס"];
+    const existingFoodPartners = ['KFC', 'McDonald', 'באקרו', 'יומנגס'];
     const availableForNetwork = allBrands.filter(
-      (b) =>
-        !existingFoodPartners.some((existing) => b.name.includes(existing)),
+      (b) => !existingFoodPartners.some((existing) => b.name.includes(existing))
     );
 
     if (availableForNetwork.length > 0) {
@@ -190,7 +189,7 @@ async function testUiPartnerships() {
       // Connect to all existing partners
       const existingPartnerIds = allBrands
         .filter((b) =>
-          existingFoodPartners.some((existing) => b.name.includes(existing)),
+          existingFoodPartners.some((existing) => b.name.includes(existing))
         )
         .map((b) => b.id);
 
@@ -230,30 +229,30 @@ async function testUiPartnerships() {
 
       const partners = [];
       updatedBrand.partnershipsFrom.forEach((p) =>
-        partners.push(p.brandB.name),
+        partners.push(p.brandB.name)
       );
       updatedBrand.partnershipsTo.forEach((p) => partners.push(p.brandA.name));
 
       console.log(`\n  ${newPartner.name} now has ${partners.length} partners`);
       const fullDescription = `${
         updatedBrand.description
-      } | כולל גישה ל: ${partners.join(", ")}`;
+      } | כולל גישה ל: ${partners.join(', ')}`;
       console.log(`  Full description would be: "${fullDescription}"`);
       console.log(`  Length: ${fullDescription.length} characters`);
 
       if (fullDescription.length > 150) {
         console.log(
-          `  🚨 UI Issue: Description too long for comfortable display`,
+          `  🚨 UI Issue: Description too long for comfortable display`
         );
         console.log(
-          `  💡 Better approach: "כולל גישה ל-${partners.length} מותגים נוספים"`,
+          `  💡 Better approach: "כולל גישה ל-${partners.length} מותגים נוספים"`
         );
       }
     }
 
-    console.log("\n🎉 UI partnership display test completed!");
+    console.log('\n🎉 UI partnership display test completed!');
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    console.error('❌ Test failed:', error);
   } finally {
     await prisma.$disconnect();
   }

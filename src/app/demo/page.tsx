@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useDarkMode } from "@/contexts/DarkModeContext";
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
-import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
-import { Gift, Calendar, Star, Copy, ExternalLink } from "lucide-react";
+import { useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useDarkMode } from '@/contexts/DarkModeContext';
+import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
+import { DarkModeToggle } from '@/components/ui/DarkModeToggle';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { Gift, Calendar, Star, Copy, ExternalLink } from 'lucide-react';
 
 interface Benefit {
   id: string;
@@ -31,58 +31,58 @@ export default function DemoPage() {
 
   const mockBenefits: Benefit[] = [
     {
-      id: "1",
-      title: "30% הנחה על כל הקנייה",
-      description: "הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות",
+      id: '1',
+      title: '30% הנחה על כל הקנייה',
+      description: 'הטבה מיוחדת ליום הולדת - 30% הנחה על כל הקנייה בחנות',
       brand: {
-        name: "Fox",
-        logoUrl: "/images/brands/fox.png",
+        name: 'Fox',
+        logoUrl: '/images/brands/fox.png',
       },
-      promoCode: "BDAY30",
-      url: "https://fox.co.il",
-      validityType: "birthday_month",
-      redemptionMethod: "קוד קופון",
-      termsAndConditions: "הטבה תקפה לחודש יום ההולדת בלבד",
+      promoCode: 'BDAY30',
+      url: 'https://fox.co.il',
+      validityType: 'birthday_month',
+      redemptionMethod: 'קוד קופון',
+      termsAndConditions: 'הטבה תקפה לחודש יום ההולדת בלבד',
     },
     {
-      id: "2",
-      title: "קפה חינם",
-      description: "קפה חינם ביום ההולדת שלך",
+      id: '2',
+      title: 'קפה חינם',
+      description: 'קפה חינם ביום ההולדת שלך',
       brand: {
-        name: "Starbucks",
-        logoUrl: "/images/brands/starbucks.png",
+        name: 'Starbucks',
+        logoUrl: '/images/brands/starbucks.png',
       },
-      validityType: "birthday_date",
-      redemptionMethod: "אוטומטי באפליקציה",
-      termsAndConditions: "תקף ביום ההולדת בלבד",
+      validityType: 'birthday_date',
+      redemptionMethod: 'אוטומטי באפליקציה',
+      termsAndConditions: 'תקף ביום ההולדת בלבד',
     },
     {
-      id: "3",
-      title: "הנחה של 50 ₪",
-      description: "הנחה של 50 ₪ על קנייה מעל 200 ₪",
+      id: '3',
+      title: 'הנחה של 50 ₪',
+      description: 'הנחה של 50 ₪ על קנייה מעל 200 ₪',
       brand: {
-        name: "Super-Pharm",
-        logoUrl: "/images/brands/super-pharm.png",
+        name: 'Super-Pharm',
+        logoUrl: '/images/brands/super-pharm.png',
       },
-      promoCode: "BDAY50",
-      url: "https://super-pharm.co.il",
-      validityType: "birthday_month",
-      redemptionMethod: "קוד קופון",
-      termsAndConditions: "תקף לחודש יום ההולדת",
+      promoCode: 'BDAY50',
+      url: 'https://super-pharm.co.il',
+      validityType: 'birthday_month',
+      redemptionMethod: 'קוד קופון',
+      termsAndConditions: 'תקף לחודש יום ההולדת',
     },
     {
-      id: "4",
-      title: "מתנה חינם",
-      description: "מתנה חינם על קנייה מעל 300 ₪",
+      id: '4',
+      title: 'מתנה חינם',
+      description: 'מתנה חינם על קנייה מעל 300 ₪',
       brand: {
-        name: "H&M",
-        logoUrl: "/images/brands/hm.png",
+        name: 'H&M',
+        logoUrl: '/images/brands/hm.png',
       },
-      promoCode: "GIFT2024",
-      url: "https://hm.com/il",
-      validityType: "birthday_month",
-      redemptionMethod: "קוד קופון",
-      termsAndConditions: "תקף לחודש יום ההולדת",
+      promoCode: 'GIFT2024',
+      url: 'https://hm.com/il',
+      validityType: 'birthday_month',
+      redemptionMethod: 'קוד קופון',
+      termsAndConditions: 'תקף לחודש יום ההולדת',
     },
   ];
 
@@ -92,60 +92,72 @@ export default function DemoPage() {
       setCopiedCode(text);
       setTimeout(() => setCopiedCode(null), 2000);
     } catch (error) {
-      console.error("Failed to copy:", error);
+      console.error('Failed to copy:', error);
     }
   };
 
   const getValidityText = (benefit: Benefit) => {
     switch (benefit.validityType) {
-      case "birthday_date":
-        return t("validOnlyOnBirthday");
-      case "birthday_month":
-        return t("validForEntireMonth");
-      case "birthday_week":
-        return t("validForWeek");
+      case 'birthday_date':
+        return t('validOnlyOnBirthday');
+      case 'birthday_month':
+        return t('validForEntireMonth');
+      case 'birthday_week':
+        return t('validForWeek');
       default:
-        return t("validForLimitedPeriod");
+        return t('validForLimitedPeriod');
     }
   };
 
   const activeBenefits = mockBenefits.filter(
-    (b) => b.validityType === "birthday_month",
+    (b) => b.validityType === 'birthday_month'
   );
   const upcomingBenefits = mockBenefits.filter(
-    (b) => b.validityType === "birthday_date",
+    (b) => b.validityType === 'birthday_date'
   );
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDarkMode
-        ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
-        : "bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50"
-    }`}>
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        isDarkMode
+          ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900'
+          : 'bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50'
+      }`}
+    >
       {/* Header */}
-      <header className={`shadow-sm border-b ${
-        isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-      }`}>
+      <header
+        className={`shadow-sm border-b ${
+          isDarkMode
+            ? 'bg-gray-800 border-gray-700'
+            : 'bg-white border-gray-200'
+        }`}
+      >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <Gift className="w-6 h-6 text-white" />
               </div>
-              <span className={`text-xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}>YomU</span>
+              <span
+                className={`text-xl font-bold ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}
+              >
+                YomU
+              </span>
             </div>
             <div className="flex items-center space-x-4">
               <DarkModeToggle />
               <LanguageSwitcher />
-              <span className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
-              }`}>
-                {t("demo") || "דמו"}
+              <span
+                className={`text-sm ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}
+              >
+                {t('demo') || 'דמו'}
               </span>
               <Link href="/auth/signup">
-                <Button size="sm">{t("getStarted")}</Button>
+                <Button size="sm">{t('getStarted')}</Button>
               </Link>
             </div>
           </div>
@@ -156,23 +168,25 @@ export default function DemoPage() {
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="text-center mb-8">
-          <h1 className={`text-3xl font-bold mb-2 ${
-            isDarkMode ? "text-white" : "text-gray-900"
-          }`}>
-            {t("welcome")} YomU! 🎉
+          <h1
+            className={`text-3xl font-bold mb-2 ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}
+          >
+            {t('welcome')} YomU! 🎉
           </h1>
-          <p className={`mb-4 ${
-            isDarkMode ? "text-gray-300" : "text-gray-600"
-          }`}>
-            {t("hereAreYourBirthdayBenefits")}
+          <p
+            className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}
+          >
+            {t('hereAreYourBirthdayBenefits')}
           </p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-md mx-auto">
             <Link
               href="/about"
               className="text-sm text-yellow-800 underline hover:text-yellow-900 focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded"
-              aria-label={t("learnMore")}
+              aria-label={t('learnMore')}
             >
-              💡 {t("learnMore")}
+              💡 {t('learnMore')}
             </Link>
           </div>
         </div>
@@ -181,10 +195,12 @@ export default function DemoPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <Star className="w-6 h-6 text-purple-600" />
-            <h2 className={`text-2xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}>
-              {t("activeNow")}
+            <h2
+              className={`text-2xl font-bold ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              {t('activeNow')}
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -192,7 +208,7 @@ export default function DemoPage() {
               <div
                 key={benefit.id}
                 className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow ${
-                  isDarkMode ? "bg-gray-800" : "bg-white"
+                  isDarkMode ? 'bg-gray-800' : 'bg-white'
                 }`}
               >
                 <div className="flex items-center space-x-3 mb-4">
@@ -204,9 +220,11 @@ export default function DemoPage() {
                     />
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}>
+                    <h3
+                      className={`font-semibold ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}
+                    >
                       {benefit.brand.name}
                     </h3>
                     <span className="text-sm text-purple-600 font-medium">
@@ -215,23 +233,29 @@ export default function DemoPage() {
                   </div>
                 </div>
 
-                <h4 className={`font-bold text-lg mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>
+                <h4
+                  className={`font-bold text-lg mb-2 ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}
+                >
                   {benefit.title}
                 </h4>
-                <p className={`text-sm mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}>
+                <p
+                  className={`text-sm mb-4 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                >
                   {benefit.description}
                 </p>
 
                 {benefit.promoCode && (
                   <div className="flex items-center space-x-2 mb-4">
-                    <span className={`text-sm font-medium ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}>
-                      {t("couponCode")}:
+                    <span
+                      className={`text-sm font-medium ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}
+                    >
+                      {t('couponCode')}:
                     </span>
                     <code className="bg-purple-100 border border-purple-200 px-3 py-2 rounded-md text-sm font-mono text-purple-800 font-bold">
                       {benefit.promoCode}
@@ -242,13 +266,13 @@ export default function DemoPage() {
                       onClick={() => copyToClipboard(benefit.promoCode!)}
                       className={
                         copiedCode === benefit.promoCode
-                          ? "bg-green-600 text-white"
-                          : "bg-purple-600 text-white hover:bg-purple-700"
+                          ? 'bg-green-600 text-white'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
                       }
                     >
                       {copiedCode === benefit.promoCode ? (
                         <span className="text-sm font-medium">
-                          {t("copied")}
+                          {t('copied')}
                         </span>
                       ) : (
                         <Copy className="w-4 h-4" />
@@ -262,11 +286,11 @@ export default function DemoPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => window.open(benefit.url, "_blank")}
+                      onClick={() => window.open(benefit.url, '_blank')}
                       className="flex-1"
                     >
                       <ExternalLink className="w-4 h-4 ml-1" />
-                      {t("buyNow")}
+                      {t('buyNow')}
                     </Button>
                   )}
                 </div>
@@ -279,10 +303,12 @@ export default function DemoPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <Calendar className="w-6 h-6 text-orange-600" />
-            <h2 className={`text-2xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}>
-              {t("comingSoon")}
+            <h2
+              className={`text-2xl font-bold ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              {t('comingSoon')}
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -290,7 +316,7 @@ export default function DemoPage() {
               <div
                 key={benefit.id}
                 className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow opacity-75 ${
-                  isDarkMode ? "bg-gray-800" : "bg-white"
+                  isDarkMode ? 'bg-gray-800' : 'bg-white'
                 }`}
               >
                 <div className="flex items-center space-x-3 mb-4">
@@ -302,9 +328,11 @@ export default function DemoPage() {
                     />
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}>
+                    <h3
+                      className={`font-semibold ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}
+                    >
                       {benefit.brand.name}
                     </h3>
                     <span className="text-sm text-orange-600 font-medium">
@@ -313,14 +341,18 @@ export default function DemoPage() {
                   </div>
                 </div>
 
-                <h4 className={`font-bold text-lg mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>
+                <h4
+                  className={`font-bold text-lg mb-2 ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}
+                >
                   {benefit.title}
                 </h4>
-                <p className={`text-sm mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}>
+                <p
+                  className={`text-sm mb-4 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                >
                   {benefit.description}
                 </p>
 
@@ -330,7 +362,7 @@ export default function DemoPage() {
                     size="sm"
                     className="flex-1 opacity-50 cursor-not-allowed"
                   >
-                    {t("moreDetails")}
+                    {t('moreDetails')}
                   </Button>
                 </div>
               </div>
@@ -339,26 +371,32 @@ export default function DemoPage() {
         </div>
 
         {/* Call to Action */}
-        <div className={`rounded-xl shadow-lg p-8 text-center ${
-          isDarkMode ? "bg-gray-800" : "bg-white"
-        }`}>
-          <h3 className={`text-2xl font-bold mb-4 ${
-            isDarkMode ? "text-white" : "text-gray-900"
-          }`}>
-            {t("getStarted")}
+        <div
+          className={`rounded-xl shadow-lg p-8 text-center ${
+            isDarkMode ? 'bg-gray-800' : 'bg-white'
+          }`}
+        >
+          <h3
+            className={`text-2xl font-bold mb-4 ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}
+          >
+            {t('getStarted')}
           </h3>
-          <p className={`mb-6 ${
-            isDarkMode ? "text-gray-300" : "text-gray-600"
-          }`}>{t("signUpNow")}</p>
+          <p
+            className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}
+          >
+            {t('signUpNow')}
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup">
               <Button size="lg" className="px-8 py-3">
-                {t("signUpNow")}
+                {t('signUpNow')}
               </Button>
             </Link>
             <Link href="/auth/signin">
               <Button variant="outline" size="lg" className="px-8 py-3">
-                {t("alreadyHaveAccount")}
+                {t('alreadyHaveAccount')}
               </Button>
             </Link>
           </div>

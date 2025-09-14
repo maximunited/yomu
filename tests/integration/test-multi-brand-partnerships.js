@@ -1,13 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function testMultiBrandPartnerships() {
   try {
-    console.log("🧪 Testing multi-brand partnership capabilities...\n");
+    console.log('🧪 Testing multi-brand partnership capabilities...\n');
 
     // 1. Current partnership analysis
-    console.log("1️⃣ Current partnerships:");
+    console.log('1️⃣ Current partnerships:');
     const partnerships = await prisma.brandPartnership.findMany({
       include: {
         brandA: { select: { name: true, category: true } },
@@ -20,33 +20,33 @@ async function testMultiBrandPartnerships() {
     });
 
     // 2. Create a multi-brand partnership scenario
-    console.log("\n2️⃣ Creating multi-brand partnership scenario:");
+    console.log('\n2️⃣ Creating multi-brand partnership scenario:');
     console.log(
-      "Scenario: Food delivery partnership - KFC + McDonald's + באקרו",
+      "Scenario: Food delivery partnership - KFC + McDonald's + באקרו"
     );
 
     // Find the brands
     const kfc = await prisma.brand.findFirst({
-      where: { name: { contains: "KFC" } },
+      where: { name: { contains: 'KFC' } },
     });
     const mcdonalds = await prisma.brand.findFirst({
-      where: { name: { contains: "McDonald" } },
+      where: { name: { contains: 'McDonald' } },
     });
     const buckaroo = await prisma.brand.findFirst({
-      where: { name: { contains: "באקרו" } },
+      where: { name: { contains: 'באקרו' } },
     });
 
     if (!kfc || !mcdonalds || !buckaroo) {
-      console.log("❌ Could not find all required brands");
+      console.log('❌ Could not find all required brands');
       console.log(
-        "Available brands:",
-        [kfc?.name, mcdonalds?.name, buckaroo?.name].filter(Boolean),
+        'Available brands:',
+        [kfc?.name, mcdonalds?.name, buckaroo?.name].filter(Boolean)
       );
       return;
     }
 
     console.log(
-      `Found brands: ${kfc.name}, ${mcdonalds.name}, ${buckaroo.name}`,
+      `Found brands: ${kfc.name}, ${mcdonalds.name}, ${buckaroo.name}`
     );
 
     // Check for existing partnerships to avoid duplicates
@@ -67,7 +67,7 @@ async function testMultiBrandPartnerships() {
       !existingPartnerships.some(
         (p) =>
           (p.brandAId === kfc.id && p.brandBId === mcdonalds.id) ||
-          (p.brandAId === mcdonalds.id && p.brandBId === kfc.id),
+          (p.brandAId === mcdonalds.id && p.brandBId === kfc.id)
       )
     ) {
       partnershipsToCreate.push({ brandAId: kfc.id, brandBId: mcdonalds.id });
@@ -78,7 +78,7 @@ async function testMultiBrandPartnerships() {
       !existingPartnerships.some(
         (p) =>
           (p.brandAId === kfc.id && p.brandBId === buckaroo.id) ||
-          (p.brandAId === buckaroo.id && p.brandBId === kfc.id),
+          (p.brandAId === buckaroo.id && p.brandBId === kfc.id)
       )
     ) {
       partnershipsToCreate.push({ brandAId: kfc.id, brandBId: buckaroo.id });
@@ -89,7 +89,7 @@ async function testMultiBrandPartnerships() {
       !existingPartnerships.some(
         (p) =>
           (p.brandAId === mcdonalds.id && p.brandBId === buckaroo.id) ||
-          (p.brandAId === buckaroo.id && p.brandBId === mcdonalds.id),
+          (p.brandAId === buckaroo.id && p.brandBId === mcdonalds.id)
       )
     ) {
       partnershipsToCreate.push({
@@ -105,18 +105,18 @@ async function testMultiBrandPartnerships() {
     }
 
     if (partnershipsToCreate.length === 0) {
-      console.log("  ℹ️ Partnerships already exist");
+      console.log('  ℹ️ Partnerships already exist');
     }
 
     // 3. Test membership creation for one brand (should create memberships for all partners)
     console.log(
-      "\n3️⃣ Testing membership creation for KFC (should include all partners):",
+      '\n3️⃣ Testing membership creation for KFC (should include all partners):'
     );
 
     // Get test user
     const testUser = await prisma.user.findFirst();
     if (!testUser) {
-      console.log("❌ No test user found");
+      console.log('❌ No test user found');
       return;
     }
 
@@ -167,12 +167,12 @@ async function testMultiBrandPartnerships() {
         },
       });
       console.log(
-        `  ✅ Auto-created partnership membership for ${partnerBrand.name}`,
+        `  ✅ Auto-created partnership membership for ${partnerBrand.name}`
       );
     }
 
     // 4. Verify the results
-    console.log("\n4️⃣ Verification:");
+    console.log('\n4️⃣ Verification:');
 
     const finalMemberships = await prisma.userMembership.findMany({
       where: {
@@ -185,14 +185,14 @@ async function testMultiBrandPartnerships() {
     });
 
     console.log(
-      `User ${testUser.name} now has ${finalMemberships.length} active memberships:`,
+      `User ${testUser.name} now has ${finalMemberships.length} active memberships:`
     );
     finalMemberships.forEach((m) => {
       console.log(`  - ${m.brand.name} (${m.brand.category})`);
     });
 
     // 5. Test partnership discovery for each brand
-    console.log("\n5️⃣ Partnership discovery for each brand:");
+    console.log('\n5️⃣ Partnership discovery for each brand:');
 
     for (const membership of finalMemberships) {
       const brandWithPartners = await prisma.brand.findUnique({
@@ -205,22 +205,22 @@ async function testMultiBrandPartnerships() {
 
       const partners = [];
       brandWithPartners.partnershipsFrom.forEach((p) =>
-        partners.push(p.brandB.name),
+        partners.push(p.brandB.name)
       );
       brandWithPartners.partnershipsTo.forEach((p) =>
-        partners.push(p.brandA.name),
+        partners.push(p.brandA.name)
       );
 
       console.log(
-        `  ${brandWithPartners.name} → partners: [${partners.join(", ")}]`,
+        `  ${brandWithPartners.name} → partners: [${partners.join(', ')}]`
       );
     }
 
     // 6. Test complex scenario: What if we add a 4th brand?
-    console.log("\n6️⃣ Testing with a 4th brand (יומנגס):");
+    console.log('\n6️⃣ Testing with a 4th brand (יומנגס):');
 
     const yomangus = await prisma.brand.findFirst({
-      where: { name: { contains: "יומנגס" } },
+      where: { name: { contains: 'יומנגס' } },
     });
     if (yomangus) {
       console.log(`Adding ${yomangus.name} to the food partnership network`);
@@ -279,13 +279,13 @@ async function testMultiBrandPartnerships() {
       });
 
       console.log(
-        `  🎉 Result: Creating ${yomangus.name} membership auto-created ${finalCount} total memberships!`,
+        `  🎉 Result: Creating ${yomangus.name} membership auto-created ${finalCount} total memberships!`
       );
     }
 
-    console.log("\n📊 Multi-brand partnership test completed!");
+    console.log('\n📊 Multi-brand partnership test completed!');
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    console.error('❌ Test failed:', error);
   } finally {
     await prisma.$disconnect();
   }

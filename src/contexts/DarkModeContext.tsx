@@ -1,11 +1,11 @@
-"use client";
+'use client';
 import React, {
   createContext,
   useContext,
   useState,
   useEffect,
   ReactNode,
-} from "react";
+} from 'react';
 
 interface DarkModeContextType {
   isDarkMode: boolean;
@@ -14,14 +14,14 @@ interface DarkModeContextType {
 }
 
 const DarkModeContext = createContext<DarkModeContextType | undefined>(
-  undefined,
+  undefined
 );
 
 // Helper function to safely get system dark mode preference
 function getSystemDarkModePreference(): boolean {
   try {
-    if (typeof window !== "undefined" && window.matchMedia) {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
     return false;
   } catch (error) {
@@ -39,15 +39,15 @@ export function DarkModeProvider({ children }: { children: ReactNode }) {
 
     try {
       // Check for saved dark mode preference or default to system preference
-      const savedDarkMode = localStorage.getItem("darkMode");
+      const savedDarkMode = localStorage.getItem('darkMode');
 
       if (savedDarkMode !== null) {
         // Validate the saved value is a proper boolean string
-        if (savedDarkMode === "true" || savedDarkMode === "false") {
-          setIsDarkMode(savedDarkMode === "true");
+        if (savedDarkMode === 'true' || savedDarkMode === 'false') {
+          setIsDarkMode(savedDarkMode === 'true');
         } else {
           // Invalid value, fall back to system preference
-          localStorage.removeItem("darkMode");
+          localStorage.removeItem('darkMode');
           const systemPrefersDark = getSystemDarkModePreference();
           setIsDarkMode(systemPrefersDark);
         }
@@ -65,9 +65,9 @@ export function DarkModeProvider({ children }: { children: ReactNode }) {
     // Apply dark mode to document only after hydration
     if (isHydrated) {
       if (isDarkMode) {
-        document.documentElement.classList.add("dark");
+        document.documentElement.classList.add('dark');
       } else {
-        document.documentElement.classList.remove("dark");
+        document.documentElement.classList.remove('dark');
       }
     }
   }, [isDarkMode, isHydrated]);
@@ -76,20 +76,20 @@ export function DarkModeProvider({ children }: { children: ReactNode }) {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
     try {
-      localStorage.setItem("darkMode", newDarkMode.toString());
+      localStorage.setItem('darkMode', newDarkMode.toString());
     } catch (error) {
       // localStorage might be disabled or full
-      console.warn("Failed to save dark mode preference:", error);
+      console.warn('Failed to save dark mode preference:', error);
     }
   };
 
   const setDarkMode = (dark: boolean) => {
     setIsDarkMode(dark);
     try {
-      localStorage.setItem("darkMode", dark.toString());
+      localStorage.setItem('darkMode', dark.toString());
     } catch (error) {
       // localStorage might be disabled or full
-      console.warn("Failed to save dark mode preference:", error);
+      console.warn('Failed to save dark mode preference:', error);
     }
   };
 
@@ -105,7 +105,7 @@ export function DarkModeProvider({ children }: { children: ReactNode }) {
 export function useDarkMode() {
   const context = useContext(DarkModeContext);
   if (context === undefined) {
-    throw new Error("useDarkMode must be used within a DarkModeProvider");
+    throw new Error('useDarkMode must be used within a DarkModeProvider');
   }
   return context;
 }

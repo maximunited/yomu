@@ -1,13 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function testMembershipsApi() {
   try {
-    console.log("🧪 Testing memberships API data flow...\n");
+    console.log('🧪 Testing memberships API data flow...\n');
 
     // 1. Test brands API structure
-    console.log("1️⃣ Testing brands API response structure:");
+    console.log('1️⃣ Testing brands API response structure:');
 
     const brands = await prisma.brand.findMany({
       where: { isActive: true },
@@ -23,7 +23,7 @@ async function testMembershipsApi() {
           },
         },
       },
-      orderBy: { name: "asc" },
+      orderBy: { name: 'asc' },
     });
 
     console.log(`Found ${brands.length} brands`);
@@ -56,23 +56,23 @@ async function testMembershipsApi() {
       };
     });
 
-    console.log("Brands with partnerships:");
+    console.log('Brands with partnerships:');
     transformedBrands.forEach((brand) => {
       if (brand.partnerBrands.length > 0) {
         console.log(
           `  ${brand.name} → ${brand.partnerBrands
             .map((p) => p.name)
-            .join(", ")}`,
+            .join(', ')}`
         );
       }
     });
 
     // 2. Test user memberships
-    console.log("\n2️⃣ Testing user memberships:");
+    console.log('\n2️⃣ Testing user memberships:');
 
     const testUser = await prisma.user.findFirst();
     if (!testUser) {
-      console.log("❌ No test user found");
+      console.log('❌ No test user found');
       return;
     }
 
@@ -88,16 +88,16 @@ async function testMembershipsApi() {
     });
 
     console.log(
-      `User ${testUser.name} has ${userMemberships.length} active memberships:`,
+      `User ${testUser.name} has ${userMemberships.length} active memberships:`
     );
     userMemberships.forEach((membership) => {
       console.log(
-        `  - ${membership.brand.name} (${membership.brand.category})`,
+        `  - ${membership.brand.name} (${membership.brand.category})`
       );
     });
 
     // 3. Simulate memberships page data processing
-    console.log("\n3️⃣ Simulating memberships page processing:");
+    console.log('\n3️⃣ Simulating memberships page processing:');
 
     const activeBrandIds = new Set(userMemberships.map((m) => m.brandId));
 
@@ -105,7 +105,7 @@ async function testMembershipsApi() {
       let description = brand.description;
       const partners = brand.partnerBrands || [];
       if (partners.length > 0) {
-        const partnerNames = partners.map((partner) => partner.name).join(", ");
+        const partnerNames = partners.map((partner) => partner.name).join(', ');
         description += ` | כולל גישה ל: ${partnerNames}`;
       }
 
@@ -116,17 +116,17 @@ async function testMembershipsApi() {
         category: brand.category,
         isActive: activeBrandIds.has(brand.id),
         icon: brand.logoUrl,
-        type: "free",
+        type: 'free',
         cost: null,
       };
     });
 
-    console.log("Processed memberships for frontend:");
+    console.log('Processed memberships for frontend:');
     brandMemberships.forEach((membership) => {
-      const status = membership.isActive ? "✅" : "❌";
+      const status = membership.isActive ? '✅' : '❌';
       console.log(`  ${status} ${membership.name} (${membership.category})`);
-      if (membership.description.includes("כולל גישה ל:")) {
-        console.log(`      ${membership.description.split(" | ")[1]}`);
+      if (membership.description.includes('כולל גישה ל:')) {
+        console.log(`      ${membership.description.split(' | ')[1]}`);
       }
     });
 
@@ -135,15 +135,15 @@ async function testMembershipsApi() {
     console.log(
       `  Active memberships: ${
         brandMemberships.filter((m) => m.isActive).length
-      }`,
+      }`
     );
     console.log(
       `  Brands with partnerships: ${
         transformedBrands.filter((b) => b.partnerBrands.length > 0).length
-      }`,
+      }`
     );
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    console.error('❌ Test failed:', error);
   } finally {
     await prisma.$disconnect();
   }

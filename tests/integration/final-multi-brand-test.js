@@ -1,13 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function finalMultiBrandTest() {
   try {
-    console.log("🎯 Final Multi-Brand Partnership System Test\n");
+    console.log('🎯 Final Multi-Brand Partnership System Test\n');
 
     // 1. Show current partnership network
-    console.log("1️⃣ Current Partnership Network:");
+    console.log('1️⃣ Current Partnership Network:');
     const partnerships = await prisma.brandPartnership.findMany({
       include: {
         brandA: { select: { name: true, category: true } },
@@ -24,25 +24,25 @@ async function finalMultiBrandTest() {
       networkMap[p.brandB.name].add(p.brandA.name);
     });
 
-    console.log("Partnership networks:");
+    console.log('Partnership networks:');
     Object.entries(networkMap).forEach(([brand, partners]) => {
       if (partners.size > 0) {
         console.log(
-          `  ${brand} ↔ [${Array.from(partners).join(", ")}] (${
+          `  ${brand} ↔ [${Array.from(partners).join(', ')}] (${
             partners.size
-          } partners)`,
+          } partners)`
         );
       }
     });
 
     // 2. Test large network creation
-    console.log("\n2️⃣ Testing scalability with larger networks:");
+    console.log('\n2️⃣ Testing scalability with larger networks:');
 
     // Find all food brands and create a mega food network
     const foodBrands = await prisma.brand.findMany({
       where: {
         isActive: true,
-        category: "food",
+        category: 'food',
       },
       select: { id: true, name: true },
     });
@@ -51,10 +51,10 @@ async function finalMultiBrandTest() {
 
     // Create connections between some more brands to test scalability
     const additionalConnections = [
-      ["שגב", "M32"],
-      ["מסעדת ליבירה", "ג'מס"],
-      ["פראג הקטנה", "שגב"],
-      ["שגב", "מסעדת ליבירה"],
+      ['שגב', 'M32'],
+      ['מסעדת ליבירה', "ג'מס"],
+      ['פראג הקטנה', 'שגב'],
+      ['שגב', 'מסעדת ליבירה'],
     ];
 
     let connectionsCreated = 0;
@@ -85,7 +85,7 @@ async function finalMultiBrandTest() {
     console.log(`Created ${connectionsCreated} additional partnerships`);
 
     // 3. Test membership creation for a brand with many partners
-    console.log("\n3️⃣ Testing membership creation for complex network:");
+    console.log('\n3️⃣ Testing membership creation for complex network:');
 
     // Find a brand with the most partners
     const brandsWithPartners = await prisma.brand.findMany({
@@ -113,7 +113,7 @@ async function finalMultiBrandTest() {
 
     const topBrand = brandPartnerCounts[0];
     console.log(`Testing with ${topBrand.name} (${topBrand.count} partners)`);
-    console.log(`Partners: [${topBrand.partners.join(", ")}]`);
+    console.log(`Partners: [${topBrand.partners.join(', ')}]`);
 
     // Clear and test membership creation
     const testUser = await prisma.user.findFirst();
@@ -151,7 +151,7 @@ async function finalMultiBrandTest() {
     console.log(`  🎉 Result: ${finalMemberships} total memberships created`);
 
     // 4. Test UI data processing
-    console.log("\n4️⃣ Testing UI data processing for complex partnerships:");
+    console.log('\n4️⃣ Testing UI data processing for complex partnerships:');
 
     // Simulate the brands API response
     const brands = await prisma.brand.findMany({
@@ -183,7 +183,7 @@ async function finalMultiBrandTest() {
         if (partnerBrands.length <= 2) {
           const partnerNames = partnerBrands
             .map((partner) => partner.name)
-            .join(", ");
+            .join(', ');
           description += ` | כולל גישה ל: ${partnerNames}`;
         } else {
           description += ` | כולל גישה ל-${partnerBrands.length} מותגים נוספים`;
@@ -203,20 +203,20 @@ async function finalMultiBrandTest() {
     console.log(`Brands with partnerships: ${partneredBrands.length}`);
 
     partneredBrands.forEach((brand) => {
-      const icon = brand.partnerCount <= 2 ? "📝" : "📊";
+      const icon = brand.partnerCount <= 2 ? '📝' : '📊';
       console.log(`  ${icon} ${brand.name}: ${brand.partnerCount} partners`);
       console.log(
-        `      Description: "${brand.description}" (${brand.descriptionLength} chars)`,
+        `      Description: "${brand.description}" (${brand.descriptionLength} chars)`
       );
 
       if (brand.partnerCount > 2) {
-        console.log(`      Partners list: [${brand.partnerNames.join(", ")}]`);
+        console.log(`      Partners list: [${brand.partnerNames.join(', ')}]`);
         console.log(`      💡 UI will show expandable details for this brand`);
       }
     });
 
     // 5. Performance and scalability summary
-    console.log("\n5️⃣ System Performance & Scalability Summary:");
+    console.log('\n5️⃣ System Performance & Scalability Summary:');
 
     const totalBrands = await prisma.brand.count({ where: { isActive: true } });
     const totalPartnerships = await prisma.brandPartnership.count();
@@ -233,26 +233,26 @@ async function finalMultiBrandTest() {
     console.log(
       `  • Brands with 3+ partners: ${
         brandPartnerCounts.filter((b) => b.count >= 3).length
-      }`,
+      }`
     );
 
     console.log(`\n✅ System Capabilities:`);
     console.log(`  • ✅ Handles unlimited number of brands in partnerships`);
     console.log(`  • ✅ Supports bidirectional many-to-many relationships`);
     console.log(
-      `  • ✅ Auto-creates all partner memberships when subscribing to one brand`,
+      `  • ✅ Auto-creates all partner memberships when subscribing to one brand`
     );
     console.log(
-      `  • ✅ Prevents duplicate memberships when subscribing to multiple partners`,
+      `  • ✅ Prevents duplicate memberships when subscribing to multiple partners`
     );
     console.log(
-      `  • ✅ UI scales gracefully from 2-brand to 10+ brand partnerships`,
+      `  • ✅ UI scales gracefully from 2-brand to 10+ brand partnerships`
     );
     console.log(`  • ✅ Partnership discovery works efficiently at any scale`);
 
-    console.log("\n🎉 Multi-brand partnership system is ready for production!");
+    console.log('\n🎉 Multi-brand partnership system is ready for production!');
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    console.error('❌ Test failed:', error);
   } finally {
     await prisma.$disconnect();
   }

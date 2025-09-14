@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     container_name: yomu-app
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - NODE_ENV=production
       - DATABASE_URL=file:/data/dev.db
@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: yomu-app-dev
     ports:
-      - "3001:3000"
+      - '3001:3000'
     environment:
       - NODE_ENV=development
       - DATABASE_URL=file:/data/dev.db

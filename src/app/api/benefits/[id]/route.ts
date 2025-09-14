@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -28,7 +28,7 @@ export async function GET(
     });
 
     if (!benefit) {
-      return NextResponse.json({ message: "benefitNotFound" }, { status: 404 });
+      return NextResponse.json({ message: 'benefitNotFound' }, { status: 404 });
     }
 
     // Transform to match expected format
@@ -43,7 +43,7 @@ export async function GET(
       },
       promoCode: benefit.promoCode,
       url: benefit.brand.website,
-      validityType: benefit.validityType || "birthday_month",
+      validityType: benefit.validityType || 'birthday_month',
       validityDuration: benefit.validityDuration,
       redemptionMethod: benefit.redemptionMethod,
       termsAndConditions: benefit.termsAndConditions,
@@ -51,10 +51,10 @@ export async function GET(
 
     return NextResponse.json(transformedBenefit);
   } catch (error) {
-    console.error("Error fetching benefit:", error);
+    console.error('Error fetching benefit:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }

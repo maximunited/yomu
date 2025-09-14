@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,14 +13,14 @@ export async function POST(request: NextRequest) {
       if (testUser) {
         userId = testUser.id;
       } else {
-        return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+        return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
       }
     }
 
     const { customMembershipId, benefit } = await request.json();
 
     if (!customMembershipId || !benefit) {
-      return NextResponse.json({ message: "missingFields" }, { status: 400 });
+      return NextResponse.json({ message: 'missingFields' }, { status: 400 });
     }
 
     // Verify the custom membership belongs to the user
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
 
     if (!customMembership) {
       return NextResponse.json(
-        { message: "customMembershipNotFound" },
-        { status: 404 },
+        { message: 'customMembershipNotFound' },
+        { status: 404 }
       );
     }
 
@@ -56,14 +56,14 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "customMembershipCreated",
+      message: 'customMembershipCreated',
       benefit: createdBenefit,
     });
   } catch (error) {
-    console.error("Error creating custom benefit:", error);
+    console.error('Error creating custom benefit:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }
@@ -78,7 +78,7 @@ export async function PUT(request: NextRequest) {
       if (testUser) {
         userId = testUser.id;
       } else {
-        return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+        return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
       }
     }
 
@@ -86,8 +86,8 @@ export async function PUT(request: NextRequest) {
 
     if (!customMembershipId) {
       return NextResponse.json(
-        { message: "customMembershipIdRequired" },
-        { status: 400 },
+        { message: 'customMembershipIdRequired' },
+        { status: 400 }
       );
     }
 
@@ -101,8 +101,8 @@ export async function PUT(request: NextRequest) {
 
     if (!customMembership) {
       return NextResponse.json(
-        { message: "customMembershipNotFound" },
-        { status: 404 },
+        { message: 'customMembershipNotFound' },
+        { status: 404 }
       );
     }
 
@@ -113,14 +113,14 @@ export async function PUT(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "customMembershipUpdated",
+      message: 'customMembershipUpdated',
       membership: updatedMembership,
     });
   } catch (error) {
-    console.error("Error updating custom membership:", error);
+    console.error('Error updating custom membership:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }
@@ -135,17 +135,17 @@ export async function DELETE(request: NextRequest) {
       if (testUser) {
         userId = testUser.id;
       } else {
-        return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+        return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
       }
     }
 
     const { searchParams } = new URL(request.url);
-    const customMembershipId = searchParams.get("id");
+    const customMembershipId = searchParams.get('id');
 
     if (!customMembershipId) {
       return NextResponse.json(
-        { message: "customMembershipIdRequired" },
-        { status: 400 },
+        { message: 'customMembershipIdRequired' },
+        { status: 400 }
       );
     }
 
@@ -159,8 +159,8 @@ export async function DELETE(request: NextRequest) {
 
     if (!customMembership) {
       return NextResponse.json(
-        { message: "customMembershipNotFound" },
-        { status: 404 },
+        { message: 'customMembershipNotFound' },
+        { status: 404 }
       );
     }
 
@@ -170,13 +170,13 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "customMembershipDeleted",
+      message: 'customMembershipDeleted',
     });
   } catch (error) {
-    console.error("Error deleting custom membership:", error);
+    console.error('Error deleting custom membership:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }

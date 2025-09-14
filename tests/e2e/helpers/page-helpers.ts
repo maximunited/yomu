@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test";
+import { Page, expect } from '@playwright/test';
 
 export class PageHelper {
   constructor(private page: Page) {}
@@ -7,8 +7,8 @@ export class PageHelper {
    * Wait for page to load completely
    */
   async waitForPageLoad() {
-    await this.page.waitForLoadState("networkidle");
-    await this.page.waitForFunction(() => document.readyState === "complete");
+    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForFunction(() => document.readyState === 'complete');
   }
 
   /**
@@ -16,15 +16,15 @@ export class PageHelper {
    */
   async checkAccessibility() {
     // Check for proper heading structure
-    const h1 = this.page.locator("h1");
+    const h1 = this.page.locator('h1');
     await expect(h1).toBeVisible();
 
     // Check for main landmark
-    const main = this.page.locator("main");
+    const main = this.page.locator('main');
     await expect(main).toBeVisible();
 
     // Check that interactive elements are keyboard accessible
-    const buttons = this.page.locator("button:visible");
+    const buttons = this.page.locator('button:visible');
     const buttonCount = await buttons.count();
 
     for (let i = 0; i < Math.min(buttonCount, 5); i++) {
@@ -47,7 +47,7 @@ export class PageHelper {
     await this.waitForPageLoad();
 
     // Check that content is still visible and accessible
-    const main = this.page.locator("main");
+    const main = this.page.locator('main');
     await expect(main).toBeVisible();
 
     // Reset to desktop
@@ -86,12 +86,12 @@ export class PageHelper {
   async checkForErrors() {
     const errors: string[] = [];
 
-    this.page.on("pageerror", (error) => {
+    this.page.on('pageerror', (error) => {
       errors.push(error.message);
     });
 
-    this.page.on("console", (msg) => {
-      if (msg.type() === "error") {
+    this.page.on('console', (msg) => {
+      if (msg.type() === 'error') {
         errors.push(msg.text());
       }
     });

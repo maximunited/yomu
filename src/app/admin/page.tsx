@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import {
   PlusIcon,
   PencilIcon,
   TrashIcon,
   EyeIcon,
-} from "@heroicons/react/24/outline";
-import AdminForm from "@/components/AdminForm";
-import type { Brand, Benefit } from "@/types/admin";
+} from '@heroicons/react/24/outline';
+import AdminForm from '@/components/AdminForm';
+import type { Brand, Benefit } from '@/types/admin';
 
 export default function AdminPage() {
   const { status } = useSession();
@@ -18,19 +18,19 @@ export default function AdminPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"brands" | "benefits">("brands");
+  const [activeTab, setActiveTab] = useState<'brands' | 'benefits'>('brands');
   const [editingItem, setEditingItem] = useState<Brand | Benefit | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
     }
   }, [status, router]);
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === 'authenticated') {
       loadData();
     }
   }, [status]);
@@ -39,8 +39,8 @@ export default function AdminPage() {
     setIsLoading(true);
     try {
       const [brandsRes, benefitsRes] = await Promise.all([
-        fetch("/api/brands"),
-        fetch("/api/admin/benefits"),
+        fetch('/api/brands'),
+        fetch('/api/admin/benefits'),
       ]);
 
       if (brandsRes.ok) {
@@ -56,44 +56,44 @@ export default function AdminPage() {
         setBenefits(items);
       } else {
         console.error(
-          "Benefits response not ok:",
+          'Benefits response not ok:',
           benefitsRes.status,
-          await benefitsRes.text(),
+          await benefitsRes.text()
         );
       }
     } catch (error) {
-      console.error("Error loading data:", error);
+      console.error('Error loading data:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDelete = async (id: string, type: "brand" | "benefit") => {
-    if (!confirm("Are you sure you want to delete this item?")) return;
+  const handleDelete = async (id: string, type: 'brand' | 'benefit') => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
 
     try {
       const response = await fetch(`/api/admin/${type}s/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
       if (response.ok) {
         loadData();
       }
     } catch (error) {
-      console.error("Error deleting item:", error);
+      console.error('Error deleting item:', error);
     }
   };
 
-  const handleToggleActive = async (id: string, type: "brand" | "benefit") => {
+  const handleToggleActive = async (id: string, type: 'brand' | 'benefit') => {
     try {
       const current =
-        type === "brand"
+        type === 'brand'
           ? brands.find((b) => b.id === id)?.isActive
           : benefits.find((b) => b.id === id)?.isActive;
 
       const response = await fetch(`/api/admin/${type}s/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !current }),
       });
 
@@ -101,7 +101,7 @@ export default function AdminPage() {
         loadData();
       }
     } catch (error) {
-      console.error("Error updating item:", error);
+      console.error('Error updating item:', error);
     }
   };
 
@@ -112,11 +112,11 @@ export default function AdminPage() {
         ? `/api/admin/${activeTab}/${editingItem.id}`
         : `/api/admin/${activeTab}`;
 
-      const method = isEditing ? "PATCH" : "POST";
+      const method = isEditing ? 'PATCH' : 'POST';
 
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
 
@@ -126,7 +126,7 @@ export default function AdminPage() {
         loadData();
       }
     } catch (error) {
-      console.error("Error saving item:", error);
+      console.error('Error saving item:', error);
     }
   };
 
@@ -140,7 +140,7 @@ export default function AdminPage() {
     setShowForm(true);
   };
 
-  if (status === "loading" || isLoading) {
+  if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -163,21 +163,21 @@ export default function AdminPage() {
         <div className="border-b border-gray-200 mb-6">
           <nav className="-mb-px flex space-x-8">
             <button
-              onClick={() => setActiveTab("brands")}
+              onClick={() => setActiveTab('brands')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "brands"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                activeTab === 'brands'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               Brands ({brands.length})
             </button>
             <button
-              onClick={() => setActiveTab("benefits")}
+              onClick={() => setActiveTab('benefits')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "benefits"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                activeTab === 'benefits'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               Benefits ({benefits.length})
@@ -189,7 +189,7 @@ export default function AdminPage() {
         <div className="mb-6 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
-              {activeTab === "brands" ? "Brands" : "Benefits"}
+              {activeTab === 'brands' ? 'Brands' : 'Benefits'}
             </h2>
           </div>
           <button
@@ -197,12 +197,12 @@ export default function AdminPage() {
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
-            Add {activeTab === "brands" ? "Brand" : "Benefit"}
+            Add {activeTab === 'brands' ? 'Brand' : 'Benefit'}
           </button>
         </div>
 
         {/* Content */}
-        {activeTab === "brands" ? (
+        {activeTab === 'brands' ? (
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <ul className="divide-y divide-gray-200">
               {brands.map((brand) => (
@@ -222,11 +222,11 @@ export default function AdminPage() {
                           <span
                             className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               brand.isActive
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
                             }`}
                           >
-                            {brand.isActive ? "Active" : "Inactive"}
+                            {brand.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </div>
                         <p className="text-sm text-gray-500">
@@ -245,13 +245,13 @@ export default function AdminPage() {
                         <PencilIcon className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleToggleActive(brand.id, "brand")}
+                        onClick={() => handleToggleActive(brand.id, 'brand')}
                         className="text-gray-400 hover:text-gray-600"
                       >
                         <EyeIcon className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(brand.id, "brand")}
+                        onClick={() => handleDelete(brand.id, 'brand')}
                         className="text-red-400 hover:text-red-600"
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -277,11 +277,11 @@ export default function AdminPage() {
                           <span
                             className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               benefit.isActive
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
                             }`}
                           >
-                            {benefit.isActive ? "Active" : "Inactive"}
+                            {benefit.isActive ? 'Active' : 'Inactive'}
                           </span>
                           {benefit.isFree && (
                             <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -307,14 +307,14 @@ export default function AdminPage() {
                         </button>
                         <button
                           onClick={() =>
-                            handleToggleActive(benefit.id, "benefit")
+                            handleToggleActive(benefit.id, 'benefit')
                           }
                           className="text-gray-400 hover:text-gray-600"
                         >
                           <EyeIcon className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(benefit.id, "benefit")}
+                          onClick={() => handleDelete(benefit.id, 'benefit')}
                           className="text-red-400 hover:text-red-600"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -330,9 +330,9 @@ export default function AdminPage() {
         {/* Form Modal */}
         {showForm && (
           <AdminForm
-            type={activeTab === "brands" ? "brand" : "benefit"}
+            type={activeTab === 'brands' ? 'brand' : 'benefit'}
             item={editingItem ?? undefined}
-            brands={activeTab === "benefits" ? brands : undefined}
+            brands={activeTab === 'benefits' ? brands : undefined}
             onSave={handleSaveItem}
             onCancel={() => {
               setShowForm(false);

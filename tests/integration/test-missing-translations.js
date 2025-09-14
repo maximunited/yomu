@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 // Simple utility to find files recursively
 function findFiles(dir, extension) {
@@ -14,8 +14,8 @@ function findFiles(dir, extension) {
 
       if (
         stat.isDirectory() &&
-        !item.startsWith(".") &&
-        item !== "node_modules"
+        !item.startsWith('.') &&
+        item !== 'node_modules'
       ) {
         traverseDir(fullPath);
       } else if (stat.isFile() && item.endsWith(extension)) {
@@ -30,27 +30,27 @@ function findFiles(dir, extension) {
 
 async function testMissingTranslations() {
   try {
-    console.log("🧪 Testing for Missing Translations...\n");
+    console.log('🧪 Testing for Missing Translations...\n');
 
     // 1. Load translation files
-    console.log("1️⃣ Loading translation definitions:");
+    console.log('1️⃣ Loading translation definitions:');
 
     const translationsPath = path.join(
       __dirname,
-      "../../src/lib/translations.ts",
+      '../../src/lib/translations.ts'
     );
-    const translationsContent = fs.readFileSync(translationsPath, "utf8");
+    const translationsContent = fs.readFileSync(translationsPath, 'utf8');
 
     // Extract Hebrew and English translation keys
     const hebrewKeyMatches = translationsContent.match(
-      /he:\s*{([\s\S]*?)},\s*en:/,
+      /he:\s*{([\s\S]*?)},\s*en:/
     );
     const englishKeyMatches = translationsContent.match(
-      /en:\s*{([\s\S]*?)}\s*,?\s*};/,
+      /en:\s*{([\s\S]*?)}\s*,?\s*};/
     );
 
     if (!hebrewKeyMatches || !englishKeyMatches) {
-      console.log("❌ Could not parse translation file structure");
+      console.log('❌ Could not parse translation file structure');
       return;
     }
 
@@ -76,42 +76,42 @@ async function testMissingTranslations() {
     console.log(`English keys found: ${englishKeys.size}`);
 
     // 2. Check for missing keys between languages
-    console.log("\n2️⃣ Checking for missing keys between languages:");
+    console.log('\n2️⃣ Checking for missing keys between languages:');
 
     const missingInEnglish = [...hebrewKeys].filter(
-      (key) => !englishKeys.has(key),
+      (key) => !englishKeys.has(key)
     );
     const missingInHebrew = [...englishKeys].filter(
-      (key) => !hebrewKeys.has(key),
+      (key) => !hebrewKeys.has(key)
     );
 
     if (missingInEnglish.length > 0) {
-      console.log("❌ Keys missing in English:");
+      console.log('❌ Keys missing in English:');
       missingInEnglish.forEach((key) => console.log(`  - ${key}`));
     }
 
     if (missingInHebrew.length > 0) {
-      console.log("❌ Keys missing in Hebrew:");
+      console.log('❌ Keys missing in Hebrew:');
       missingInHebrew.forEach((key) => console.log(`  - ${key}`));
     }
 
     if (missingInEnglish.length === 0 && missingInHebrew.length === 0) {
-      console.log("✅ All translation keys are present in both languages");
+      console.log('✅ All translation keys are present in both languages');
     }
 
     // 3. Find all usage of translation keys in code
-    console.log("\n3️⃣ Scanning codebase for translation usage:");
+    console.log('\n3️⃣ Scanning codebase for translation usage:');
 
-    const srcDir = path.join(__dirname, "../../src");
+    const srcDir = path.join(__dirname, '../../src');
     const codeFiles = [
-      ...findFiles(srcDir, ".tsx"),
-      ...findFiles(srcDir, ".ts"),
-      ...findFiles(srcDir, ".js"),
-      ...findFiles(srcDir, ".jsx"),
+      ...findFiles(srcDir, '.tsx'),
+      ...findFiles(srcDir, '.ts'),
+      ...findFiles(srcDir, '.js'),
+      ...findFiles(srcDir, '.jsx'),
     ]
-      .filter((file) => !file.includes("translations.ts"))
+      .filter((file) => !file.includes('translations.ts'))
       // Ignore seed data files; they contain domain content, not UI strings
-      .filter((file) => !file.replace(/\\/g, "/").includes("/app/api/seed/"));
+      .filter((file) => !file.replace(/\\/g, '/').includes('/app/api/seed/'));
 
     console.log(`Scanning ${codeFiles.length} code files...`);
 
@@ -133,7 +133,7 @@ async function testMissingTranslations() {
     ];
 
     for (const file of codeFiles) {
-      const content = fs.readFileSync(file, "utf8");
+      const content = fs.readFileSync(file, 'utf8');
       const relativePath = path.relative(srcDir, file);
 
       // Find translation key usage
@@ -151,10 +151,10 @@ async function testMissingTranslations() {
           const text = match[1].trim();
           if (
             text.length > 2 &&
-            !text.includes("http") &&
-            !text.includes("@") &&
-            !text.includes(".") &&
-            !text.includes("/")
+            !text.includes('http') &&
+            !text.includes('@') &&
+            !text.includes('.') &&
+            !text.includes('/')
           ) {
             hardcodedTexts.add(`${relativePath}: "${text}"`);
           }
@@ -163,12 +163,12 @@ async function testMissingTranslations() {
 
       // Look for specific Hebrew text patterns that might need translation
       const hebrewTextMatches = content.match(
-        /['"`][^'"`]*[\u0590-\u05FF][^'"`]*['"`]/g,
+        /['"`][^'"`]*[\u0590-\u05FF][^'"`]*['"`]/g
       );
       if (hebrewTextMatches) {
         hebrewTextMatches.forEach((match) => {
           const text = match.slice(1, -1); // Remove quotes
-          if (text.length > 5 && !text.includes("http")) {
+          if (text.length > 5 && !text.includes('http')) {
             possibleMissingTranslations.add(`${relativePath}: ${match}`);
           }
         });
@@ -176,31 +176,31 @@ async function testMissingTranslations() {
     }
 
     console.log(
-      `Found ${usedTranslationKeys.size} translation keys used in code`,
+      `Found ${usedTranslationKeys.size} translation keys used in code`
     );
 
     // 4. Check for unused translation keys
-    console.log("\n4️⃣ Checking for unused translation keys:");
+    console.log('\n4️⃣ Checking for unused translation keys:');
 
     const allTranslationKeys = new Set([...hebrewKeys, ...englishKeys]);
     const unusedKeys = [...allTranslationKeys].filter(
-      (key) => !usedTranslationKeys.has(key),
+      (key) => !usedTranslationKeys.has(key)
     );
 
     if (unusedKeys.length > 0) {
       console.log(
-        `⚠️ Found ${unusedKeys.length} potentially unused translation keys:`,
+        `⚠️ Found ${unusedKeys.length} potentially unused translation keys:`
       );
       unusedKeys.slice(0, 10).forEach((key) => console.log(`  - ${key}`));
       if (unusedKeys.length > 10) {
         console.log(`  ... and ${unusedKeys.length - 10} more`);
       }
     } else {
-      console.log("✅ All translation keys appear to be used");
+      console.log('✅ All translation keys appear to be used');
     }
 
     // 5. Check for missing translations (used keys not in translation file)
-    console.log("\n5️⃣ Checking for missing translation definitions:");
+    console.log('\n5️⃣ Checking for missing translation definitions:');
 
     const missingDefinitions = [...usedTranslationKeys]
       .filter((key) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) // ignore numeric and non-identifier tokens
@@ -208,19 +208,19 @@ async function testMissingTranslations() {
 
     if (missingDefinitions.length > 0) {
       console.log(
-        `❌ Found ${missingDefinitions.length} translation keys used but not defined:`,
+        `❌ Found ${missingDefinitions.length} translation keys used but not defined:`
       );
       missingDefinitions.forEach((key) => console.log(`  - ${key}`));
     } else {
-      console.log("✅ All used translation keys are defined");
+      console.log('✅ All used translation keys are defined');
     }
 
     // 6. Report hardcoded text that might need translation
-    console.log("\n6️⃣ Potential hardcoded text that might need translation:");
+    console.log('\n6️⃣ Potential hardcoded text that might need translation:');
 
     if (possibleMissingTranslations.size > 0) {
       console.log(
-        `⚠️ Found ${possibleMissingTranslations.size} potential hardcoded texts:`,
+        `⚠️ Found ${possibleMissingTranslations.size} potential hardcoded texts:`
       );
       const sortedTexts = Array.from(possibleMissingTranslations).sort();
       sortedTexts.slice(0, 15).forEach((text) => console.log(`  ${text}`));
@@ -228,34 +228,34 @@ async function testMissingTranslations() {
         console.log(`  ... and ${sortedTexts.length - 15} more`);
       }
     } else {
-      console.log("✅ No obvious hardcoded text found");
+      console.log('✅ No obvious hardcoded text found');
     }
 
     // 7. Check for specific multi-brand partnership texts
-    console.log("\n7️⃣ Checking multi-brand partnership feature translations:");
+    console.log('\n7️⃣ Checking multi-brand partnership feature translations:');
 
     const partnershipTexts = [
-      "כולל גישה ל", // "includes access to"
-      "מותגים נוספים", // "additional brands"
-      "הצג רשימת מותגים", // "show brand list"
-      "includes access to",
-      "additional brands",
-      "show brand list",
+      'כולל גישה ל', // "includes access to"
+      'מותגים נוספים', // "additional brands"
+      'הצג רשימת מותגים', // "show brand list"
+      'includes access to',
+      'additional brands',
+      'show brand list',
     ];
 
     const foundPartnershipTexts = [];
 
     for (const file of codeFiles) {
-      const content = fs.readFileSync(file, "utf8");
+      const content = fs.readFileSync(file, 'utf8');
       const relativePath = path.relative(srcDir, file);
 
       for (const text of partnershipTexts) {
         const quotedRegex = new RegExp(
           `["'\-\uFFFF]([^"'\\` +
-            "`" +
+            '`' +
             `]*${text}[^"'\\` +
-            "`" +
-            `]*)["'\-\uFFFF]`,
+            '`' +
+            `]*)["'\-\uFFFF]`
         ); // match text inside any quote
         if (quotedRegex.test(content)) {
           foundPartnershipTexts.push(`${relativePath}: "${text}"`);
@@ -264,21 +264,21 @@ async function testMissingTranslations() {
     }
 
     if (foundPartnershipTexts.length > 0) {
-      console.log("⚠️ Found hardcoded partnership-related texts:");
+      console.log('⚠️ Found hardcoded partnership-related texts:');
       foundPartnershipTexts.forEach((text) => console.log(`  ${text}`));
-      console.log("\n💡 Consider adding these to translations:");
+      console.log('\n💡 Consider adding these to translations:');
       console.log('  - includesAccessTo: "כולל גישה ל" / "includes access to"');
       console.log(
-        '  - additionalBrands: "מותגים נוספים" / "additional brands"',
+        '  - additionalBrands: "מותגים נוספים" / "additional brands"'
       );
       console.log('  - showBrandList: "הצג רשימת מותגים" / "show brand list"');
       console.log('  - partnershipCount: "שותפויות" / "partnerships"');
     } else {
-      console.log("✅ No hardcoded partnership texts found");
+      console.log('✅ No hardcoded partnership texts found');
     }
 
     // 8. Summary
-    console.log("\n8️⃣ Translation Health Summary:");
+    console.log('\n8️⃣ Translation Health Summary:');
 
     const issues = [];
     if (missingInEnglish.length > 0)
@@ -289,31 +289,31 @@ async function testMissingTranslations() {
       issues.push(`${missingDefinitions.length} used keys not defined`);
     if (foundPartnershipTexts.length > 0)
       issues.push(
-        `${foundPartnershipTexts.length} hardcoded partnership texts`,
+        `${foundPartnershipTexts.length} hardcoded partnership texts`
       );
 
     if (issues.length === 0) {
-      console.log("🎉 Translation system is healthy!");
-      console.log("  ✅ All keys present in both languages");
-      console.log("  ✅ All used keys are defined");
-      console.log("  ✅ No obvious missing translations");
+      console.log('🎉 Translation system is healthy!');
+      console.log('  ✅ All keys present in both languages');
+      console.log('  ✅ All used keys are defined');
+      console.log('  ✅ No obvious missing translations');
     } else {
-      console.log("⚠️ Translation issues found:");
+      console.log('⚠️ Translation issues found:');
       issues.forEach((issue) => console.log(`  - ${issue}`));
-      console.log("\n🔧 Recommended actions:");
+      console.log('\n🔧 Recommended actions:');
       if (foundPartnershipTexts.length > 0) {
-        console.log("  1. Add partnership-related translation keys");
-        console.log("  2. Replace hardcoded partnership texts with t() calls");
+        console.log('  1. Add partnership-related translation keys');
+        console.log('  2. Replace hardcoded partnership texts with t() calls');
       }
       if (missingDefinitions.length > 0) {
-        console.log("  3. Add missing translation definitions");
+        console.log('  3. Add missing translation definitions');
       }
       if (missingInEnglish.length > 0 || missingInHebrew.length > 0) {
-        console.log("  4. Add missing translations between languages");
+        console.log('  4. Add missing translations between languages');
       }
     }
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    console.error('❌ Test failed:', error);
   }
 }
 

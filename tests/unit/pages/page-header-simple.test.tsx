@@ -1,8 +1,8 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
 
 // Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
     matches: false,
@@ -23,22 +23,22 @@ const localStorageMock = {
   removeItem: jest.fn(),
   clear: jest.fn(),
 };
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
 // Mock Next.js Link
-jest.mock("next/link", () => {
+jest.mock('next/link', () => {
   return ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
   );
 });
 
 // Mock the contexts to avoid complex setup
-jest.mock("@/contexts/LanguageContext", () => ({
+jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
-    language: "he",
+    language: 'he',
     setLanguage: jest.fn(),
   }),
   LanguageProvider: ({ children }: { children: React.ReactNode }) => (
@@ -46,7 +46,7 @@ jest.mock("@/contexts/LanguageContext", () => ({
   ),
 }));
 
-jest.mock("@/contexts/DarkModeContext", () => ({
+jest.mock('@/contexts/DarkModeContext', () => ({
   useDarkMode: () => ({
     isDarkMode: false,
     toggleDarkMode: jest.fn(),
@@ -57,33 +57,33 @@ jest.mock("@/contexts/DarkModeContext", () => ({
 }));
 
 // Mock the UI components
-jest.mock("@/components/ui/LanguageSwitcher", () => {
+jest.mock('@/components/ui/LanguageSwitcher', () => {
   return function MockLanguageSwitcher() {
     return <button aria-label="language">עברית</button>;
   };
 });
 
-jest.mock("@/components/ui/DarkModeToggle", () => {
+jest.mock('@/components/ui/DarkModeToggle', () => {
   return function MockDarkModeToggle() {
     return <button aria-label="dark mode toggle">🌙</button>;
   };
 });
 
-describe("Page Header Tests", () => {
-  test("renders basic page header", () => {
+describe('Page Header Tests', () => {
+  test('renders basic page header', () => {
     // Simple test to verify the testing setup works
     render(<div>Test Page</div>);
-    expect(screen.getByText("Test Page")).toBeInTheDocument();
+    expect(screen.getByText('Test Page')).toBeInTheDocument();
   });
 
-  test("renders page header with title", () => {
+  test('renders page header with title', () => {
     // Test that we can render a simple component with the mocked contexts
     const TestComponent = () => {
-      const { t } = require("@/contexts/LanguageContext").useLanguage();
-      return <div>{t("test")}</div>;
+      const { t } = require('@/contexts/LanguageContext').useLanguage();
+      return <div>{t('test')}</div>;
     };
 
     render(<TestComponent />);
-    expect(screen.getByText("test")).toBeInTheDocument();
+    expect(screen.getByText('test')).toBeInTheDocument();
   });
 });

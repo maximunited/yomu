@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
   // Simple middleware that just passes through requests
@@ -8,5 +8,5 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   // Skip API routes, static files and Next.js internals
-  matcher: ["/((?!api|_next|.*..*).*)"],
+  matcher: ['/((?!api|_next|.*..*).*)'],
 };

@@ -1,33 +1,33 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    console.log("=== Starting GET request to /api/benefits ===");
+    console.log('=== Starting GET request to /api/benefits ===');
 
     const session = await getServerSession(authOptions);
-    console.log("Session:", session ? "Found" : "Not found");
+    console.log('Session:', session ? 'Found' : 'Not found');
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
 
     if (!userId) {
-      console.log("No session user ID, using test user ID");
+      console.log('No session user ID, using test user ID');
       // Get the first user from the database for testing
       const testUser = await prisma.user.findFirst();
       if (testUser) {
         userId = testUser.id;
-        console.log("Using test user ID:", userId);
+        console.log('Using test user ID:', userId);
       } else {
-        console.log("No users found in database");
+        console.log('No users found in database');
         return NextResponse.json(
           {
-            message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED",
+            message: 'unauthorized',
+            error: 'AUTHENTICATION_REQUIRED',
           },
-          { status: 401 },
+          { status: 401 }
         );
       }
     }
@@ -89,7 +89,7 @@ export async function GET() {
       },
       promoCode: benefit.promoCode,
       url: benefit.brand.website,
-      validityType: benefit.validityType || "birthday_month",
+      validityType: benefit.validityType || 'birthday_month',
       validityDuration: benefit.validityDuration,
       redemptionMethod: benefit.redemptionMethod,
       termsAndConditions: benefit.termsAndConditions,
@@ -103,10 +103,10 @@ export async function GET() {
       memberships: userMemberships.length,
     });
   } catch (error) {
-    console.error("Error fetching benefits:", error);
+    console.error('Error fetching benefits:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }

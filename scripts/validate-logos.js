@@ -3,14 +3,14 @@
  * Validates that brand logos are from authentic sources, not self-generated
  */
 
-const fs = require("fs");
-const path = require("path");
-const { PrismaClient } = require("@prisma/client");
+const fs = require('fs');
+const path = require('path');
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function validateLogos() {
-  console.log("🔍 Validating brand logo authenticity...\n");
+  console.log('🔍 Validating brand logo authenticity...\n');
 
   try {
     const brands = await prisma.brand.findMany({
@@ -33,25 +33,25 @@ async function validateLogos() {
       suspicious: [],
     };
 
-    const publicDir = path.join(process.cwd(), "public");
+    const publicDir = path.join(process.cwd(), 'public');
 
     for (const brand of brands) {
       let isAuthentic = true;
 
       // Check for inline SVG data URLs (often self-generated)
-      if (brand.logoUrl.startsWith("data:image/svg+xml")) {
+      if (brand.logoUrl.startsWith('data:image/svg+xml')) {
         isAuthentic = false;
         results.selfGenerated++;
         issues.selfGenerated.push({
           name: brand.name,
-          reason: "Inline SVG data URL (likely self-generated)",
-          logoUrl: brand.logoUrl.substring(0, 100) + "...",
+          reason: 'Inline SVG data URL (likely self-generated)',
+          logoUrl: brand.logoUrl.substring(0, 100) + '...',
         });
         continue;
       }
 
       // Check if local file exists
-      if (brand.logoUrl.startsWith("/")) {
+      if (brand.logoUrl.startsWith('/')) {
         const logoPath = brand.logoUrl;
         const abs = path.join(publicDir, logoPath);
 
@@ -81,14 +81,14 @@ async function validateLogos() {
         }
 
         // Check if it's a simple SVG with just text (self-generated)
-        if (logoPath.endsWith(".svg")) {
-          const content = fs.readFileSync(abs, "utf-8");
-          if (content.includes("<text") && content.length < 1000) {
+        if (logoPath.endsWith('.svg')) {
+          const content = fs.readFileSync(abs, 'utf-8');
+          if (content.includes('<text') && content.length < 1000) {
             isAuthentic = false;
             results.selfGenerated++;
             issues.selfGenerated.push({
               name: brand.name,
-              reason: "Simple SVG with text (likely self-generated)",
+              reason: 'Simple SVG with text (likely self-generated)',
               logoUrl: brand.logoUrl,
             });
             continue;
@@ -97,15 +97,15 @@ async function validateLogos() {
 
         // Check for placeholder patterns
         const suspiciousPatterns = [
-          "placeholder",
-          "example.com",
-          "generic",
-          "default",
-          "test",
+          'placeholder',
+          'example.com',
+          'generic',
+          'default',
+          'test',
         ];
 
         const hasSuspiciousPattern = suspiciousPatterns.some((pattern) =>
-          brand.logoUrl.toLowerCase().includes(pattern),
+          brand.logoUrl.toLowerCase().includes(pattern)
         );
 
         if (hasSuspiciousPattern) {
@@ -113,7 +113,7 @@ async function validateLogos() {
           results.suspicious++;
           issues.suspicious.push({
             name: brand.name,
-            reason: "Contains suspicious placeholder pattern",
+            reason: 'Contains suspicious placeholder pattern',
             logoUrl: brand.logoUrl,
           });
           continue;
@@ -126,24 +126,24 @@ async function validateLogos() {
     }
 
     // Report Results
-    console.log("📈 VALIDATION RESULTS:");
-    console.log("─".repeat(50));
+    console.log('📈 VALIDATION RESULTS:');
+    console.log('─'.repeat(50));
     console.log(
-      `✅ Authentic logos: ${results.authentic}/${results.total} (${((results.authentic / results.total) * 100).toFixed(1)}%)`,
+      `✅ Authentic logos: ${results.authentic}/${results.total} (${((results.authentic / results.total) * 100).toFixed(1)}%)`
     );
     console.log(
-      `🔧 Self-generated: ${results.selfGenerated}/${results.total} (${((results.selfGenerated / results.total) * 100).toFixed(1)}%)`,
+      `🔧 Self-generated: ${results.selfGenerated}/${results.total} (${((results.selfGenerated / results.total) * 100).toFixed(1)}%)`
     );
     console.log(
-      `❌ Missing files: ${results.missing}/${results.total} (${((results.missing / results.total) * 100).toFixed(1)}%)`,
+      `❌ Missing files: ${results.missing}/${results.total} (${((results.missing / results.total) * 100).toFixed(1)}%)`
     );
     console.log(
-      `⚠️  Suspicious: ${results.suspicious}/${results.total} (${((results.suspicious / results.total) * 100).toFixed(1)}%)`,
+      `⚠️  Suspicious: ${results.suspicious}/${results.total} (${((results.suspicious / results.total) * 100).toFixed(1)}%)`
     );
 
     // Detailed issue reports
     if (issues.selfGenerated.length > 0) {
-      console.log("\n🔧 SELF-GENERATED LOGOS (need authentic replacements):");
+      console.log('\n🔧 SELF-GENERATED LOGOS (need authentic replacements):');
       issues.selfGenerated.forEach((issue) => {
         console.log(`  ❌ ${issue.name}: ${issue.reason}`);
         if (issue.logoUrl) {
@@ -153,7 +153,7 @@ async function validateLogos() {
     }
 
     if (issues.missing.length > 0) {
-      console.log("\n❌ MISSING LOGO FILES:");
+      console.log('\n❌ MISSING LOGO FILES:');
       issues.missing.forEach((issue) => {
         console.log(`  ❌ ${issue.name}: ${issue.file}`);
         console.log(`     Expected at: ${issue.absolutePath}`);
@@ -161,7 +161,7 @@ async function validateLogos() {
     }
 
     if (issues.suspicious.length > 0) {
-      console.log("\n⚠️  SUSPICIOUS LOGOS:");
+      console.log('\n⚠️  SUSPICIOUS LOGOS:');
       issues.suspicious.forEach((issue) => {
         console.log(`  ⚠️  ${issue.name}: ${issue.reason}`);
         console.log(`     ${issue.logoUrl}`);
@@ -170,16 +170,16 @@ async function validateLogos() {
 
     // Check website coverage
     const brandsWithWebsites = brands.filter(
-      (b) => b.website && b.website.trim() !== "",
+      (b) => b.website && b.website.trim() !== ''
     );
     const websiteRatio = brandsWithWebsites.length / brands.length;
 
     console.log(
-      `\n🌐 WEBSITE COVERAGE: ${brandsWithWebsites.length}/${brands.length} (${(websiteRatio * 100).toFixed(1)}%) have websites`,
+      `\n🌐 WEBSITE COVERAGE: ${brandsWithWebsites.length}/${brands.length} (${(websiteRatio * 100).toFixed(1)}%) have websites`
     );
 
     // File format distribution
-    const localLogos = brands.filter((b) => b.logoUrl.startsWith("/"));
+    const localLogos = brands.filter((b) => b.logoUrl.startsWith('/'));
     const formats = {};
 
     localLogos.forEach((brand) => {
@@ -187,35 +187,35 @@ async function validateLogos() {
       formats[ext] = (formats[ext] || 0) + 1;
     });
 
-    console.log("\n📁 LOGO FILE FORMATS:");
+    console.log('\n📁 LOGO FILE FORMATS:');
     Object.entries(formats).forEach(([format, count]) => {
       const percentage = ((count / localLogos.length) * 100).toFixed(1);
       console.log(
-        `  ${format || "no-extension"}: ${count} files (${percentage}%)`,
+        `  ${format || 'no-extension'}: ${count} files (${percentage}%)`
       );
     });
 
     // Overall assessment
     const authenticityRatio = results.authentic / results.total;
-    console.log("\n🎯 OVERALL ASSESSMENT:");
-    console.log("─".repeat(50));
+    console.log('\n🎯 OVERALL ASSESSMENT:');
+    console.log('─'.repeat(50));
 
     if (authenticityRatio >= 0.9) {
-      console.log("✅ EXCELLENT: Most logos appear authentic");
+      console.log('✅ EXCELLENT: Most logos appear authentic');
     } else if (authenticityRatio >= 0.7) {
       console.log(
-        "👍 GOOD: Majority of logos are authentic, some need updates",
+        '👍 GOOD: Majority of logos are authentic, some need updates'
       );
     } else if (authenticityRatio >= 0.5) {
-      console.log("⚠️  FAIR: Many logos need authentic replacements");
+      console.log('⚠️  FAIR: Many logos need authentic replacements');
     } else {
       console.log(
-        "❌ POOR: Most logos appear to be placeholders or self-generated",
+        '❌ POOR: Most logos appear to be placeholders or self-generated'
       );
     }
 
     console.log(
-      `\nRecommendation: Replace ${results.selfGenerated + results.suspicious} logos with authentic versions from brand websites.`,
+      `\nRecommendation: Replace ${results.selfGenerated + results.suspicious} logos with authentic versions from brand websites.`
     );
 
     // Identify brands that need priority attention
@@ -225,16 +225,16 @@ async function validateLogos() {
     ];
 
     if (priorityBrands.length > 0) {
-      console.log("\n🚨 PRIORITY BRANDS (need authentic logos):");
+      console.log('\n🚨 PRIORITY BRANDS (need authentic logos):');
       priorityBrands.forEach((name) => {
         const brand = brands.find((b) => b.name === name);
         console.log(
-          `  • ${name}${brand?.website ? ` - ${brand.website}` : " (no website)"}`,
+          `  • ${name}${brand?.website ? ` - ${brand.website}` : ' (no website)'}`
         );
       });
     }
   } catch (error) {
-    console.error("❌ Error validating logos:", error);
+    console.error('❌ Error validating logos:', error);
   } finally {
     await prisma.$disconnect();
   }

@@ -42,7 +42,20 @@
     "prepare": "husky",
     "db:studio": "npx prisma studio",
     "commit": "cz",
-    "lint:commits": "commitlint --from=HEAD~20 --to=HEAD"
+    "lint:commits": "commitlint --from=HEAD~20 --to=HEAD",
+    "ci:test": "npm run ci:lint && npm run ci:build && npm run ci:test:unit && npm run ci:test:translations",
+    "ci:lint": "npm run lint",
+    "ci:build": "npm run build",
+    "ci:test:unit": "npm run test:coverage",
+    "ci:test:translations": "npm run test:translations",
+    "ci:docker": "npm run test:docker",
+    "ci:audit": "npm audit --omit=dev --audit-level=moderate",
+    "ci:format:check": "npm run format:check",
+    "ci:all": "npm run ci:test && npm run ci:docker && npm run ci:audit && npm run ci:format:check",
+    "ci:quick": "node scripts/quick-ci-check.js",
+    "ci:full": "node scripts/test-ci-local.js",
+    "ci:simulate": "node scripts/simulate-github-actions.js",
+    "pre-ci": "npm ci && npm run prisma:generate"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",

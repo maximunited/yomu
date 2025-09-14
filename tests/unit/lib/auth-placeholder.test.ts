@@ -1,7 +1,7 @@
-import * as auth from "@/lib/auth";
+import * as auth from '@/lib/auth';
 
-describe("auth module smoke", () => {
-  it("exports something", () => {
+describe('auth module smoke', () => {
+  it('exports something', () => {
     expect(auth).toBeDefined();
   });
 });

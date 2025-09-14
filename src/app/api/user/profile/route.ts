@@ -1,34 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function PUT(request: NextRequest) {
   try {
-    console.log("=== Starting PUT request to /api/user/profile ===");
+    console.log('=== Starting PUT request to /api/user/profile ===');
 
     const session = await getServerSession(authOptions);
-    console.log("Session:", session ? "Found" : "Not found");
-    console.log("Session user:", session?.user);
+    console.log('Session:', session ? 'Found' : 'Not found');
+    console.log('Session user:', session?.user);
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
 
     if (!userId) {
-      console.log("No session user ID, using test user ID");
+      console.log('No session user ID, using test user ID');
       // Get the first user from the database for testing
       const testUser = await prisma.user.findFirst();
       if (testUser) {
         userId = testUser.id;
-        console.log("Using test user ID:", userId);
+        console.log('Using test user ID:', userId);
       } else {
-        console.log("No users found in database");
+        console.log('No users found in database');
         return NextResponse.json(
           {
-            message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED",
+            message: 'unauthorized',
+            error: 'AUTHENTICATION_REQUIRED',
           },
-          { status: 401 },
+          { status: 401 }
         );
       }
     }
@@ -36,12 +36,12 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { name, dateOfBirth, anniversaryDate, profilePicture } = body;
 
-    console.log("Updating profile for user:", userId);
-    console.log("Profile data:", {
+    console.log('Updating profile for user:', userId);
+    console.log('Profile data:', {
       name,
       dateOfBirth,
       anniversaryDate,
-      profilePicture: profilePicture ? "present" : "not present",
+      profilePicture: profilePicture ? 'present' : 'not present',
     });
 
     // Update user profile
@@ -59,10 +59,10 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    console.log("Profile updated successfully");
+    console.log('Profile updated successfully');
 
     return NextResponse.json({
-      message: "profileUpdatedSuccessfully",
+      message: 'profileUpdatedSuccessfully',
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
@@ -73,42 +73,42 @@ export async function PUT(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error updating profile:", error);
+    console.error('Error updating profile:', error);
     return NextResponse.json(
       {
-        message: "profileUpdateError",
-        error: error instanceof Error ? error.message : "Unknown error",
+        message: 'profileUpdateError',
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("=== Starting GET request to /api/user/profile ===");
+    console.log('=== Starting GET request to /api/user/profile ===');
 
     const session = await getServerSession(authOptions);
-    console.log("Session:", session ? "Found" : "Not found");
+    console.log('Session:', session ? 'Found' : 'Not found');
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
 
     if (!userId) {
-      console.log("No session user ID, using test user ID");
+      console.log('No session user ID, using test user ID');
       // Get the first user from the database for testing
       const testUser = await prisma.user.findFirst();
       if (testUser) {
         userId = testUser.id;
-        console.log("Using test user ID:", userId);
+        console.log('Using test user ID:', userId);
       } else {
-        console.log("No users found in database");
+        console.log('No users found in database');
         return NextResponse.json(
           {
-            message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED",
+            message: 'unauthorized',
+            error: 'AUTHENTICATION_REQUIRED',
           },
-          { status: 401 },
+          { status: 401 }
         );
       }
     }
@@ -128,20 +128,20 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ message: "userNotFound" }, { status: 404 });
+      return NextResponse.json({ message: 'userNotFound' }, { status: 404 });
     }
 
-    console.log("Profile loaded successfully");
+    console.log('Profile loaded successfully');
 
     return NextResponse.json({ user });
   } catch (error) {
-    console.error("Error fetching profile:", error);
+    console.error('Error fetching profile:', error);
     return NextResponse.json(
       {
-        message: "profileLoadError",
-        error: error instanceof Error ? error.message : "Unknown error",
+        message: 'profileLoadError',
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

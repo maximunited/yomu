@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -23,22 +23,22 @@ export async function GET(request: NextRequest) {
             },
           },
           orderBy: {
-            usedAt: "desc",
+            usedAt: 'desc',
           },
         },
       },
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     return NextResponse.json({ usedBenefits: user.usedBenefits });
   } catch (error) {
-    console.error("Error fetching used benefits:", error);
+    console.error('Error fetching used benefits:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
+      { error: 'Internal server error' },
+      { status: 500 }
     );
   }
 }
@@ -48,15 +48,15 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { benefitId, notes } = await request.json();
 
     if (!benefitId) {
       return NextResponse.json(
-        { error: "Benefit ID is required" },
-        { status: 400 },
+        { error: 'Benefit ID is required' },
+        { status: 400 }
       );
     }
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Check if benefit exists
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!benefit) {
-      return NextResponse.json({ error: "Benefit not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Benefit not found' }, { status: 404 });
     }
 
     // Create or update used benefit
@@ -105,10 +105,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ usedBenefit });
   } catch (error) {
-    console.error("Error marking benefit as used:", error);
+    console.error('Error marking benefit as used:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
+      { error: 'Internal server error' },
+      { status: 500 }
     );
   }
 }

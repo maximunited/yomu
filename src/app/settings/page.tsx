@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import {
   ArrowLeft,
   User,
@@ -21,9 +21,9 @@ import {
   Globe,
   Key,
   Copy,
-} from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import LanguageSelector from "@/components/LanguageSelector";
+} from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
 
 interface UserProfile {
   name: string;
@@ -39,11 +39,11 @@ export default function SettingsPage() {
   const { t, language, setLanguage } = useLanguage();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
-    name: session?.user?.name || "",
-    email: session?.user?.email || "",
-    dateOfBirth: "",
-    anniversaryDate: "",
-    profilePicture: "",
+    name: session?.user?.name || '',
+    email: session?.user?.email || '',
+    dateOfBirth: '',
+    anniversaryDate: '',
+    profilePicture: '',
   });
   const [notifications, setNotifications] = useState({
     email: true,
@@ -52,24 +52,24 @@ export default function SettingsPage() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [apiKey, setApiKey] = useState("key123");
+  const [apiKey, setApiKey] = useState('key123');
   const [isApiKeyEditing, setIsApiKeyEditing] = useState(false);
   const [isApiKeySaving, setIsApiKeySaving] = useState(false);
 
   useEffect(() => {
     // Check for saved dark mode preference
-    const savedDarkMode = localStorage.getItem("darkMode") === "true";
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setIsDarkMode(savedDarkMode);
 
     // Apply dark mode to document
     if (savedDarkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     }
 
     // Load profile data
     const loadProfile = async () => {
       try {
-        const response = await fetch("/api/user/profile");
+        const response = await fetch('/api/user/profile');
         if (response.ok) {
           const data = await response.json();
           if (data.user) {
@@ -78,16 +78,18 @@ export default function SettingsPage() {
               ...data.user,
               // Convert null dates to empty strings for React inputs
               dateOfBirth: data.user.dateOfBirth
-                ? new Date(data.user.dateOfBirth).toISOString().split("T")[0]
-                : "",
+                ? new Date(data.user.dateOfBirth).toISOString().split('T')[0]
+                : '',
               anniversaryDate: data.user.anniversaryDate
-                ? new Date(data.user.anniversaryDate).toISOString().split("T")[0]
-                : "",
+                ? new Date(data.user.anniversaryDate)
+                    .toISOString()
+                    .split('T')[0]
+                : '',
             }));
           }
         }
       } catch (error) {
-        console.error("Error loading profile:", error);
+        console.error('Error loading profile:', error);
       }
     };
 
@@ -96,13 +98,13 @@ export default function SettingsPage() {
     // Load API key
     const loadApiKey = async () => {
       try {
-        const response = await fetch("/api/user/api-key");
+        const response = await fetch('/api/user/api-key');
         if (response.ok) {
           const data = await response.json();
           setApiKey(data.apiKey);
         }
       } catch (error) {
-        console.error("Error loading API key:", error);
+        console.error('Error loading API key:', error);
       }
     };
 
@@ -112,28 +114,28 @@ export default function SettingsPage() {
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
-    localStorage.setItem("darkMode", newDarkMode.toString());
+    localStorage.setItem('darkMode', newDarkMode.toString());
 
     if (newDarkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove('dark');
     }
   };
 
   const handleSaveProfile = async () => {
     // Validate required fields
     if (!profile.name.trim()) {
-      console.error("Name is required");
+      console.error('Name is required');
       return;
     }
 
     setIsSaving(true);
     try {
-      const response = await fetch("/api/user/profile", {
-        method: "PUT",
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: profile.name,
@@ -151,20 +153,20 @@ export default function SettingsPage() {
           ...data.user,
           // Convert null dates to empty strings for React inputs
           dateOfBirth: data.user.dateOfBirth
-            ? new Date(data.user.dateOfBirth).toISOString().split("T")[0]
-            : "",
+            ? new Date(data.user.dateOfBirth).toISOString().split('T')[0]
+            : '',
           anniversaryDate: data.user.anniversaryDate
-            ? new Date(data.user.anniversaryDate).toISOString().split("T")[0]
-            : "",
+            ? new Date(data.user.anniversaryDate).toISOString().split('T')[0]
+            : '',
         }));
         setIsEditing(false);
         // Show success message (you could add a toast notification here)
       } else {
-        console.error("Failed to save profile");
+        console.error('Failed to save profile');
         // Show error message
       }
     } catch (error) {
-      console.error("Error saving profile:", error);
+      console.error('Error saving profile:', error);
       // Show error message
     } finally {
       setIsSaving(false);
@@ -172,11 +174,11 @@ export default function SettingsPage() {
   };
 
   const handleLogout = () => {
-    signOut({ callbackUrl: "/" });
+    signOut({ callbackUrl: '/' });
   };
 
   const handleProfilePictureChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -197,10 +199,10 @@ export default function SettingsPage() {
 
   const saveProfilePicture = async (profilePicture: string) => {
     try {
-      const response = await fetch("/api/user/profile", {
-        method: "PUT",
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: profile.name,
@@ -211,14 +213,14 @@ export default function SettingsPage() {
       });
 
       if (response.ok) {
-        console.log("Profile picture saved successfully");
+        console.log('Profile picture saved successfully');
         // Could add a toast notification here
       } else {
-        console.error("Failed to save profile picture");
+        console.error('Failed to save profile picture');
         // Could add error notification here
       }
     } catch (error) {
-      console.error("Error saving profile picture:", error);
+      console.error('Error saving profile picture:', error);
       // Could add error notification here
     }
   };
@@ -226,10 +228,10 @@ export default function SettingsPage() {
   const handleSaveApiKey = async () => {
     setIsApiKeySaving(true);
     try {
-      const response = await fetch("/api/user/api-key", {
-        method: "PUT",
+      const response = await fetch('/api/user/api-key', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ apiKey }),
       });
@@ -238,7 +240,7 @@ export default function SettingsPage() {
         setIsApiKeyEditing(false);
       }
     } catch (error) {
-      console.error("Error saving API key:", error);
+      console.error('Error saving API key:', error);
     } finally {
       setIsApiKeySaving(false);
     }
@@ -249,7 +251,7 @@ export default function SettingsPage() {
       await navigator.clipboard.writeText(apiKey);
       // You could add a toast notification here
     } catch (error) {
-      console.error("Error copying API key:", error);
+      console.error('Error copying API key:', error);
     }
   };
 
@@ -263,11 +265,11 @@ export default function SettingsPage() {
               <Link href="/dashboard">
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="w-4 h-4 ml-1" />
-                  {t("back")}
+                  {t('back')}
                 </Button>
               </Link>
               <span className="text-xl font-bold text-gray-900 dark:text-white">
-                {t("settings")}
+                {t('settings')}
               </span>
             </div>
           </div>
@@ -285,7 +287,7 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-3 mb-6">
               <User className="w-6 h-6 text-purple-600" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("profile")}
+                {t('profile')}
               </h2>
             </div>
 
@@ -317,10 +319,10 @@ export default function SettingsPage() {
               </div>
               <div>
                 <h3 className="font-medium text-gray-900 dark:text-white">
-                  {t("profilePicture")}
+                  {t('profilePicture')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("clickToChange")}
+                  {t('clickToChange')}
                 </p>
               </div>
             </div>
@@ -329,7 +331,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("fullName")}
+                  {t('fullName')}
                 </label>
                 <Input
                   value={profile.name}
@@ -343,7 +345,7 @@ export default function SettingsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("email")}
+                  {t('email')}
                 </label>
                 <Input
                   value={profile.email}
@@ -351,14 +353,14 @@ export default function SettingsPage() {
                   className="bg-gray-100 dark:bg-gray-700 dark:text-gray-400"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {t("emailPermanent")}
+                  {t('emailPermanent')}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t("dateOfBirth")}
+                    {t('dateOfBirth')}
                   </label>
                   <Input
                     type="date"
@@ -375,7 +377,7 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t("anniversaryDate")} ({t("optional")})
+                    {t('anniversaryDate')} ({t('optional')})
                   </label>
                   <Input
                     type="date"
@@ -396,7 +398,7 @@ export default function SettingsPage() {
                 {!isEditing ? (
                   <Button onClick={() => setIsEditing(true)}>
                     <User className="w-4 h-4 ml-2" />
-                    {t("editProfile")}
+                    {t('editProfile')}
                   </Button>
                 ) : (
                   <>
@@ -406,13 +408,13 @@ export default function SettingsPage() {
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <Save className="w-4 h-4 ml-2" />
-                      {isSaving ? t("saving") : t("saveChanges")}
+                      {isSaving ? t('saving') : t('saveChanges')}
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => setIsEditing(false)}
                     >
-                      {t("cancel")}
+                      {t('cancel')}
                     </Button>
                   </>
                 )}
@@ -428,14 +430,14 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-3 mb-6">
               <Key className="w-6 h-6 text-purple-600" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("apiKey")}
+                {t('apiKey')}
               </h2>
             </div>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("apiKey")}
+                  {t('apiKey')}
                 </label>
                 <div className="flex items-center space-x-2">
                   <Input
@@ -451,11 +453,11 @@ export default function SettingsPage() {
                     className="flex items-center space-x-2"
                   >
                     <Copy className="w-4 h-4" />
-                    {t("copyApiKey")}
+                    {t('copyApiKey')}
                   </Button>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {t("apiKeyDescription")}
+                  {t('apiKeyDescription')}
                 </p>
               </div>
 
@@ -463,7 +465,7 @@ export default function SettingsPage() {
                 {!isApiKeyEditing ? (
                   <Button onClick={() => setIsApiKeyEditing(true)}>
                     <Key className="w-4 h-4 ml-2" />
-                    {t("editApiKey")}
+                    {t('editApiKey')}
                   </Button>
                 ) : (
                   <>
@@ -473,16 +475,16 @@ export default function SettingsPage() {
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <Save className="w-4 h-4 ml-2" />
-                      {isApiKeySaving ? t("saving") : t("saveApiKey")}
+                      {isApiKeySaving ? t('saving') : t('saveApiKey')}
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => {
                         setIsApiKeyEditing(false);
-                        setApiKey("key123"); // Reset to default
+                        setApiKey('key123'); // Reset to default
                       }}
                     >
-                      {t("cancel")}
+                      {t('cancel')}
                     </Button>
                   </>
                 )}
@@ -502,17 +504,17 @@ export default function SettingsPage() {
                 <Sun className="w-6 h-6 text-purple-600" />
               )}
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("appearance")}
+                {t('appearance')}
               </h2>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium text-gray-900 dark:text-white">
-                  {t("darkMode")}
+                  {t('darkMode')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("darkModeDescription")}
+                  {t('darkModeDescription')}
                 </p>
               </div>
               <Button
@@ -525,7 +527,7 @@ export default function SettingsPage() {
                 ) : (
                   <Moon className="w-4 h-4" />
                 )}
-                <span>{isDarkMode ? t("lightMode") : t("darkMode")}</span>
+                <span>{isDarkMode ? t('lightMode') : t('darkMode')}</span>
               </Button>
             </div>
           </div>
@@ -535,24 +537,24 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-3 mb-6">
               <Globe className="w-6 h-6 text-purple-600" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("language")}
+                {t('language')}
               </h2>
             </div>
 
             <div className="space-y-4">
               <div>
                 <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-                  {t("interfaceLanguage")}
+                  {t('interfaceLanguage')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  {t("languageDescription")}
+                  {t('languageDescription')}
                 </p>
                 <LanguageSelector variant="dropdown" showBeta={true} />
               </div>
 
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {t("betaLanguagesNote")}
+                  {t('betaLanguagesNote')}
                 </p>
               </div>
             </div>
@@ -566,7 +568,7 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-3 mb-6">
               <Bell className="w-6 h-6 text-purple-600" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("notifications")}
+                {t('notifications')}
               </h2>
             </div>
 
@@ -574,10 +576,10 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white">
-                    {t("emailNotifications")}
+                    {t('emailNotifications')}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {t("emailNotificationsDescription")}
+                    {t('emailNotificationsDescription')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -599,10 +601,10 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white">
-                    {t("pushNotifications")}
+                    {t('pushNotifications')}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {t("pushNotificationsDescription")}
+                    {t('pushNotificationsDescription')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -624,10 +626,10 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white">
-                    {t("smsNotifications")}
+                    {t('smsNotifications')}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {t("smsNotificationsDescription")}
+                    {t('smsNotificationsDescription')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -656,7 +658,7 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-3 mb-6">
               <Shield className="w-6 h-6 text-purple-600" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("account")}
+                {t('account')}
               </h2>
             </div>
 
@@ -664,21 +666,21 @@ export default function SettingsPage() {
               <Link href="/privacy">
                 <Button variant="outline" className="w-full justify-start">
                   <Shield className="w-4 h-4 ml-2" />
-                  {t("privacyPolicy")}
+                  {t('privacyPolicy')}
                 </Button>
               </Link>
 
               <Link href="/terms">
                 <Button variant="outline" className="w-full justify-start">
                   <Shield className="w-4 h-4 ml-2" />
-                  {t("termsOfService")}
+                  {t('termsOfService')}
                 </Button>
               </Link>
 
               <Link href="/contact">
                 <Button variant="outline" className="w-full justify-start">
                   <Mail className="w-4 h-4 ml-2" />
-                  {t("contact")}
+                  {t('contact')}
                 </Button>
               </Link>
 
@@ -688,7 +690,7 @@ export default function SettingsPage() {
                 className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <LogOut className="w-4 h-4 ml-2" />
-                {t("logout")}
+                {t('logout')}
               </Button>
             </div>
           </div>

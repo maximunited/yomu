@@ -1,10 +1,10 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function createPartnerships() {
   try {
-    console.log("🔄 Creating partnerships between existing brands...");
+    console.log('🔄 Creating partnerships between existing brands...');
 
     // Get all brands
     const brands = await prisma.brand.findMany({
@@ -19,23 +19,23 @@ async function createPartnerships() {
     });
 
     console.log(
-      "Found brands:",
-      brands.map((b) => ({ name: b.name, category: b.category })),
+      'Found brands:',
+      brands.map((b) => ({ name: b.name, category: b.category }))
     );
 
     // Find Giraffe and Nono&Mimi brands
     const giraffeBrand = brands.find((b) =>
-      b.name.toLowerCase().includes("giraffe"),
+      b.name.toLowerCase().includes('giraffe')
     );
     const nonoMimiBrand = brands.find(
       (b) =>
-        b.name.toLowerCase().includes("nono") ||
-        b.name.toLowerCase().includes("mimi"),
+        b.name.toLowerCase().includes('nono') ||
+        b.name.toLowerCase().includes('mimi')
     );
 
     if (giraffeBrand && nonoMimiBrand) {
       console.log(
-        `Creating partnership: ${giraffeBrand.name} ↔ ${nonoMimiBrand.name}`,
+        `Creating partnership: ${giraffeBrand.name} ↔ ${nonoMimiBrand.name}`
       );
 
       // Check if partnership already exists
@@ -49,7 +49,7 @@ async function createPartnerships() {
       });
 
       if (existingPartnership) {
-        console.log("Partnership already exists!");
+        console.log('Partnership already exists!');
       } else {
         await prisma.brandPartnership.create({
           data: {
@@ -57,7 +57,7 @@ async function createPartnerships() {
             brandBId: nonoMimiBrand.id,
           },
         });
-        console.log("✅ Partnership created successfully!");
+        console.log('✅ Partnership created successfully!');
       }
 
       // Update action URLs for brands based on category
@@ -69,37 +69,37 @@ async function createPartnerships() {
         let actionLabel = null;
 
         switch (brand.category.toLowerCase()) {
-          case "restaurant":
-          case "food":
-            actionUrl = "https://www.opentable.com/";
-            actionType = "reserve";
-            actionLabel = "הזמנת מקום";
+          case 'restaurant':
+          case 'food':
+            actionUrl = 'https://www.opentable.com/';
+            actionType = 'reserve';
+            actionLabel = 'הזמנת מקום';
             break;
-          case "home":
+          case 'home':
             actionUrl = `https://www.google.com/maps/search/${encodeURIComponent(
-              brand.name,
+              brand.name
             )}`;
-            actionType = "navigate";
-            actionLabel = "נווט לחנות";
+            actionType = 'navigate';
+            actionLabel = 'נווט לחנות';
             break;
-          case "baby":
+          case 'baby':
             actionUrl = `https://www.google.com/maps/search/${encodeURIComponent(
-              brand.name,
+              brand.name
             )}`;
-            actionType = "navigate";
-            actionLabel = "נווט לחנות";
+            actionType = 'navigate';
+            actionLabel = 'נווט לחנות';
             break;
-          case "transport":
+          case 'transport':
             actionUrl = `https://www.google.com/maps/search/${encodeURIComponent(
-              brand.name,
+              brand.name
             )}`;
-            actionType = "navigate";
-            actionLabel = "מצא מיקום";
+            actionType = 'navigate';
+            actionLabel = 'מצא מיקום';
             break;
           default:
             actionUrl = null; // Will use brand's website
-            actionType = "visit";
-            actionLabel = "בקר באתר";
+            actionType = 'visit';
+            actionLabel = 'בקר באתר';
         }
 
         if (!brand.actionUrl && actionUrl) {
@@ -118,14 +118,14 @@ async function createPartnerships() {
           data: update.updates,
         });
         console.log(
-          `✅ Updated ${update.name} with action: ${update.updates.actionLabel}`,
+          `✅ Updated ${update.name} with action: ${update.updates.actionLabel}`
         );
       }
     } else {
-      console.log("Could not find both Giraffe and Nono&Mimi brands");
+      console.log('Could not find both Giraffe and Nono&Mimi brands');
       console.log(
-        "Available brands:",
-        brands.map((b) => b.name),
+        'Available brands:',
+        brands.map((b) => b.name)
       );
     }
 
@@ -137,12 +137,12 @@ async function createPartnerships() {
       },
     });
 
-    console.log("\n🤝 Current partnerships:");
+    console.log('\n🤝 Current partnerships:');
     partnerships.forEach((p) => {
       console.log(`  ${p.brandA.name} ↔ ${p.brandB.name}`);
     });
   } catch (error) {
-    console.error("❌ Error creating partnerships:", error);
+    console.error('❌ Error creating partnerships:', error);
   } finally {
     await prisma.$disconnect();
   }

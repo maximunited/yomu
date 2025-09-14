@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/Button";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/Button';
 import {
   Check,
   Gift,
@@ -12,8 +12,8 @@ import {
   Car,
   Plane,
   Heart,
-} from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+} from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Brand {
   id: string;
@@ -25,74 +25,74 @@ interface Brand {
 
 const popularBrands: Brand[] = [
   {
-    id: "fox",
-    name: "Fox",
-    logoUrl: "/images/brands/fox.png",
-    category: "fashion",
-    description: "brandDescriptionFashion",
+    id: 'fox',
+    name: 'Fox',
+    logoUrl: '/images/brands/fox.png',
+    category: 'fashion',
+    description: 'brandDescriptionFashion',
   },
   {
-    id: "super-pharm-lifestyle",
-    name: "Super-Pharm - LifeStyle",
-    logoUrl: "/images/brands/super-pharm.png",
-    category: "health",
-    description: "brandDescriptionHealth",
+    id: 'super-pharm-lifestyle',
+    name: 'Super-Pharm - LifeStyle',
+    logoUrl: '/images/brands/super-pharm.png',
+    category: 'health',
+    description: 'brandDescriptionHealth',
   },
   {
-    id: "mcdonalds",
+    id: 'mcdonalds',
     name: "McDonald's",
-    logoUrl: "/images/brands/mcdonalds.png",
-    category: "food",
-    description: "brandDescriptionFood",
+    logoUrl: '/images/brands/mcdonalds.png',
+    category: 'food',
+    description: 'brandDescriptionFood',
   },
   {
-    id: "bbb",
-    name: "BBB",
-    logoUrl: "/images/brands/bbb.png",
-    category: "home",
-    description: "brandDescriptionHome",
+    id: 'bbb',
+    name: 'BBB',
+    logoUrl: '/images/brands/bbb.png',
+    category: 'home',
+    description: 'brandDescriptionHome',
   },
   {
-    id: "hm",
-    name: "H&M",
-    logoUrl: "/images/brands/hm.png",
-    category: "fashion",
-    description: "brandDescriptionFashion",
+    id: 'hm',
+    name: 'H&M',
+    logoUrl: '/images/brands/hm.png',
+    category: 'fashion',
+    description: 'brandDescriptionFashion',
   },
   {
-    id: "isracard",
-    name: "Isracard",
-    logoUrl: "/images/brands/isracard.png",
-    category: "finance",
-    description: "brandDescriptionFinance",
+    id: 'isracard',
+    name: 'Isracard',
+    logoUrl: '/images/brands/isracard.png',
+    category: 'finance',
+    description: 'brandDescriptionFinance',
   },
   {
-    id: "max",
-    name: "Max",
-    logoUrl: "/images/brands/max.png",
-    category: "fashion",
-    description: "brandDescriptionFashion",
+    id: 'max',
+    name: 'Max',
+    logoUrl: '/images/brands/max.png',
+    category: 'fashion',
+    description: 'brandDescriptionFashion',
   },
   {
-    id: "starbucks",
-    name: "Starbucks",
-    logoUrl: "/images/brands/starbucks.png",
-    category: "food",
-    description: "brandDescriptionCoffee",
+    id: 'starbucks',
+    name: 'Starbucks',
+    logoUrl: '/images/brands/starbucks.png',
+    category: 'food',
+    description: 'brandDescriptionCoffee',
   },
   {
-    id: "shufersal",
-    name: "Shufersal",
-    logoUrl: "/images/brands/shufersal.png",
-    category: "grocery",
-    description: "brandDescriptionGrocery",
+    id: 'shufersal',
+    name: 'Shufersal',
+    logoUrl: '/images/brands/shufersal.png',
+    category: 'grocery',
+    description: 'brandDescriptionGrocery',
   },
   {
-    id: "coffee-shop",
-    name: "Coffee Shop",
-    logoUrl: "/images/brands/coffee-shop.svg",
-    category: "food",
-    description: "brandDescriptionCoffee",
+    id: 'coffee-shop',
+    name: 'Coffee Shop',
+    logoUrl: '/images/brands/coffee-shop.svg',
+    category: 'food',
+    description: 'brandDescriptionCoffee',
   },
 ];
 
@@ -114,17 +114,17 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
     }
   }, [status, router]);
 
-  if (status === "loading") {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t("loading")}</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -134,22 +134,22 @@ export default function OnboardingPage() {
     setSelectedBrands((prev) =>
       prev.includes(brandId)
         ? prev.filter((id) => id !== brandId)
-        : [...prev, brandId],
+        : [...prev, brandId]
     );
   };
 
   const handleSubmit = async () => {
     if (selectedBrands.length === 0) {
-      alert(t("onboardingSelectAtLeastOne"));
+      alert(t('onboardingSelectAtLeastOne'));
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/user/memberships", {
-        method: "POST",
+      const response = await fetch('/api/user/memberships', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           brandIds: selectedBrands,
@@ -157,13 +157,13 @@ export default function OnboardingPage() {
       });
 
       if (response.ok) {
-        router.push("/dashboard");
+        router.push('/dashboard');
       } else {
-        throw new Error(t("onboardingSaveError"));
+        throw new Error(t('onboardingSaveError'));
       }
     } catch (error) {
-      console.error("Error saving memberships:", error);
-      alert(t("onboardingSaveError"));
+      console.error('Error saving memberships:', error);
+      alert(t('onboardingSaveError'));
     } finally {
       setIsLoading(false);
     }
@@ -181,10 +181,10 @@ export default function OnboardingPage() {
             <span className="text-2xl font-bold text-gray-900">YomU</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {t("onboardingTitle")}
+            {t('onboardingTitle')}
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            {t("onboardingDescription")}
+            {t('onboardingDescription')}
           </p>
         </div>
 
@@ -203,8 +203,8 @@ export default function OnboardingPage() {
                   onClick={() => handleBrandToggle(brand.id)}
                   className={`relative cursor-pointer rounded-xl border-2 p-4 transition-all hover:shadow-lg ${
                     isSelected
-                      ? "border-purple-500 bg-purple-50"
-                      : "border-gray-200 bg-white hover:border-gray-300"
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
                   }`}
                 >
                   {isSelected && (
@@ -239,9 +239,9 @@ export default function OnboardingPage() {
           {/* Action Buttons */}
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600">
-              {t("onboardingSelectedCount").replace(
-                "{count}",
-                selectedBrands.length.toString(),
+              {t('onboardingSelectedCount').replace(
+                '{count}',
+                selectedBrands.length.toString()
               )}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -251,15 +251,15 @@ export default function OnboardingPage() {
                 className="px-8 py-3"
               >
                 {isLoading
-                  ? t("onboardingSaving")
-                  : t("onboardingContinueToDashboard")}
+                  ? t('onboardingSaving')
+                  : t('onboardingContinueToDashboard')}
               </Button>
               <Button
                 variant="outline"
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push('/dashboard')}
                 className="px-8 py-3"
               >
-                {t("onboardingSkipForNow")}
+                {t('onboardingSkipForNow')}
               </Button>
             </div>
           </div>

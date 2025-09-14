@@ -1,4 +1,4 @@
-import { translations } from "@/lib/translations";
+import { translations } from '@/lib/translations';
 
 export type SupportedLocale = keyof typeof translations;
 
@@ -7,4 +7,4 @@ export function getMessages(locale: SupportedLocale) {
   return translations[locale] as unknown as Record<string, unknown>;
 }
 
-export const DEFAULT_LOCALE: SupportedLocale = "he";
+export const DEFAULT_LOCALE: SupportedLocale = 'he';

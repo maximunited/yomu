@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
-const fs = require("fs");
-const path = require("path");
-const { predefinedBrands } = require("../../scripts/seed");
+const fs = require('fs');
+const path = require('path');
+const { predefinedBrands } = require('../../scripts/seed');
 
-describe("Brand logos assets", () => {
-  it("every predefined brand logo should point to an existing file under public/", () => {
-    const publicDir = path.join(process.cwd(), "public");
+describe('Brand logos assets', () => {
+  it('every predefined brand logo should point to an existing file under public/', () => {
+    const publicDir = path.join(process.cwd(), 'public');
     const missing = [];
     for (const brand of predefinedBrands) {
-      const logoPath = brand.logoUrl.startsWith("/")
+      const logoPath = brand.logoUrl.startsWith('/')
         ? brand.logoUrl
         : `/${brand.logoUrl}`;
       const abs = path.join(publicDir, logoPath);
@@ -17,7 +17,7 @@ describe("Brand logos assets", () => {
       }
     }
     if (missing.length) {
-      console.log("Missing logo assets:", missing);
+      console.log('Missing logo assets:', missing);
     }
     expect(missing).toHaveLength(0);
   });

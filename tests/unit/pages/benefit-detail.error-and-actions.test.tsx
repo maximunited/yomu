@@ -1,12 +1,12 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import BenefitDetailPage from "@/app/benefit/[id]/page";
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import BenefitDetailPage from '@/app/benefit/[id]/page';
 
-jest.mock("next/navigation", () => ({
-  useParams: () => ({ id: "b1" }),
+jest.mock('next/navigation', () => ({
+  useParams: () => ({ id: 'b1' }),
 }));
 
-describe("BenefitDetailPage error + actions", () => {
-  it("shows not found on 404 and action buttons open windows", async () => {
+describe('BenefitDetailPage error + actions', () => {
+  it('shows not found on 404 and action buttons open windows', async () => {
     // First render: 404
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
@@ -19,34 +19,34 @@ describe("BenefitDetailPage error + actions", () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        id: "b1",
-        title: "T",
-        description: "D",
+        id: 'b1',
+        title: 'T',
+        description: 'D',
         brand: {
-          name: "Brand",
-          logoUrl: "/x.png",
-          website: "https://brand.example",
+          name: 'Brand',
+          logoUrl: '/x.png',
+          website: 'https://brand.example',
         },
-        validityType: "birthday_month",
-        redemptionMethod: "Show code",
-        url: "https://buy.example",
-        termsAndConditions: "Terms",
+        validityType: 'birthday_month',
+        redemptionMethod: 'Show code',
+        url: 'https://buy.example',
+        termsAndConditions: 'Terms',
       }),
     });
 
     const openSpy = jest
-      .spyOn(window, "open")
+      .spyOn(window, 'open')
       .mockImplementation(() => null as any);
     render(<BenefitDetailPage />);
-    await waitFor(() => expect(screen.getByText("Brand")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Brand')).toBeInTheDocument());
 
     // Buy button - look for the actual Hebrew text
-    const buyBtn = screen.getByRole("button", { name: /לקנייה באתר המותג/i });
+    const buyBtn = screen.getByRole('button', { name: /לקנייה באתר המותג/i });
     fireEvent.click(buyBtn);
     expect(openSpy).toHaveBeenCalled();
 
     // Official site button
-    const siteBtn = screen.getByRole("button", { name: /אתר המותג הרשמי/i });
+    const siteBtn = screen.getByRole('button', { name: /אתר המותג הרשמי/i });
     fireEvent.click(siteBtn);
     expect(openSpy).toHaveBeenCalled();
     openSpy.mockRestore();

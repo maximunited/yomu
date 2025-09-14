@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import LanguageSelector from "./LanguageSelector";
+import LanguageSelector from './LanguageSelector';
 
 interface LanguageSwitcherProps {
   className?: string;
 }
 
 export default function LanguageSwitcher({
-  className = "",
+  className = '',
 }: LanguageSwitcherProps) {
   return (
     <LanguageSelector

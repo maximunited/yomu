@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 import {
   ArrowLeft,
   Plus,
@@ -10,10 +10,10 @@ import {
   Trash2,
   CheckCircle,
   Circle,
-} from "lucide-react";
-import { useSession } from "next-auth/react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useRouter } from "next/navigation";
+} from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useRouter } from 'next/navigation';
 
 interface Membership {
   id: string;
@@ -22,7 +22,7 @@ interface Membership {
   category: string;
   isActive: boolean;
   icon: string;
-  type: "free" | "paid";
+  type: 'free' | 'paid';
   cost: string | null;
   partnerBrands?: Brand[];
   partnerCount?: number;
@@ -45,23 +45,23 @@ export default function MembershipsPage() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const [customMembership, setCustomMembership] = useState({
-    name: "",
-    description: "",
-    category: "",
-    url: "",
-    type: "free" as "free" | "paid",
-    cost: "",
+    name: '',
+    description: '',
+    category: '',
+    url: '',
+    type: 'free' as 'free' | 'paid',
+    cost: '',
     partnerBrands: [] as string[],
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showCustomMembershipDialog, setShowCustomMembershipDialog] =
     useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedMembershipType, setSelectedMembershipType] = useState("");
+  const [selectedMembershipType, setSelectedMembershipType] = useState('');
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [originalMemberships, setOriginalMemberships] = useState<Membership[]>(
-    [],
+    []
   );
   const [availableBrands, setAvailableBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,8 +69,8 @@ export default function MembershipsPage() {
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
     }
   }, [status, router]);
 
@@ -80,13 +80,13 @@ export default function MembershipsPage() {
       setIsLoading(true);
       try {
         // Load brands
-        const brandsResponse = await fetch("/api/brands");
+        const brandsResponse = await fetch('/api/brands');
         if (brandsResponse.ok) {
           const brands = await brandsResponse.json();
           setAvailableBrands(brands);
 
           // Load user's existing memberships
-          const userMembershipsResponse = await fetch("/api/user/memberships");
+          const userMembershipsResponse = await fetch('/api/user/memberships');
           let userMemberships: Array<{ brandId: string; isActive: boolean }> =
             [];
           if (userMembershipsResponse.ok) {
@@ -101,7 +101,7 @@ export default function MembershipsPage() {
           const brandPaidMap = new Map<string, boolean>();
           const brandsWithBenefits = new Set<string>();
           try {
-            const benefitsResp = await fetch("/api/benefits");
+            const benefitsResp = await fetch('/api/benefits');
             if (benefitsResp.ok) {
               const data = await benefitsResp.json();
               const list = Array.isArray(data.benefits) ? data.benefits : [];
@@ -133,13 +133,13 @@ export default function MembershipsPage() {
                 // Show full names for small partnerships
                 const partnerNames = partners
                   .map((partner) => partner.name)
-                  .join(", ");
-                description += ` | ${t("includesAccessTo")}: ${partnerNames}`;
+                  .join(', ');
+                description += ` | ${t('includesAccessTo')}: ${partnerNames}`;
               } else {
                 // Show count for larger partnerships to keep UI clean
-                description += ` | ${t("includesAccessTo")} ${
+                description += ` | ${t('includesAccessTo')} ${
                   partners.length
-                } ${t("additionalBrands")}`;
+                } ${t('additionalBrands')}`;
               }
             }
 
@@ -149,7 +149,7 @@ export default function MembershipsPage() {
               paidFromBenefits !== undefined
                 ? paidFromBenefits
                 : /₪|שנה|חודשי|subscription|paid|מסלול בתשלום/i.test(
-                    brand.description || "",
+                    brand.description || ''
                   );
             const membership: Membership = {
               id: brand.id,
@@ -161,7 +161,7 @@ export default function MembershipsPage() {
                 brandsWithBenefits.has(brand.id) ||
                 brandsWithBenefits.has(brand.name),
               icon: brand.logoUrl,
-              type: inferredPaid ? ("paid" as const) : ("free" as const),
+              type: inferredPaid ? ('paid' as const) : ('free' as const),
               cost: inferredPaid ? ((brand as any).cost ?? null) : null,
               partnerBrands: partners,
             };
@@ -178,197 +178,197 @@ export default function MembershipsPage() {
           setOriginalMemberships(brandMemberships); // Initialize original memberships
         }
       } catch (error) {
-        console.error("Error loading data:", error);
+        console.error('Error loading data:', error);
         // Fallback to mock data if API fails
         const fallbackMemberships: Membership[] = [
           {
-            id: "1",
+            id: '1',
             name: "McDonald's",
-            description: "הטבות על מזון מהיר",
-            category: "food",
+            description: 'הטבות על מזון מהיר',
+            category: 'food',
             isActive: true,
-            icon: "/images/brands/mcdonalds.png",
-            type: "free",
+            icon: '/images/brands/mcdonalds.png',
+            type: 'free',
             cost: null,
           },
           {
-            id: "2",
-            name: "Super-Pharm - LifeStyle",
-            description: "הטבות על מוצרי בריאות ויופי",
-            category: "health",
+            id: '2',
+            name: 'Super-Pharm - LifeStyle',
+            description: 'הטבות על מוצרי בריאות ויופי',
+            category: 'health',
             isActive: true,
-            icon: "/images/brands/super-pharm.png",
-            type: "free",
+            icon: '/images/brands/super-pharm.png',
+            type: 'free',
             cost: null,
           },
           {
-            id: "3",
-            name: "Fox",
-            description: "הטבות על ביגוד והנעלה",
-            category: "fashion",
+            id: '3',
+            name: 'Fox',
+            description: 'הטבות על ביגוד והנעלה',
+            category: 'fashion',
             isActive: false,
-            icon: "/images/brands/fox.png",
-            type: "paid",
-            cost: "₪99/שנה",
+            icon: '/images/brands/fox.png',
+            type: 'paid',
+            cost: '₪99/שנה',
           },
           {
-            id: "4",
-            name: "Isracard",
-            description: "הטבות על דלק ותחבורה",
-            category: "transport",
+            id: '4',
+            name: 'Isracard',
+            description: 'הטבות על דלק ותחבורה',
+            category: 'transport',
             isActive: false,
-            icon: "/images/brands/isracard.png",
-            type: "free",
+            icon: '/images/brands/isracard.png',
+            type: 'free',
             cost: null,
           },
           {
-            id: "5",
-            name: "H&M",
-            description: "הטבות על ביגוד והנעלה",
-            category: "fashion",
+            id: '5',
+            name: 'H&M',
+            description: 'הטבות על ביגוד והנעלה',
+            category: 'fashion',
             isActive: false,
-            icon: "/images/brands/hm.png",
-            type: "free",
+            icon: '/images/brands/hm.png',
+            type: 'free',
             cost: null,
           },
           {
-            id: "6",
-            name: "BBB",
-            description: "הטבות על מוצרי בית",
-            category: "home",
+            id: '6',
+            name: 'BBB',
+            description: 'הטבות על מוצרי בית',
+            category: 'home',
             isActive: false,
-            icon: "/images/brands/bbb.png",
-            type: "free",
+            icon: '/images/brands/bbb.png',
+            type: 'free',
             cost: null,
           },
           {
-            id: "7",
-            name: "Shufersal",
-            description: "הטבות על מוצרי מזון",
-            category: "grocery",
+            id: '7',
+            name: 'Shufersal',
+            description: 'הטבות על מוצרי מזון',
+            category: 'grocery',
             isActive: false,
-            icon: "/images/brands/shufersal.png",
-            type: "free",
+            icon: '/images/brands/shufersal.png',
+            type: 'free',
             cost: null,
           },
           {
-            id: "8",
-            name: "KFC",
-            description: "הטבות על מזון מהיר",
-            category: "food",
+            id: '8',
+            name: 'KFC',
+            description: 'הטבות על מזון מהיר',
+            category: 'food',
             isActive: false,
-            icon: "/images/brands/kfc.svg",
-            type: "free",
+            icon: '/images/brands/kfc.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "9",
-            name: "אסקייפרום",
-            description: "50 שח הנחה בחודש יומולדת",
-            category: "entertainment",
+            id: '9',
+            name: 'אסקייפרום',
+            description: '50 שח הנחה בחודש יומולדת',
+            category: 'entertainment',
             isActive: false,
-            icon: "/images/brands/escape-room.svg",
-            type: "free",
+            icon: '/images/brands/escape-room.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "10",
-            name: "מסעדת באקרו (רעננה)",
-            description: "מנה ראשונה וקינוח מתנה",
-            category: "food",
+            id: '10',
+            name: 'מסעדת באקרו (רעננה)',
+            description: 'מנה ראשונה וקינוח מתנה',
+            category: 'food',
             isActive: false,
-            icon: "/images/brands/bacaro.svg",
-            type: "free",
+            icon: '/images/brands/bacaro.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "11",
-            name: "שגב (מסעדה)",
-            description: "מנה ראשונה",
-            category: "food",
+            id: '11',
+            name: 'שגב (מסעדה)',
+            description: 'מנה ראשונה',
+            category: 'food',
             isActive: false,
-            icon: "/images/brands/shegev.svg",
-            type: "free",
+            icon: '/images/brands/shegev.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "12",
+            id: '12',
             name: "ג'מס",
-            description: "חצי ליטר בירה",
-            category: "food",
+            description: 'חצי ליטר בירה',
+            category: 'food',
             isActive: false,
-            icon: "/images/brands/james.svg",
-            type: "free",
+            icon: '/images/brands/james.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "13",
-            name: "פראג הקטנה (מסעדה)",
+            id: '13',
+            name: 'פראג הקטנה (מסעדה)',
             description: "50 נק' מתנה",
-            category: "food",
+            category: 'food',
             isActive: false,
-            icon: "/images/brands/prague.svg",
-            type: "free",
+            icon: '/images/brands/prague.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "14",
-            name: "מיקה חנויות נוחות",
-            description: "10 שח מתנה בהצגת תעודה",
-            category: "convenience",
+            id: '14',
+            name: 'מיקה חנויות נוחות',
+            description: '10 שח מתנה בהצגת תעודה',
+            category: 'convenience',
             isActive: false,
-            icon: "/images/brands/mika.svg",
-            type: "free",
+            icon: '/images/brands/mika.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "15",
-            name: "מנמ עשה זאת בעצמך",
-            description: "50 שח מתנה (מעל 300)",
-            category: "home",
+            id: '15',
+            name: 'מנמ עשה זאת בעצמך',
+            description: '50 שח מתנה (מעל 300)',
+            category: 'home',
             isActive: false,
-            icon: "/images/brands/menam.svg",
-            type: "free",
+            icon: '/images/brands/menam.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "16",
-            name: "שילב",
-            description: "הטבות על מוצרי תינוקות",
-            category: "baby",
+            id: '16',
+            name: 'שילב',
+            description: 'הטבות על מוצרי תינוקות',
+            category: 'baby',
             isActive: false,
-            icon: "/images/brands/shilav.svg",
-            type: "free",
+            icon: '/images/brands/shilav.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "17",
-            name: "יומנגס",
-            description: "הטבות על גלידה",
-            category: "food",
+            id: '17',
+            name: 'יומנגס',
+            description: 'הטבות על גלידה',
+            category: 'food',
             isActive: false,
-            icon: "/images/brands/yomango.svg",
-            type: "free",
+            icon: '/images/brands/yomango.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "18",
-            name: "M32 המבורגרים",
-            description: "15% הנחה בחודש יומולדת",
-            category: "food",
+            id: '18',
+            name: 'M32 המבורגרים',
+            description: '15% הנחה בחודש יומולדת',
+            category: 'food',
             isActive: false,
-            icon: "/images/brands/m32.svg",
-            type: "free",
+            icon: '/images/brands/m32.svg',
+            type: 'free',
             cost: null,
           },
           {
-            id: "19",
-            name: "מסעדת ליבירה",
-            description: "בירה וקינוח בישיבה בלבד כל החודש",
-            category: "food",
+            id: '19',
+            name: 'מסעדת ליבירה',
+            description: 'בירה וקינוח בישיבה בלבד כל החודש',
+            category: 'food',
             isActive: false,
-            icon: "/images/brands/libira.svg",
-            type: "free",
+            icon: '/images/brands/libira.svg',
+            type: 'free',
             cost: null,
           },
         ];
@@ -391,28 +391,28 @@ export default function MembershipsPage() {
       prev.map((membership) =>
         membership.id === id
           ? { ...membership, isActive: !membership.isActive }
-          : membership,
-      ),
+          : membership
+      )
     );
   };
 
   const handleSaveChanges = async () => {
-    const previousScrollY = typeof window !== "undefined" ? window.scrollY : 0;
+    const previousScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
     if (!session) {
-      console.error("No session available");
-      alert(t("unauthorized"));
-      router.push("/auth/signin");
+      console.error('No session available');
+      alert(t('unauthorized'));
+      router.push('/auth/signin');
       return;
     }
 
     setIsSaving(true);
     try {
       const activeBrandIds = memberships
-        .filter((m) => m.isActive && !m.id.startsWith("custom-"))
+        .filter((m) => m.isActive && !m.id.startsWith('custom-'))
         .map((m) => m.id);
 
       const activeCustomMemberships = memberships
-        .filter((m) => m.isActive && m.id.startsWith("custom-"))
+        .filter((m) => m.isActive && m.id.startsWith('custom-'))
         .map((m) => ({
           name: m.name,
           description: m.description,
@@ -422,15 +422,15 @@ export default function MembershipsPage() {
           cost: m.cost,
         }));
 
-      console.log("Saving memberships:", {
+      console.log('Saving memberships:', {
         activeBrandIds,
         activeCustomMemberships,
       });
 
-      const response = await fetch("/api/user/memberships", {
-        method: "POST",
+      const response = await fetch('/api/user/memberships', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           brandIds: activeBrandIds,
@@ -438,38 +438,38 @@ export default function MembershipsPage() {
         }),
       });
 
-      console.log("Response status:", response.status);
+      console.log('Response status:', response.status);
 
       if (response.ok) {
         const result = await response.json();
-        console.log("Save successful:", result);
+        console.log('Save successful:', result);
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
         setOriginalMemberships(memberships); // Update original memberships after successful save
         // Restore scroll position to avoid jump after resorting
-        if (typeof window !== "undefined") {
+        if (typeof window !== 'undefined') {
           window.scrollTo(0, previousScrollY);
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error(
-          "Failed to save memberships:",
+          'Failed to save memberships:',
           response.status,
-          errorData,
+          errorData
         );
 
         if (response.status === 401) {
-          alert(t("unauthorized"));
-          router.push("/auth/signin");
+          alert(t('unauthorized'));
+          router.push('/auth/signin');
         } else if (response.status === 500) {
-          alert(t("internalServerError"));
+          alert(t('internalServerError'));
         } else {
-          alert(t("profileUpdateError"));
+          alert(t('profileUpdateError'));
         }
       }
     } catch (error) {
-      console.error("Error saving memberships:", error);
-      alert(t("internalServerError"));
+      console.error('Error saving memberships:', error);
+      alert(t('internalServerError'));
     } finally {
       setIsSaving(false);
     }
@@ -483,7 +483,7 @@ export default function MembershipsPage() {
     ) {
       // Create partner brands array from available brands based on selected names
       const selectedPartnerBrands = availableBrands.filter((brand) =>
-        customMembership.partnerBrands.includes(brand.name),
+        customMembership.partnerBrands.includes(brand.name)
       );
 
       const newMembership: Membership = {
@@ -492,10 +492,10 @@ export default function MembershipsPage() {
         description: customMembership.description,
         category: customMembership.category,
         isActive: false,
-        icon: "/images/brands/restaurant.svg",
+        icon: '/images/brands/restaurant.svg',
         type: customMembership.type,
         cost:
-          customMembership.type === "paid" && customMembership.cost
+          customMembership.type === 'paid' && customMembership.cost
             ? customMembership.cost
             : null,
         partnerBrands: selectedPartnerBrands,
@@ -513,12 +513,12 @@ export default function MembershipsPage() {
         { ...newMembership, isActive: false },
       ]);
       setCustomMembership({
-        name: "",
-        description: "",
-        category: "",
-        url: "",
-        type: "free",
-        cost: "",
+        name: '',
+        description: '',
+        category: '',
+        url: '',
+        type: 'free',
+        cost: '',
         partnerBrands: [],
       });
       setShowCustomMembershipDialog(false);
@@ -527,21 +527,21 @@ export default function MembershipsPage() {
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      food: "bg-orange-100 text-orange-800",
-      health: "bg-green-100 text-green-800",
-      fashion: "bg-purple-100 text-purple-800",
-      transport: "bg-blue-100 text-blue-800",
-      home: "bg-yellow-100 text-yellow-800",
-      grocery: "bg-pink-100 text-pink-800",
-      entertainment: "bg-indigo-100 text-indigo-800",
-      convenience: "bg-teal-100 text-teal-800",
-      baby: "bg-rose-100 text-rose-800",
-      travel: "bg-cyan-100 text-cyan-800",
-      beauty: "bg-pink-100 text-pink-800",
-      multi: "bg-gray-100 text-gray-800",
+      food: 'bg-orange-100 text-orange-800',
+      health: 'bg-green-100 text-green-800',
+      fashion: 'bg-purple-100 text-purple-800',
+      transport: 'bg-blue-100 text-blue-800',
+      home: 'bg-yellow-100 text-yellow-800',
+      grocery: 'bg-pink-100 text-pink-800',
+      entertainment: 'bg-indigo-100 text-indigo-800',
+      convenience: 'bg-teal-100 text-teal-800',
+      baby: 'bg-rose-100 text-rose-800',
+      travel: 'bg-cyan-100 text-cyan-800',
+      beauty: 'bg-pink-100 text-pink-800',
+      multi: 'bg-gray-100 text-gray-800',
     };
     return (
-      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
+      colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800'
     );
   };
 
@@ -558,7 +558,7 @@ export default function MembershipsPage() {
     const newActiveMemberships = memberships.filter(
       (m) =>
         !originalMemberships.some((original) => original.id === m.id) &&
-        m.isActive,
+        m.isActive
     );
 
     return existingMembershipsChanged || newActiveMemberships.length > 0;
@@ -566,14 +566,14 @@ export default function MembershipsPage() {
 
   const isCustomMembershipFormValid = () => {
     const basicFieldsValid =
-      customMembership.name.trim() !== "" &&
-      customMembership.description.trim() !== "" &&
-      customMembership.category !== "";
+      customMembership.name.trim() !== '' &&
+      customMembership.description.trim() !== '' &&
+      customMembership.category !== '';
 
     // If it's a paid membership, cost is required
     const costValid =
-      customMembership.type === "free" ||
-      (customMembership.type === "paid" && customMembership.cost.trim() !== "");
+      customMembership.type === 'free' ||
+      (customMembership.type === 'paid' && customMembership.cost.trim() !== '');
 
     return basicFieldsValid && costValid;
   };
@@ -590,33 +590,33 @@ export default function MembershipsPage() {
   const getCategoryDisplayName = (category: string) => {
     // Always check translations first
     switch (category) {
-      case "food":
-        return t("food");
-      case "health":
-        return t("health");
-      case "fashion":
-        return t("fashion");
-      case "transport":
-        return t("transport");
-      case "home":
-        return t("homeCategory");
-      case "finance":
-      case "financial":
-        return t("finance");
-      case "grocery":
-        return t("grocery");
-      case "entertainment":
-        return t("entertainment");
-      case "convenience":
-        return t("convenience");
-      case "baby":
-        return t("baby");
-      case "travel":
-        return "Travel";
-      case "beauty":
-        return "Beauty";
-      case "multi":
-        return "Multi-brand";
+      case 'food':
+        return t('food');
+      case 'health':
+        return t('health');
+      case 'fashion':
+        return t('fashion');
+      case 'transport':
+        return t('transport');
+      case 'home':
+        return t('homeCategory');
+      case 'finance':
+      case 'financial':
+        return t('finance');
+      case 'grocery':
+        return t('grocery');
+      case 'entertainment':
+        return t('entertainment');
+      case 'convenience':
+        return t('convenience');
+      case 'baby':
+        return t('baby');
+      case 'travel':
+        return 'Travel';
+      case 'beauty':
+        return 'Beauty';
+      case 'multi':
+        return 'Multi-brand';
       default:
         return category; // fallback to the original category name if no translation
     }
@@ -624,11 +624,11 @@ export default function MembershipsPage() {
 
   const handleBackNavigation = () => {
     if (hasChanges()) {
-      if (confirm(t("unsavedChangesWarning"))) {
-        router.push("/dashboard");
+      if (confirm(t('unsavedChangesWarning'))) {
+        router.push('/dashboard');
       }
     } else {
-      router.push("/dashboard");
+      router.push('/dashboard');
     }
   };
 
@@ -668,20 +668,20 @@ export default function MembershipsPage() {
   }, [filteredMemberships, originalActiveMap, language]);
 
   // Authentication gates (placed after hooks to keep hook order stable)
-  if (status === "loading") {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-300">
-            {t("loading")}
+            {t('loading')}
           </p>
         </div>
       </div>
     );
   }
 
-  if (status === "unauthenticated") {
+  if (status === 'unauthenticated') {
     return null;
   }
 
@@ -692,7 +692,7 @@ export default function MembershipsPage() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">
-              {t("loading")}
+              {t('loading')}
             </p>
           </div>
         </div>
@@ -713,15 +713,15 @@ export default function MembershipsPage() {
                 onClick={handleBackNavigation}
               >
                 <ArrowLeft className="w-4 h-4 ml-1" />
-                {t("back")}
+                {t('back')}
               </Button>
               <span className="text-xl font-bold text-gray-900 dark:text-white">
-                {t("manageMemberships")}
+                {t('manageMemberships')}
               </span>
             </div>
             <div className="flex items-center space-x-4 relative">
               <span className="text-sm text-gray-600 dark:text-gray-300">
-                {activeCount} {t("activeOutOfTotal")} {memberships.length}
+                {activeCount} {t('activeOutOfTotal')} {memberships.length}
               </span>
               <div className="relative">
                 <Button
@@ -729,11 +729,11 @@ export default function MembershipsPage() {
                   disabled={isSaving || !hasChanges()}
                   className={`${
                     isSaving || !hasChanges()
-                      ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                      : "bg-purple-600 hover:bg-purple-700 text-white"
+                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                      : 'bg-purple-600 hover:bg-purple-700 text-white'
                   }`}
                 >
-                  {isSaving ? t("saving") : t("saveChanges")}
+                  {isSaving ? t('saving') : t('saveChanges')}
                 </Button>
 
                 {/* Success Message - positioned under save button */}
@@ -743,7 +743,7 @@ export default function MembershipsPage() {
                       <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
                       </div>
-                      <span>{t("changesSavedSuccessfully")}</span>
+                      <span>{t('changesSavedSuccessfully')}</span>
                     </div>
                   </div>
                 )}
@@ -759,7 +759,7 @@ export default function MembershipsPage() {
           {/* Instructions */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800 text-sm">
-              {t("membershipsDescription")}
+              {t('membershipsDescription')}
             </p>
           </div>
 
@@ -769,7 +769,7 @@ export default function MembershipsPage() {
               <div className="flex-1">
                 <input
                   type="text"
-                  placeholder={t("searchPlaceholder")}
+                  placeholder={t('searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"
@@ -779,16 +779,16 @@ export default function MembershipsPage() {
                 <div className="w-full max-h-40 overflow-auto border border-gray-300 dark:border-gray-600 rounded-md p-2 font-sans">
                   <div className="grid grid-cols-1 gap-2">
                     {[
-                      "food",
-                      "health",
-                      "fashion",
-                      "transport",
-                      "home",
-                      "finance",
-                      "grocery",
-                      "entertainment",
-                      "convenience",
-                      "baby",
+                      'food',
+                      'health',
+                      'fashion',
+                      'transport',
+                      'home',
+                      'finance',
+                      'grocery',
+                      'entertainment',
+                      'convenience',
+                      'baby',
                     ]
                       .map((key) => ({
                         key,
@@ -798,8 +798,8 @@ export default function MembershipsPage() {
                         a.label
                           .toLowerCase()
                           .localeCompare(b.label.toLowerCase(), undefined, {
-                            sensitivity: "base",
-                          }),
+                            sensitivity: 'base',
+                          })
                       )
                       .map(({ key, label }) => (
                         <label
@@ -814,7 +814,7 @@ export default function MembershipsPage() {
                               setSelectedCategories((prev) =>
                                 prev.includes(key)
                                   ? prev.filter((c) => c !== key)
-                                  : [...prev, key],
+                                  : [...prev, key]
                               )
                             }
                           />
@@ -831,34 +831,34 @@ export default function MembershipsPage() {
             {/* Quick Filter Buttons */}
             <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => setSelectedMembershipType("")}
+                onClick={() => setSelectedMembershipType('')}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedMembershipType === ""
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                  selectedMembershipType === ''
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                 }`}
               >
-                {t("allTypes")}
+                {t('allTypes')}
               </button>
               <button
-                onClick={() => setSelectedMembershipType("free")}
+                onClick={() => setSelectedMembershipType('free')}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedMembershipType === "free"
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                  selectedMembershipType === 'free'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                 }`}
               >
-                {t("free")}
+                {t('free')}
               </button>
               <button
-                onClick={() => setSelectedMembershipType("paid")}
+                onClick={() => setSelectedMembershipType('paid')}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  selectedMembershipType === "paid"
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                  selectedMembershipType === 'paid'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                 }`}
               >
-                {t("paid")}
+                {t('paid')}
               </button>
             </div>
           </div>
@@ -870,23 +870,23 @@ export default function MembershipsPage() {
                 key={membership.id}
                 className={`bg-white dark:bg-gray-800 rounded-lg p-4 border-2 transition-all cursor-pointer flex flex-col h-full ${
                   membership.isActive
-                    ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
                 onClick={() => toggleMembership(membership.id)}
               >
                 {/* Header with icon, title, description, and checkbox */}
                 <div className="flex items-start justify-between mb-3 flex-grow">
                   <div className="flex items-start space-x-3 flex-grow">
-                    {membership.icon.startsWith("/") ||
-                    membership.icon.startsWith("data:image") ? (
+                    {membership.icon.startsWith('/') ||
+                    membership.icon.startsWith('data:image') ? (
                       <img
                         src={membership.icon}
                         alt={membership.name}
                         className="w-8 h-8 rounded-full object-contain bg-white flex-shrink-0"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.style.display = "none";
+                          target.style.display = 'none';
                         }}
                       />
                     ) : (
@@ -906,12 +906,12 @@ export default function MembershipsPage() {
                         membership.partnerCount > 2 && (
                           <details className="mt-2">
                             <summary className="text-xs text-purple-600 cursor-pointer hover:text-purple-800">
-                              {t("showBrandList")} ({membership.partnerCount})
+                              {t('showBrandList')} ({membership.partnerCount})
                             </summary>
                             <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                               {membership.partnerBrands
                                 ?.map((partner) => partner.name)
-                                .join(" • ")}
+                                .join(' • ')}
                             </div>
                           </details>
                         )}
@@ -930,7 +930,7 @@ export default function MembershipsPage() {
                 <div className="flex items-center justify-between mt-auto pt-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(
-                      membership.category,
+                      membership.category
                     )}`}
                   >
                     {getCategoryDisplayName(membership.category)}
@@ -938,12 +938,12 @@ export default function MembershipsPage() {
                   <div className="flex items-center space-x-2">
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        membership.type === "paid"
-                          ? "bg-orange-100 text-orange-800"
-                          : "bg-green-100 text-green-800"
+                        membership.type === 'paid'
+                          ? 'bg-orange-100 text-orange-800'
+                          : 'bg-green-100 text-green-800'
                       }`}
                     >
-                      {membership.type === "paid" ? t("paid") : t("free")}
+                      {membership.type === 'paid' ? t('paid') : t('free')}
                     </span>
                     {membership.cost && (
                       <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -960,7 +960,7 @@ export default function MembershipsPage() {
           <button
             onClick={() => setShowCustomMembershipDialog(true)}
             className="fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-20"
-            aria-label={t("addCustomMembership")}
+            aria-label={t('addCustomMembership')}
           >
             <Plus className="w-6 h-6" />
           </button>
@@ -980,7 +980,7 @@ export default function MembershipsPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t("addCustomMembership")}
+                {t('addCustomMembership')}
               </h3>
               <button
                 onClick={() => setShowCustomMembershipDialog(false)}
@@ -995,11 +995,11 @@ export default function MembershipsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t("customMembershipName")} *
+                    {t('customMembershipName')} *
                   </label>
                   <input
                     type="text"
-                    placeholder={t("customMembershipName")}
+                    placeholder={t('customMembershipName')}
                     value={customMembership.name}
                     onChange={(e) =>
                       setCustomMembership((prev) => ({
@@ -1013,7 +1013,7 @@ export default function MembershipsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t("categoryLabel")} *
+                    {t('categoryLabel')} *
                   </label>
                   <select
                     value={customMembership.category}
@@ -1025,27 +1025,27 @@ export default function MembershipsPage() {
                     }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white dark:bg-gray-700"
                   >
-                    <option value="">{t("chooseCategory")}</option>
-                    <option value="food">{t("food")}</option>
-                    <option value="health">{t("health")}</option>
-                    <option value="fashion">{t("fashion")}</option>
-                    <option value="transport">{t("transport")}</option>
-                    <option value="home">{t("homeCategory")}</option>
-                    <option value="finance">{t("finance")}</option>
-                    <option value="grocery">{t("grocery")}</option>
-                    <option value="entertainment">{t("entertainment")}</option>
-                    <option value="convenience">{t("convenience")}</option>
-                    <option value="baby">{t("baby")}</option>
+                    <option value="">{t('chooseCategory')}</option>
+                    <option value="food">{t('food')}</option>
+                    <option value="health">{t('health')}</option>
+                    <option value="fashion">{t('fashion')}</option>
+                    <option value="transport">{t('transport')}</option>
+                    <option value="home">{t('homeCategory')}</option>
+                    <option value="finance">{t('finance')}</option>
+                    <option value="grocery">{t('grocery')}</option>
+                    <option value="entertainment">{t('entertainment')}</option>
+                    <option value="convenience">{t('convenience')}</option>
+                    <option value="baby">{t('baby')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t("customMembershipDescription")} *
+                  {t('customMembershipDescription')} *
                 </label>
                 <textarea
-                  placeholder={t("customMembershipDescription")}
+                  placeholder={t('customMembershipDescription')}
                   value={customMembership.description}
                   onChange={(e) =>
                     setCustomMembership((prev) => ({
@@ -1060,7 +1060,7 @@ export default function MembershipsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t("contact")}
+                  {t('contact')}
                 </label>
                 <input
                   type="url"
@@ -1079,7 +1079,7 @@ export default function MembershipsPage() {
               {/* Membership Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("membershipType")}
+                  {t('membershipType')}
                 </label>
                 <div className="flex space-x-4">
                   <label className="flex items-center">
@@ -1087,18 +1087,18 @@ export default function MembershipsPage() {
                       type="radio"
                       name="membershipType"
                       value="free"
-                      checked={customMembership.type === "free"}
+                      checked={customMembership.type === 'free'}
                       onChange={(e) =>
                         setCustomMembership((prev) => ({
                           ...prev,
-                          type: e.target.value as "free" | "paid",
-                          cost: "",
+                          type: e.target.value as 'free' | 'paid',
+                          cost: '',
                         }))
                       }
                       className="mr-2"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {t("free")}
+                      {t('free')}
                     </span>
                   </label>
                   <label className="flex items-center">
@@ -1106,27 +1106,27 @@ export default function MembershipsPage() {
                       type="radio"
                       name="membershipType"
                       value="paid"
-                      checked={customMembership.type === "paid"}
+                      checked={customMembership.type === 'paid'}
                       onChange={(e) =>
                         setCustomMembership((prev) => ({
                           ...prev,
-                          type: e.target.value as "free" | "paid",
+                          type: e.target.value as 'free' | 'paid',
                         }))
                       }
                       className="mr-2"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {t("paid")}
+                      {t('paid')}
                     </span>
                   </label>
                 </div>
               </div>
 
               {/* Cost field - only show if paid */}
-              {customMembership.type === "paid" && (
+              {customMembership.type === 'paid' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t("membershipCost")} *
+                    {t('membershipCost')} *
                   </label>
                   <input
                     type="text"
@@ -1146,7 +1146,7 @@ export default function MembershipsPage() {
               {/* Partner Brands */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("partnerBrands")} ({t("optional")})
+                  {t('partnerBrands')} ({t('optional')})
                 </label>
                 <div className="max-h-32 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-2">
                   {availableBrands.length > 0 ? (
@@ -1156,7 +1156,7 @@ export default function MembershipsPage() {
                           <input
                             type="checkbox"
                             checked={customMembership.partnerBrands.includes(
-                              brand.name,
+                              brand.name
                             )}
                             onChange={() =>
                               handlePartnerBrandToggle(brand.name)
@@ -1171,14 +1171,14 @@ export default function MembershipsPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {t("loading")}
+                      {t('loading')}
                     </p>
                   )}
                 </div>
                 {customMembership.partnerBrands.length > 0 && (
                   <div className="mt-2">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {customMembership.partnerBrands.join(", ")}
+                      {customMembership.partnerBrands.join(', ')}
                     </p>
                   </div>
                 )}
@@ -1191,18 +1191,18 @@ export default function MembershipsPage() {
                 variant="outline"
                 className="flex-1"
               >
-                {t("cancel")}
+                {t('cancel')}
               </Button>
               <Button
                 onClick={handleAddCustomMembership}
                 disabled={!isCustomMembershipFormValid()}
                 className={`flex-1 ${
                   isCustomMembershipFormValid()
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                    ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
                 }`}
               >
-                {t("addMembership")}
+                {t('addMembership')}
               </Button>
             </div>
           </div>

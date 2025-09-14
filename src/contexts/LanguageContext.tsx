@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   createContext,
@@ -6,27 +6,27 @@ import React, {
   useState,
   useEffect,
   ReactNode,
-} from "react";
-import { translations, Language } from "@/lib/translations";
+} from 'react';
+import { translations, Language } from '@/lib/translations';
 import {
   LanguageCode,
   detectUserLanguage,
   getLanguageInfo,
   getDirection,
   DEFAULT_LANGUAGE,
-} from "@/lib/languages";
+} from '@/lib/languages';
 
 interface LanguageContextType {
   language: LanguageCode;
   setLanguage: (lang: LanguageCode) => void;
   t: (key: keyof typeof translations.he) => string;
-  dir: "rtl" | "ltr";
+  dir: 'rtl' | 'ltr';
   languageInfo: ReturnType<typeof getLanguageInfo>;
   isRTL: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
@@ -38,7 +38,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setIsHydrated(true);
     // During tests, do not depend on browser detection to keep html[lang]/dir stable
     const isTestEnv =
-      typeof process !== "undefined" &&
+      typeof process !== 'undefined' &&
       process.env &&
       process.env.JEST_WORKER_ID !== undefined;
     const detectedLanguage = isTestEnv
@@ -50,7 +50,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLanguage = (lang: LanguageCode) => {
     setLanguageState(lang);
     if (isHydrated) {
-      localStorage.setItem("language", lang);
+      localStorage.setItem('language', lang);
       // Update document direction and language
       const languageInfo = getLanguageInfo(lang);
       document.documentElement.dir = languageInfo.dir;
@@ -103,7 +103,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (context === undefined) {
-    throw new Error("useLanguage must be used within a LanguageProvider");
+    throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
 }

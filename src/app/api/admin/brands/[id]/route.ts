@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
@@ -28,27 +28,27 @@ export async function GET(
     });
 
     if (!brand) {
-      return NextResponse.json({ message: "benefitNotFound" }, { status: 404 });
+      return NextResponse.json({ message: 'benefitNotFound' }, { status: 404 });
     }
 
     return NextResponse.json(brand);
   } catch (error) {
-    console.error("Error fetching brand:", error);
+    console.error('Error fetching brand:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -72,22 +72,22 @@ export async function PATCH(
 
     return NextResponse.json(updatedBrand);
   } catch (error) {
-    console.error("Error updating brand:", error);
+    console.error('Error updating brand:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
@@ -112,12 +112,12 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ message: "brandDeletedSuccessfully" });
+    return NextResponse.json({ message: 'brandDeletedSuccessfully' });
   } catch (error) {
-    console.error("Error deleting brand:", error);
+    console.error('Error deleting brand:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }

@@ -1,16 +1,16 @@
 /** This test bypasses the global mock to cover the real LanguageContext implementation */
-import React from "react";
-import { renderHook, act } from "@testing-library/react";
-import { translations } from "@/lib/translations";
+import React from 'react';
+import { renderHook, act } from '@testing-library/react';
+import { translations } from '@/lib/translations';
 
-describe("LanguageContext (real implementation)", () => {
+describe('LanguageContext (real implementation)', () => {
   beforeEach(() => {
-    localStorage.removeItem("language");
+    localStorage.removeItem('language');
   });
 
-  it("initializes with DEFAULT_LANGUAGE and updates document and storage on setLanguage", async () => {
+  it('initializes with DEFAULT_LANGUAGE and updates document and storage on setLanguage', async () => {
     const { LanguageProvider, useLanguage } = jest.requireActual(
-      "@/contexts/LanguageContext",
+      '@/contexts/LanguageContext'
     ) as any;
 
     const wrapper = ({ children }: any) =>
@@ -22,12 +22,12 @@ describe("LanguageContext (real implementation)", () => {
     await new Promise((r) => setTimeout(r, 0));
 
     act(() => {
-      result.current.setLanguage("en");
+      result.current.setLanguage('en');
     });
 
-    expect(document.documentElement.lang).toBe("en");
-    expect(document.documentElement.dir).toBe("ltr");
-    expect(localStorage.getItem("language")).toBe("en");
-    expect(result.current.t("back")).toBe(translations.en.back);
+    expect(document.documentElement.lang).toBe('en');
+    expect(document.documentElement.dir).toBe('ltr');
+    expect(localStorage.getItem('language')).toBe('en');
+    expect(result.current.t('back')).toBe(translations.en.back);
   });
 });

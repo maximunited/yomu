@@ -1,9 +1,9 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
     matches: false,
@@ -24,22 +24,22 @@ const localStorageMock = {
   removeItem: jest.fn(),
   clear: jest.fn(),
 };
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
 // Mock Next.js Link
-jest.mock("next/link", () => {
+jest.mock('next/link', () => {
   return ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
   );
 });
 
 // Mock the contexts
-jest.mock("@/contexts/LanguageContext", () => ({
+jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
-    language: "he",
+    language: 'he',
     setLanguage: jest.fn(),
   }),
   LanguageProvider: ({ children }: { children: React.ReactNode }) => (
@@ -47,7 +47,7 @@ jest.mock("@/contexts/LanguageContext", () => ({
   ),
 }));
 
-jest.mock("@/contexts/DarkModeContext", () => ({
+jest.mock('@/contexts/DarkModeContext', () => ({
   useDarkMode: () => ({
     isDarkMode: false,
     toggleDarkMode: jest.fn(),
@@ -58,14 +58,14 @@ jest.mock("@/contexts/DarkModeContext", () => ({
 }));
 
 // Mock the UI components
-jest.mock("@/components/ui/LanguageSwitcher", () => ({
+jest.mock('@/components/ui/LanguageSwitcher', () => ({
   __esModule: true,
   default: function MockLanguageSwitcher() {
     return <button aria-label="language switcher">עברית</button>;
   },
 }));
 
-jest.mock("@/components/ui/DarkModeToggle", () => ({
+jest.mock('@/components/ui/DarkModeToggle', () => ({
   __esModule: true,
   default: function MockDarkModeToggle() {
     return <button aria-label="dark mode toggle">🌙</button>;
@@ -73,7 +73,7 @@ jest.mock("@/components/ui/DarkModeToggle", () => ({
 }));
 
 // Mock the PageHeader component
-jest.mock("@/components/PageHeader", () => ({
+jest.mock('@/components/PageHeader', () => ({
   __esModule: true,
   default: function MockPageHeader({
     title,
@@ -93,80 +93,80 @@ jest.mock("@/components/PageHeader", () => ({
   },
 }));
 
-describe("Page Header Functionality", () => {
-  it("should render page header with title", () => {
-    const PageHeader = require("@/components/PageHeader").default;
+describe('Page Header Functionality', () => {
+  it('should render page header with title', () => {
+    const PageHeader = require('@/components/PageHeader').default;
     render(<PageHeader title="Test Page" />);
 
-    expect(screen.getByText("Test Page")).toBeInTheDocument();
+    expect(screen.getByText('Test Page')).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "language switcher" }),
+      screen.getByRole('button', { name: 'language switcher' })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "dark mode toggle" }),
+      screen.getByRole('button', { name: 'dark mode toggle' })
     ).toBeInTheDocument();
   });
 
-  it("should render page header with back button", () => {
-    const PageHeader = require("@/components/PageHeader").default;
+  it('should render page header with back button', () => {
+    const PageHeader = require('@/components/PageHeader').default;
     render(<PageHeader title="Test Page" showBackButton={true} />);
 
-    expect(screen.getByText("Back")).toBeInTheDocument();
+    expect(screen.getByText('Back')).toBeInTheDocument();
   });
 
-  it("should not render back button when showBackButton is false", () => {
-    const PageHeader = require("@/components/PageHeader").default;
+  it('should not render back button when showBackButton is false', () => {
+    const PageHeader = require('@/components/PageHeader').default;
     render(<PageHeader title="Test Page" showBackButton={false} />);
 
-    expect(screen.queryByText("Back")).not.toBeInTheDocument();
+    expect(screen.queryByText('Back')).not.toBeInTheDocument();
   });
 });
 
-describe("Language and Dark Mode Integration", () => {
-  it("should render language switcher", () => {
+describe('Language and Dark Mode Integration', () => {
+  it('should render language switcher', () => {
     const LanguageSwitcher =
-      require("@/components/ui/LanguageSwitcher").default;
+      require('@/components/ui/LanguageSwitcher').default;
     render(<LanguageSwitcher />);
 
     expect(
-      screen.getByRole("button", { name: "language switcher" }),
+      screen.getByRole('button', { name: 'language switcher' })
     ).toBeInTheDocument();
-    expect(screen.getByText("עברית")).toBeInTheDocument();
+    expect(screen.getByText('עברית')).toBeInTheDocument();
   });
 
-  it("should render dark mode toggle", () => {
-    const DarkModeToggle = require("@/components/ui/DarkModeToggle").default;
+  it('should render dark mode toggle', () => {
+    const DarkModeToggle = require('@/components/ui/DarkModeToggle').default;
     render(<DarkModeToggle />);
 
     expect(
-      screen.getByRole("button", { name: "dark mode toggle" }),
+      screen.getByRole('button', { name: 'dark mode toggle' })
     ).toBeInTheDocument();
-    expect(screen.getByText("🌙")).toBeInTheDocument();
+    expect(screen.getByText('🌙')).toBeInTheDocument();
   });
 });
 
-describe("Translation Functionality", () => {
-  it("should translate content", () => {
-    const { useLanguage } = require("@/contexts/LanguageContext");
+describe('Translation Functionality', () => {
+  it('should translate content', () => {
+    const { useLanguage } = require('@/contexts/LanguageContext');
     const TestComponent = () => {
       const { t } = useLanguage();
-      return <div>{t("test")}</div>;
+      return <div>{t('test')}</div>;
     };
 
     render(<TestComponent />);
-    expect(screen.getByText("test")).toBeInTheDocument();
+    expect(screen.getByText('test')).toBeInTheDocument();
   });
 });
 
-describe("Dark Mode Functionality", () => {
-  it("should provide dark mode state", () => {
-    const { useDarkMode } = require("@/contexts/DarkModeContext");
+describe('Dark Mode Functionality', () => {
+  it('should provide dark mode state', () => {
+    const { useDarkMode } = require('@/contexts/DarkModeContext');
     const TestComponent = () => {
       const { isDarkMode } = useDarkMode();
-      return <div data-testid="dark-mode">{isDarkMode ? "dark" : "light"}</div>;
+      return <div data-testid="dark-mode">{isDarkMode ? 'dark' : 'light'}</div>;
     };
 
     render(<TestComponent />);
-    expect(screen.getByTestId("dark-mode")).toHaveTextContent("light");
+    expect(screen.getByTestId('dark-mode')).toHaveTextContent('light');
   });
 });

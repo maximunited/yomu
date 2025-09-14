@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { ArrowLeft, Gift } from "lucide-react";
-import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
-import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useDarkMode } from "@/contexts/DarkModeContext";
+import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
+import { ArrowLeft, Gift } from 'lucide-react';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { DarkModeToggle } from '@/components/ui/DarkModeToggle';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useDarkMode } from '@/contexts/DarkModeContext';
 
 interface PageHeaderProps {
   title: string;
@@ -17,7 +17,7 @@ interface PageHeaderProps {
 export default function PageHeader({
   title,
   showBackButton = true,
-  backHref = "/",
+  backHref = '/',
 }: PageHeaderProps) {
   const { t } = useLanguage();
   const { isDarkMode } = useDarkMode();
@@ -25,7 +25,7 @@ export default function PageHeader({
   return (
     <header
       className={`shadow-sm border-b transition-colors duration-300 ${
-        isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+        isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
       }`}
     >
       <div className="container mx-auto px-4 py-4">
@@ -35,7 +35,7 @@ export default function PageHeader({
               <Link href={backHref}>
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="w-4 h-4 ml-1" />
-                  {t("back")}
+                  {t('back')}
                 </Button>
               </Link>
             )}
@@ -44,7 +44,7 @@ export default function PageHeader({
             </div>
             <span
               className={`text-xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                isDarkMode ? 'text-white' : 'text-gray-900'
               }`}
             >
               {title}

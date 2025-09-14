@@ -1,15 +1,15 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function testDashboard() {
   try {
-    console.log("=== Testing Dashboard Data ===");
+    console.log('=== Testing Dashboard Data ===');
 
     // Get user
     const user = await prisma.user.findFirst();
     if (!user) {
-      console.log("No user found");
+      console.log('No user found');
       return;
     }
 
@@ -46,7 +46,7 @@ async function testDashboard() {
     console.log(`User brand IDs: ${Array.from(userBrandIds)}`);
 
     const userBenefits = allBenefits.filter((benefit) =>
-      userBrandIds.has(benefit.brandId),
+      userBrandIds.has(benefit.brandId)
     );
 
     console.log(`\nBenefits for user's memberships: ${userBenefits.length}`);
@@ -60,9 +60,9 @@ async function testDashboard() {
     const userDOB = user.dateOfBirth ? new Date(user.dateOfBirth) : null;
 
     console.log(
-      `\nCurrent month: ${currentMonth} (${new Date().toLocaleString("en-US", {
-        month: "long",
-      })})`,
+      `\nCurrent month: ${currentMonth} (${new Date().toLocaleString('en-US', {
+        month: 'long',
+      })})`
     );
     console.log(`Current day: ${currentDay}`);
     if (userDOB) {
@@ -81,20 +81,20 @@ async function testDashboard() {
       const currentDay = new Date().getDate();
 
       switch (b.validityType) {
-        case "birthday_entire_month":
+        case 'birthday_entire_month':
           const isBirthdayMonth = birthdayMonth === currentMonth;
           console.log(
-            `Benefit ${b.id} (${b.title}): validityType=${b.validityType}, isBirthdayMonth=${isBirthdayMonth}`,
+            `Benefit ${b.id} (${b.title}): validityType=${b.validityType}, isBirthdayMonth=${isBirthdayMonth}`
           );
           return isBirthdayMonth;
 
-        case "birthday_exact_date":
+        case 'birthday_exact_date':
           if (birthdayMonth === currentMonth) {
             const daysUntilBirthday = birthdayDay - currentDay;
             const isWithinWeek =
               daysUntilBirthday >= -7 && daysUntilBirthday <= 7;
             console.log(
-              `Benefit ${b.id} (${b.title}): validityType=${b.validityType}, daysUntilBirthday=${daysUntilBirthday}, isWithinWeek=${isWithinWeek}`,
+              `Benefit ${b.id} (${b.title}): validityType=${b.validityType}, daysUntilBirthday=${daysUntilBirthday}, isWithinWeek=${isWithinWeek}`
             );
             return isWithinWeek;
           }
@@ -102,20 +102,20 @@ async function testDashboard() {
 
         default:
           // For legacy types, fall back to old logic
-          if (b.validityType === "birthday_month") {
+          if (b.validityType === 'birthday_month') {
             const isBirthdayMonth = birthdayMonth === currentMonth;
             console.log(
-              `Benefit ${b.id} (${b.title}): legacy validityType=${b.validityType}, isBirthdayMonth=${isBirthdayMonth}`,
+              `Benefit ${b.id} (${b.title}): legacy validityType=${b.validityType}, isBirthdayMonth=${isBirthdayMonth}`
             );
             return isBirthdayMonth;
           }
-          if (b.validityType === "birthday_date") {
+          if (b.validityType === 'birthday_date') {
             if (birthdayMonth === currentMonth) {
               const daysUntilBirthday = birthdayDay - currentDay;
               const isWithinWeek =
                 daysUntilBirthday >= -7 && daysUntilBirthday <= 7;
               console.log(
-                `Benefit ${b.id} (${b.title}): legacy validityType=${b.validityType}, daysUntilBirthday=${daysUntilBirthday}, isWithinWeek=${isWithinWeek}`,
+                `Benefit ${b.id} (${b.title}): legacy validityType=${b.validityType}, daysUntilBirthday=${daysUntilBirthday}, isWithinWeek=${isWithinWeek}`
               );
               return isWithinWeek;
             }
@@ -140,21 +140,21 @@ async function testDashboard() {
       const currentDay = new Date().getDate();
 
       switch (b.validityType) {
-        case "birthday_exact_date":
+        case 'birthday_exact_date':
           if (birthdayMonth === currentMonth) {
             const daysUntilBirthday = birthdayDay - currentDay;
             const isNotYetActive = daysUntilBirthday > 7;
             console.log(
-              `Upcoming Benefit ${b.id} (${b.title}): validityType=${b.validityType}, daysUntilBirthday=${daysUntilBirthday}, isNotYetActive=${isNotYetActive}`,
+              `Upcoming Benefit ${b.id} (${b.title}): validityType=${b.validityType}, daysUntilBirthday=${daysUntilBirthday}, isNotYetActive=${isNotYetActive}`
             );
             return isNotYetActive;
           }
           return false;
 
-        case "birthday_entire_month":
+        case 'birthday_entire_month':
           const isNotBirthdayMonth = birthdayMonth !== currentMonth;
           console.log(
-            `Upcoming Benefit ${b.id} (${b.title}): validityType=${b.validityType}, isNotBirthdayMonth=${isNotBirthdayMonth}`,
+            `Upcoming Benefit ${b.id} (${b.title}): validityType=${b.validityType}, isNotBirthdayMonth=${isNotBirthdayMonth}`
           );
           return isNotBirthdayMonth;
 
@@ -168,7 +168,7 @@ async function testDashboard() {
       console.log(`✓ ${b.title} (${b.brand.name})`);
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error('Error:', error);
   } finally {
     await prisma.$disconnect();
   }

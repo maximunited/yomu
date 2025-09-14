@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect, Suspense } from "react";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { useState, useEffect, Suspense } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import {
   Gift,
   Calendar,
@@ -22,14 +22,14 @@ import {
   Shield,
   LogOut,
   Sparkles,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   isBenefitActive,
   getUpcomingBenefits,
   getValidityDisplayText,
-} from "@/lib/benefit-validation";
-import { useLanguage } from "@/contexts/LanguageContext";
-import type { Translations } from "@/lib/translations";
+} from '@/lib/benefit-validation';
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { Translations } from '@/lib/translations';
 
 interface Benefit {
   id: string;
@@ -75,15 +75,15 @@ function DashboardPageContent() {
   const [userMemberships, setUserMemberships] = useState<UserMembership[]>([]);
   const [userDOB, setUserDOB] = useState<Date | null>(null);
   const [userProfilePicture, setUserProfilePicture] = useState<string | null>(
-    null,
+    null
   );
   const [isLoading, setIsLoading] = useState(true);
 
   // Search and filter states
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedValidityDuration, setSelectedValidityDuration] = useState("");
-  const [selectedMembershipType, setSelectedMembershipType] = useState("");
+  const [selectedValidityDuration, setSelectedValidityDuration] = useState('');
+  const [selectedMembershipType, setSelectedMembershipType] = useState('');
   const [recentlyAddedOnly, setRecentlyAddedOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const searchParams = useSearchParams();
@@ -95,24 +95,24 @@ function DashboardPageContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
     }
   }, [status, router]);
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === 'authenticated') {
       fetchUserData();
     }
   }, [status]);
 
   // Apply query-parameter driven filters (e.g., from notifications)
   useEffect(() => {
-    const recent = searchParams?.get("recent");
+    const recent = searchParams?.get('recent');
     if (recent) {
       setSelectedCategories([]);
-      setSelectedValidityDuration("");
-      setSelectedMembershipType("");
+      setSelectedValidityDuration('');
+      setSelectedMembershipType('');
       setRecentlyAddedOnly(true);
     }
   }, [searchParams]);
@@ -122,59 +122,59 @@ function DashboardPageContent() {
       setIsLoading(true);
       setErrorMessage(null);
 
-      console.log("=== Starting to fetch user data ===");
+      console.log('=== Starting to fetch user data ===');
 
       // Load user's profile to get DOB and profile picture
-      const profileResponse = await fetch("/api/user/profile");
-      console.log("Profile response status:", profileResponse.status);
+      const profileResponse = await fetch('/api/user/profile');
+      console.log('Profile response status:', profileResponse.status);
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
-        console.log("Profile data:", profileData);
+        console.log('Profile data:', profileData);
         if (profileData.user.dateOfBirth) {
           setUserDOB(new Date(profileData.user.dateOfBirth));
-          console.log("Set user DOB:", new Date(profileData.user.dateOfBirth));
+          console.log('Set user DOB:', new Date(profileData.user.dateOfBirth));
         }
         if (profileData.user.profilePicture) {
           setUserProfilePicture(profileData.user.profilePicture);
-          console.log("Set user profile picture");
+          console.log('Set user profile picture');
         }
       } else {
-        console.log("Profile response not ok:", await profileResponse.text());
-        setErrorMessage(t("profileLoadError"));
+        console.log('Profile response not ok:', await profileResponse.text());
+        setErrorMessage(t('profileLoadError'));
       }
 
       // Load user's memberships first
-      const membershipsResponse = await fetch("/api/user/memberships");
-      console.log("Memberships response status:", membershipsResponse.status);
+      const membershipsResponse = await fetch('/api/user/memberships');
+      console.log('Memberships response status:', membershipsResponse.status);
       let userMembershipsData: UserMembership[] = [];
       if (membershipsResponse.ok) {
         const membershipsData = await membershipsResponse.json();
         userMembershipsData = membershipsData.memberships || [];
         setUserMemberships(userMembershipsData);
-        console.log("User memberships:", userMembershipsData.length);
+        console.log('User memberships:', userMembershipsData.length);
       } else {
         console.log(
-          "Memberships response not ok:",
-          await membershipsResponse.text(),
+          'Memberships response not ok:',
+          await membershipsResponse.text()
         );
-        setErrorMessage(t("profileLoadError"));
+        setErrorMessage(t('profileLoadError'));
       }
 
       // Load all benefits
-      const benefitsResponse = await fetch("/api/benefits");
-      console.log("Benefits response status:", benefitsResponse.status);
+      const benefitsResponse = await fetch('/api/benefits');
+      console.log('Benefits response status:', benefitsResponse.status);
       if (benefitsResponse.ok) {
         const benefitsData = await benefitsResponse.json();
-        console.log("All benefits count:", benefitsData.benefits?.length || 0);
+        console.log('All benefits count:', benefitsData.benefits?.length || 0);
 
         // Filter benefits to only show those for brands the user is actively a member of
         const hasAnyMemberships = userMembershipsData.length > 0;
         const activeMemberships = userMembershipsData.filter((m) => m.isActive);
         const activeBrandIds = new Set(activeMemberships.map((m) => m.brandId));
         const activeBrandNames = new Set(
-          activeMemberships.map((m) => m.brand?.name).filter(Boolean),
+          activeMemberships.map((m) => m.brand?.name).filter(Boolean)
         );
-        console.log("Active brand IDs:", Array.from(activeBrandIds));
+        console.log('Active brand IDs:', Array.from(activeBrandIds));
         const userBenefits = benefitsData.benefits.filter(
           (benefit: {
             brandId?: string;
@@ -197,21 +197,21 @@ function DashboardPageContent() {
             }
             // Unknown brand shape: include to avoid hiding due to fixture gaps
             return true;
-          },
+          }
         );
-        console.log("Filtered benefits count:", userBenefits.length);
+        console.log('Filtered benefits count:', userBenefits.length);
 
         setBenefits(userBenefits);
       } else {
-        console.log("Benefits response not ok:", await benefitsResponse.text());
-        setErrorMessage(t("profileLoadError"));
+        console.log('Benefits response not ok:', await benefitsResponse.text());
+        setErrorMessage(t('profileLoadError'));
       }
 
       // Load used benefits
       await fetchUsedBenefits();
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      setErrorMessage(t("profileLoadError"));
+      console.error('Error fetching user data:', error);
+      setErrorMessage(t('profileLoadError'));
     } finally {
       setIsLoading(false);
     }
@@ -220,21 +220,21 @@ function DashboardPageContent() {
   const fetchUsedBenefits = async () => {
     try {
       setUsedBenefitsLoading(true);
-      const response = await fetch("/api/user/used-benefits");
+      const response = await fetch('/api/user/used-benefits');
       if (response && response.ok) {
         const data = await response.json();
         const list = Array.isArray(data.usedBenefits) ? data.usedBenefits : [];
         const usedBenefitIds = new Set<string>(
-          list.map((ub: { benefitId: string }) => ub.benefitId),
+          list.map((ub: { benefitId: string }) => ub.benefitId)
         );
         setUsedBenefits(usedBenefitIds);
       } else {
         // Non-critical failure; proceed without blocking the page
-        console.log("Used benefits not available");
+        console.log('Used benefits not available');
         setUsedBenefitsError(true);
       }
     } catch (error) {
-      console.error("Error fetching used benefits:", error);
+      console.error('Error fetching used benefits:', error);
       setUsedBenefitsError(true);
     } finally {
       setUsedBenefitsLoading(false);
@@ -244,36 +244,36 @@ function DashboardPageContent() {
   const markBenefitAsUsed = async (benefitId: string, notes?: string) => {
     try {
       setUsedBenefitsLoading(true);
-      console.log("Marking benefit as used:", benefitId);
+      console.log('Marking benefit as used:', benefitId);
 
-      const response = await fetch("/api/user/used-benefits", {
-        method: "POST",
+      const response = await fetch('/api/user/used-benefits', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ benefitId, notes }),
       });
 
-      console.log("Response status:", response.status);
+      console.log('Response status:', response.status);
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Success response:", data);
+        console.log('Success response:', data);
         setUsedBenefits((prev) => new Set([...prev, benefitId]));
         // Inline UI indicates success by turning the button green; no blocking alert
       } else {
         const errorText = await response.text();
         console.error(
-          "Failed to mark benefit as used:",
+          'Failed to mark benefit as used:',
           response.status,
-          errorText,
+          errorText
         );
         // Show user feedback
-        alert(`${t("internalServerError")}: ${response.status}`);
+        alert(`${t('internalServerError')}: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error marking benefit as used:", error);
-      alert(t("internalServerError"));
+      console.error('Error marking benefit as used:', error);
+      alert(t('internalServerError'));
     } finally {
       setUsedBenefitsLoading(false);
     }
@@ -282,13 +282,13 @@ function DashboardPageContent() {
   const unmarkBenefitAsUsed = async (benefitId: string) => {
     try {
       setUsedBenefitsLoading(true);
-      console.log("Unmarking benefit as used:", benefitId);
+      console.log('Unmarking benefit as used:', benefitId);
 
       const response = await fetch(`/api/user/used-benefits/${benefitId}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
-      console.log("Response status:", response.status);
+      console.log('Response status:', response.status);
 
       if (response.ok) {
         setUsedBenefits((prev) => {
@@ -300,16 +300,16 @@ function DashboardPageContent() {
       } else {
         const errorText = await response.text();
         console.error(
-          "Failed to unmark benefit as used:",
+          'Failed to unmark benefit as used:',
           response.status,
-          errorText,
+          errorText
         );
         // Show user feedback
-        alert(`${t("internalServerError")}: ${response.status}`);
+        alert(`${t('internalServerError')}: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error unmarking benefit as used:", error);
-      alert(t("internalServerError"));
+      console.error('Error unmarking benefit as used:', error);
+      alert(t('internalServerError'));
     } finally {
       setUsedBenefitsLoading(false);
     }
@@ -320,7 +320,7 @@ function DashboardPageContent() {
       await navigator.clipboard.writeText(text);
       // You could add a toast notification here
     } catch (error) {
-      console.error("Failed to copy:", error);
+      console.error('Failed to copy:', error);
     }
   };
 
@@ -329,50 +329,50 @@ function DashboardPageContent() {
   };
 
   const containsHebrew = (text: string | undefined) =>
-    /[\u0590-\u05FF]/.test(text || "");
+    /[\u0590-\u05FF]/.test(text || '');
 
   const getCategoryGenericDescription = (category: string): string => {
     switch (category) {
-      case "fashion":
-        return t("brandDescriptionFashion");
-      case "food":
-        return t("brandDescriptionFood");
-      case "health":
-        return t("brandDescriptionHealth");
-      case "home":
-        return t("brandDescriptionHome");
-      case "finance":
-        return t("brandDescriptionFinance");
-      case "grocery":
-        return t("brandDescriptionGrocery");
-      case "entertainment":
-        return t("categoryEntertainment");
-      case "convenience":
-        return t("categoryConvenience");
+      case 'fashion':
+        return t('brandDescriptionFashion');
+      case 'food':
+        return t('brandDescriptionFood');
+      case 'health':
+        return t('brandDescriptionHealth');
+      case 'home':
+        return t('brandDescriptionHome');
+      case 'finance':
+        return t('brandDescriptionFinance');
+      case 'grocery':
+        return t('brandDescriptionGrocery');
+      case 'entertainment':
+        return t('categoryEntertainment');
+      case 'convenience':
+        return t('categoryConvenience');
       default:
-        return "";
+        return '';
     }
   };
 
   const getBenefitDescription = (benefit: Benefit): string => {
-    const desc = benefit.description || "";
+    const desc = benefit.description || '';
     // If UI language is English and description appears Hebrew, use a generic per-category description
-    if (language === "en" && containsHebrew(desc)) {
+    if (language === 'en' && containsHebrew(desc)) {
       return getCategoryGenericDescription(benefit.brand.category);
     }
     // If UI language is Hebrew and description appears English, also use generic per-category description
-    if (language === "he" && !containsHebrew(desc) && desc.trim() !== "") {
+    if (language === 'he' && !containsHebrew(desc) && desc.trim() !== '') {
       return getCategoryGenericDescription(benefit.brand.category);
     }
     return desc;
   };
 
   const getBenefitTitle = (benefit: Benefit): string => {
-    const title = benefit.title || "";
-    if (language === "en" && containsHebrew(title)) {
-      return getCategoryGenericDescription(benefit.brand.category) || "Benefit";
+    const title = benefit.title || '';
+    if (language === 'en' && containsHebrew(title)) {
+      return getCategoryGenericDescription(benefit.brand.category) || 'Benefit';
     }
-    if (language === "he" && !containsHebrew(title) && title.trim() !== "") {
+    if (language === 'he' && !containsHebrew(title) && title.trim() !== '') {
       return getCategoryGenericDescription(benefit.brand.category) || title;
     }
     return title;
@@ -392,22 +392,22 @@ function DashboardPageContent() {
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      fashion: "bg-purple-100 text-purple-800",
-      food: "bg-orange-100 text-orange-800",
-      health: "bg-green-100 text-green-800",
-      home: "bg-blue-100 text-blue-800",
-      finance: "bg-yellow-100 text-yellow-800",
-      grocery: "bg-pink-100 text-pink-800",
-      entertainment: "bg-indigo-100 text-indigo-800",
-      convenience: "bg-teal-100 text-teal-800",
-      transport: "bg-blue-100 text-blue-800",
-      baby: "bg-rose-100 text-rose-800",
-      travel: "bg-cyan-100 text-cyan-800",
-      beauty: "bg-pink-100 text-pink-800",
-      multi: "bg-gray-100 text-gray-800",
+      fashion: 'bg-purple-100 text-purple-800',
+      food: 'bg-orange-100 text-orange-800',
+      health: 'bg-green-100 text-green-800',
+      home: 'bg-blue-100 text-blue-800',
+      finance: 'bg-yellow-100 text-yellow-800',
+      grocery: 'bg-pink-100 text-pink-800',
+      entertainment: 'bg-indigo-100 text-indigo-800',
+      convenience: 'bg-teal-100 text-teal-800',
+      transport: 'bg-blue-100 text-blue-800',
+      baby: 'bg-rose-100 text-rose-800',
+      travel: 'bg-cyan-100 text-cyan-800',
+      beauty: 'bg-pink-100 text-pink-800',
+      multi: 'bg-gray-100 text-gray-800',
     };
     return (
-      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
+      colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800'
     );
   };
 
@@ -417,24 +417,24 @@ function DashboardPageContent() {
       .split(/[ _-]+/)
       .filter(Boolean)
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
+      .join(' ');
   };
 
   const getCategoryDisplayName = (category: string) => {
     const categoryMap = {
-      fashion: t("categoryFashion"),
-      food: t("categoryFood"),
-      health: t("categoryHealth"),
-      home: t("categoryHome"),
-      finance: t("categoryFinance"),
-      grocery: t("categoryGrocery"),
-      entertainment: t("categoryEntertainment"),
-      convenience: t("categoryConvenience"),
-      transport: t("categoryTransport"),
-      baby: t("categoryBaby"),
-      travel: toTitleCase("travel"),
-      beauty: toTitleCase("beauty"),
-      multi: toTitleCase("multi"),
+      fashion: t('categoryFashion'),
+      food: t('categoryFood'),
+      health: t('categoryHealth'),
+      home: t('categoryHome'),
+      finance: t('categoryFinance'),
+      grocery: t('categoryGrocery'),
+      entertainment: t('categoryEntertainment'),
+      convenience: t('categoryConvenience'),
+      transport: t('categoryTransport'),
+      baby: t('categoryBaby'),
+      travel: toTitleCase('travel'),
+      beauty: toTitleCase('beauty'),
+      multi: toTitleCase('multi'),
     };
     return (
       categoryMap[category as keyof typeof categoryMap] || toTitleCase(category)
@@ -443,20 +443,20 @@ function DashboardPageContent() {
 
   const getValidityDurationDisplay = (validityType: string) => {
     const durationMap = {
-      always: t("validityLimitedPeriod"),
-      birthday_exact_date: t("validityExactDate"),
-      birthday_entire_month: t("validityEntireMonth"),
-      birthday_week_before_after: t("validityWeekBeforeAfter"),
-      birthday_weekend: t("validityWeekend"),
-      birthday_30_days: t("validity30Days"),
-      birthday_7_days_before: t("validity7DaysBefore"),
-      birthday_7_days_after: t("validity7DaysAfter"),
-      birthday_3_days_before: t("validity3DaysBefore"),
-      birthday_3_days_after: t("validity3DaysAfter"),
+      always: t('validityLimitedPeriod'),
+      birthday_exact_date: t('validityExactDate'),
+      birthday_entire_month: t('validityEntireMonth'),
+      birthday_week_before_after: t('validityWeekBeforeAfter'),
+      birthday_weekend: t('validityWeekend'),
+      birthday_30_days: t('validity30Days'),
+      birthday_7_days_before: t('validity7DaysBefore'),
+      birthday_7_days_after: t('validity7DaysAfter'),
+      birthday_3_days_before: t('validity3DaysBefore'),
+      birthday_3_days_after: t('validity3DaysAfter'),
     };
     return (
       durationMap[validityType as keyof typeof durationMap] ||
-      t("validityLimitedPeriod")
+      t('validityLimitedPeriod')
     );
   };
 
@@ -484,8 +484,8 @@ function DashboardPageContent() {
       // Membership type filter (free/paid)
       const matchesMembershipType =
         !selectedMembershipType ||
-        (selectedMembershipType === "free" && benefit.isFree !== false) ||
-        (selectedMembershipType === "paid" && benefit.isFree === false);
+        (selectedMembershipType === 'free' && benefit.isFree !== false) ||
+        (selectedMembershipType === 'paid' && benefit.isFree === false);
 
       // Recently added: naive heuristic using id timestamp or existence of createdAt
       let matchesRecentlyAdded = true;
@@ -521,19 +521,19 @@ function DashboardPageContent() {
           role="alert"
           className="bg-red-50 border border-red-200 text-red-800 rounded-md p-6 max-w-md w-full"
         >
-          <h1 className="text-xl font-bold mb-2">{t("signInError")}</h1>
+          <h1 className="text-xl font-bold mb-2">{t('signInError')}</h1>
           <p>{errorMessage}</p>
         </div>
       </div>
     );
   }
 
-  if (status === "loading" || isLoading) {
+  if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t("loading")}</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -544,36 +544,36 @@ function DashboardPageContent() {
   const currentDay = new Date().getDate();
 
   // Debug logging
-  console.log("Current month:", currentMonth, "Current day:", currentDay);
-  console.log("User DOB:", userDOB);
+  console.log('Current month:', currentMonth, 'Current day:', currentDay);
+  console.log('User DOB:', userDOB);
   if (userDOB) {
     console.log(
-      "User birthday month:",
+      'User birthday month:',
       userDOB.getMonth(),
-      "User birthday day:",
-      userDOB.getDate(),
+      'User birthday day:',
+      userDOB.getDate()
     );
   }
 
   // Filter benefits based on validity type and user's birthday
-  console.log("=== Filtering benefits ===");
-  console.log("Total benefits:", benefits.length);
+  console.log('=== Filtering benefits ===');
+  console.log('Total benefits:', benefits.length);
   console.log(
-    "Benefits with validity types:",
-    benefits.map((b) => ({ id: b.id, validityType: b.validityType })),
+    'Benefits with validity types:',
+    benefits.map((b) => ({ id: b.id, validityType: b.validityType }))
   );
 
   const activeBenefits = benefits.filter((b) => {
     return isBenefitActive(b, userDOB);
   });
 
-  console.log("Active benefits count:", activeBenefits.length);
+  console.log('Active benefits count:', activeBenefits.length);
 
   const upcomingBenefits = benefits.filter((b) => {
     return getUpcomingBenefits(b, userDOB);
   });
 
-  console.log("Upcoming benefits count:", upcomingBenefits.length);
+  console.log('Upcoming benefits count:', upcomingBenefits.length);
 
   // Apply search and filters
   const filteredActiveBenefits = filterBenefits(activeBenefits);
@@ -581,34 +581,34 @@ function DashboardPageContent() {
 
   // Get unique categories from benefits
   const allCategories = Array.from(
-    new Set(benefits.map((b) => b.brand.category).filter(Boolean)),
+    new Set(benefits.map((b) => b.brand.category).filter(Boolean))
   );
   const allValidityDurations = Array.from(
-    new Set(benefits.map((b) => getValidityDurationDisplay(b.validityType))),
+    new Set(benefits.map((b) => getValidityDurationDisplay(b.validityType)))
   );
 
   // Debug logging for categories
   console.log(
-    "Benefits with categories:",
+    'Benefits with categories:',
     benefits.map((b) => ({
       brand: b.brand.name,
       category: b.brand.category,
-    })),
+    }))
   );
-  console.log("All categories found:", allCategories);
+  console.log('All categories found:', allCategories);
 
   // Fallback categories if none are found in benefits
   const fallbackCategories = [
-    "food",
-    "health",
-    "fashion",
-    "home",
-    "finance",
-    "grocery",
-    "entertainment",
-    "convenience",
-    "transport",
-    "baby",
+    'food',
+    'health',
+    'fashion',
+    'home',
+    'finance',
+    'grocery',
+    'entertainment',
+    'convenience',
+    'transport',
+    'baby',
   ];
 
   // Sort categories by localized display name for a better UX
@@ -620,21 +620,21 @@ function DashboardPageContent() {
       getCategoryDisplayName(a)
         .toLowerCase()
         .localeCompare(getCategoryDisplayName(b).toLowerCase(), undefined, {
-          sensitivity: "base",
-        }),
+          sensitivity: 'base',
+        })
     );
 
   // Membership summary count: prefer user's active memberships; if none, fallback to available brands
   const activeMembershipCount = userMemberships.filter(
-    (m) => m.isActive,
+    (m) => m.isActive
   ).length;
   const availableBrandCount = new Set(
     benefits
       .map(
         (b: { brandId?: string; brand?: { id?: string; name?: string } }) =>
-          b.brandId || b.brand?.id || b.brand?.name,
+          b.brandId || b.brand?.id || b.brand?.name
       )
-      .filter(Boolean),
+      .filter(Boolean)
   ).size;
   const membershipCountDisplay =
     activeMembershipCount > 0 ? activeMembershipCount : availableBrandCount;
@@ -656,13 +656,13 @@ function DashboardPageContent() {
             <div className="flex items-center space-x-4">
               {/* Global polite status region for screen readers (keeps a loading announcement available) */}
               <div role="status" aria-live="polite" className="sr-only">
-                {t("loading")}
+                {t('loading')}
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 className="border-2 border-gray-400 hover:border-gray-500"
-                onClick={() => router.push("/notifications")}
+                onClick={() => router.push('/notifications')}
               >
                 <Bell className="w-5 h-5" />
               </Button>
@@ -682,49 +682,49 @@ function DashboardPageContent() {
                     )}
                   </div>
                   <span className="text-sm font-medium text-black dark:text-white">
-                    {session?.user?.name || t("user")}
+                    {session?.user?.name || t('user')}
                   </span>
                 </button>
                 <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="py-1">
                     <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {t("settings")}
+                      {t('settings')}
                     </div>
                     <Link href="/settings#profile">
                       <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                         <User className="w-4 h-4 ml-2" />
-                        {t("personalProfile")}
+                        {t('personalProfile')}
                       </button>
                     </Link>
                     <Link href="/settings#notifications">
                       <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                         <Bell className="w-4 h-4 ml-2" />
-                        {t("notifications")}
+                        {t('notifications')}
                       </button>
                     </Link>
                     <Link href="/settings#appearance">
                       <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                         <Moon className="w-4 h-4 ml-2" />
-                        {t("appearanceAndLanguage")}
+                        {t('appearanceAndLanguage')}
                       </button>
                     </Link>
                     <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
                     <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {t("account")}
+                      {t('account')}
                     </div>
                     <Link href="/settings#account">
                       <button className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                         <Shield className="w-4 h-4 ml-2" />
-                        {t("accountManagement")}
+                        {t('accountManagement')}
                       </button>
                     </Link>
                     <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
                     <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => signOut({ callbackUrl: '/' })}
                       className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center"
                     >
                       <LogOut className="w-4 h-4 ml-2" />
-                      {t("signOut")}
+                      {t('signOut')}
                     </button>
                   </div>
                 </div>
@@ -739,10 +739,10 @@ function DashboardPageContent() {
         {/* Welcome Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {t("helloUser").replace("{name}", session?.user?.name || t("user"))}
+            {t('helloUser').replace('{name}', session?.user?.name || t('user'))}
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            {t("hereAreYourBirthdayBenefits")}
+            {t('hereAreYourBirthdayBenefits')}
           </p>
 
           {/* Membership Summary */}
@@ -750,7 +750,7 @@ function DashboardPageContent() {
             <div className="flex items-center justify-center space-x-2 mb-2">
               <ShoppingBag className="w-5 h-5 text-purple-600" />
               <span className="text-sm font-medium text-gray-700">
-                {t("activeMemberships")}
+                {t('activeMemberships')}
               </span>
             </div>
             <div className="text-2xl font-bold text-purple-600">
@@ -758,7 +758,7 @@ function DashboardPageContent() {
             </div>
             <Link href="/memberships">
               <Button variant="outline" size="sm" className="mt-2">
-                {t("manageMemberships")}
+                {t('manageMemberships')}
               </Button>
             </Link>
           </div>
@@ -767,7 +767,7 @@ function DashboardPageContent() {
         {/* Non-blocking error alert for used-benefits failures */}
         {usedBenefitsError && (
           <div role="alert" aria-live="polite" className="sr-only">
-            {t("signInError")}
+            {t('signInError')}
           </div>
         )}
 
@@ -775,7 +775,7 @@ function DashboardPageContent() {
         <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">
-              {t("searchAndFilter")}
+              {t('searchAndFilter')}
             </h2>
             <Button
               variant="outline"
@@ -784,7 +784,7 @@ function DashboardPageContent() {
               className="flex items-center space-x-2"
             >
               <Filter className="w-4 h-4" />
-              <span>{showFilters ? t("hideFilters") : t("showFilters")}</span>
+              <span>{showFilters ? t('hideFilters') : t('showFilters')}</span>
             </Button>
           </div>
 
@@ -793,8 +793,8 @@ function DashboardPageContent() {
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               type="text"
-              placeholder={t("searchPlaceholder")}
-              aria-label={t("searchPlaceholder")}
+              placeholder={t('searchPlaceholder')}
+              aria-label={t('searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pr-10"
@@ -807,11 +807,11 @@ function DashboardPageContent() {
               {/* Category Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("category")}
+                  {t('category')}
                 </label>
                 <div
                   role="group"
-                  aria-label={t("category")}
+                  aria-label={t('category')}
                   className="w-full max-h-44 overflow-auto border border-gray-300 rounded-md p-3"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -833,7 +833,7 @@ function DashboardPageContent() {
                               setSelectedCategories((prev) =>
                                 prev.includes(category)
                                   ? prev.filter((c) => c !== category)
-                                  : [...prev, category],
+                                  : [...prev, category]
                               )
                             }
                           />
@@ -851,7 +851,7 @@ function DashboardPageContent() {
                   htmlFor="validity-select"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  {t("validityPeriod")}
+                  {t('validityPeriod')}
                 </label>
                 <select
                   id="validity-select"
@@ -860,7 +860,7 @@ function DashboardPageContent() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white font-sans"
                 >
                   <option key="all-durations" value="">
-                    {t("allPeriods")}
+                    {t('allPeriods')}
                   </option>
                   {allValidityDurations.map((duration) => (
                     <option key={`duration-${duration}`} value={duration}>
@@ -873,41 +873,41 @@ function DashboardPageContent() {
               {/* Membership Type Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("membershipType")}
+                  {t('membershipType')}
                 </label>
                 <div className="inline-flex gap-2">
                   <Button
                     variant={
-                      selectedMembershipType === "" ? "default" : "outline"
+                      selectedMembershipType === '' ? 'default' : 'outline'
                     }
                     size="sm"
-                    onClick={() => setSelectedMembershipType("")}
+                    onClick={() => setSelectedMembershipType('')}
                     className="whitespace-nowrap"
-                    aria-pressed={selectedMembershipType === ""}
+                    aria-pressed={selectedMembershipType === ''}
                   >
-                    {t("allTypes")}
+                    {t('allTypes')}
                   </Button>
                   <Button
                     variant={
-                      selectedMembershipType === "free" ? "default" : "outline"
+                      selectedMembershipType === 'free' ? 'default' : 'outline'
                     }
                     size="sm"
-                    onClick={() => setSelectedMembershipType("free")}
+                    onClick={() => setSelectedMembershipType('free')}
                     className="whitespace-nowrap"
-                    aria-pressed={selectedMembershipType === "free"}
+                    aria-pressed={selectedMembershipType === 'free'}
                   >
-                    {t("free")}
+                    {t('free')}
                   </Button>
                   <Button
                     variant={
-                      selectedMembershipType === "paid" ? "default" : "outline"
+                      selectedMembershipType === 'paid' ? 'default' : 'outline'
                     }
                     size="sm"
-                    onClick={() => setSelectedMembershipType("paid")}
+                    onClick={() => setSelectedMembershipType('paid')}
                     className="whitespace-nowrap"
-                    aria-pressed={selectedMembershipType === "paid"}
+                    aria-pressed={selectedMembershipType === 'paid'}
                   >
-                    {t("paid")}
+                    {t('paid')}
                   </Button>
                 </div>
               </div>
@@ -915,7 +915,7 @@ function DashboardPageContent() {
               {/* Recently Added */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("recentlyAddedFilter")}
+                  {t('recentlyAddedFilter')}
                 </label>
                 <label className="inline-flex items-center gap-2 text-sm text-gray-700">
                   <input
@@ -924,7 +924,7 @@ function DashboardPageContent() {
                     checked={recentlyAddedOnly}
                     onChange={() => setRecentlyAddedOnly((v) => !v)}
                   />
-                  <span>{t("recentlyAdded")}</span>
+                  <span>{t('recentlyAdded')}</span>
                 </label>
               </div>
             </div>
@@ -941,11 +941,11 @@ function DashboardPageContent() {
                   key={`chip-${cat}`}
                   className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800"
                 >
-                  {t("categoryLabel")}: {getCategoryDisplayName(cat)}
+                  {t('categoryLabel')}: {getCategoryDisplayName(cat)}
                   <button
                     onClick={() =>
                       setSelectedCategories((prev) =>
-                        prev.filter((c) => c !== cat),
+                        prev.filter((c) => c !== cat)
                       )
                     }
                     className="mr-2 text-purple-600 hover:text-purple-800"
@@ -956,9 +956,9 @@ function DashboardPageContent() {
               ))}
               {selectedValidityDuration && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                  {t("periodLabel")}: {selectedValidityDuration}
+                  {t('periodLabel')}: {selectedValidityDuration}
                   <button
-                    onClick={() => setSelectedValidityDuration("")}
+                    onClick={() => setSelectedValidityDuration('')}
                     className="mr-2 text-blue-600 hover:text-blue-800"
                   >
                     ×
@@ -967,10 +967,10 @@ function DashboardPageContent() {
               )}
               {selectedMembershipType && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-                  {t("typeLabel")}:{" "}
-                  {selectedMembershipType === "free" ? t("free") : t("paid")}
+                  {t('typeLabel')}:{' '}
+                  {selectedMembershipType === 'free' ? t('free') : t('paid')}
                   <button
-                    onClick={() => setSelectedMembershipType("")}
+                    onClick={() => setSelectedMembershipType('')}
                     className="mr-2 text-green-600 hover:text-green-800"
                   >
                     ×
@@ -979,7 +979,7 @@ function DashboardPageContent() {
               )}
               {recentlyAddedOnly && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
-                  {t("recentlyAdded")}
+                  {t('recentlyAdded')}
                   <button
                     onClick={() => setRecentlyAddedOnly(false)}
                     className="mr-2 text-yellow-600 hover:text-yellow-800"
@@ -998,7 +998,7 @@ function DashboardPageContent() {
             <div className="flex items-center space-x-2">
               <Star className="w-6 h-6 text-purple-600" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {t("activeNow")}
+                {t('activeNow')}
               </h2>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 ({filteredActiveBenefits.length})
@@ -1013,18 +1013,18 @@ function DashboardPageContent() {
                 aria-label={`${benefit.brand.name} - ${benefit.title}`}
                 className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 flex flex-col h-full ${
                   usedBenefits.has(benefit.id)
-                    ? "bg-gray-50 border-2 border-green-200 shadow-green-100"
-                    : "bg-white border-2 border-transparent"
+                    ? 'bg-gray-50 border-2 border-green-200 shadow-green-100'
+                    : 'bg-white border-2 border-transparent'
                 }`}
               >
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-white">
-                    {benefit.brand.logoUrl?.startsWith("data:image/svg") ? (
+                    {benefit.brand.logoUrl?.startsWith('data:image/svg') ? (
                       <img
                         src={benefit.brand.logoUrl}
                         alt={benefit.brand.name}
                         className="w-full h-full object-contain"
-                        style={{ imageRendering: "auto" }}
+                        style={{ imageRendering: 'auto' }}
                       />
                     ) : (
                       <img
@@ -1048,7 +1048,7 @@ function DashboardPageContent() {
                 <div className="mb-3 flex flex-wrap gap-2 items-center">
                   <span
                     className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                      benefit.brand.category,
+                      benefit.brand.category
                     )}`}
                   >
                     {getCategoryDisplayName(benefit.brand.category)}
@@ -1057,26 +1057,26 @@ function DashboardPageContent() {
                   <span
                     className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
                       benefit.isFree
-                        ? "bg-green-100 text-green-800"
-                        : "bg-orange-100 text-orange-800"
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-orange-100 text-orange-800'
                     }`}
                   >
-                    {benefit.isFree ? t("free") : t("paid")}
+                    {benefit.isFree ? t('free') : t('paid')}
                   </span>
                   {isRecentlyAdded(benefit) && (
                     <span
-                      title={t("recentlyAdded")}
-                      aria-label={t("recentlyAdded")}
+                      title={t('recentlyAdded')}
+                      aria-label={t('recentlyAdded')}
                       className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
                     >
                       <Sparkles className="w-3 h-3" />
-                      {t("recentlyAdded")}
+                      {t('recentlyAdded')}
                     </span>
                   )}
                   {/* Used Status */}
                   {usedBenefits.has(benefit.id) && (
                     <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                      ✓ {t("usedOn")} {new Date().toLocaleDateString()}
+                      ✓ {t('usedOn')} {new Date().toLocaleDateString()}
                     </span>
                   )}
                 </div>
@@ -1091,7 +1091,7 @@ function DashboardPageContent() {
                 {benefit.promoCode && (
                   <div className="flex items-center space-x-2 mb-4">
                     <span className="text-sm text-gray-700 font-medium">
-                      {t("couponCode")}:
+                      {t('couponCode')}:
                     </span>
                     <code className="bg-purple-100 border border-purple-200 px-3 py-2 rounded-md text-sm font-mono text-purple-800 font-bold">
                       {benefit.promoCode}
@@ -1111,7 +1111,7 @@ function DashboardPageContent() {
                   {/* Used/Unused Button */}
                   <Button
                     variant={
-                      usedBenefits.has(benefit.id) ? "default" : "outline"
+                      usedBenefits.has(benefit.id) ? 'default' : 'outline'
                     }
                     size="sm"
                     onClick={() =>
@@ -1124,26 +1124,26 @@ function DashboardPageContent() {
                     aria-busy={usedBenefitsLoading}
                     className={`flex-1 transition-all duration-200 whitespace-nowrap min-w-[10rem] ${
                       usedBenefits.has(benefit.id)
-                        ? "bg-green-600 hover:bg-green-700 text-white shadow-md"
-                        : "bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800"
+                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
+                        : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
                     } ${
-                      usedBenefitsLoading ? "opacity-50 cursor-not-allowed" : ""
+                      usedBenefitsLoading ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >
                     {usedBenefitsLoading ? (
                       <>
                         <span className="animate-spin mr-1">⏳</span>
-                        {t("loading")}
+                        {t('loading')}
                       </>
                     ) : usedBenefits.has(benefit.id) ? (
                       <>
                         <span className="mr-1">✓</span>
-                        {t("unmarkAsUsed")}
+                        {t('unmarkAsUsed')}
                       </>
                     ) : (
                       <>
                         <span className="mr-1">○</span>
-                        {t("markAsUsed")}
+                        {t('markAsUsed')}
                       </>
                     )}
                   </Button>
@@ -1156,13 +1156,13 @@ function DashboardPageContent() {
                       onClick={() =>
                         window.open(
                           benefit.brand.actionUrl || benefit.url,
-                          "_blank",
+                          '_blank'
                         )
                       }
                       className="flex-1"
                     >
                       <ExternalLink className="w-4 h-4 ml-1" />
-                      {benefit.brand.actionLabel || t("buyNow")}
+                      {benefit.brand.actionLabel || t('buyNow')}
                     </Button>
                   )}
                   <Button
@@ -1171,7 +1171,7 @@ function DashboardPageContent() {
                     onClick={() => router.push(`/benefit/${benefit.id}`)}
                     className="flex-1"
                   >
-                    {t("moreDetails")}
+                    {t('moreDetails')}
                   </Button>
                 </div>
               </div>
@@ -1185,7 +1185,7 @@ function DashboardPageContent() {
             <div className="flex items-center space-x-2">
               <Calendar className="w-6 h-6 text-orange-600" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {t("comingSoon")}
+                {t('comingSoon')}
               </h2>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 ({filteredUpcomingBenefits.length})
@@ -1224,7 +1224,7 @@ function DashboardPageContent() {
                 <div className="mb-3 flex flex-wrap gap-2 items-center">
                   <span
                     className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                      benefit.brand.category,
+                      benefit.brand.category
                     )}`}
                   >
                     {getCategoryDisplayName(benefit.brand.category)}
@@ -1233,20 +1233,20 @@ function DashboardPageContent() {
                   <span
                     className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
                       benefit.isFree
-                        ? "bg-green-100 text-green-800"
-                        : "bg-orange-100 text-orange-800"
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-orange-100 text-orange-800'
                     }`}
                   >
-                    {benefit.isFree ? t("free") : t("paid")}
+                    {benefit.isFree ? t('free') : t('paid')}
                   </span>
                   {isRecentlyAdded(benefit) && (
                     <span
-                      title={t("recentlyAdded")}
-                      aria-label={t("recentlyAdded")}
+                      title={t('recentlyAdded')}
+                      aria-label={t('recentlyAdded')}
                       className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
                     >
                       <Sparkles className="w-3 h-3" />
-                      {t("recentlyAdded")}
+                      {t('recentlyAdded')}
                     </span>
                   )}
                 </div>
@@ -1261,7 +1261,7 @@ function DashboardPageContent() {
                 <div className="flex space-x-2 mt-auto">
                   <Button
                     variant={
-                      usedBenefits.has(benefit.id) ? "default" : "outline"
+                      usedBenefits.has(benefit.id) ? 'default' : 'outline'
                     }
                     size="sm"
                     onClick={() =>
@@ -1274,26 +1274,26 @@ function DashboardPageContent() {
                     aria-busy={usedBenefitsLoading}
                     className={`flex-1 transition-all duration-200 whitespace-nowrap min-w-[10rem] ${
                       usedBenefits.has(benefit.id)
-                        ? "bg-green-600 hover:bg-green-700 text-white shadow-md"
-                        : "bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800"
+                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
+                        : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
                     } ${
-                      usedBenefitsLoading ? "opacity-50 cursor-not-allowed" : ""
+                      usedBenefitsLoading ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >
                     {usedBenefitsLoading ? (
                       <>
                         <span className="animate-spin mr-1">⏳</span>
-                        {t("loading")}
+                        {t('loading')}
                       </>
                     ) : usedBenefits.has(benefit.id) ? (
                       <>
                         <span className="mr-1">✓</span>
-                        {t("unmarkAsUsed")}
+                        {t('unmarkAsUsed')}
                       </>
                     ) : (
                       <>
                         <span className="mr-1">○</span>
-                        {t("markAsUsed")}
+                        {t('markAsUsed')}
                       </>
                     )}
                   </Button>
@@ -1309,7 +1309,7 @@ function DashboardPageContent() {
             role="alert"
             className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mb-6"
           >
-            <strong className="block mb-1">{t("signInError")}</strong>
+            <strong className="block mb-1">{t('signInError')}</strong>
             <span>{errorMessage}</span>
           </div>
         )}
@@ -1321,7 +1321,7 @@ function DashboardPageContent() {
               <div className="flex items-center space-x-2">
                 <Gift className="w-6 h-6 text-green-600" />
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {t("usedBenefitsHistory")}
+                  {t('usedBenefitsHistory')}
                 </h2>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   ({usedBenefits.size})
@@ -1330,7 +1330,7 @@ function DashboardPageContent() {
             </div>
             <div className="bg-white rounded-xl shadow-lg p-6">
               <p className="text-gray-600 mb-4">
-                {t("usedBenefitsHistoryDescription")}
+                {t('usedBenefitsHistoryDescription')}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {benefits
@@ -1359,7 +1359,7 @@ function DashboardPageContent() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-500">
-                          {t("usedOn")} {new Date().toLocaleDateString()}
+                          {t('usedOn')} {new Date().toLocaleDateString()}
                         </span>
                         <Button
                           variant="outline"
@@ -1367,7 +1367,7 @@ function DashboardPageContent() {
                           onClick={() => unmarkBenefitAsUsed(benefit.id)}
                           className="text-xs"
                         >
-                          {t("unmarkAsUsed")}
+                          {t('unmarkAsUsed')}
                         </Button>
                       </div>
                     </div>
@@ -1380,27 +1380,27 @@ function DashboardPageContent() {
         {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {t("quickActions")}
+            {t('quickActions')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Button
               variant="outline"
-              onClick={() => router.push("/memberships")}
+              onClick={() => router.push('/memberships')}
               className="h-16"
             >
               <div className="text-center">
                 <ShoppingBag className="w-6 h-6 mx-auto mb-2" />
-                <span>{t("manageMemberships")}</span>
+                <span>{t('manageMemberships')}</span>
               </div>
             </Button>
             <Button
               variant="outline"
-              onClick={() => router.push("/notifications")}
+              onClick={() => router.push('/notifications')}
               className="h-16"
             >
               <div className="text-center">
                 <Bell className="w-6 h-6 mx-auto mb-2" />
-                <span>{t("notifications")}</span>
+                <span>{t('notifications')}</span>
               </div>
             </Button>
           </div>
@@ -1412,14 +1412,18 @@ function DashboardPageContent() {
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading dashboard...
+            </p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <DashboardPageContent />
     </Suspense>
   );

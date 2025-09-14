@@ -1,13 +1,13 @@
-import { render, screen } from "@testing-library/react";
-import { SessionProvider } from "@/components/providers/SessionProvider";
+import { render, screen } from '@testing-library/react';
+import { SessionProvider } from '@/components/providers/SessionProvider';
 
-describe("SessionProvider basic", () => {
-  it("renders children", () => {
+describe('SessionProvider basic', () => {
+  it('renders children', () => {
     render(
       <SessionProvider>
         <div>child</div>
-      </SessionProvider>,
+      </SessionProvider>
     );
-    expect(screen.getByText("child")).toBeInTheDocument();
+    expect(screen.getByText('child')).toBeInTheDocument();
   });
 });

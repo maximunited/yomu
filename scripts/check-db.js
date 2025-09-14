@@ -1,10 +1,10 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function checkDatabase() {
   try {
-    console.log("=== Checking Database Contents ===");
+    console.log('=== Checking Database Contents ===');
 
     // Check users
     const users = await prisma.user.findMany();
@@ -30,8 +30,8 @@ async function checkDatabase() {
     benefits.forEach((benefit) => {
       console.log(
         `- ${benefit.title} (${benefit.brand.name}) - Validity: ${
-          benefit.validityType || "birthday_month"
-        }`,
+          benefit.validityType || 'birthday_month'
+        }`
       );
     });
 
@@ -46,19 +46,19 @@ async function checkDatabase() {
     memberships.forEach((membership) => {
       console.log(
         `- ${membership.user.name} -> ${membership.brand.name} (${
-          membership.isActive ? "Active" : "Inactive"
-        })`,
+          membership.isActive ? 'Active' : 'Inactive'
+        })`
       );
     });
 
     // Test filtering logic
-    console.log("\n=== Testing Filtering Logic ===");
+    console.log('\n=== Testing Filtering Logic ===');
     const currentMonth = new Date().getMonth();
     const currentDay = new Date().getDate();
     console.log(
-      `Current month: ${currentMonth} (${new Date().toLocaleString("en-US", {
-        month: "long",
-      })})`,
+      `Current month: ${currentMonth} (${new Date().toLocaleString('en-US', {
+        month: 'long',
+      })})`
     );
     console.log(`Current day: ${currentDay}`);
 
@@ -70,7 +70,7 @@ async function checkDatabase() {
         console.log(`User birthday month: ${userDOB.getMonth()}`);
         console.log(`User birthday day: ${userDOB.getDate()}`);
         console.log(
-          `Is birthday month? ${userDOB.getMonth() === currentMonth}`,
+          `Is birthday month? ${userDOB.getMonth() === currentMonth}`
         );
       }
 
@@ -88,26 +88,26 @@ async function checkDatabase() {
       console.log(`\nUser has ${userMemberships.length} active memberships`);
 
       // Test which benefits should be active
-      console.log("\nBenefits that should be active:");
+      console.log('\nBenefits that should be active:');
       let activeCount = 0;
       let totalUserBenefits = 0;
 
       benefits.forEach((benefit) => {
         // Check if user is a member of this brand
         const isUserMember = userMemberships.some(
-          (m) => m.brandId === benefit.brandId,
+          (m) => m.brandId === benefit.brandId
         );
         if (!isUserMember) return;
 
         totalUserBenefits++;
-        const validityType = benefit.validityType || "birthday_month";
+        const validityType = benefit.validityType || 'birthday_month';
         let shouldBeActive = false;
-        let reason = "";
+        let reason = '';
 
-        if (validityType === "birthday_month" && userDOB) {
+        if (validityType === 'birthday_month' && userDOB) {
           shouldBeActive = userDOB.getMonth() === currentMonth;
-          reason = shouldBeActive ? "Birthday month" : "Not birthday month";
-        } else if (validityType === "birthday_date" && userDOB) {
+          reason = shouldBeActive ? 'Birthday month' : 'Not birthday month';
+        } else if (validityType === 'birthday_date' && userDOB) {
           const birthdayMonth = userDOB.getMonth();
           const birthdayDay = userDOB.getDate();
           if (birthdayMonth === currentMonth) {
@@ -117,28 +117,28 @@ async function checkDatabase() {
               ? `Within 7 days of birthday (${daysUntilBirthday} days)`
               : `Not within 7 days of birthday (${daysUntilBirthday} days)`;
           } else {
-            reason = "Not birthday month";
+            reason = 'Not birthday month';
           }
         }
 
         if (shouldBeActive) {
           console.log(
-            `✓ ${benefit.title} (${benefit.brand.name}) - ${validityType} - ${reason}`,
+            `✓ ${benefit.title} (${benefit.brand.name}) - ${validityType} - ${reason}`
           );
           activeCount++;
         } else {
           console.log(
-            `✗ ${benefit.title} (${benefit.brand.name}) - ${validityType} - ${reason}`,
+            `✗ ${benefit.title} (${benefit.brand.name}) - ${validityType} - ${reason}`
           );
         }
       });
 
       console.log(
-        `\nSummary: ${activeCount} out of ${totalUserBenefits} user benefits should be active`,
+        `\nSummary: ${activeCount} out of ${totalUserBenefits} user benefits should be active`
       );
     }
   } catch (error) {
-    console.error("Error:", error);
+    console.error('Error:', error);
   } finally {
     await prisma.$disconnect();
   }

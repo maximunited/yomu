@@ -1,16 +1,16 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { SessionProvider } from "@/components/providers/SessionProvider";
-import { DarkModeProvider } from "@/contexts/DarkModeContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { SessionProvider } from '@/components/providers/SessionProvider';
+import { DarkModeProvider } from '@/contexts/DarkModeContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "YomU - יום-You | Birthday Benefits",
+  title: 'YomU - יום-You | Birthday Benefits',
   description:
-    "Discover and manage your birthday benefits from all your favorite brands",
+    'Discover and manage your birthday benefits from all your favorite brands',
 };
 
 export default function RootLayout({

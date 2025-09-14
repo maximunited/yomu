@@ -1,13 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
-const fs = require("fs");
-const path = require("path");
+const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+const path = require('path');
 
 const prisma = new PrismaClient();
 
 // Helper function to import brands from JSON file
 async function importBrandsFromJson(filePath) {
   try {
-    const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     console.log(`Importing ${data.length} brands...`);
 
     for (const brand of data) {
@@ -27,16 +27,16 @@ async function importBrandsFromJson(filePath) {
       console.log(`✓ Created brand: ${brand.name}`);
     }
 
-    console.log("Brand import completed successfully!");
+    console.log('Brand import completed successfully!');
   } catch (error) {
-    console.error("Error importing brands:", error);
+    console.error('Error importing brands:', error);
   }
 }
 
 // Helper function to import benefits from JSON file
 async function importBenefitsFromJson(filePath) {
   try {
-    const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     console.log(`Importing ${data.length} benefits...`);
 
     for (const benefit of data) {
@@ -47,7 +47,7 @@ async function importBenefitsFromJson(filePath) {
 
       if (!brand) {
         console.log(
-          `⚠️  Brand not found: ${benefit.brandName}, skipping benefit: ${benefit.title}`,
+          `⚠️  Brand not found: ${benefit.brandName}, skipping benefit: ${benefit.title}`
         );
         continue;
       }
@@ -68,13 +68,13 @@ async function importBenefitsFromJson(filePath) {
         },
       });
       console.log(
-        `✓ Created benefit: ${benefit.title} for ${benefit.brandName}`,
+        `✓ Created benefit: ${benefit.title} for ${benefit.brandName}`
       );
     }
 
-    console.log("Benefit import completed successfully!");
+    console.log('Benefit import completed successfully!');
   } catch (error) {
-    console.error("Error importing benefits:", error);
+    console.error('Error importing benefits:', error);
   }
 }
 
@@ -90,7 +90,7 @@ async function exportBrandsToJson(filePath) {
     fs.writeFileSync(filePath, JSON.stringify(brands, null, 2));
     console.log(`✓ Exported ${brands.length} brands to ${filePath}`);
   } catch (error) {
-    console.error("Error exporting brands:", error);
+    console.error('Error exporting brands:', error);
   }
 }
 
@@ -106,7 +106,7 @@ async function exportBenefitsToJson(filePath) {
     fs.writeFileSync(filePath, JSON.stringify(benefits, null, 2));
     console.log(`✓ Exported ${benefits.length} benefits to ${filePath}`);
   } catch (error) {
-    console.error("Error exporting benefits:", error);
+    console.error('Error exporting benefits:', error);
   }
 }
 
@@ -121,17 +121,17 @@ async function listBrands() {
       },
     });
 
-    console.log("\n📋 Brands:");
-    console.log("─".repeat(80));
+    console.log('\n📋 Brands:');
+    console.log('─'.repeat(80));
     brands.forEach((brand) => {
       console.log(
         `${brand.id} | ${brand.name} | ${brand.category} | ${
-          brand.isActive ? "✅" : "❌"
-        } | ${brand._count.benefits} benefits`,
+          brand.isActive ? '✅' : '❌'
+        } | ${brand._count.benefits} benefits`
       );
     });
   } catch (error) {
-    console.error("Error listing brands:", error);
+    console.error('Error listing brands:', error);
   }
 }
 
@@ -144,17 +144,17 @@ async function listBenefits() {
       },
     });
 
-    console.log("\n🎁 Benefits:");
-    console.log("─".repeat(80));
+    console.log('\n🎁 Benefits:');
+    console.log('─'.repeat(80));
     benefits.forEach((benefit) => {
       console.log(
         `${benefit.id} | ${benefit.title} | ${benefit.brand.name} | ${
-          benefit.isActive ? "✅" : "❌"
-        } | ${benefit.isFree ? "Free" : "Paid"}`,
+          benefit.isActive ? '✅' : '❌'
+        } | ${benefit.isFree ? 'Free' : 'Paid'}`
       );
     });
   } catch (error) {
-    console.error("Error listing benefits:", error);
+    console.error('Error listing benefits:', error);
   }
 }
 
@@ -166,7 +166,7 @@ async function toggleBrandStatus(brandId) {
     });
 
     if (!brand) {
-      console.log("❌ Brand not found");
+      console.log('❌ Brand not found');
       return;
     }
 
@@ -177,11 +177,11 @@ async function toggleBrandStatus(brandId) {
 
     console.log(
       `✓ ${updatedBrand.name} is now ${
-        updatedBrand.isActive ? "active" : "inactive"
-      }`,
+        updatedBrand.isActive ? 'active' : 'inactive'
+      }`
     );
   } catch (error) {
-    console.error("Error toggling brand status:", error);
+    console.error('Error toggling brand status:', error);
   }
 }
 
@@ -193,7 +193,7 @@ async function toggleBenefitStatus(benefitId) {
     });
 
     if (!benefit) {
-      console.log("❌ Benefit not found");
+      console.log('❌ Benefit not found');
       return;
     }
 
@@ -204,11 +204,11 @@ async function toggleBenefitStatus(benefitId) {
 
     console.log(
       `✓ ${updatedBenefit.title} is now ${
-        updatedBenefit.isActive ? "active" : "inactive"
-      }`,
+        updatedBenefit.isActive ? 'active' : 'inactive'
+      }`
     );
   } catch (error) {
-    console.error("Error toggling benefit status:", error);
+    console.error('Error toggling benefit status:', error);
   }
 }
 
@@ -218,49 +218,49 @@ async function main() {
   const arg = process.argv[3];
 
   switch (command) {
-    case "import-brands":
+    case 'import-brands':
       if (!arg) {
-        console.log("Usage: node admin-helper.js import-brands <json-file>");
+        console.log('Usage: node admin-helper.js import-brands <json-file>');
         return;
       }
       await importBrandsFromJson(arg);
       break;
 
-    case "import-benefits":
+    case 'import-benefits':
       if (!arg) {
-        console.log("Usage: node admin-helper.js import-benefits <json-file>");
+        console.log('Usage: node admin-helper.js import-benefits <json-file>');
         return;
       }
       await importBenefitsFromJson(arg);
       break;
 
-    case "export-brands":
-      await exportBrandsToJson(arg || "brands-export.json");
+    case 'export-brands':
+      await exportBrandsToJson(arg || 'brands-export.json');
       break;
 
-    case "export-benefits":
-      await exportBenefitsToJson(arg || "benefits-export.json");
+    case 'export-benefits':
+      await exportBenefitsToJson(arg || 'benefits-export.json');
       break;
 
-    case "list-brands":
+    case 'list-brands':
       await listBrands();
       break;
 
-    case "list-benefits":
+    case 'list-benefits':
       await listBenefits();
       break;
 
-    case "toggle-brand":
+    case 'toggle-brand':
       if (!arg) {
-        console.log("Usage: node admin-helper.js toggle-brand <brand-id>");
+        console.log('Usage: node admin-helper.js toggle-brand <brand-id>');
         return;
       }
       await toggleBrandStatus(arg);
       break;
 
-    case "toggle-benefit":
+    case 'toggle-benefit':
       if (!arg) {
-        console.log("Usage: node admin-helper.js toggle-benefit <benefit-id>");
+        console.log('Usage: node admin-helper.js toggle-benefit <benefit-id>');
         return;
       }
       await toggleBenefitStatus(arg);

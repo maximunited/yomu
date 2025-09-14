@@ -1,41 +1,41 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("=== Starting POST request to /api/user/memberships ===");
+    console.log('=== Starting POST request to /api/user/memberships ===');
 
     const session = await getServerSession(authOptions);
-    console.log("Session:", session ? "Found" : "Not found");
-    console.log("Session user:", session?.user);
+    console.log('Session:', session ? 'Found' : 'Not found');
+    console.log('Session user:', session?.user);
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
 
     if (!userId) {
-      console.log("No session user ID, using test user ID");
+      console.log('No session user ID, using test user ID');
       // Get the first user from the database for testing
       const testUser = await prisma.user.findFirst();
       if (testUser) {
         userId = testUser.id;
-        console.log("Using test user ID:", userId);
+        console.log('Using test user ID:', userId);
       } else {
-        console.log("No users found in database");
+        console.log('No users found in database');
         return NextResponse.json(
           {
-            message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED",
+            message: 'unauthorized',
+            error: 'AUTHENTICATION_REQUIRED',
           },
-          { status: 401 },
+          { status: 401 }
         );
       }
     }
 
     const { brandIds, customMemberships } = await request.json();
-    console.log("Received brandIds:", brandIds);
-    console.log("Received customMemberships:", customMemberships);
+    console.log('Received brandIds:', brandIds);
+    console.log('Received customMemberships:', customMemberships);
 
     // First, deactivate all existing memberships for this user
     await prisma.userMembership.updateMany({
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     // Handle regular brand memberships
     if (brandIds && Array.isArray(brandIds)) {
-      console.log("Processing brand IDs:", brandIds);
+      console.log('Processing brand IDs:', brandIds);
 
       const brandMemberships = await Promise.all(
         brandIds.map(async (brandId) => {
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
             console.log(
               `Creating partnership memberships for ${
                 brand.name
-              } ↔ ${partnerBrands.map((p) => p.name).join(", ")}`,
+              } ↔ ${partnerBrands.map((p) => p.name).join(', ')}`
             );
 
             for (const partnerBrand of partnerBrands) {
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
           }
 
           return membershipsToCreate;
-        }),
+        })
       );
 
       results.push(...brandMemberships.filter((m) => m !== null).flat());
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
 
     // Handle custom memberships
     if (customMemberships && Array.isArray(customMemberships)) {
-      console.log("Processing custom memberships:", customMemberships);
+      console.log('Processing custom memberships:', customMemberships);
 
       const customMembershipResults = await Promise.all(
         customMemberships.map(async (customMembership) => {
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
             !customMembership.description ||
             !customMembership.category
           ) {
-            console.log("Invalid custom membership data:", customMembership);
+            console.log('Invalid custom membership data:', customMembership);
             return null;
           }
 
@@ -171,8 +171,8 @@ export async function POST(request: NextRequest) {
               name: customMembership.name,
               description: customMembership.description,
               category: customMembership.category,
-              icon: customMembership.icon || "/images/brands/restaurant.svg",
-              type: customMembership.type || "free",
+              icon: customMembership.icon || '/images/brands/restaurant.svg',
+              type: customMembership.type || 'free',
               cost: customMembership.cost || null,
               isActive: true,
             },
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
           });
 
           return userMembership;
-        }),
+        })
       );
 
       results.push(...customMembershipResults.filter((m) => m !== null));
@@ -198,48 +198,48 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "changesSavedSuccessfully",
+        message: 'changesSavedSuccessfully',
         memberships: results.length,
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
-    console.error("Error saving memberships:", error);
+    console.error('Error saving memberships:', error);
     return NextResponse.json(
       {
-        message: "internalServerError",
-        error: error instanceof Error ? error.message : "Unknown error",
+        message: 'internalServerError',
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("=== Starting GET request to /api/user/memberships ===");
+    console.log('=== Starting GET request to /api/user/memberships ===');
 
     const session = await getServerSession(authOptions);
-    console.log("Session:", session ? "Found" : "Not found");
+    console.log('Session:', session ? 'Found' : 'Not found');
 
     // For testing purposes, let's use a hardcoded user ID if session fails
     let userId = session?.user?.id;
 
     if (!userId) {
-      console.log("No session user ID, using test user ID");
+      console.log('No session user ID, using test user ID');
       // Get the first user from the database for testing
       const testUser = await prisma.user.findFirst();
       if (testUser) {
         userId = testUser.id;
-        console.log("Using test user ID:", userId);
+        console.log('Using test user ID:', userId);
       } else {
-        console.log("No users found in database");
+        console.log('No users found in database');
         return NextResponse.json(
           {
-            message: "unauthorized",
-            error: "AUTHENTICATION_REQUIRED",
+            message: 'unauthorized',
+            error: 'AUTHENTICATION_REQUIRED',
           },
-          { status: 401 },
+          { status: 401 }
         );
       }
     }
@@ -278,13 +278,13 @@ export async function GET(request: NextRequest) {
           id: membership.customMembership!.id,
           name: membership.customMembership!.name,
           logoUrl: membership.customMembership!.icon,
-          website: "",
+          website: '',
           description: membership.customMembership!.description,
           category: membership.customMembership!.category,
           type: membership.customMembership!.type,
           cost: membership.customMembership!.cost,
         },
-      }),
+      })
     );
 
     const allMemberships = [
@@ -296,13 +296,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ memberships: allMemberships });
   } catch (error) {
-    console.error("Error fetching memberships:", error);
+    console.error('Error fetching memberships:', error);
     return NextResponse.json(
       {
-        message: "internalServerError",
-        error: error instanceof Error ? error.message : "Unknown error",
+        message: 'internalServerError',
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

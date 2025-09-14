@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("=== Testing users in database ===");
+    console.log('=== Testing users in database ===');
 
     const users = await prisma.user.findMany({
       select: {
@@ -22,14 +22,14 @@ export async function GET(request: NextRequest) {
       users: users,
     });
   } catch (error) {
-    console.error("Error testing users:", error);
+    console.error('Error testing users:', error);
     return NextResponse.json(
       {
         success: false,
-        message: "failedToFetchUsers",
-        error: error instanceof Error ? error.message : "Unknown error",
+        message: 'failedToFetchUsers',
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

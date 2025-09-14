@@ -1,16 +1,16 @@
-import React from "react";
-import { render, screen, waitFor } from "../../utils/test-helpers";
-import AdminPage from "@/app/admin/page";
+import React from 'react';
+import { render, screen, waitFor } from '../../utils/test-helpers';
+import AdminPage from '@/app/admin/page';
 
 // Mock next-auth
 const mockUseSession = jest.fn();
-jest.mock("next-auth/react", () => ({
+jest.mock('next-auth/react', () => ({
   useSession: () => mockUseSession(),
 }));
 
 // Mock next/navigation
 const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
@@ -19,7 +19,7 @@ jest.mock("next/navigation", () => ({
 // Mock fetch
 global.fetch = jest.fn();
 
-describe("AdminPage", () => {
+describe('AdminPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (global.fetch as jest.Mock).mockResolvedValue({
@@ -28,19 +28,19 @@ describe("AdminPage", () => {
     });
   });
 
-  it("should redirect unauthenticated users to signin", () => {
+  it('should redirect unauthenticated users to signin', () => {
     mockUseSession.mockReturnValue({
-      status: "unauthenticated",
+      status: 'unauthenticated',
     });
 
     render(<AdminPage />);
 
-    expect(mockPush).toHaveBeenCalledWith("/auth/signin");
+    expect(mockPush).toHaveBeenCalledWith('/auth/signin');
   });
 
-  it("should show loading state initially", () => {
+  it('should show loading state initially', () => {
     mockUseSession.mockReturnValue({
-      status: "loading",
+      status: 'loading',
     });
 
     render(<AdminPage />);
@@ -49,37 +49,37 @@ describe("AdminPage", () => {
     expect(document.body).toBeInTheDocument();
   });
 
-  it("should load data when authenticated", async () => {
+  it('should load data when authenticated', async () => {
     mockUseSession.mockReturnValue({
-      status: "authenticated",
+      status: 'authenticated',
     });
 
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
-          { id: "1", name: "Test Brand", logoUrl: "", website: "" },
+          { id: '1', name: 'Test Brand', logoUrl: '', website: '' },
         ],
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => [{ id: "1", title: "Test Benefit", brandId: "1" }],
+        json: async () => [{ id: '1', title: 'Test Benefit', brandId: '1' }],
       });
 
     render(<AdminPage />);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/brands");
-      expect(global.fetch).toHaveBeenCalledWith("/api/admin/benefits");
+      expect(global.fetch).toHaveBeenCalledWith('/api/brands');
+      expect(global.fetch).toHaveBeenCalledWith('/api/admin/benefits');
     });
   });
 
-  it("should handle fetch errors gracefully", async () => {
+  it('should handle fetch errors gracefully', async () => {
     mockUseSession.mockReturnValue({
-      status: "authenticated",
+      status: 'authenticated',
     });
 
-    (global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
     render(<AdminPage />);
 
@@ -91,9 +91,9 @@ describe("AdminPage", () => {
     expect(document.body).toBeInTheDocument();
   });
 
-  it("should render admin interface for authenticated users", async () => {
+  it('should render admin interface for authenticated users', async () => {
     mockUseSession.mockReturnValue({
-      status: "authenticated",
+      status: 'authenticated',
     });
 
     render(<AdminPage />);
@@ -104,9 +104,9 @@ describe("AdminPage", () => {
     });
   });
 
-  it("should handle non-ok response status", async () => {
+  it('should handle non-ok response status', async () => {
     mockUseSession.mockReturnValue({
-      status: "authenticated",
+      status: 'authenticated',
     });
 
     (global.fetch as jest.Mock).mockResolvedValue({

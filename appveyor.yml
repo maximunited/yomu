@@ -1,4 +1,4 @@
-version: "{build}"
+version: '{build}'
 
 # Use Windows image with PowerShell helper `Install-Product`
 image: Visual Studio 2022
@@ -10,7 +10,7 @@ build_script:
 shallow_clone: true
 
 environment:
-  nodejs_version: "20"
+  nodejs_version: '20'
   NODE_ENV: test
 
 init:

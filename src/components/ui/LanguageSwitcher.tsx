@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useLanguage } from "@/contexts/LanguageContext";
-import { Button } from "./Button";
-import { Globe } from "lucide-react";
+import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from './Button';
+import { Globe } from 'lucide-react';
 
 export function LanguageSwitcher() {
   const { language, setLanguage, t } = useLanguage();
 
   const toggleLanguage = () => {
-    setLanguage(language === "he" ? "en" : "he");
+    setLanguage(language === 'he' ? 'en' : 'he');
   };
 
   return (
@@ -20,9 +20,9 @@ export function LanguageSwitcher() {
     >
       <Globe className="w-4 h-4" />
       <span>
-        {language === "he"
-          ? t("languageAbbreviationEnglish")
-          : t("languageAbbreviationHebrew")}
+        {language === 'he'
+          ? t('languageAbbreviationEnglish')
+          : t('languageAbbreviationHebrew')}
       </span>
     </Button>
   );

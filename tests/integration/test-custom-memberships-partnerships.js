@@ -1,19 +1,19 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function testCustomMembershipsPartnerships() {
   try {
-    console.log("🧪 Testing Multi-Brand Feature with Custom Memberships...\n");
+    console.log('🧪 Testing Multi-Brand Feature with Custom Memberships...\n');
 
     const testUser = await prisma.user.findFirst();
     if (!testUser) {
-      console.log("❌ No test user found");
+      console.log('❌ No test user found');
       return;
     }
 
     // 1. Test current custom membership structure
-    console.log("1️⃣ Analyzing custom membership structure:");
+    console.log('1️⃣ Analyzing custom membership structure:');
 
     const customMemberships = await prisma.customMembership.findMany({
       where: { userId: testUser.id },
@@ -24,19 +24,19 @@ async function testCustomMembershipsPartnerships() {
     });
 
     console.log(
-      `Found ${customMemberships.length} existing custom memberships`,
+      `Found ${customMemberships.length} existing custom memberships`
     );
     customMemberships.forEach((cm) => {
       console.log(`  - ${cm.name} (${cm.category}): ${cm.description}`);
     });
 
     // 2. Check if custom memberships can have partnerships
-    console.log("\n2️⃣ Checking custom membership partnership capability:");
+    console.log('\n2️⃣ Checking custom membership partnership capability:');
 
     // Look at the schema to see if custom memberships support partnerships
     const customMembershipFields =
       await prisma.$queryRaw`PRAGMA table_info(custom_memberships)`;
-    console.log("Custom membership table structure:");
+    console.log('Custom membership table structure:');
     customMembershipFields.forEach((field) => {
       console.log(`  ${field.name}: ${field.type}`);
     });
@@ -53,31 +53,31 @@ async function testCustomMembershipsPartnerships() {
     });
 
     console.log(
-      `\nUser has ${userMemberships.length} custom memberships active`,
+      `\nUser has ${userMemberships.length} custom memberships active`
     );
 
     // 3. Test creating custom memberships through the API
-    console.log("\n3️⃣ Testing custom membership creation via API:");
+    console.log('\n3️⃣ Testing custom membership creation via API:');
 
     // Simulate POST /api/user/memberships with custom memberships
     const customMembershipData = {
       brandIds: [], // No regular brands
       customMemberships: [
         {
-          name: "רשת חנויות טכנולוגיה",
+          name: 'רשת חנויות טכנולוגיה',
           description: "הטבות על מוצרי טכנולוגיה וגאדג'טים",
-          category: "technology",
-          icon: "/images/brands/tech.svg",
-          type: "free",
+          category: 'technology',
+          icon: '/images/brands/tech.svg',
+          type: 'free',
           cost: null,
         },
         {
-          name: "רשת ספרים ותרבות",
-          description: "הטבות על ספרים, סדנאות ואירועי תרבות",
-          category: "culture",
-          icon: "/images/brands/books.svg",
-          type: "paid",
-          cost: "29.90 ₪/חודש",
+          name: 'רשת ספרים ותרבות',
+          description: 'הטבות על ספרים, סדנאות ואירועי תרבות',
+          category: 'culture',
+          icon: '/images/brands/books.svg',
+          type: 'paid',
+          cost: '29.90 ₪/חודש',
         },
       ],
     };
@@ -121,31 +121,31 @@ async function testCustomMembershipsPartnerships() {
       });
 
       console.log(
-        `  ✅ Created custom membership: ${createdCustomMembership.name}`,
+        `  ✅ Created custom membership: ${createdCustomMembership.name}`
       );
     }
 
     // 4. Test if custom memberships can be enhanced with partnerships
-    console.log("\n4️⃣ Exploring custom membership partnership enhancement:");
+    console.log('\n4️⃣ Exploring custom membership partnership enhancement:');
 
     console.log(
-      "💡 Current limitation: Custom memberships are isolated entities",
+      '💡 Current limitation: Custom memberships are isolated entities'
     );
-    console.log("💡 They do not participate in the brand partnership system");
-    console.log("💡 This is by design - custom memberships are user-specific");
+    console.log('💡 They do not participate in the brand partnership system');
+    console.log('💡 This is by design - custom memberships are user-specific');
 
     // 5. Test potential enhancement: Link custom memberships to brand partnerships
     console.log(
-      "\n5️⃣ Testing potential enhancement - custom membership + brand linking:",
+      '\n5️⃣ Testing potential enhancement - custom membership + brand linking:'
     );
 
     // Create a scenario where user has both custom and brand memberships
     const techBrands = await prisma.brand.findMany({
       where: {
         OR: [
-          { category: "tech" },
-          { name: { contains: "digital" } },
-          { description: { contains: "טכנולוגי" } },
+          { category: 'tech' },
+          { name: { contains: 'digital' } },
+          { description: { contains: 'טכנולוגי' } },
         ],
       },
     });
@@ -177,15 +177,15 @@ async function testCustomMembershipsPartnerships() {
 
       const partners = [];
       brandWithPartnerships.partnershipsFrom.forEach((p) =>
-        partners.push(p.brandB),
+        partners.push(p.brandB)
       );
       brandWithPartnerships.partnershipsTo.forEach((p) =>
-        partners.push(p.brandA),
+        partners.push(p.brandA)
       );
 
       if (partners.length > 0) {
         console.log(
-          `  💡 Brand partnerships would activate ${partners.length} additional memberships`,
+          `  💡 Brand partnerships would activate ${partners.length} additional memberships`
         );
         partners.forEach((partner) => {
           console.log(`    - ${partner.name}`);
@@ -196,7 +196,7 @@ async function testCustomMembershipsPartnerships() {
     }
 
     // 6. Test GET /api/user/memberships with mixed membership types
-    console.log("\n6️⃣ Testing mixed membership API response:");
+    console.log('\n6️⃣ Testing mixed membership API response:');
 
     // Get both types of memberships
     const brandMemberships = await prisma.userMembership.findMany({
@@ -226,12 +226,12 @@ async function testCustomMembershipsPartnerships() {
     console.log(`  Custom memberships: ${customUserMemberships.length}`);
     customUserMemberships.forEach((m) => {
       console.log(
-        `    - ${m.customMembership.name} (${m.customMembership.category}) [${m.customMembership.type}]`,
+        `    - ${m.customMembership.name} (${m.customMembership.category}) [${m.customMembership.type}]`
       );
     });
 
     // 7. Test custom benefits
-    console.log("\n7️⃣ Testing custom benefits creation:");
+    console.log('\n7️⃣ Testing custom benefits creation:');
 
     if (createdCustomMemberships.length > 0) {
       const techMembership = createdCustomMemberships[0].custom;
@@ -241,10 +241,10 @@ async function testCustomMembershipsPartnerships() {
         data: {
           customMembershipId: techMembership.id,
           title: "50% הנחה על גאדג'טים",
-          description: "הנחה של 50% על מוצרי טכנולוגיה נבחרים בחודש יום הולדת",
-          redemptionMethod: "code",
-          promoCode: "TECH50",
-          validityType: "birthday_month",
+          description: 'הנחה של 50% על מוצרי טכנולוגיה נבחרים בחודש יום הולדת',
+          redemptionMethod: 'code',
+          promoCode: 'TECH50',
+          validityType: 'birthday_month',
           isFree: true,
           isActive: true,
         },
@@ -255,36 +255,36 @@ async function testCustomMembershipsPartnerships() {
     }
 
     // 8. Summary and recommendations
-    console.log("\n8️⃣ Summary and Recommendations:");
+    console.log('\n8️⃣ Summary and Recommendations:');
 
-    console.log("✅ Current State:");
-    console.log("  • Custom memberships work independently");
-    console.log("  • Users can have both brand and custom memberships");
-    console.log("  • Custom benefits are fully functional");
-    console.log("  • API handles mixed membership types correctly");
+    console.log('✅ Current State:');
+    console.log('  • Custom memberships work independently');
+    console.log('  • Users can have both brand and custom memberships');
+    console.log('  • Custom benefits are fully functional');
+    console.log('  • API handles mixed membership types correctly');
 
-    console.log("\n💡 Partnership Enhancement Options:");
+    console.log('\n💡 Partnership Enhancement Options:');
     console.log(
-      "  1. Keep current design (custom = isolated, brands = networked)",
+      '  1. Keep current design (custom = isolated, brands = networked)'
     );
-    console.log("  2. Add optional brand linking to custom memberships");
-    console.log("  3. Create custom membership groups/networks");
+    console.log('  2. Add optional brand linking to custom memberships');
+    console.log('  3. Create custom membership groups/networks');
     console.log(
-      '  4. Allow custom memberships to "inherit" from brand partnerships',
+      '  4. Allow custom memberships to "inherit" from brand partnerships'
     );
 
-    console.log("\n🎯 Recommendation:");
+    console.log('\n🎯 Recommendation:');
     console.log(
-      "  Current design is appropriate - custom memberships are meant to be",
+      '  Current design is appropriate - custom memberships are meant to be'
     );
     console.log(
-      "  user-specific and don't need the complexity of partnerships.",
+      "  user-specific and don't need the complexity of partnerships."
     );
     console.log(
-      "  Multi-brand partnerships work perfectly for official brand networks.",
+      '  Multi-brand partnerships work perfectly for official brand networks.'
     );
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    console.error('❌ Test failed:', error);
   } finally {
     await prisma.$disconnect();
   }

@@ -1,15 +1,15 @@
-import { test, expect } from "@playwright/test";
-import { PageHelper } from "./helpers/page-helpers";
-import { urls } from "./fixtures/test-data";
+import { test, expect } from '@playwright/test';
+import { PageHelper } from './helpers/page-helpers';
+import { urls } from './fixtures/test-data';
 
-test.describe("Accessibility Testing", () => {
+test.describe('Accessibility Testing', () => {
   let pageHelper: PageHelper;
 
   test.beforeEach(async ({ page }) => {
     pageHelper = new PageHelper(page);
   });
 
-  test("should have proper heading hierarchy on all pages", async ({
+  test('should have proper heading hierarchy on all pages', async ({
     page,
   }) => {
     const pagesToTest = [
@@ -27,21 +27,21 @@ test.describe("Accessibility Testing", () => {
       await pageHelper.waitForPageLoad();
 
       // Check for h1
-      const h1 = page.locator("h1");
+      const h1 = page.locator('h1');
       await expect(h1).toBeVisible();
 
       // Check heading hierarchy (h1 > h2 > h3...)
-      const headings = await page.locator("h1, h2, h3, h4, h5, h6").all();
+      const headings = await page.locator('h1, h2, h3, h4, h5, h6').all();
 
       if (headings.length > 1) {
         // Verify headings don't skip levels
         const headingLevels = await Promise.all(
           headings.map(async (heading) => {
             const tagName = await heading.evaluate((el) =>
-              el.tagName.toLowerCase(),
+              el.tagName.toLowerCase()
             );
-            return parseInt(tagName.replace("h", ""));
-          }),
+            return parseInt(tagName.replace('h', ''));
+          })
         );
 
         // Check that we don't skip heading levels (e.g., h1 -> h3)
@@ -53,7 +53,7 @@ test.describe("Accessibility Testing", () => {
     }
   });
 
-  test("should have proper ARIA landmarks on all pages", async ({ page }) => {
+  test('should have proper ARIA landmarks on all pages', async ({ page }) => {
     const pagesToTest = [urls.home, urls.signin, urls.about, urls.contact];
 
     for (const url of pagesToTest) {
@@ -82,22 +82,22 @@ test.describe("Accessibility Testing", () => {
     }
   });
 
-  test("should have accessible form labels and inputs", async ({ page }) => {
+  test('should have accessible form labels and inputs', async ({ page }) => {
     // Test sign in form
     await page.goto(urls.signin);
     await pageHelper.waitForPageLoad();
 
-    const inputs = page.locator("input");
+    const inputs = page.locator('input');
     const inputCount = await inputs.count();
 
     for (let i = 0; i < inputCount; i++) {
       const input = inputs.nth(i);
 
       // Check for label association
-      const inputId = await input.getAttribute("id");
-      const inputName = await input.getAttribute("name");
-      const ariaLabel = await input.getAttribute("aria-label");
-      const ariaLabelledBy = await input.getAttribute("aria-labelledby");
+      const inputId = await input.getAttribute('id');
+      const inputName = await input.getAttribute('name');
+      const ariaLabel = await input.getAttribute('aria-label');
+      const ariaLabelledBy = await input.getAttribute('aria-labelledby');
 
       if (inputId) {
         // Check for associated label
@@ -115,29 +115,29 @@ test.describe("Accessibility Testing", () => {
     await page.goto(urls.signup);
     await pageHelper.waitForPageLoad();
 
-    const signupInputs = page.locator("input");
+    const signupInputs = page.locator('input');
     const signupInputCount = await signupInputs.count();
 
     for (let i = 0; i < signupInputCount; i++) {
       const input = signupInputs.nth(i);
-      const required = await input.getAttribute("required");
-      const ariaRequired = await input.getAttribute("aria-required");
+      const required = await input.getAttribute('required');
+      const ariaRequired = await input.getAttribute('aria-required');
 
       // Required fields should be marked as such
       if (required !== null) {
-        expect(ariaRequired === "true" || required !== null).toBeTruthy();
+        expect(ariaRequired === 'true' || required !== null).toBeTruthy();
       }
     }
   });
 
-  test("should have accessible buttons with proper names", async ({ page }) => {
+  test('should have accessible buttons with proper names', async ({ page }) => {
     const pagesToTest = [urls.home, urls.signin, urls.signup, urls.about];
 
     for (const url of pagesToTest) {
       await page.goto(url);
       await pageHelper.waitForPageLoad();
 
-      const buttons = page.locator("button");
+      const buttons = page.locator('button');
       const buttonCount = await buttons.count();
 
       for (let i = 0; i < buttonCount; i++) {
@@ -146,10 +146,10 @@ test.describe("Accessibility Testing", () => {
         // Button should have accessible name
         const accessibleName = await button.evaluate((el) => {
           return (
-            el.getAttribute("aria-label") ||
-            el.getAttribute("aria-labelledby") ||
+            el.getAttribute('aria-label') ||
+            el.getAttribute('aria-labelledby') ||
             el.textContent?.trim() ||
-            el.getAttribute("title")
+            el.getAttribute('title')
           );
         });
 
@@ -159,13 +159,13 @@ test.describe("Accessibility Testing", () => {
     }
   });
 
-  test("should have proper focus management", async ({ page }) => {
+  test('should have proper focus management', async ({ page }) => {
     await page.goto(urls.signin);
     await pageHelper.waitForPageLoad();
 
     // Get all focusable elements
     const focusableElements = page.locator(
-      'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     const elementCount = await focusableElements.count();
 
@@ -176,19 +176,19 @@ test.describe("Accessibility Testing", () => {
       await expect(firstElement).toBeFocused();
 
       // Tab to next element
-      await page.keyboard.press("Tab");
+      await page.keyboard.press('Tab');
 
       // Some element should have focus
-      const focusedElement = page.locator(":focus");
+      const focusedElement = page.locator(':focus');
       await expect(focusedElement).toBeVisible();
     }
   });
 
-  test("should have visible focus indicators", async ({ page }) => {
+  test('should have visible focus indicators', async ({ page }) => {
     await page.goto(urls.home);
     await pageHelper.waitForPageLoad();
 
-    const interactiveElements = page.locator("a, button, input, select");
+    const interactiveElements = page.locator('a, button, input, select');
     const elementCount = await interactiveElements.count();
 
     for (let i = 0; i < Math.min(elementCount, 5); i++) {
@@ -199,7 +199,7 @@ test.describe("Accessibility Testing", () => {
 
         // Check for visible focus indicator
         const focusStyles = await element.evaluate((el) => {
-          const styles = window.getComputedStyle(el, ":focus");
+          const styles = window.getComputedStyle(el, ':focus');
           return {
             outline: styles.outline,
             outlineWidth: styles.outlineWidth,
@@ -210,34 +210,34 @@ test.describe("Accessibility Testing", () => {
 
         // Should have some kind of focus indicator
         const hasFocusIndicator =
-          focusStyles.outline !== "none" ||
-          focusStyles.outlineWidth !== "0px" ||
-          focusStyles.boxShadow !== "none" ||
-          focusStyles.border.includes("blue") ||
-          focusStyles.border.includes("focus");
+          focusStyles.outline !== 'none' ||
+          focusStyles.outlineWidth !== '0px' ||
+          focusStyles.boxShadow !== 'none' ||
+          focusStyles.border.includes('blue') ||
+          focusStyles.border.includes('focus');
 
         expect(hasFocusIndicator).toBeTruthy();
       }
     }
   });
 
-  test("should have proper image alt text", async ({ page }) => {
+  test('should have proper image alt text', async ({ page }) => {
     const pagesToTest = [urls.home, urls.about];
 
     for (const url of pagesToTest) {
       await page.goto(url);
       await pageHelper.waitForPageLoad();
 
-      const images = page.locator("img");
+      const images = page.locator('img');
       const imageCount = await images.count();
 
       for (let i = 0; i < imageCount; i++) {
         const img = images.nth(i);
-        const altText = await img.getAttribute("alt");
-        const role = await img.getAttribute("role");
+        const altText = await img.getAttribute('alt');
+        const role = await img.getAttribute('role');
 
         // Images should have alt text unless they're decorative
-        if (role !== "presentation" && role !== "none") {
+        if (role !== 'presentation' && role !== 'none') {
           expect(altText).toBeTruthy();
           expect(altText?.length).toBeGreaterThan(0);
         }
@@ -245,12 +245,12 @@ test.describe("Accessibility Testing", () => {
     }
   });
 
-  test("should have sufficient color contrast", async ({ page }) => {
+  test('should have sufficient color contrast', async ({ page }) => {
     await page.goto(urls.home);
     await pageHelper.waitForPageLoad();
 
     // Test main text elements for contrast
-    const textElements = page.locator("h1, h2, h3, p, a, button, label");
+    const textElements = page.locator('h1, h2, h3, p, a, button, label');
     const elementCount = await textElements.count();
 
     for (let i = 0; i < Math.min(elementCount, 10); i++) {
@@ -268,17 +268,17 @@ test.describe("Accessibility Testing", () => {
 
         // Basic check that text has color and background
         expect(styles.color).toBeTruthy();
-        expect(styles.color).not.toBe("rgba(0, 0, 0, 0)");
+        expect(styles.color).not.toBe('rgba(0, 0, 0, 0)');
       }
     }
   });
 
-  test("should support keyboard navigation", async ({ page }) => {
+  test('should support keyboard navigation', async ({ page }) => {
     await page.goto(urls.signin);
     await pageHelper.waitForPageLoad();
 
     // Test Enter key on form submission
-    const form = page.locator("form").first();
+    const form = page.locator('form').first();
     if (await form.isVisible()) {
       const submitButton = form
         .locator('button[type="submit"], input[type="submit"]')
@@ -288,7 +288,7 @@ test.describe("Accessibility Testing", () => {
         await submitButton.focus();
 
         // Should be able to activate with Enter
-        await page.keyboard.press("Enter");
+        await page.keyboard.press('Enter');
         // Form should attempt to submit (validation may prevent it)
       }
     }
@@ -302,26 +302,26 @@ test.describe("Accessibility Testing", () => {
       await firstButton.focus();
 
       // Should be able to activate with Space
-      await page.keyboard.press("Space");
+      await page.keyboard.press('Space');
     }
   });
 
-  test("should handle screen reader compatibility", async ({ page }) => {
+  test('should handle screen reader compatibility', async ({ page }) => {
     await page.goto(urls.home);
     await pageHelper.waitForPageLoad();
 
     // Check for proper ARIA attributes
     const elementsWithAria = page.locator(
-      "[aria-label], [aria-labelledby], [aria-describedby], [aria-expanded], [aria-hidden], [role]",
+      '[aria-label], [aria-labelledby], [aria-describedby], [aria-expanded], [aria-hidden], [role]'
     );
     const ariaCount = await elementsWithAria.count();
 
     for (let i = 0; i < Math.min(ariaCount, 10); i++) {
       const element = elementsWithAria.nth(i);
 
-      const ariaLabel = await element.getAttribute("aria-label");
-      const ariaLabelledBy = await element.getAttribute("aria-labelledby");
-      const role = await element.getAttribute("role");
+      const ariaLabel = await element.getAttribute('aria-label');
+      const ariaLabelledBy = await element.getAttribute('aria-labelledby');
+      const role = await element.getAttribute('role');
 
       // ARIA attributes should have valid values
       if (ariaLabel) {
@@ -339,25 +339,25 @@ test.describe("Accessibility Testing", () => {
       if (role) {
         // Should be valid ARIA role
         const validRoles = [
-          "button",
-          "link",
-          "heading",
-          "banner",
-          "main",
-          "navigation",
-          "contentinfo",
-          "article",
-          "section",
-          "complementary",
-          "form",
-          "search",
+          'button',
+          'link',
+          'heading',
+          'banner',
+          'main',
+          'navigation',
+          'contentinfo',
+          'article',
+          'section',
+          'complementary',
+          'form',
+          'search',
         ];
         // This is not exhaustive but covers common roles
       }
     }
   });
 
-  test("should work with high contrast mode", async ({ page }) => {
+  test('should work with high contrast mode', async ({ page }) => {
     // Simulate high contrast by forcing specific styles
     await page.goto(urls.home);
     await pageHelper.waitForPageLoad();
@@ -381,33 +381,33 @@ test.describe("Accessibility Testing", () => {
     });
 
     // Page should still be functional
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Interactive elements should still be visible
-    const buttons = page.locator("button");
+    const buttons = page.locator('button');
     if ((await buttons.count()) > 0) {
       await expect(buttons.first()).toBeVisible();
     }
 
-    const links = page.locator("a");
+    const links = page.locator('a');
     if ((await links.count()) > 0) {
       await expect(links.first()).toBeVisible();
     }
   });
 
-  test("should be usable with reduced motion", async ({ page }) => {
+  test('should be usable with reduced motion', async ({ page }) => {
     // Set reduced motion preference
-    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
 
     await page.goto(urls.home);
     await pageHelper.waitForPageLoad();
 
     // Page should load and be functional
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Any animations should respect reduced motion
     const animatedElements = page.locator(
-      '[class*="animate"], [class*="transition"], [style*="animation"]',
+      '[class*="animate"], [class*="transition"], [style*="animation"]'
     );
     const animatedCount = await animatedElements.count();
 

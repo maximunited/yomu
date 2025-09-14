@@ -1,17 +1,17 @@
-import { test, expect, devices } from "@playwright/test";
-import { PageHelper } from "./helpers/page-helpers";
-import { urls } from "./fixtures/test-data";
+import { test, expect, devices } from '@playwright/test';
+import { PageHelper } from './helpers/page-helpers';
+import { urls } from './fixtures/test-data';
 
-test.describe("Mobile Responsiveness", () => {
+test.describe('Mobile Responsiveness', () => {
   let pageHelper: PageHelper;
 
   test.beforeEach(async ({ page }) => {
     pageHelper = new PageHelper(page);
   });
 
-  test("should work on mobile viewport", async ({ browser }) => {
+  test('should work on mobile viewport', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12"],
+      ...devices['iPhone 12'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -20,10 +20,10 @@ test.describe("Mobile Responsiveness", () => {
     await pageHelper.waitForPageLoad();
 
     // Main content should be visible
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Content should not overflow horizontally
-    const body = page.locator("body");
+    const body = page.locator('body');
     const bodyBox = await body.boundingBox();
     const viewport = page.viewportSize();
 
@@ -34,11 +34,11 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should have touch-friendly navigation on mobile", async ({
+  test('should have touch-friendly navigation on mobile', async ({
     browser,
   }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12"],
+      ...devices['iPhone 12'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -49,7 +49,7 @@ test.describe("Mobile Responsiveness", () => {
     // Check for mobile navigation (hamburger menu, etc.)
     const mobileNav = page
       .locator(
-        '.mobile-nav, .hamburger, button[aria-label*="menu"], button[aria-label*="תפריט"]',
+        '.mobile-nav, .hamburger, button[aria-label*="menu"], button[aria-label*="תפריט"]'
       )
       .first();
 
@@ -59,7 +59,7 @@ test.describe("Mobile Responsiveness", () => {
       await page.waitForTimeout(500);
 
       // Should show navigation menu
-      const navMenu = page.locator(".nav-menu, .mobile-menu, nav").first();
+      const navMenu = page.locator('.nav-menu, .mobile-menu, nav').first();
       if (await navMenu.isVisible()) {
         await expect(navMenu).toBeVisible();
 
@@ -70,7 +70,7 @@ test.describe("Mobile Responsiveness", () => {
     }
 
     // Test that regular links work with tap
-    const links = page.locator("a:visible");
+    const links = page.locator('a:visible');
     if ((await links.count()) > 0) {
       const firstLink = links.first();
       const linkBox = await firstLink.boundingBox();
@@ -85,9 +85,9 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should handle form inputs on mobile", async ({ browser }) => {
+  test('should handle form inputs on mobile', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12"],
+      ...devices['iPhone 12'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -99,21 +99,21 @@ test.describe("Mobile Responsiveness", () => {
     const emailInput = page.locator('input[type="email"]');
     if (await emailInput.isVisible()) {
       await emailInput.tap();
-      await emailInput.fill("test@example.com");
+      await emailInput.fill('test@example.com');
 
       // Input should have proper keyboard type
-      const inputType = await emailInput.getAttribute("type");
-      expect(inputType).toBe("email");
+      const inputType = await emailInput.getAttribute('type');
+      expect(inputType).toBe('email');
     }
 
     const passwordInput = page.locator('input[type="password"]');
     if (await passwordInput.isVisible()) {
       await passwordInput.tap();
-      await passwordInput.fill("password123");
+      await passwordInput.fill('password123');
 
       // Should be password type
-      const inputType = await passwordInput.getAttribute("type");
-      expect(inputType).toBe("password");
+      const inputType = await passwordInput.getAttribute('type');
+      expect(inputType).toBe('password');
     }
 
     // Test button interaction
@@ -132,9 +132,9 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should work on tablet viewport", async ({ browser }) => {
+  test('should work on tablet viewport', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices["iPad Pro"],
+      ...devices['iPad Pro'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -143,10 +143,10 @@ test.describe("Mobile Responsiveness", () => {
     await pageHelper.waitForPageLoad();
 
     // Content should adapt to tablet size
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Navigation might be different on tablet
-    const nav = page.locator("nav, header").first();
+    const nav = page.locator('nav, header').first();
     await expect(nav).toBeVisible();
 
     // Check layout doesn't break
@@ -158,9 +158,9 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should handle orientation changes", async ({ browser }) => {
+  test('should handle orientation changes', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12"],
+      ...devices['iPhone 12'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -168,17 +168,17 @@ test.describe("Mobile Responsiveness", () => {
     // Test portrait mode
     await page.goto(urls.home);
     await pageHelper.waitForPageLoad();
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Change to landscape
     await page.setViewportSize({ width: 844, height: 390 }); // iPhone 12 landscape
     await page.waitForTimeout(500);
 
     // Content should still be visible and functional
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Navigation should still work
-    const nav = page.locator("nav, header").first();
+    const nav = page.locator('nav, header').first();
     if (await nav.isVisible()) {
       await expect(nav).toBeVisible();
     }
@@ -186,9 +186,9 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should have readable text on mobile", async ({ browser }) => {
+  test('should have readable text on mobile', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12"],
+      ...devices['iPhone 12'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -197,7 +197,7 @@ test.describe("Mobile Responsiveness", () => {
     await pageHelper.waitForPageLoad();
 
     // Test font sizes are readable
-    const textElements = page.locator("p, h1, h2, h3, a, button, label");
+    const textElements = page.locator('p, h1, h2, h3, a, button, label');
     const elementCount = await textElements.count();
 
     for (let i = 0; i < Math.min(elementCount, 10); i++) {
@@ -216,9 +216,9 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should handle touch gestures", async ({ browser }) => {
+  test('should handle touch gestures', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12"],
+      ...devices['iPhone 12'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -226,16 +226,16 @@ test.describe("Mobile Responsiveness", () => {
     await page.goto(urls.dashboard);
 
     // If redirected to sign in, that's expected
-    if (page.url().includes("/auth/signin")) {
+    if (page.url().includes('/auth/signin')) {
       await context.close();
       return;
     }
 
-    if (page.url().includes("/dashboard")) {
+    if (page.url().includes('/dashboard')) {
       await pageHelper.waitForPageLoad();
 
       // Test scrolling
-      const main = page.locator("main");
+      const main = page.locator('main');
       await main.hover();
 
       // Simulate scroll gesture
@@ -246,7 +246,7 @@ test.describe("Mobile Responsiveness", () => {
       await expect(main).toBeVisible();
 
       // Test swipe-like interactions if any cards/carousels exist
-      const cards = page.locator(".card, .benefit-card, article");
+      const cards = page.locator('.card, .benefit-card, article');
       if ((await cards.count()) > 0) {
         const firstCard = cards.first();
         const cardBox = await firstCard.boundingBox();
@@ -255,12 +255,12 @@ test.describe("Mobile Responsiveness", () => {
           // Simulate touch interaction
           await page.mouse.move(
             cardBox.x + cardBox.width / 2,
-            cardBox.y + cardBox.height / 2,
+            cardBox.y + cardBox.height / 2
           );
           await page.mouse.down();
           await page.mouse.move(
             cardBox.x + cardBox.width / 2 + 50,
-            cardBox.y + cardBox.height / 2,
+            cardBox.y + cardBox.height / 2
           );
           await page.mouse.up();
         }
@@ -270,9 +270,9 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should work with zoom levels", async ({ browser }) => {
+  test('should work with zoom levels', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12"],
+      ...devices['iPhone 12'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -285,10 +285,10 @@ test.describe("Mobile Responsiveness", () => {
     await page.waitForTimeout(500);
 
     // Content should still be accessible
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Interactive elements should still work
-    const buttons = page.locator("button");
+    const buttons = page.locator('button');
     if ((await buttons.count()) > 0) {
       const firstButton = buttons.first();
       if (await firstButton.isVisible()) {
@@ -299,7 +299,7 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should handle small screen devices", async ({ browser }) => {
+  test('should handle small screen devices', async ({ browser }) => {
     const context = await browser.newContext({
       viewport: { width: 320, height: 568 }, // iPhone SE size
     });
@@ -310,7 +310,7 @@ test.describe("Mobile Responsiveness", () => {
     await pageHelper.waitForPageLoad();
 
     // Content should not overflow
-    const body = page.locator("body");
+    const body = page.locator('body');
     const bodyBox = await body.boundingBox();
 
     if (bodyBox) {
@@ -318,10 +318,10 @@ test.describe("Mobile Responsiveness", () => {
     }
 
     // Essential elements should be visible
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Text should wrap properly
-    const headings = page.locator("h1, h2");
+    const headings = page.locator('h1, h2');
     if ((await headings.count()) > 0) {
       const firstHeading = headings.first();
       const headingBox = await firstHeading.boundingBox();
@@ -334,9 +334,9 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should work with large mobile screens", async ({ browser }) => {
+  test('should work with large mobile screens', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12 Pro Max"],
+      ...devices['iPhone 12 Pro Max'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -345,10 +345,10 @@ test.describe("Mobile Responsiveness", () => {
     await pageHelper.waitForPageLoad();
 
     // Should utilize larger screen space effectively
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
 
     // Content should not be too stretched
-    const container = page.locator("main, .container, .content").first();
+    const container = page.locator('main, .container, .content').first();
     const containerBox = await container.boundingBox();
     const viewport = page.viewportSize();
 
@@ -361,11 +361,11 @@ test.describe("Mobile Responsiveness", () => {
     await context.close();
   });
 
-  test("should handle progressive web app features on mobile", async ({
+  test('should handle progressive web app features on mobile', async ({
     browser,
   }) => {
     const context = await browser.newContext({
-      ...devices["iPhone 12"],
+      ...devices['iPhone 12'],
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -376,23 +376,23 @@ test.describe("Mobile Responsiveness", () => {
     // Check for PWA manifest
     const manifest = page.locator('link[rel="manifest"]');
     if ((await manifest.count()) > 0) {
-      const manifestHref = await manifest.getAttribute("href");
+      const manifestHref = await manifest.getAttribute('href');
       expect(manifestHref).toBeTruthy();
     }
 
     // Check for service worker registration
     const swRegistration = await page.evaluate(() => {
-      return "serviceWorker" in navigator;
+      return 'serviceWorker' in navigator;
     });
 
-    expect(typeof swRegistration).toBe("boolean");
+    expect(typeof swRegistration).toBe('boolean');
 
     // Check for proper meta tags for mobile
     const viewportMeta = page.locator('meta[name="viewport"]');
     await expect(viewportMeta).toHaveCount(1);
 
-    const viewportContent = await viewportMeta.getAttribute("content");
-    expect(viewportContent).toContain("width=device-width");
+    const viewportContent = await viewportMeta.getAttribute('content');
+    expect(viewportContent).toContain('width=device-width');
 
     await context.close();
   });

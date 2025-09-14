@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { ChevronDownIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useState, useRef, useEffect } from 'react';
+import { ChevronDownIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   getAvailableLanguages,
   getFullySupportedLanguages,
   getBetaLanguages,
   type LanguageCode,
-} from "@/lib/languages";
+} from '@/lib/languages';
 
 interface LanguageSelectorProps {
-  variant?: "button" | "dropdown" | "compact";
+  variant?: 'button' | 'dropdown' | 'compact';
   showBeta?: boolean;
   className?: string;
 }
 
 export default function LanguageSelector({
-  variant = "dropdown",
+  variant = 'dropdown',
   showBeta = false,
-  className = "",
+  className = '',
 }: LanguageSelectorProps) {
   const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -36,15 +36,15 @@ export default function LanguageSelector({
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const availableLanguages = showBeta
     ? getAvailableLanguages()
     : getFullySupportedLanguages();
   const currentLanguage = availableLanguages.find(
-    (lang) => lang.code === language,
+    (lang) => lang.code === language
   );
 
   const handleLanguageChange = (newLanguage: LanguageCode) => {
@@ -52,7 +52,7 @@ export default function LanguageSelector({
     setIsOpen(false);
   };
 
-  if (variant === "button") {
+  if (variant === 'button') {
     return (
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -67,7 +67,7 @@ export default function LanguageSelector({
     );
   }
 
-  if (variant === "compact") {
+  if (variant === 'compact') {
     return (
       <div className="relative" ref={dropdownRef}>
         <button
@@ -87,8 +87,8 @@ export default function LanguageSelector({
                   onClick={() => handleLanguageChange(lang.code)}
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center justify-between ${
                     language === lang.code
-                      ? "bg-purple-50 text-purple-700"
-                      : "text-gray-700"
+                      ? 'bg-purple-50 text-purple-700'
+                      : 'text-gray-700'
                   }`}
                 >
                   <div className="flex items-center space-x-2">
@@ -121,7 +121,7 @@ export default function LanguageSelector({
       >
         <div className="flex items-center space-x-3">
           <GlobeAltIcon className="w-4 h-4 text-gray-500" />
-          <span>{t("language")}</span>
+          <span>{t('language')}</span>
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-base">{currentLanguage?.flag}</span>
@@ -135,7 +135,7 @@ export default function LanguageSelector({
           <div className="py-1">
             {/* Fully supported languages */}
             <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              {t("fullySupported")}
+              {t('fullySupported')}
             </div>
             {getFullySupportedLanguages().map((lang) => (
               <button
@@ -143,8 +143,8 @@ export default function LanguageSelector({
                 onClick={() => handleLanguageChange(lang.code)}
                 className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 flex items-center justify-between ${
                   language === lang.code
-                    ? "bg-purple-50 text-purple-700"
-                    : "text-gray-700"
+                    ? 'bg-purple-50 text-purple-700'
+                    : 'text-gray-700'
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -167,7 +167,7 @@ export default function LanguageSelector({
               <>
                 <div className="border-t border-gray-200 my-2"></div>
                 <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {t("betaLanguages")}
+                  {t('betaLanguages')}
                 </div>
                 {getBetaLanguages().map((lang) => (
                   <button
@@ -175,8 +175,8 @@ export default function LanguageSelector({
                     onClick={() => handleLanguageChange(lang.code)}
                     className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 flex items-center justify-between ${
                       language === lang.code
-                        ? "bg-purple-50 text-purple-700"
-                        : "text-gray-700"
+                        ? 'bg-purple-50 text-purple-700'
+                        : 'text-gray-700'
                     }`}
                   >
                     <div className="flex items-center space-x-3">

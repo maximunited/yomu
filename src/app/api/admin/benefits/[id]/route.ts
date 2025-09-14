@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
@@ -23,27 +23,27 @@ export async function GET(
     });
 
     if (!benefit) {
-      return NextResponse.json({ message: "benefitNotFound" }, { status: 404 });
+      return NextResponse.json({ message: 'benefitNotFound' }, { status: 404 });
     }
 
     return NextResponse.json(benefit);
   } catch (error) {
-    console.error("Error fetching benefit:", error);
+    console.error('Error fetching benefit:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -69,22 +69,22 @@ export async function PATCH(
 
     return NextResponse.json(updatedBenefit);
   } catch (error) {
-    console.error("Error updating benefit:", error);
+    console.error('Error updating benefit:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ message: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
@@ -99,12 +99,12 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ message: "benefitDeletedSuccessfully" });
+    return NextResponse.json({ message: 'benefitDeletedSuccessfully' });
   } catch (error) {
-    console.error("Error deleting benefit:", error);
+    console.error('Error deleting benefit:', error);
     return NextResponse.json(
-      { message: "internalServerError" },
-      { status: 500 },
+      { message: 'internalServerError' },
+      { status: 500 }
     );
   }
 }

@@ -1,7 +1,7 @@
-import { GET } from "@/app/api/brands/route";
+import { GET } from '@/app/api/brands/route';
 
 // Mock Prisma
-jest.mock("@/lib/prisma", () => ({
+jest.mock('@/lib/prisma', () => ({
   prisma: {
     brand: {
       findMany: jest.fn(),
@@ -9,61 +9,61 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
-describe("/api/brands", () => {
-  const { prisma } = require("@/lib/prisma");
+describe('/api/brands', () => {
+  const { prisma } = require('@/lib/prisma');
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should return transformed brands with partnerships", async () => {
+  it('should return transformed brands with partnerships', async () => {
     const mockBrands = [
       {
-        id: "brand1",
-        name: "Brand A",
+        id: 'brand1',
+        name: 'Brand A',
         isActive: true,
-        logoUrl: "https://example.com/logo1.png",
-        category: "food",
-        description: "Test brand A",
-        website: "https://branda.com",
+        logoUrl: 'https://example.com/logo1.png',
+        category: 'food',
+        description: 'Test brand A',
+        website: 'https://branda.com',
         actionUrl: null,
         actionType: null,
         actionLabel: null,
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2023-01-01"),
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-01'),
         partnershipsFrom: [
           {
             brandB: {
-              id: "brand2",
-              name: "Brand B",
+              id: 'brand2',
+              name: 'Brand B',
               isActive: true,
-              logoUrl: "https://example.com/logo2.png",
-              category: "shopping",
-              description: "Test brand B",
-              website: "https://brandb.com",
+              logoUrl: 'https://example.com/logo2.png',
+              category: 'shopping',
+              description: 'Test brand B',
+              website: 'https://brandb.com',
               actionUrl: null,
               actionType: null,
               actionLabel: null,
-              createdAt: new Date("2023-01-02"),
-              updatedAt: new Date("2023-01-02"),
+              createdAt: new Date('2023-01-02'),
+              updatedAt: new Date('2023-01-02'),
             },
           },
         ],
         partnershipsTo: [
           {
             brandA: {
-              id: "brand3",
-              name: "Brand C",
+              id: 'brand3',
+              name: 'Brand C',
               isActive: true,
-              logoUrl: "https://example.com/logo3.png",
-              category: "entertainment",
-              description: "Test brand C",
-              website: "https://brandc.com",
+              logoUrl: 'https://example.com/logo3.png',
+              category: 'entertainment',
+              description: 'Test brand C',
+              website: 'https://brandc.com',
               actionUrl: null,
               actionType: null,
               actionLabel: null,
-              createdAt: new Date("2023-01-03"),
-              updatedAt: new Date("2023-01-03"),
+              createdAt: new Date('2023-01-03'),
+              updatedAt: new Date('2023-01-03'),
             },
           },
         ],
@@ -80,16 +80,16 @@ describe("/api/brands", () => {
     expect(data).toHaveLength(1);
 
     const transformedBrand = data[0];
-    expect(transformedBrand.id).toBe("brand1");
-    expect(transformedBrand.name).toBe("Brand A");
+    expect(transformedBrand.id).toBe('brand1');
+    expect(transformedBrand.name).toBe('Brand A');
     expect(transformedBrand.partnerBrands).toHaveLength(2);
     expect(transformedBrand.childBrands).toHaveLength(2); // Backward compatibility
     expect(transformedBrand.parentBrand).toBeNull(); // Backward compatibility
 
     // Check partner brands include both from partnershipsFrom and partnershipsTo
     const partnerIds = transformedBrand.partnerBrands.map((p: any) => p.id);
-    expect(partnerIds).toContain("brand2");
-    expect(partnerIds).toContain("brand3");
+    expect(partnerIds).toContain('brand2');
+    expect(partnerIds).toContain('brand3');
 
     expect(prisma.brand.findMany).toHaveBeenCalledWith({
       where: {
@@ -108,41 +108,41 @@ describe("/api/brands", () => {
         },
       },
       orderBy: {
-        name: "asc",
+        name: 'asc',
       },
     });
   });
 
-  it("should filter out inactive partner brands", async () => {
+  it('should filter out inactive partner brands', async () => {
     const mockBrands = [
       {
-        id: "brand1",
-        name: "Brand A",
+        id: 'brand1',
+        name: 'Brand A',
         isActive: true,
-        logoUrl: "https://example.com/logo1.png",
-        category: "food",
-        description: "Test brand A",
-        website: "https://branda.com",
+        logoUrl: 'https://example.com/logo1.png',
+        category: 'food',
+        description: 'Test brand A',
+        website: 'https://branda.com',
         actionUrl: null,
         actionType: null,
         actionLabel: null,
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2023-01-01"),
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-01'),
         partnershipsFrom: [
           {
             brandB: {
-              id: "brand2",
-              name: "Inactive Brand",
+              id: 'brand2',
+              name: 'Inactive Brand',
               isActive: false, // Inactive brand
-              logoUrl: "https://example.com/logo2.png",
-              category: "shopping",
-              description: "Inactive brand",
-              website: "https://inactive.com",
+              logoUrl: 'https://example.com/logo2.png',
+              category: 'shopping',
+              description: 'Inactive brand',
+              website: 'https://inactive.com',
               actionUrl: null,
               actionType: null,
               actionLabel: null,
-              createdAt: new Date("2023-01-02"),
-              updatedAt: new Date("2023-01-02"),
+              createdAt: new Date('2023-01-02'),
+              updatedAt: new Date('2023-01-02'),
             },
           },
         ],
@@ -160,21 +160,21 @@ describe("/api/brands", () => {
     expect(transformedBrand.partnerBrands).toHaveLength(0); // Inactive brand filtered out
   });
 
-  it("should handle brands with no partnerships", async () => {
+  it('should handle brands with no partnerships', async () => {
     const mockBrands = [
       {
-        id: "brand1",
-        name: "Standalone Brand",
+        id: 'brand1',
+        name: 'Standalone Brand',
         isActive: true,
-        logoUrl: "https://example.com/logo1.png",
-        category: "food",
-        description: "Standalone brand",
-        website: "https://standalone.com",
+        logoUrl: 'https://example.com/logo1.png',
+        category: 'food',
+        description: 'Standalone brand',
+        website: 'https://standalone.com',
         actionUrl: null,
         actionType: null,
         actionLabel: null,
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2023-01-01"),
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-01'),
         partnershipsFrom: [],
         partnershipsTo: [],
       },
@@ -191,7 +191,7 @@ describe("/api/brands", () => {
     expect(transformedBrand.childBrands).toHaveLength(0);
   });
 
-  it("should return empty array when no brands found", async () => {
+  it('should return empty array when no brands found', async () => {
     prisma.brand.findMany.mockResolvedValue([]);
 
     const response = await GET();
@@ -202,13 +202,13 @@ describe("/api/brands", () => {
     expect(data).toHaveLength(0);
   });
 
-  it("should return error response when database query fails", async () => {
-    const mockError = new Error("Database connection failed");
+  it('should return error response when database query fails', async () => {
+    const mockError = new Error('Database connection failed');
     prisma.brand.findMany.mockRejectedValue(mockError);
 
     // Spy on console.error to verify error logging
     const consoleSpy = jest
-      .spyOn(console, "error")
+      .spyOn(console, 'error')
       .mockImplementation(() => {});
 
     const response = await GET();
@@ -216,32 +216,32 @@ describe("/api/brands", () => {
 
     expect(response.status).toBe(500);
     expect(data).toEqual({
-      message: "internalServerError",
+      message: 'internalServerError',
     });
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Error fetching brands:",
-      mockError,
+      'Error fetching brands:',
+      mockError
     );
 
     consoleSpy.mockRestore();
   });
 
-  it("should handle null brandB or brandA in partnerships", async () => {
+  it('should handle null brandB or brandA in partnerships', async () => {
     const mockBrands = [
       {
-        id: "brand1",
-        name: "Brand A",
+        id: 'brand1',
+        name: 'Brand A',
         isActive: true,
-        logoUrl: "https://example.com/logo1.png",
-        category: "food",
-        description: "Test brand A",
-        website: "https://branda.com",
+        logoUrl: 'https://example.com/logo1.png',
+        category: 'food',
+        description: 'Test brand A',
+        website: 'https://branda.com',
         actionUrl: null,
         actionType: null,
         actionLabel: null,
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2023-01-01"),
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-01'),
         partnershipsFrom: [
           {
             brandB: null, // Null brandB

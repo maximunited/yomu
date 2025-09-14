@@ -1,5 +1,5 @@
-import { Page, expect } from "@playwright/test";
-import { testUsers, urls } from "../fixtures/test-data";
+import { Page, expect } from '@playwright/test';
+import { testUsers, urls } from '../fixtures/test-data';
 
 export class AuthHelper {
   constructor(private page: Page) {}
@@ -9,12 +9,12 @@ export class AuthHelper {
    */
   async signIn(
     email = testUsers.validUser.email,
-    password = testUsers.validUser.password,
+    password = testUsers.validUser.password
   ) {
     await this.page.goto(urls.signin);
 
     // Wait for sign in form to load
-    await expect(this.page.locator("form")).toBeVisible();
+    await expect(this.page.locator('form')).toBeVisible();
 
     // Fill in credentials
     await this.page.fill('input[type="email"]', email);
@@ -37,7 +37,7 @@ export class AuthHelper {
     await this.page.goto(urls.signup);
 
     // Wait for sign up form to load
-    await expect(this.page.locator("form")).toBeVisible();
+    await expect(this.page.locator('form')).toBeVisible();
 
     // Fill in registration details
     await this.page.fill('input[name="name"]', userData.name);
@@ -59,7 +59,7 @@ export class AuthHelper {
   async signOut() {
     // Look for sign out button/link
     const signOutButton = this.page.locator(
-      'button:has-text("התנתק"), button:has-text("Sign Out"), a:has-text("התנתק"), a:has-text("Sign Out")',
+      'button:has-text("התנתק"), button:has-text("Sign Out"), a:has-text("התנתק"), a:has-text("Sign Out")'
     );
 
     if (await signOutButton.isVisible()) {
@@ -77,7 +77,7 @@ export class AuthHelper {
     try {
       // Try to go to dashboard - if not authenticated, should redirect
       await this.page.goto(urls.dashboard);
-      return this.page.url().includes("/dashboard");
+      return this.page.url().includes('/dashboard');
     } catch {
       return false;
     }
