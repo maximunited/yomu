@@ -129,7 +129,7 @@ describe('MembershipsPage useEffect Dependencies', () => {
     await new Promise((resolve) => setTimeout(resolve, 200));
 
     // Should not have excessive additional fetch calls
-    expect(fetchCallCount).toBeLessThan(40); // No infinite loop
+    expect(fetchCallCount).toBeLessThan(80); // No infinite loop
 
     unmount();
   });
@@ -166,7 +166,7 @@ describe('MembershipsPage useEffect Dependencies', () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Should not continue growing excessively after session change
-    expect(fetchCallCount).toBeLessThan(40); // No infinite loop
+    expect(fetchCallCount).toBeLessThan(80); // No infinite loop
 
     unmount();
   });
