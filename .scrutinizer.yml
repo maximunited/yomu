@@ -2,9 +2,26 @@ build:
   environment:
     node:
       version: 24
+    variables:
+      NODE_ENV: test
+      DATABASE_URL: "file:./test.db"
+      NEXTAUTH_URL: "http://localhost:3000"
+      NEXTAUTH_SECRET: "test-secret-key"
+      GOOGLE_CLIENT_ID: "test-client-id"
+      GOOGLE_CLIENT_SECRET: "test-client-secret"
   dependencies:
     override:
       - npm ci
+      - npx prisma generate
+  tests:
+    override:
+      - npm test
+  nodes:
+    analysis:
+      tests:
+        override:
+          - npm run lint
+          - npm run format:check
 
 filter:
   excluded_paths:
