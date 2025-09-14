@@ -315,3 +315,4 @@ describe('Settings Page Form Handling', () => {
     expect(typeof navigator.clipboard.writeText).toBe('function');
   });
 });
+// Test pre-commit after fixes
