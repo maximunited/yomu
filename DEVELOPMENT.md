@@ -53,7 +53,7 @@ This project uses automated pre-commit hooks that enforce code quality. Understa
 
 ### Test Organization
 
-```
+```text
 tests/
 ├── unit/               # Unit tests (Jest)
 │   ├── components/     # UI component tests
