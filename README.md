@@ -539,3 +539,4 @@ If you find this project helpful, you can support the work here:
 ---
 
 **YomU** - Never miss a birthday deal again! 🎉
+# Pre-commit hooks added

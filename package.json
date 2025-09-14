@@ -26,6 +26,8 @@
     "test:e2e:dashboard": "playwright test tests/e2e/dashboard.spec.ts",
     "test:e2e:dark-mode": "playwright test tests/e2e/dark-mode.spec.ts",
     "test:e2e:report": "playwright show-report",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test:dark-mode": "jest --testPathPatterns=\".*DarkMode.*\"",
     "test:color-contrast": "jest --testPathPatterns=\".*color-contrast.*\"",
     "test:partnerships": "node tests/integration/final-multi-brand-test.js",
@@ -79,8 +81,10 @@
     "husky": "^9.1.7",
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
+    "lint-staged": "^16.1.6",
     "msw": "^2.10.4",
     "playwright": "^1.54.2",
+    "prettier": "^3.6.2",
     "prisma": "^6.13.0",
     "tailwindcss": "^4",
     "typescript": "^5"
@@ -94,5 +98,15 @@
     "shelljs": "^0.8.5",
     "tmp": "^0.2.4",
     "external-editor": "^3.1.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "npm run test -- --bail --findRelatedTests"
+    ],
+    "*.{json,md,css,scss}": [
+      "prettier --write"
+    ]
   }
 }
