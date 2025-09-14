@@ -1,18 +1,18 @@
-import React from "react";
-import { render, screen, waitFor, act } from "../../utils/test-helpers";
-import userEvent from "@testing-library/user-event";
-import SettingsPage from "@/app/settings/page";
+import React from 'react';
+import { render, screen, waitFor, act } from '../../utils/test-helpers';
+import userEvent from '@testing-library/user-event';
+import SettingsPage from '@/app/settings/page';
 
 // Mock next-auth
 const mockUseSession = jest.fn();
-jest.mock("next-auth/react", () => ({
+jest.mock('next-auth/react', () => ({
   useSession: () => mockUseSession(),
   signOut: jest.fn(),
 }));
 
 // Mock next/navigation
 const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
@@ -32,9 +32,9 @@ const mockLocalStorage = (() => {
     }),
   };
 })();
-Object.defineProperty(window, "localStorage", { value: mockLocalStorage });
+Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
 
-describe("Settings Page Form Handling", () => {
+describe('Settings Page Form Handling', () => {
   let mockWriteText: jest.Mock;
 
   beforeEach(() => {
@@ -44,12 +44,12 @@ describe("Settings Page Form Handling", () => {
     mockUseSession.mockReturnValue({
       data: {
         user: {
-          id: "user-1",
-          name: "Test User",
-          email: "test@example.com",
+          id: 'user-1',
+          name: 'Test User',
+          email: 'test@example.com',
         },
       },
-      status: "authenticated",
+      status: 'authenticated',
     });
 
     // Mock successful profile API response
@@ -57,9 +57,9 @@ describe("Settings Page Form Handling", () => {
       ok: true,
       json: async () => ({
         user: {
-          name: "Test User",
-          email: "test@example.com",
-          dateOfBirth: "1990-01-01",
+          name: 'Test User',
+          email: 'test@example.com',
+          dateOfBirth: '1990-01-01',
           anniversaryDate: null,
           profilePicture: null,
         },
@@ -73,26 +73,26 @@ describe("Settings Page Form Handling", () => {
       writable: true,
       configurable: true,
     });
-    
+
     // Ensure the mock is properly set
     (navigator as any).clipboard = { writeText: mockWriteText };
   });
 
-  it("should load and display user profile data", async () => {
+  it('should load and display user profile data', async () => {
     await act(async () => {
       render(<SettingsPage />);
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
-      expect(screen.getByDisplayValue("test@example.com")).toBeInTheDocument();
-      expect(screen.getByDisplayValue("1990-01-01")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('test@example.com')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('1990-01-01')).toBeInTheDocument();
     });
 
-    expect(global.fetch).toHaveBeenCalledWith("/api/user/profile");
+    expect(global.fetch).toHaveBeenCalledWith('/api/user/profile');
   });
 
-  it("should enable edit mode when edit button is clicked", async () => {
+  it('should enable edit mode when edit button is clicked', async () => {
     const user = userEvent.setup();
 
     await act(async () => {
@@ -100,7 +100,7 @@ describe("Settings Page Form Handling", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
     });
 
     // Find and click edit button
@@ -108,11 +108,11 @@ describe("Settings Page Form Handling", () => {
     await user.click(editButton);
 
     // Form fields should now be editable
-    const nameInput = screen.getByDisplayValue("Test User");
+    const nameInput = screen.getByDisplayValue('Test User');
     expect(nameInput).not.toBeDisabled();
   });
 
-  it("should save profile changes when save button is clicked", async () => {
+  it('should save profile changes when save button is clicked', async () => {
     const user = userEvent.setup();
 
     // Mock successful save response
@@ -126,7 +126,7 @@ describe("Settings Page Form Handling", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
     });
 
     // Enable edit mode
@@ -134,9 +134,9 @@ describe("Settings Page Form Handling", () => {
     await user.click(editButton);
 
     // Change the name
-    const nameInput = screen.getByDisplayValue("Test User");
+    const nameInput = screen.getByDisplayValue('Test User');
     await user.clear(nameInput);
-    await user.type(nameInput, "Updated Name");
+    await user.type(nameInput, 'Updated Name');
 
     // Save changes
     const saveButton = screen.getByText(/save changes|שמור שינויים/i);
@@ -144,17 +144,17 @@ describe("Settings Page Form Handling", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/user/profile",
+        '/api/user/profile',
         expect.objectContaining({
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: expect.stringContaining("Updated Name"),
-        }),
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: expect.stringContaining('Updated Name'),
+        })
       );
     });
   });
 
-  it("should handle profile save errors", async () => {
+  it('should handle profile save errors', async () => {
     const user = userEvent.setup();
 
     // Mock failed save response
@@ -162,7 +162,7 @@ describe("Settings Page Form Handling", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          user: { name: "Test User", email: "test@example.com" },
+          user: { name: 'Test User', email: 'test@example.com' },
         }),
       })
       .mockResolvedValueOnce({
@@ -175,7 +175,7 @@ describe("Settings Page Form Handling", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
     });
 
     // Enable edit mode and try to save
@@ -188,13 +188,13 @@ describe("Settings Page Form Handling", () => {
     // Should handle error gracefully
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/user/profile",
-        expect.any(Object),
+        '/api/user/profile',
+        expect.any(Object)
       );
     });
   });
 
-  it("should toggle dark mode and save preference", async () => {
+  it('should toggle dark mode and save preference', async () => {
     const user = userEvent.setup();
 
     await act(async () => {
@@ -202,17 +202,17 @@ describe("Settings Page Form Handling", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
     });
 
     // Find and click dark mode toggle
     const darkModeToggle = screen.getAllByText(/dark mode|מצב כהה/i)[1]; // Get the button, not the heading
     await user.click(darkModeToggle);
 
-    expect(mockLocalStorage.setItem).toHaveBeenCalledWith("darkMode", "true");
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('darkMode', 'true');
   });
 
-  it("should handle notification settings changes", async () => {
+  it('should handle notification settings changes', async () => {
     const user = userEvent.setup();
 
     await act(async () => {
@@ -220,20 +220,18 @@ describe("Settings Page Form Handling", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
     });
 
     // Find notification toggles
-    const emailToggle = screen.getByText(
-      /email notifications|התראות אימייל/i,
-    );
+    const emailToggle = screen.getByText(/email notifications|התראות אימייל/i);
     await user.click(emailToggle);
 
     // Should update notification state
     expect(emailToggle).toBeInTheDocument();
   });
 
-  it("should validate required fields", async () => {
+  it('should validate required fields', async () => {
     const user = userEvent.setup();
 
     await act(async () => {
@@ -241,7 +239,7 @@ describe("Settings Page Form Handling", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
     });
 
     // Enable edit mode
@@ -249,7 +247,7 @@ describe("Settings Page Form Handling", () => {
     await user.click(editButton);
 
     // Clear required field
-    const nameInput = screen.getByDisplayValue("Test User");
+    const nameInput = screen.getByDisplayValue('Test User');
     await user.clear(nameInput);
 
     // Try to save
@@ -258,12 +256,12 @@ describe("Settings Page Form Handling", () => {
 
     // Should prevent save with empty required field
     expect(global.fetch).not.toHaveBeenCalledWith(
-      "/api/user/profile",
-      expect.any(Object),
+      '/api/user/profile',
+      expect.any(Object)
     );
   });
 
-  it("should handle anniversary date input", async () => {
+  it('should handle anniversary date input', async () => {
     const user = userEvent.setup();
 
     await act(async () => {
@@ -271,7 +269,7 @@ describe("Settings Page Form Handling", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
     });
 
     // Enable edit mode
@@ -279,13 +277,13 @@ describe("Settings Page Form Handling", () => {
     await user.click(editButton);
 
     // Find anniversary date input and set a value
-    const anniversaryInput = screen.getAllByDisplayValue("")[1]; // Get the date input, not the file input
-    await user.type(anniversaryInput, "2020-06-15");
+    const anniversaryInput = screen.getAllByDisplayValue('')[1]; // Get the date input, not the file input
+    await user.type(anniversaryInput, '2020-06-15');
 
-    expect(anniversaryInput).toHaveValue("2020-06-15");
+    expect(anniversaryInput).toHaveValue('2020-06-15');
   });
 
-  it("should handle API key generation and copying", async () => {
+  it('should handle API key generation and copying', async () => {
     const user = userEvent.setup();
 
     await act(async () => {
@@ -293,22 +291,22 @@ describe("Settings Page Form Handling", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
     });
 
     // Find API key section and copy button
     const copyButton = screen.getByText(/copy|העתק/i);
-    
+
     // Reset the mock to ensure clean state
     mockWriteText.mockClear();
-    
+
     // Mock the clipboard API to resolve successfully
     mockWriteText.mockResolvedValue(undefined);
-    
+
     await user.click(copyButton);
 
     // Wait a bit for the async operation to complete
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     // The clipboard API might fail in test environment, but we should still verify it was called
     // Since the mock setup is complex, let's just verify the button is clickable and the function exists
@@ -317,3 +315,4 @@ describe("Settings Page Form Handling", () => {
     expect(typeof navigator.clipboard.writeText).toBe('function');
   });
 });
+// Test comment for pre-commit
