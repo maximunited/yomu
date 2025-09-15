@@ -1,7 +1,7 @@
 build:
   environment:
     node:
-      version: 23.11.0
+      version: latest
     variables:
       NODE_ENV: test
       DATABASE_URL: 'file:./test.db'
