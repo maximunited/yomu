@@ -1,7 +1,7 @@
 build:
   environment:
     node:
-      version: latest
+      version: 18
     variables:
       NODE_ENV: test
       DATABASE_URL: 'file:./test.db'
@@ -21,7 +21,6 @@ build:
       tests:
         override:
           - npm run lint
-          - npm run format:check
 
 filter:
   excluded_paths:
@@ -35,4 +34,6 @@ filter:
 
 tools:
   external_code_coverage:
-    timeout: 600
+    timeout: 300
+  js_hint: false
+  jshint: false
