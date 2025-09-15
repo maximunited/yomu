@@ -23,7 +23,8 @@
       "Bash(npm run assets:brands:*)",
       "Bash(find:*)",
       "Bash(curl:*)",
-      "WebFetch(domain:www.facebook.com)"
+      "WebFetch(domain:www.facebook.com)",
+      "WebFetch(domain:scrutinizer-ci.com)"
     ],
     "deny": []
   }
