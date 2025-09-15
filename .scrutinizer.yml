@@ -1,7 +1,7 @@
 build:
   environment:
-    node:
-      version: 18
+#    node:
+#      version: 18
     variables:
       NODE_ENV: test
       DATABASE_URL: 'file:./test.db'
