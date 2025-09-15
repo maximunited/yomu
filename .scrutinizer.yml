@@ -36,4 +36,3 @@ tools:
   external_code_coverage:
     timeout: 300
   js_hint: false
-  jshint: false
