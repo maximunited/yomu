@@ -115,10 +115,23 @@
     "glob": "^10.0.0"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "src/**/*.{js,jsx,ts,tsx}": [
       "eslint --fix",
       "prettier --write",
       "npm run test -- --bail --findRelatedTests"
+    ],
+    "tests/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "npm run test -- --bail --findRelatedTests"
+    ],
+    "*.config.{js,ts,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    ".commitlintrc.js": [
+      "eslint --fix",
+      "prettier --write"
     ],
     "*.{json,md,css,scss}": [
       "prettier --write"

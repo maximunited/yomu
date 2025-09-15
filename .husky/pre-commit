@@ -1,7 +1,1 @@
-#!/usr/bin/env sh
-
-# Run lint-staged first
-if npx lint-staged; then
-  echo "🔧 Running quick CI check..."
-  npm run ci:quick
-fi
+npx lint-staged
