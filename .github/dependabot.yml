@@ -8,8 +8,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "friday"
+      time: "12:30"
       timezone: "Asia/Jerusalem"
     # Group dependency updates to reduce PR noise
     groups:
@@ -84,8 +84,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "friday"
+      time: "12:30"
       timezone: "Asia/Jerusalem"
     labels:
       - "github-actions"
