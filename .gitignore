@@ -76,3 +76,7 @@ prisma/dev.db
 prisma/dev.db-journal
 prisma/*.sqlite
 prisma/*.sqlite-journal
+
+# security audit reports
+audit-report.json
+vulnerability-report.json
