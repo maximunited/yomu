@@ -7,7 +7,10 @@ console.log('🔧 Fixing remaining non-breaking vulnerabilities...\n');
 try {
   // Try to fix brace-expansion specifically
   console.log('Updating brace-expansion...');
-  execSync('npm update brace-expansion', { encoding: 'utf-8', stdio: 'inherit' });
+  execSync('npm update brace-expansion', {
+    encoding: 'utf-8',
+    stdio: 'inherit',
+  });
 
   console.log('\n✅ Updates applied!\n');
   console.log('Checking remaining vulnerabilities...\n');

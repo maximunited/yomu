@@ -11,11 +11,12 @@ packages.forEach((pkg) => {
     const output = execSync(`npm view ${pkg} version`, {
       encoding: 'utf-8',
     }).trim();
-    const current = execSync(`npm list ${pkg} --depth=0 2>&1 | grep ${pkg}`, {
-      encoding: 'utf-8',
-    })
-      .trim()
-      .match(/@([\d.]+)/)?.[1] || 'not found';
+    const current =
+      execSync(`npm list ${pkg} --depth=0 2>&1 | grep ${pkg}`, {
+        encoding: 'utf-8',
+      })
+        .trim()
+        .match(/@([\d.]+)/)?.[1] || 'not found';
 
     console.log(`${pkg}:`);
     console.log(`  Current: ${current}`);

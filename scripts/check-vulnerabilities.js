@@ -29,9 +29,7 @@ try {
 
     const vulnerabilities = Object.entries(audit.vulnerabilities || {});
     vulnerabilities.forEach(([name, data]) => {
-      console.log(
-        `\n📦 ${name} (${data.severity.toUpperCase()})`
-      );
+      console.log(`\n📦 ${name} (${data.severity.toUpperCase()})`);
       console.log(`   Range: ${data.range}`);
       if (data.via && Array.isArray(data.via)) {
         data.via.forEach((v) => {
@@ -42,7 +40,9 @@ try {
         });
       }
       if (data.fixAvailable) {
-        console.log(`   ✅ Fix available: ${data.fixAvailable.name}@${data.fixAvailable.version}`);
+        console.log(
+          `   ✅ Fix available: ${data.fixAvailable.name}@${data.fixAvailable.version}`
+        );
       } else {
         console.log(`   ❌ No fix available yet`);
       }
