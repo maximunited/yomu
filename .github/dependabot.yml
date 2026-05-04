@@ -1,0 +1,97 @@
+# Dependabot configuration for YomU project
+# Docs: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Enable version updates for npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jerusalem"
+    # Group dependency updates to reduce PR noise
+    groups:
+      # Group all Next.js related packages together
+      nextjs:
+        patterns:
+          - "next"
+          - "eslint-config-next"
+      # Group React packages together
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react*"
+      # Group testing libraries together
+      testing:
+        patterns:
+          - "jest"
+          - "@jest/*"
+          - "@testing-library/*"
+          - "@types/jest"
+          - "jest-environment-jsdom"
+          - "playwright"
+          - "@playwright/test"
+      # Group Prisma packages together
+      prisma:
+        patterns:
+          - "prisma"
+          - "@prisma/*"
+      # Group ESLint and Prettier
+      linting:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
+          - "prettier"
+      # Group Tailwind CSS packages
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+      # Group all minor and patch updates for devDependencies
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Limit number of open PRs
+    open-pull-requests-limit: 10
+    # Add labels to PRs
+    labels:
+      - "dependencies"
+      - "automated"
+    # Commit message prefix
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    # Review settings
+    reviewers:
+      - "Maxim-Alter"
+    # Ignore specific dependencies (if needed)
+    ignore:
+      # Ignore major version updates for stable packages
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jerusalem"
+    labels:
+      - "github-actions"
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore(ci)"
+    reviewers:
+      - "Maxim-Alter"
