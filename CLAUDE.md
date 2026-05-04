@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+**YomU** (יום-You) is a mobile-first birthday benefits platform that aggregates personal birthday deals and freebies for users in Israel. The application helps users track membership-based birthday benefits from Israeli brands.
+
 ## Development Commands
 
 ### Build and Development
@@ -10,10 +14,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` - Create production build
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting without modifying files
 - `npm run test` - Run Jest unit tests from tests/unit/ directory
 - `npm run test:watch` - Run Jest in watch mode
 - `npm run test:coverage` - Run tests with coverage report
+- `npm test -- path/to/test.test.tsx` - Run a specific test file
 - `npm run test:e2e` - Run Playwright end-to-end tests from tests/e2e/ directory
+- `npm run test:e2e:headed` - Run E2E tests with visible browser
+- `npm run test:e2e:debug` - Run E2E tests in debug mode (step-by-step)
+- `npm run test:e2e:mobile` - Run E2E tests on mobile viewports only
+- `npm run test:e2e:accessibility` - Run accessibility-specific E2E tests
+- `npm run test:e2e:auth` - Run authentication E2E tests only
+- `npm run test:e2e:dashboard` - Run dashboard E2E tests only
+- `npm run test:e2e:dark-mode` - Run dark mode E2E tests only
+- `npm run test:e2e:report` - View Playwright test report
 
 ### Integration Testing
 
@@ -28,7 +43,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npx prisma generate` - Generate Prisma client
 - `npx prisma db push` - Push schema changes to database
 - `npx prisma migrate deploy` - Run database migrations
-- `npx prisma studio` - Open Prisma Studio GUI
+- `npx prisma studio` - Open Prisma Studio GUI (visual database browser)
+- `npm run db:studio` - Alias for Prisma Studio
 - `npm run db:seed` - Seed database (alias for `node scripts/seed.js`)
 - `node scripts/seed.js --mode=fresh` - Wipe and reseed database completely
 - `node scripts/seed.js --mode=upsert` - Safe update without wiping data
@@ -36,6 +52,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Admin Tools
 
+**Admin Dashboard UI:**
+- Access at `/admin` route (e.g., `http://localhost:3000/admin`)
+- Provides web interface for brand and benefit management
+- **Requires authentication**: Redirects to `/auth/signin` if not logged in
+- ⚠️ **Production**: Consider adding role-based access control (currently any authenticated user can access admin)
+
+**Command-Line Admin Tools:**
 - `npm run admin:help` - Show admin helper script usage
 - `node scripts/admin-helper.js list-brands` - List all brands
 - `node scripts/admin-helper.js export-brands` - Export brands to JSON
@@ -50,9 +73,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `./scripts/docker-setup.sh start-dev` - Start development containers
 - `./scripts/docker-setup.sh init-db` - Initialize database in containers
 
+### Git and Commit Tools
+
+- `npm run commit` - Interactive commit with Commitizen (conventional commits)
+- `npm run lint:commits` - Validate commit messages (last 20 commits)
+
+### CI/Testing Locally
+
+- `npm run ci:test` - Run full CI test suite (lint, build, unit tests, translations)
+- `npm run ci:quick` - Quick CI check
+- `npm run ci:full` - Full local CI simulation
+- `npm run ci:docker` - Test Docker setup
+- `npm run ci:audit` - Run security audit
+- `npm run ci:format:check` - Check code formatting for CI
+
 ## Project Structure
 
-This project follows modern industry standards for file organization:
+This project follows modern industry standards for file organization. The project directory name is "yomu":
 
 ```text
 yomu/
@@ -85,10 +122,21 @@ yomu/
 
 ### Test Organization
 
-- **Unit Tests**: `tests/unit/` - Fast, isolated tests for individual components and functions
-- **Integration Tests**: `tests/integration/` - Tests that verify components working together
-- **E2E Tests**: `tests/e2e/` - Full application workflow tests
-- **Test Utils**: `tests/utils/` - Shared test helpers and utilities
+**Directory Structure:**
+```
+tests/
+├── unit/          # Jest unit tests (71 suites, 255 tests)
+├── integration/   # Integration tests (Node.js scripts, not Jest)
+├── e2e/           # Playwright end-to-end tests
+├── api/           # API integration tests (standalone scripts)
+└── utils/         # Shared test helpers and utilities
+```
+
+- **Unit Tests**: `tests/unit/` - Fast, isolated tests for individual components and functions (run with `npm test`)
+- **Integration Tests**: `tests/integration/` - Node.js scripts that verify components working together (run with `npm run test:partnerships`, `npm run test:translations`, etc.)
+- **E2E Tests**: `tests/e2e/` - Full application workflow tests with Playwright (run with `npm run test:e2e`)
+- **API Tests**: `tests/api/` - Standalone API integration tests (run with `npm run test:api`)
+- **Test Utils**: `tests/utils/` - Shared test helpers and utilities (not tests themselves)
 
 ### Key Directories
 
@@ -104,6 +152,7 @@ yomu/
 
 - **Framework**: Next.js 15 with App Router and TypeScript
 - **Database**: SQLite (development) with Prisma ORM
+  - ⚠️ **Production Warning**: SQLite is for development only. For production, switch to PostgreSQL or MySQL by updating the Prisma schema and `DATABASE_URL` in `.env`
 - **Authentication**: NextAuth.js with Google OAuth and email/password
 - **Styling**: Tailwind CSS with dark mode support
 - **Testing**: Jest for unit tests, Playwright for E2E tests
@@ -181,26 +230,43 @@ When working with benefits, always use the validation functions from `src/lib/be
 - **Validation**: Ensures all benefits follow the specification in `docs/BENEFITS_SPECIFICATION.md`
 - **Partnership Support**: Automatically creates brand partnerships and co-branded benefits
 
+## Initial Setup
+
+### Environment Variables
+
+Create a `.env` file in the project root with the following required variables:
+
+```env
+# Database
+DATABASE_URL=file:./dev.db
+
+# NextAuth.js Configuration
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-key-here-change-in-production
+
+# Google OAuth (optional, for Google sign-in)
+GOOGLE_CLIENT_ID=your-google-client-id-here
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here
+```
+
+**Required for basic functionality:**
+- `DATABASE_URL`: SQLite database path (use `file:./dev.db` for local development)
+- `NEXTAUTH_URL`: The base URL of your application
+- `NEXTAUTH_SECRET`: Secret key for JWT encryption (generate with `openssl rand -base64 32`)
+
+**Optional:**
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: Only needed if enabling Google OAuth
+
+### First-Time Setup
+
+1. Install dependencies: `npm install`
+2. Create `.env` file with the required variables above
+3. Generate Prisma client: `npx prisma generate`
+4. Initialize database: `npx prisma db push`
+5. Seed the database: `npm run db:seed`
+6. Start dev server: `npm run dev`
+
 ## Development Workflow
-
-### CRITICAL: Whitespace Prevention Protocol
-
-**MANDATORY BEFORE ANY FILE EDIT:**
-
-1. **Inspect Read output carefully** - Remove ALL trailing spaces from copied text
-2. **Verify Edit parameters** - Both `old_string` and `new_string` must have NO trailing whitespace
-3. **Check line endings** - Ensure proper newline handling without trailing spaces
-4. **Double-check before submit** - Mentally verify no spaces after line content
-
-**Common failure patterns:**
-
-- Copying text from Read output that contains trailing spaces
-- Adding spaces after final characters when editing
-- Inconsistent tab/space mixing
-
-### Prevention Rule
-
-ALWAYS manually strip trailing whitespace from Edit tool parameters
 
 ### Code Quality and Pre-commit Guidelines
 
@@ -208,12 +274,21 @@ ALWAYS manually strip trailing whitespace from Edit tool parameters
 
 #### Pre-commit Hook Rules
 
+This project uses Husky + lint-staged to automatically enforce code quality on commit. When you commit, the following happens automatically:
+
 - **Trailing Whitespace**: All trailing whitespace is automatically removed
 - **End of File**: Files must end with a single newline
-- **Prettier Formatting**: Code is automatically formatted according to .prettierrc
-- **ESLint**: All linting issues must be resolved
+- **Prettier Formatting**: Code is automatically formatted according to .prettierrc (2 spaces, single quotes, semicolons)
+- **ESLint**: Linting issues are auto-fixed where possible; unfixable issues block the commit
 - **TypeScript**: Code must compile without errors
-- **Tests**: All tests must pass before commit
+- **Tests**: Related tests run automatically for changed files (`--findRelatedTests`)
+
+**What lint-staged does:**
+- Runs only on staged files (fast and efficient)
+- Applies ESLint fixes and Prettier formatting
+- Runs tests related to the changed files
+- Automatically adds formatting changes back to the commit
+- Blocks commit if tests fail or unfixable issues exist
 
 #### Before Making Changes
 
@@ -280,6 +355,28 @@ When modifying the Prisma schema:
 - Authentication middleware protects user-specific endpoints
 - Validation using Prisma and custom validation functions
 
+**IMPORTANT - Next.js 15 API Route Format:**
+Next.js 15 uses Promise-based params. Always use this pattern:
+
+```typescript
+// ✅ Correct - Next.js 15 format
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  // ... use id
+}
+
+// ❌ Wrong - Old Next.js format (will cause TypeScript errors)
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  // ... params.id
+}
+```
+
 ### UI Components (`src/components/ui/`)
 
 - Reusable components: Button, Input, DarkModeToggle, LanguageSwitcher
@@ -311,6 +408,32 @@ When modifying the Prisma schema:
 - **Translation Testing**: Use actual translation values, not hardcoded expectations
 - **Async Testing**: Use waitFor() for components with loading states
 - **Provider Identification**: Use 'id' field for NextAuth providers, not 'name'
+
+#### Running Specific Tests
+
+**Jest (Unit Tests):**
+```bash
+# Run a specific test file
+npm test -- tests/unit/lib/benefit-validation.test.ts
+
+# Run all tests matching a pattern
+npm test -- --testPathPattern="DarkMode"
+
+# Run tests in watch mode for specific file
+npm run test:watch -- tests/unit/components/ui/Button.test.tsx
+```
+
+**Playwright (E2E Tests):**
+```bash
+# Run a specific E2E test file
+npx playwright test tests/e2e/auth.spec.ts
+
+# Run a specific test by name
+npx playwright test -g "should login successfully"
+
+# Run tests for a specific project (browser)
+npx playwright test --project="chromium"
+```
 
 ### Docker Support
 
