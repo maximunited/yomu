@@ -41,6 +41,8 @@ const customJestConfig = {
     // Unit tests only for now (integration tests are shell scripts, not Jest)
     '<rootDir>/tests/unit/**/*.{js,jsx,ts,tsx}',
   ],
+  coveragePathIgnorePatterns: ['/node_modules/', '/.next/', '/coverage/'],
+  coverageProvider: 'v8', // Use V8 coverage provider to avoid babel-plugin-istanbul issues
   coverageThreshold: {
     global: {
       branches: 15,
