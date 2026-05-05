@@ -65,7 +65,7 @@
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "lucide-react": "^0.540.0",
+    "lucide-react": "^1.14.0",
     "next": "^16.2.4",
     "next-auth": "^4.24.11",
     "next-intl": "^4.3.8",
