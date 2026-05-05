@@ -89,7 +89,7 @@
     "@types/react-dom": "^19.1.9",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^9.35.0",
+    "eslint": "^10.3.0",
     "eslint-config-next": "^16.2.4",
     "husky": "^9.1.7",
     "jest": "^30.1.3",
@@ -116,21 +116,17 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
       "prettier --write",
       "npm run test -- --bail --findRelatedTests"
     ],
     "tests/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
       "prettier --write",
       "npm run test -- --bail --findRelatedTests"
     ],
     "*.config.{js,ts,mjs}": [
-      "eslint --fix",
       "prettier --write"
     ],
     ".commitlintrc.js": [
-      "eslint --fix",
       "prettier --write"
     ],
     "*.{json,md,css,scss}": [
