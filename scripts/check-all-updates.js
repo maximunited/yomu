@@ -33,9 +33,7 @@ try {
     const latestCol = (info.latest || 'N/A').padEnd(10);
     const type = info.type === 'devDependencies' ? 'dev' : 'prod';
 
-    console.log(
-      `${nameCol} ${currentCol} ${wantedCol} ${latestCol} ${type}`
-    );
+    console.log(`${nameCol} ${currentCol} ${wantedCol} ${latestCol} ${type}`);
   });
 
   console.log('\n💡 Update Commands:\n');
