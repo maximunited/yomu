@@ -30,6 +30,11 @@ repos:
       - id: mixed-line-ending
         name: Fix mixed line endings
         args: [--fix=lf]
+        exclude: |
+          (?x)^(
+              public/images/brands/.*\.(svg|jpg|jpeg|png|gif)$|
+              \.vscode/.*
+          )$
       - id: no-commit-to-branch
         name: Prevent commits to protected branches
         args: [--branch, master, --branch, main]
