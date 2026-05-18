@@ -28,7 +28,9 @@
       "Bash(npx husky:*)",
       "Bash(chmod:*)",
       "Bash(npm run *)",
-      "Bash(npm audit *)"
+      "Bash(npm audit *)",
+      "Bash(git restore *)",
+      "Bash(npm install *)"
     ],
     "deny": []
   }
