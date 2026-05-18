@@ -6,8 +6,43 @@ Thanks for your interest in contributing!
 
 - Fork the repo and create your feature branch: `git checkout -b feat/awesome`
 - Install deps: `npm install`
+- (Optional) Install pre-commit hooks: `pre-commit install` (requires Python)
 - Run tests: `npm test`
 - Run app: `npm run dev`
+
+### Pre-commit Hooks (Optional)
+
+This project supports [pre-commit](https://pre-commit.com/) for automated code quality checks before commits.
+
+**Installation:**
+
+```bash
+# Install pre-commit (requires Python 3.8+)
+pip install pre-commit
+
+# Install the git hook scripts
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
+**What it does:**
+- Formats code with Prettier
+- Lints with ESLint
+- Validates commit messages (Conventional Commits)
+- Checks for secrets, trailing whitespace, merge conflicts
+- Runs type checking and tests on pre-push
+
+**Manual run:**
+
+```bash
+# Run on all files
+pre-commit run --all-files
+
+# Run on staged files only
+pre-commit run
+```
+
+**Note:** The project already uses Husky + lint-staged for similar functionality. Pre-commit is optional but provides additional checks like secret detection.
 
 ## Commit Messages
 

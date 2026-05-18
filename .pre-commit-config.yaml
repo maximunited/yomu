@@ -1,0 +1,141 @@
+# Pre-commit hooks configuration
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+default_install_hook_types: [pre-commit, commit-msg]
+
+repos:
+  # General file cleanup and formatting
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+        exclude: '\.min\.(js|css)$'
+      - id: end-of-file-fixer
+        name: Fix end of files
+        exclude: '\.min\.(js|css)$'
+      - id: check-yaml
+        name: Check YAML syntax
+        args: [--safe]
+      - id: check-json
+        name: Check JSON syntax
+        exclude: ^(package-lock\.json|tsconfig\.tsbuildinfo)$
+      - id: check-added-large-files
+        name: Check for large files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+      - id: check-case-conflict
+        name: Check for case conflicts
+      - id: mixed-line-ending
+        name: Fix mixed line endings
+        args: [--fix=lf]
+      - id: no-commit-to-branch
+        name: Prevent commits to protected branches
+        args: [--branch, master, --branch, main]
+
+  # Prettier - Code formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        name: Format with Prettier
+        types_or: [javascript, jsx, ts, tsx, json, yaml, markdown, css, scss]
+        exclude: |
+          (?x)^(
+              \.next/.*|
+              node_modules/.*|
+              coverage/.*|
+              \.min\.(js|css)$|
+              package-lock\.json|
+              tsconfig\.tsbuildinfo
+          )$
+        additional_dependencies:
+          - prettier@3.6.2
+          - prettier-plugin-organize-imports
+
+  # ESLint - JavaScript/TypeScript linting
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.16.0
+    hooks:
+      - id: eslint
+        name: Lint with ESLint
+        types: [file]
+        files: \.(js|jsx|ts|tsx)$
+        exclude: |
+          (?x)^(
+              \.next/.*|
+              node_modules/.*|
+              coverage/.*|
+              dist/.*|
+              build/.*|
+              \.min\.js$
+          )$
+        args: [--fix, --max-warnings=0]
+        additional_dependencies:
+          - eslint@9.39.4
+          - typescript-eslint@8.59.4
+          - eslint-plugin-react@7.37.5
+          - eslint-plugin-react-hooks@7.1.1
+          - '@next/eslint-plugin-next@16.2.6'
+          - globals@17.6.0
+
+  # Commitlint - Conventional commit messages
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.18.0
+    hooks:
+      - id: commitlint
+        name: Lint commit message
+        stages: [commit-msg]
+        additional_dependencies:
+          - '@commitlint/cli@20.5.3'
+          - '@commitlint/config-conventional@20.5.3'
+
+  # Security - Secret detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: |
+          (?x)^(
+              \.git/.*|
+              \.next/.*|
+              node_modules/.*|
+              package-lock\.json
+          )$
+
+  # TypeScript - Type checking
+  - repo: local
+    hooks:
+      - id: typescript-check
+        name: TypeScript type check
+        entry: npx tsc --noEmit
+        language: system
+        types: [ts, tsx]
+        pass_filenames: false
+        stages: [pre-push]
+
+  # Tests - Run related tests
+  - repo: local
+    hooks:
+      - id: jest-related
+        name: Run related Jest tests
+        entry: npm test -- --bail --findRelatedTests --passWithNoTests
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        exclude: ^tests/
+        stages: [pre-push]
+        pass_filenames: true
+
+# CI skip configuration
+ci:
+  autofix_commit_msg: 'chore: auto-fix pre-commit hooks'
+  autofix_prs: true
+  autoupdate_commit_msg: 'chore: update pre-commit hooks'
+  autoupdate_schedule: weekly
+  skip:
+    - typescript-check
+    - jest-related

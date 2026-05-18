@@ -8,3 +8,4 @@ coverage
 .env*
 .DS_Store
 *.md
+.secrets.baseline
