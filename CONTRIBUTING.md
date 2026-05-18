@@ -20,9 +20,10 @@ This project supports [pre-commit](https://pre-commit.com/) for automated code q
 # Install pre-commit (requires Python 3.8+)
 pip install pre-commit
 
-# Install the git hook scripts
+# Install the git hook scripts (pre-commit, commit-msg, and pre-push)
 pre-commit install
 pre-commit install --hook-type commit-msg
+pre-commit install --hook-type pre-push
 ```
 
 **What it does:**

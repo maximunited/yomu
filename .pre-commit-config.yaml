@@ -2,7 +2,7 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
-default_install_hook_types: [pre-commit, commit-msg]
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
 
 repos:
   # General file cleanup and formatting
@@ -53,7 +53,6 @@ repos:
           )$
         additional_dependencies:
           - prettier@3.6.2
-          - prettier-plugin-organize-imports
 
   # ESLint - JavaScript/TypeScript linting
   - repo: https://github.com/pre-commit/mirrors-eslint
@@ -75,6 +74,7 @@ repos:
         args: [--fix, --max-warnings=0]
         additional_dependencies:
           - eslint@9.39.4
+          - '@eslint/js@9.39.4'
           - typescript-eslint@8.59.4
           - eslint-plugin-react@7.37.5
           - eslint-plugin-react-hooks@7.1.1
