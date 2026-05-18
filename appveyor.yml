@@ -9,17 +9,12 @@ build_script:
 
 shallow_clone: true
 
-# Timeout after 10 minutes to prevent indefinite queuing
-build:
-  timeout: 10
-
 environment:
   nodejs_version: '20'
   NODE_ENV: test
 
 install:
-  - nvm install $nodejs_version
-  - nvm use $nodejs_version
+  - ps: Install-Product node $env:nodejs_version
   - node -v
   - npm -v
   - npm ci
