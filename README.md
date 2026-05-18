@@ -85,7 +85,7 @@ YomU (יום-You) is a mobile-first web application that aggregates and displays
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20.9.0+
 - npm or yarn
 - Git
 
