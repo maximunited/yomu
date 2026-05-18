@@ -26,14 +26,13 @@ describe('prisma singleton module', () => {
     let instance1: unknown;
     jest.isolateModules(() => {
       // import using relative path to bypass global jest mock of '@/lib/prisma'
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+
       instance1 = require('../../../src/lib/prisma').prisma;
     });
 
     // Second import should reuse the same instance (no new constructor call)
     let instance2: unknown;
     jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       instance2 = require('../../../src/lib/prisma').prisma;
     });
 
@@ -54,11 +53,9 @@ describe('prisma singleton module', () => {
     }));
 
     jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       require('../../../src/lib/prisma');
     });
     jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       require('../../../src/lib/prisma');
     });
 

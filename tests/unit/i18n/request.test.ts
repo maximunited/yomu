@@ -3,7 +3,7 @@ jest.mock('next-intl/server', () => ({
 }));
 
 // Import after mock so ESM from next-intl isn't loaded
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 const i18nRequestConfig = require('i18n/request').default as any;
 
 describe('i18n request config', () => {

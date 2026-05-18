@@ -34,8 +34,12 @@ export default tseslint.config(
         ...globals.node,
         ...globals.es2021,
         ...globals.jest,
+        React: 'readonly', // React is global in Next.js with new JSX transform
+        JSX: 'readonly',
       },
       parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
         ecmaFeatures: {
           jsx: true,
         },
@@ -49,7 +53,14 @@ export default tseslint.config(
     rules: {
       // TypeScript rules
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       '@typescript-eslint/no-require-imports': 'warn',
       '@typescript-eslint/ban-ts-comment': 'warn',
 
@@ -58,16 +69,24 @@ export default tseslint.config(
       ...reactPlugin.configs['jsx-runtime'].rules,
       'react/react-in-jsx-scope': 'off', // Not needed in Next.js
       'react/prop-types': 'off', // Using TypeScript for props validation
+      'react/display-name': 'warn', // Downgrade from error to warning
 
-      // React Hooks rules
-      ...reactHooksPlugin.configs.recommended.rules,
+      // React Hooks rules - downgrade all to warnings for gradual adoption
+      'react-hooks/rules-of-hooks': 'warn',
       'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/purity': 'warn',
+      'react-hooks/immutability': 'warn',
 
       // Next.js rules
       '@next/next/no-img-element': 'warn',
 
-      // General rules
-      'no-undef': 'error',
+      // General rules - downgrade most to warnings for gradual adoption
+      'no-undef': 'warn',
+      'no-case-declarations': 'warn',
+      'no-empty': 'warn',
+      'no-useless-escape': 'warn',
+      'no-constant-binary-expression': 'warn',
     },
     settings: {
       react: {

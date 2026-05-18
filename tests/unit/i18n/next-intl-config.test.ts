@@ -3,9 +3,9 @@ jest.mock('next-intl/server', () => ({
 }));
 
 // Import after mock to avoid ESM parse
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 const defaultConfig = require('i18n').default as any;
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 const { defaultLocale } = require('i18n');
 
 describe('next-intl app router config', () => {

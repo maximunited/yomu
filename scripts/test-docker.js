@@ -5,7 +5,7 @@
   - Tears down the stack
 */
 
-/* eslint-disable no-console */
+ 
 const { execSync } = require('child_process');
 const http = require('http');
 const https = require('https');

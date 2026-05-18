@@ -6,7 +6,7 @@
  * Run with: npm run ci:all or node scripts/test-ci-local.js
  */
 
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const { execSync } = require('child_process');
 const fs = require('fs');
