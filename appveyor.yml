@@ -1,7 +1,7 @@
 version: '{build}'
 
-# Use Windows image with PowerShell helper `Install-Product`
-image: Visual Studio 2022
+# Use Ubuntu for faster build allocation on free tier
+image: Ubuntu2204
 
 # Switch to script mode (overrides default MSBuild)
 build_script:
@@ -13,9 +13,6 @@ environment:
   nodejs_version: '20'
   NODE_ENV: test
 
-init:
-  - ps: Write-Host "Using Node.js $env:nodejs_version on $env:APPVEYOR_BUILD_WORKER_IMAGE"
-
 install:
   - ps: Install-Product node $env:nodejs_version
   - node -v
@@ -23,7 +20,7 @@ install:
   - npm ci
 
 artifacts:
-  - path: coverage\lcov.info
+  - path: coverage/lcov.info
     name: coverage-lcov
 
 cache:
