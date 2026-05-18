@@ -6,7 +6,6 @@
  * Run with: npm run ci:simulate
  */
 
- 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const { execSync } = require('child_process');
 const fs = require('fs');

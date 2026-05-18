@@ -6,7 +6,6 @@
  * Run with: npm run ci:quick
  */
 
- 
 const { execSync } = require('child_process');
 
 const colors = {

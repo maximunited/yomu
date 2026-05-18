@@ -5,7 +5,6 @@
   - Tears down the stack
 */
 
- 
 const { execSync } = require('child_process');
 const http = require('http');
 const https = require('https');
