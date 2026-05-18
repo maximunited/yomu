@@ -102,7 +102,7 @@ npx lint-staged && npm run ci:quick
    ```bash
    # Check for TypeScript errors
    npm run build
-   
+
    # Check for missing dependencies
    npm ci
    ```
@@ -111,7 +111,7 @@ npx lint-staged && npm run ci:quick
    ```bash
    # Run tests in watch mode for debugging
    npm run test:watch
-   
+
    # Run specific test file
    npm test -- tests/unit/pages/dashboard.test.tsx
    ```
@@ -120,7 +120,7 @@ npx lint-staged && npm run ci:quick
    ```bash
    # Check Docker is running
    docker --version
-   
+
    # Clean up Docker containers
    docker system prune -f
    ```
@@ -129,7 +129,7 @@ npx lint-staged && npm run ci:quick
    ```bash
    # Auto-fix linting issues
    npm run lint -- --fix
-   
+
    # Check specific file
    npm run lint -- src/app/dashboard/page.tsx
    ```
