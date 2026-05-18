@@ -17,7 +17,6 @@ repos:
         exclude: '\.min\.(js|css)$'
       - id: check-yaml
         name: Check YAML syntax
-        args: [--safe]
       - id: check-json
         name: Check JSON syntax
         exclude: ^(package-lock\.json|tsconfig\.tsbuildinfo)$
@@ -54,12 +53,13 @@ repos:
         additional_dependencies:
           - prettier@3.6.2
 
-  # ESLint - JavaScript/TypeScript linting
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.16.0
+  # ESLint - JavaScript/TypeScript linting (uses project's ESLint)
+  - repo: local
     hooks:
       - id: eslint
         name: Lint with ESLint
+        entry: npx eslint --fix
+        language: system
         types: [file]
         files: \.(js|jsx|ts|tsx)$
         exclude: |
@@ -71,15 +71,6 @@ repos:
               build/.*|
               \.min\.js$
           )$
-        args: [--fix, --max-warnings=0]
-        additional_dependencies:
-          - eslint@9.39.4
-          - '@eslint/js@9.39.4'
-          - typescript-eslint@8.59.4
-          - eslint-plugin-react@7.37.5
-          - eslint-plugin-react-hooks@7.1.1
-          - '@next/eslint-plugin-next@16.2.6'
-          - globals@17.6.0
 
   # Commitlint - Conventional commit messages
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
