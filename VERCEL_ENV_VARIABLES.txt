@@ -1,0 +1,47 @@
+# Environment Variables for Vercel Deployment
+# Copy these to Vercel Dashboard → Your Project → Settings → Environment Variables
+
+# ==============================================
+# STEP 1: Required Variables (Add These First)
+# ==============================================
+
+# NextAuth Secret (CRITICAL - for session encryption)
+# Variable Name: NEXTAUTH_SECRET
+# Value: coqjW5Tk5lYEHGVy0KkbdEzveHlnwinGEQ5/miUW1gg=
+NEXTAUTH_SECRET=coqjW5Tk5lYEHGVy0KkbdEzveHlnwinGEQ5/miUW1gg=
+
+# NextAuth URL (will be updated after first deploy)
+# Variable Name: NEXTAUTH_URL
+# Value: https://your-app-name.vercel.app (get this after deployment)
+NEXTAUTH_URL=https://your-app-name.vercel.app
+
+# ==============================================
+# STEP 2: Database (Add After Setting Up Vercel Postgres)
+# ==============================================
+
+# Database Connection String
+# Variable Name: DATABASE_URL
+# Value: Get this from Vercel Dashboard → Storage → Postgres
+# Example: postgres://default:xxxxx@ep-xxxxx.us-east-1.postgres.vercel-storage.com:5432/verceldb?sslmode=require
+DATABASE_URL=postgres://...get-from-vercel-postgres...
+
+# ==============================================
+# STEP 3: Google OAuth (Optional - Skip for Now)
+# ==============================================
+
+# Only add these if you want Google sign-in
+# Get from: https://console.cloud.google.com/apis/credentials
+
+# Variable Name: GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_ID=your-google-client-id-here
+
+# Variable Name: GOOGLE_CLIENT_SECRET
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here
+
+# ==============================================
+# NOTES:
+# ==============================================
+# 1. In Vercel, add each variable separately using the UI
+# 2. Set environment to: Production, Preview, Development (all)
+# 3. You'll update NEXTAUTH_URL after first deployment
+# 4. Database setup comes in Step 5 of the deployment guide
