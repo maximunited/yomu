@@ -14,7 +14,11 @@ environment:
   NODE_ENV: test
 
 install:
-  - ps: Install-Product node $env:nodejs_version
+  - sh: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+      nvm install ${nodejs_version}
+      nvm use ${nodejs_version}
   - node -v
   - npm -v
   - npm ci
