@@ -3,10 +3,6 @@ version: '{build}'
 # Use Ubuntu for faster build allocation on free tier
 image: Ubuntu2204
 
-# Switch to script mode (overrides default MSBuild)
-build_script:
-  - npm test -- --ci --runInBand --coverage
-
 shallow_clone: true
 
 environment:
@@ -19,9 +15,17 @@ install:
       [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
       nvm install ${nodejs_version}
       nvm use ${nodejs_version}
-  - node -v
-  - npm -v
-  - npm ci
+      node -v
+      npm -v
+      npm ci
+
+# Switch to script mode (overrides default MSBuild)
+build_script:
+  - sh: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+      nvm use ${nodejs_version}
+      npm test -- --ci --runInBand --coverage
 
 artifacts:
   - path: coverage/lcov.info
