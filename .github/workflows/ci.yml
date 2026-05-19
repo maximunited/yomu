@@ -51,6 +51,8 @@ jobs:
 
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
+        # Only upload once: on pull_request events, or on push to master (skip push events for PR branches)
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
         continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
