@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg data-bbox="1.976 2 28.024 28" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" height="32" width="32" data-type="color">
+    <g>
+        <path fill="#4C37E5" d="M16 30A14.002 14.002 0 0 1 4.39 8.138a14 14 0 0 1 16.08-5.397 1 1 0 0 1 .595 1.351 6.092 6.092 0 0 0 7.365 8.276 1 1 0 0 1 1.27.751A14 14 0 0 1 16 30m0-26a12 12 0 1 0 11.91 10.536 8.1 8.1 0 0 1-9.064-10.191A12 12 0 0 0 16 4" data-color="1"/>
+        <path fill="#4C37E5" d="M12 23a1 1 0 1 0 0-2 1 1 0 0 0 0 2" data-color="1"/>
+        <path fill="#4C37E5" d="M16 18a1 1 0 1 0 0-2 1 1 0 0 0 0 2" data-color="1"/>
+        <path fill="#4C37E5" d="M14 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2" data-color="1"/>
+        <path fill="#4C37E5" d="M21.182 22a1.182 1.182 0 1 0 0-2.364 1.182 1.182 0 0 0 0 2.364" data-color="1"/>
+        <path fill="#4C37E5" d="M9 16a1 1 0 1 0 0-2 1 1 0 0 0 0 2" data-color="1"/>
+    </g>
+</svg>

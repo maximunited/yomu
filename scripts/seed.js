@@ -49,7 +49,7 @@ const predefinedBrands = [
   },
   {
     name: 'Isracard',
-    logoUrl: '/images/brands/isracard.png',
+    logoUrl: '/images/brands/isracard.svg',
     website: 'https://www.isracard.co.il',
     description: 'הטבות על דלק ותחבורה',
     category: 'transport',
