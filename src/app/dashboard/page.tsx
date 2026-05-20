@@ -1159,19 +1159,21 @@ function DashboardPageContent() {
                           '_blank'
                         )
                       }
-                      className="flex-1"
+                      className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
                     >
-                      <ExternalLink className="w-4 h-4 ml-1" />
-                      {benefit.brand.actionLabel || t('buyNow')}
+                      <ExternalLink className="w-4 h-4 ml-1 flex-shrink-0" />
+                      <span className="truncate">
+                        {benefit.brand.actionLabel || t('buyNow')}
+                      </span>
                     </Button>
                   )}
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => router.push(`/benefit/${benefit.id}`)}
-                    className="flex-1"
+                    className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
                   >
-                    {t('moreDetails')}
+                    <span className="truncate">{t('moreDetails')}</span>
                   </Button>
                 </div>
               </div>
