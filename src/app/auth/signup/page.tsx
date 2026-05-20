@@ -16,9 +16,11 @@ export default function SignUpPage() {
   const { t } = useLanguage();
   const { isDarkMode } = useDarkMode();
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
+    dateOfBirth: '',
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -48,8 +50,10 @@ export default function SignUpPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          name: formData.name,
           email: formData.email,
           password: formData.password,
+          dateOfBirth: formData.dateOfBirth,
         }),
       });
 
@@ -149,6 +153,27 @@ export default function SignUpPage() {
               <div className="space-y-4">
                 <div>
                   <label
+                    htmlFor="name"
+                    className={`block text-sm font-medium mb-2 ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}
+                  >
+                    {t('name')}
+                  </label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Your Name"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label
                     htmlFor="email"
                     className={`block text-sm font-medium mb-2 ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -207,6 +232,29 @@ export default function SignUpPage() {
                       setFormData({
                         ...formData,
                         confirmPassword: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="dateOfBirth"
+                    className={`block text-sm font-medium mb-2 ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}
+                  >
+                    {t('dateOfBirth')}
+                  </label>
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    value={formData.dateOfBirth}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        dateOfBirth: e.target.value,
                       })
                     }
                     required
