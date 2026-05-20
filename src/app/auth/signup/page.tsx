@@ -158,7 +158,7 @@ export default function SignUpPage() {
                       isDarkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}
                   >
-                    {t('name')}
+                    Name
                   </label>
                   <Input
                     id="name"
