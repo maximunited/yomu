@@ -114,16 +114,16 @@ const predefinedBrands = [
   },
   {
     name: 'אסקייפרום',
-    logoUrl: '/images/brands/escape-room.svg',
+    logoUrl: '/images/brands/escape-room.png',
     website: 'https://www.escaperoom.co.il',
     description: 'חדרי בריחה - 50 שח הנחה בחודש יומולדת',
     category: 'entertainment',
   },
   {
     name: 'באקרו - Buckaroo',
-    logoUrl: '/images/brands/buckaroo.svg',
-    website: 'https://www.bacaro.co.il',
-    description: 'מסעדה - קינוח ומנה ראשונה מתנה',
+    logoUrl: '/images/brands/buckaroo.png',
+    website: 'https://www.buckaroobbq.co.il',
+    description: 'מסעדת בשרים - קינוח ומנה ראשונה מתנה',
     category: 'food',
   },
   {
@@ -156,7 +156,7 @@ const predefinedBrands = [
   },
   {
     name: 'מנמ',
-    logoUrl: '/images/brands/menam.svg',
+    logoUrl: '/images/brands/menam.png',
     website: 'https://www.menam.co.il',
     description: '50 שח מתנה בקנייה מעל 300 שח',
     category: 'home',
@@ -177,7 +177,7 @@ const predefinedBrands = [
   },
   {
     name: 'M32 המבורגרים',
-    logoUrl: '/images/brands/m32.svg',
+    logoUrl: '/images/brands/m32.png',
     website: 'https://www.m32.co.il',
     description: '15% הנחה בחודש יומולדת',
     category: 'food',
