@@ -1107,7 +1107,7 @@ function DashboardPageContent() {
                   </div>
                 )}
 
-                <div className="flex space-x-2 mt-auto">
+                <div className="flex gap-2 mt-auto">
                   {/* Used/Unused Button */}
                   <Button
                     variant={
@@ -1122,7 +1122,14 @@ function DashboardPageContent() {
                     disabled={usedBenefitsLoading}
                     aria-disabled={usedBenefitsLoading}
                     aria-busy={usedBenefitsLoading}
-                    className={`flex-1 transition-all duration-200 whitespace-nowrap min-w-[10rem] ${
+                    title={
+                      usedBenefitsLoading
+                        ? t('loading')
+                        : usedBenefits.has(benefit.id)
+                          ? t('unmarkAsUsed')
+                          : t('markAsUsed')
+                    }
+                    className={`flex-1 transition-all duration-200 whitespace-nowrap overflow-hidden text-ellipsis min-w-0 ${
                       usedBenefits.has(benefit.id)
                         ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
                         : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
@@ -1133,17 +1140,17 @@ function DashboardPageContent() {
                     {usedBenefitsLoading ? (
                       <>
                         <span className="animate-spin mr-1">⏳</span>
-                        {t('loading')}
+                        <span className="truncate">{t('loading')}</span>
                       </>
                     ) : usedBenefits.has(benefit.id) ? (
                       <>
-                        <span className="mr-1">✓</span>
-                        {t('unmarkAsUsed')}
+                        <span className="mr-1 flex-shrink-0">✓</span>
+                        <span className="truncate">{t('unmarkAsUsed')}</span>
                       </>
                     ) : (
                       <>
-                        <span className="mr-1">○</span>
-                        {t('markAsUsed')}
+                        <span className="mr-1 flex-shrink-0">○</span>
+                        <span className="truncate">{t('markAsUsed')}</span>
                       </>
                     )}
                   </Button>
@@ -1159,6 +1166,7 @@ function DashboardPageContent() {
                           '_blank'
                         )
                       }
+                      title={benefit.brand.actionLabel || t('buyNow')}
                       className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
                     >
                       <ExternalLink className="w-4 h-4 ml-1 flex-shrink-0" />
@@ -1171,6 +1179,7 @@ function DashboardPageContent() {
                     variant="outline"
                     size="sm"
                     onClick={() => router.push(`/benefit/${benefit.id}`)}
+                    title={t('moreDetails')}
                     className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
                   >
                     <span className="truncate">{t('moreDetails')}</span>
@@ -1260,7 +1269,7 @@ function DashboardPageContent() {
                   {getBenefitDescription(benefit)}
                 </p>
 
-                <div className="flex space-x-2 mt-auto">
+                <div className="flex gap-2 mt-auto">
                   <Button
                     variant={
                       usedBenefits.has(benefit.id) ? 'default' : 'outline'
@@ -1274,7 +1283,14 @@ function DashboardPageContent() {
                     disabled={usedBenefitsLoading}
                     aria-disabled={usedBenefitsLoading}
                     aria-busy={usedBenefitsLoading}
-                    className={`flex-1 transition-all duration-200 whitespace-nowrap min-w-[10rem] ${
+                    title={
+                      usedBenefitsLoading
+                        ? t('loading')
+                        : usedBenefits.has(benefit.id)
+                          ? t('unmarkAsUsed')
+                          : t('markAsUsed')
+                    }
+                    className={`flex-1 transition-all duration-200 whitespace-nowrap overflow-hidden text-ellipsis min-w-0 ${
                       usedBenefits.has(benefit.id)
                         ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
                         : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
@@ -1284,18 +1300,20 @@ function DashboardPageContent() {
                   >
                     {usedBenefitsLoading ? (
                       <>
-                        <span className="animate-spin mr-1">⏳</span>
-                        {t('loading')}
+                        <span className="animate-spin mr-1 flex-shrink-0">
+                          ⏳
+                        </span>
+                        <span className="truncate">{t('loading')}</span>
                       </>
                     ) : usedBenefits.has(benefit.id) ? (
                       <>
-                        <span className="mr-1">✓</span>
-                        {t('unmarkAsUsed')}
+                        <span className="mr-1 flex-shrink-0">✓</span>
+                        <span className="truncate">{t('unmarkAsUsed')}</span>
                       </>
                     ) : (
                       <>
-                        <span className="mr-1">○</span>
-                        {t('markAsUsed')}
+                        <span className="mr-1 flex-shrink-0">○</span>
+                        <span className="truncate">{t('markAsUsed')}</span>
                       </>
                     )}
                   </Button>
