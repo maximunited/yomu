@@ -1,26 +1,28 @@
-build:
-  environment:
-    node:
-      version: 18
-    variables:
-      NODE_ENV: test
-      DATABASE_URL: 'file:./test.db'
-      NEXTAUTH_URL: 'http://localhost:3000'
-      NEXTAUTH_SECRET: 'test-secret-key'
-      GOOGLE_CLIENT_ID: 'test-client-id'
-      GOOGLE_CLIENT_SECRET: 'test-client-secret'
-  dependencies:
-    override:
-      - npm ci
-      - npx prisma generate
-  tests:
-    override:
-      - npm test
-  nodes:
-    analysis:
-      tests:
-        override:
-          - npm run lint
+# Build disabled - Scrutinizer's infrastructure too old for Node.js >=18
+# Using GitHub Actions for CI/CD instead
+# build:
+#   environment:
+#     node:
+#       version: 18
+#     variables:
+#       NODE_ENV: test
+#       DATABASE_URL: 'file:./test.db'
+#       NEXTAUTH_URL: 'http://localhost:3000'
+#       NEXTAUTH_SECRET: 'test-secret-key'
+#       GOOGLE_CLIENT_ID: 'test-client-id'
+#       GOOGLE_CLIENT_SECRET: 'test-client-secret'
+#   dependencies:
+#     override:
+#       - npm ci
+#       - npx prisma generate
+#   tests:
+#     override:
+#       - npm test
+#   nodes:
+#     analysis:
+#       tests:
+#         override:
+#           - npm run lint
 
 filter:
   excluded_paths:
