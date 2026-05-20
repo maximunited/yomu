@@ -13,7 +13,8 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "prisma db push --accept-data-loss && next build",
+    "build": "next build",
+    "postbuild": "prisma db push --skip-generate --accept-data-loss",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "postinstall": "prisma generate",
