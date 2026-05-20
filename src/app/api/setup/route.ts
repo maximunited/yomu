@@ -1,45 +1,37 @@
 import { NextResponse } from 'next/server';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { prisma } from '@/lib/prisma';
 
-const execPromise = promisify(exec);
-
-// One-time setup endpoint to initialize database schema
+// Database setup endpoint - checks if schema exists
 export async function GET() {
   try {
-    // Check if tables already exist by trying to count users
-    const { prisma } = await import('@/lib/prisma');
+    // Try to query the database to check if tables exist
+    await prisma.user.count();
 
-    try {
-      await prisma.user.count();
-      return NextResponse.json({
-        message: 'Database already initialized',
-        status: 'success',
-      });
-    } catch (error) {
-      // Tables don't exist, need to create them
-      console.log('Database tables not found, running migration...');
-
-      // Run Prisma db push to create tables
-      const { stdout, stderr } = await execPromise('npx prisma db push --skip-generate --accept-data-loss');
-
-      console.log('Migration stdout:', stdout);
-      if (stderr) console.error('Migration stderr:', stderr);
-
-      return NextResponse.json({
-        message: 'Database initialized successfully',
-        status: 'success',
-        output: stdout,
-      });
-    }
+    return NextResponse.json({
+      message: 'Database is initialized and working',
+      status: 'success',
+      tablesExist: true,
+    });
   } catch (error) {
-    console.error('Setup error:', error);
+    console.error('Database check error:', error);
+
     return NextResponse.json(
       {
-        message: 'Setup failed',
+        message:
+          'Database tables do not exist. Run: npx prisma db push (locally with Vercel env)',
+        status: 'error',
+        tablesExist: false,
         error: error instanceof Error ? error.message : 'Unknown error',
+        instructions: [
+          '1. Install Vercel CLI: npm i -g vercel',
+          '2. Login: vercel login',
+          '3. Link project: vercel link',
+          '4. Pull env: vercel env pull .env.local',
+          '5. Run migration: npx prisma db push',
+        ],
       },
       { status: 500 }
     );
   }
 }
+
