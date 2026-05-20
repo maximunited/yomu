@@ -16,11 +16,11 @@ export async function POST() {
       );
     }
 
-    // Execute raw SQL to create all tables based on Prisma schema
-    // This is a workaround since we can't run `prisma db push` in serverless
-    await prisma.$executeRawUnsafe(`
-      -- Create User table
-      CREATE TABLE IF NOT EXISTS "User" (
+    // Execute each CREATE TABLE statement separately
+    // Prisma doesn't support multiple statements in one call
+    const sqlStatements = [
+      // User table
+      `CREATE TABLE IF NOT EXISTS "User" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "name" TEXT,
         "email" TEXT UNIQUE,
@@ -33,10 +33,10 @@ export async function POST() {
         "apiKey" TEXT NOT NULL DEFAULT 'key123',
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
+      )`,
 
-      -- Create Account table
-      CREATE TABLE IF NOT EXISTS "Account" (
+      // Account table
+      `CREATE TABLE IF NOT EXISTS "Account" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "userId" TEXT NOT NULL,
         "type" TEXT NOT NULL,
@@ -51,27 +51,27 @@ export async function POST() {
         "session_state" TEXT,
         CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "Account_provider_providerAccountId_key" UNIQUE ("provider", "providerAccountId")
-      );
+      )`,
 
-      -- Create Session table
-      CREATE TABLE IF NOT EXISTS "Session" (
+      // Session table
+      `CREATE TABLE IF NOT EXISTS "Session" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "sessionToken" TEXT NOT NULL UNIQUE,
         "userId" TEXT NOT NULL,
         "expires" TIMESTAMP(3) NOT NULL,
         CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-      );
+      )`,
 
-      -- Create VerificationToken table
-      CREATE TABLE IF NOT EXISTS "VerificationToken" (
+      // VerificationToken table
+      `CREATE TABLE IF NOT EXISTS "VerificationToken" (
         "identifier" TEXT NOT NULL,
         "token" TEXT NOT NULL UNIQUE,
         "expires" TIMESTAMP(3) NOT NULL,
         CONSTRAINT "VerificationToken_identifier_token_key" UNIQUE ("identifier", "token")
-      );
+      )`,
 
-      -- Create brands table
-      CREATE TABLE IF NOT EXISTS "brands" (
+      // brands table
+      `CREATE TABLE IF NOT EXISTS "brands" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "name" TEXT NOT NULL,
         "logoUrl" TEXT NOT NULL,
@@ -84,10 +84,10 @@ export async function POST() {
         "isActive" BOOLEAN NOT NULL DEFAULT true,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
+      )`,
 
-      -- Create brand_partnerships table
-      CREATE TABLE IF NOT EXISTS "brand_partnerships" (
+      // brand_partnerships table
+      `CREATE TABLE IF NOT EXISTS "brand_partnerships" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "brandAId" TEXT NOT NULL,
         "brandBId" TEXT NOT NULL,
@@ -95,10 +95,10 @@ export async function POST() {
         CONSTRAINT "brand_partnerships_brandAId_fkey" FOREIGN KEY ("brandAId") REFERENCES "brands" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "brand_partnerships_brandBId_fkey" FOREIGN KEY ("brandBId") REFERENCES "brands" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "brand_partnerships_brandAId_brandBId_key" UNIQUE ("brandAId", "brandBId")
-      );
+      )`,
 
-      -- Create benefits table
-      CREATE TABLE IF NOT EXISTS "benefits" (
+      // benefits table
+      `CREATE TABLE IF NOT EXISTS "benefits" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "brandId" TEXT NOT NULL,
         "title" TEXT NOT NULL,
@@ -114,10 +114,10 @@ export async function POST() {
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "benefits_brandId_fkey" FOREIGN KEY ("brandId") REFERENCES "brands" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-      );
+      )`,
 
-      -- Create custom_memberships table
-      CREATE TABLE IF NOT EXISTS "custom_memberships" (
+      // custom_memberships table
+      `CREATE TABLE IF NOT EXISTS "custom_memberships" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "userId" TEXT NOT NULL,
         "name" TEXT NOT NULL,
@@ -130,10 +130,10 @@ export async function POST() {
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "custom_memberships_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-      );
+      )`,
 
-      -- Create custom_benefits table
-      CREATE TABLE IF NOT EXISTS "custom_benefits" (
+      // custom_benefits table
+      `CREATE TABLE IF NOT EXISTS "custom_benefits" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "customMembershipId" TEXT NOT NULL,
         "title" TEXT NOT NULL,
@@ -149,10 +149,10 @@ export async function POST() {
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "custom_benefits_customMembershipId_fkey" FOREIGN KEY ("customMembershipId") REFERENCES "custom_memberships" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-      );
+      )`,
 
-      -- Create user_memberships table
-      CREATE TABLE IF NOT EXISTS "user_memberships" (
+      // user_memberships table
+      `CREATE TABLE IF NOT EXISTS "user_memberships" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "userId" TEXT NOT NULL,
         "brandId" TEXT,
@@ -165,10 +165,10 @@ export async function POST() {
         CONSTRAINT "user_memberships_customMembershipId_fkey" FOREIGN KEY ("customMembershipId") REFERENCES "custom_memberships" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "user_memberships_userId_brandId_key" UNIQUE ("userId", "brandId"),
         CONSTRAINT "user_memberships_userId_customMembershipId_key" UNIQUE ("userId", "customMembershipId")
-      );
+      )`,
 
-      -- Create notifications table
-      CREATE TABLE IF NOT EXISTS "notifications" (
+      // notifications table
+      `CREATE TABLE IF NOT EXISTS "notifications" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "userId" TEXT NOT NULL,
         "benefitId" TEXT,
@@ -181,10 +181,10 @@ export async function POST() {
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "notifications_benefitId_fkey" FOREIGN KEY ("benefitId") REFERENCES "benefits" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-      );
+      )`,
 
-      -- Create used_benefits table
-      CREATE TABLE IF NOT EXISTS "used_benefits" (
+      // used_benefits table
+      `CREATE TABLE IF NOT EXISTS "used_benefits" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "userId" TEXT NOT NULL,
         "benefitId" TEXT NOT NULL,
@@ -195,8 +195,13 @@ export async function POST() {
         CONSTRAINT "used_benefits_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "used_benefits_benefitId_fkey" FOREIGN KEY ("benefitId") REFERENCES "benefits" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "used_benefits_userId_benefitId_key" UNIQUE ("userId", "benefitId")
-      );
-    `);
+      )`,
+    ];
+
+    // Execute each statement individually
+    for (const sql of sqlStatements) {
+      await prisma.$executeRawUnsafe(sql);
+    }
 
     return NextResponse.json({
       message: 'Database initialized successfully',
