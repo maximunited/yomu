@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SignUpPage from '@/app/auth/signup/page';
 import { DarkModeProvider } from '@/contexts/DarkModeContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 jest.mock('next-auth/react', () => ({
   signIn: jest.fn(async () => ({ ok: true })),
@@ -13,9 +14,14 @@ jest.mock('next/navigation', () => ({
 describe('SignUpPage', () => {
   it('validates mismatched passwords', async () => {
     const Wrapper = ({ children }: any) => (
-      <DarkModeProvider>{children}</DarkModeProvider>
+      <DarkModeProvider>
+        <LanguageProvider>{children}</LanguageProvider>
+      </DarkModeProvider>
     );
     render(<SignUpPage />, { wrapper: Wrapper as any });
+    fireEvent.change(screen.getByLabelText(/^Name$/i), {
+      target: { value: 'Test User' },
+    });
     fireEvent.change(screen.getByLabelText(/^אימייל$|^Email$/i), {
       target: { value: 'a@b.com' },
     });
@@ -26,6 +32,9 @@ describe('SignUpPage', () => {
       screen.getByLabelText(/^אימות סיסמה$|^Confirm Password$/i),
       { target: { value: 'xxxxxx' } }
     );
+    fireEvent.change(screen.getByLabelText(/^תאריך לידה$|^Date of Birth$/i), {
+      target: { value: '1990-01-01' },
+    });
     fireEvent.click(
       screen.getByRole('button', { name: /^צור חשבון$|^Create Account$/i })
     );
@@ -45,9 +54,14 @@ describe('SignUpPage', () => {
       json: async () => ({ message: 'Error' }),
     });
     const Wrapper = ({ children }: any) => (
-      <DarkModeProvider>{children}</DarkModeProvider>
+      <DarkModeProvider>
+        <LanguageProvider>{children}</LanguageProvider>
+      </DarkModeProvider>
     );
     render(<SignUpPage />, { wrapper: Wrapper as any });
+    fireEvent.change(screen.getByLabelText(/^Name$/i), {
+      target: { value: 'Test User' },
+    });
     fireEvent.change(screen.getByLabelText(/^אימייל$|^Email$/i), {
       target: { value: 'a@b.com' },
     });
@@ -58,6 +72,9 @@ describe('SignUpPage', () => {
       screen.getByLabelText(/^אימות סיסמה$|^Confirm Password$/i),
       { target: { value: 'goodpass' } }
     );
+    fireEvent.change(screen.getByLabelText(/^תאריך לידה$|^Date of Birth$/i), {
+      target: { value: '1990-01-01' },
+    });
     fireEvent.click(
       screen.getByRole('button', { name: /^צור חשבון$|^Create Account$/i })
     );
@@ -81,9 +98,14 @@ describe('SignUpPage', () => {
     const push = jest.fn();
     jest.spyOn(nav, 'useRouter').mockReturnValue({ push } as any);
     const Wrapper = ({ children }: any) => (
-      <DarkModeProvider>{children}</DarkModeProvider>
+      <DarkModeProvider>
+        <LanguageProvider>{children}</LanguageProvider>
+      </DarkModeProvider>
     );
     render(<SignUpPage />, { wrapper: Wrapper as any });
+    fireEvent.change(screen.getByLabelText(/^Name$/i), {
+      target: { value: 'Test User' },
+    });
     fireEvent.change(screen.getByLabelText(/^אימייל$|^Email$/i), {
       target: { value: 'a@b.com' },
     });
@@ -94,6 +116,9 @@ describe('SignUpPage', () => {
       screen.getByLabelText(/^אימות סיסמה$|^Confirm Password$/i),
       { target: { value: 'goodpass' } }
     );
+    fireEvent.change(screen.getByLabelText(/^תאריך לידה$|^Date of Birth$/i), {
+      target: { value: '1990-01-01' },
+    });
     fireEvent.click(
       screen.getByRole('button', { name: /^צור חשבון$|^Create Account$/i })
     );
