@@ -87,3 +87,6 @@ vulnerability-report.json
 
 # Claude Code local settings (user-specific)
 .claude/
+
+.vercel
+.env*.local
