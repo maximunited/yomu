@@ -32,14 +32,17 @@ function createPrismaClient() {
 }
 
 async function disconnectPrisma() {
-  if (cachedPrisma) {
-    await cachedPrisma.$disconnect();
+  try {
+    if (cachedPrisma) {
+      await cachedPrisma.$disconnect();
+    }
+  } finally {
+    if (cachedPool) {
+      await cachedPool.end();
+    }
+    cachedPrisma = undefined;
+    cachedPool = undefined;
   }
-  if (cachedPool) {
-    await cachedPool.end();
-  }
-  cachedPrisma = undefined;
-  cachedPool = undefined;
 }
 
 module.exports = {
