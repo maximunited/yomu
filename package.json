@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "postbuild": "bash -c '[ -n \"$SKIP_DB_PUSH\" ] || prisma db push --skip-generate --accept-data-loss'",
+    "postbuild": "node scripts/conditional-db-push.js",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "postinstall": "prisma generate",
