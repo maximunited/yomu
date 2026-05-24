@@ -28,7 +28,7 @@ function getRequiredNodeVersion() {
   try {
     const packageJsonPath = path.join(__dirname, '..', 'package.json');
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-    return packageJson.engines?.node || '>=20.9.0';
+    return packageJson.engines?.node || '>=22.14.0';
   } catch (error) {
     log(`Error reading package.json: ${error.message}`, COLORS.red);
     process.exit(1);
@@ -105,8 +105,8 @@ function main() {
     log(`   Required: ${requiredVersionSpec}`, COLORS.red);
     log('', COLORS.reset);
     log('Please upgrade Node.js:', COLORS.yellow);
-    log('  - Using nvm: nvm install 20.9.0 && nvm use 20.9.0', COLORS.yellow);
-    log('  - Using fnm: fnm install 20.9.0 && fnm use 20.9.0', COLORS.yellow);
+    log('  - Using nvm: nvm install 22.14.0 && nvm use 22.14.0', COLORS.yellow);
+    log('  - Using fnm: fnm install 22.14.0 && fnm use 22.14.0', COLORS.yellow);
     log('  - Or download from: https://nodejs.org', COLORS.yellow);
     process.exit(1);
   }

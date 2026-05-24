@@ -268,18 +268,18 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret-here
 
 ### Node.js Version Management
 
-**Minimum Version:** Node.js 20.9.0 (specified in `package.json` engines field)
+**Minimum Version:** Node.js 22.14.0 (specified in `package.json` engines field)
 
 **Current Environment Versions:**
-- **Local Development:** Uses `.nvmrc` (Node.js 20.9.0 recommended)
-- **Docker Containers:** Uses `node:20-alpine` (Node.js 20.x LTS)
+- **Local Development:** Uses `.nvmrc` (Node.js 22.14.0 recommended)
+- **Docker Containers:** Uses `node:22-alpine` (Node.js 22.x LTS)
 - **GitHub Actions CI:** Uses `.nvmrc` for consistency
 
 **Version Semantics:**
-The `>=20.9.0` requirement in `package.json` means:
-- ✅ Any Node.js version 20.9.0 or higher is supported
-- ✅ Node.js 20.15.1, 22.0.0, 26.2.0 all work
-- ❌ Node.js 20.8.0, 18.x, 16.x will NOT work
+The `>=22.14.0` requirement in `package.json` means:
+- ✅ Any Node.js version 22.14.0 or higher is supported
+- ✅ Node.js 22.15.0, 23.0.0, 26.2.0 all work
+- ❌ Node.js 22.13.0, 20.x, 18.x will NOT work
 
 **For New Developers:**
 
@@ -300,10 +300,10 @@ The `>=20.9.0` requirement in `package.json` means:
 
 2. **Or install Node.js manually:**
    - Download from https://nodejs.org (use 20.x or higher)
-   - Verify: `node --version` should show v20.9.0 or higher
+   - Verify: `node --version` should show v22.14.0 or higher
 
 **Docker Environments:**
-- The official `node:20-alpine` image includes Node.js and all required system libraries
+- The official `node:22-alpine` image includes Node.js and all required system libraries
 - **DO NOT attempt to manually install Node.js inside Docker containers**
 - If you encounter GLIBC errors, you're likely trying to install Node.js manually (not needed)
 - The Alpine Linux base uses musl libc, avoiding common GLIBC compatibility issues
@@ -316,16 +316,16 @@ The `>=20.9.0` requirement in `package.json` means:
 
 1. **GLIBC errors (e.g., "GLIBC_2.27 not found"):**
    - This indicates attempting to install Node.js on an old Linux distribution
-   - In Docker: Use official `node:20-alpine` image (already included)
+   - In Docker: Use official `node:22-alpine` image (already included)
    - On host systems: Use a version manager (nvm/fnm) or update your OS
 
 2. **"nvm is not compatible with npm config 'prefix' option":**
-   - Run: `npm config delete prefix` or `npm config set prefix $NVM_DIR/versions/node/v20.9.0`
-   - Then retry: `nvm install 20.9.0`
+   - Run: `npm config delete prefix` or `npm config set prefix $NVM_DIR/versions/node/v22.14.0`
+   - Then retry: `nvm install 22.14.0`
 
 3. **Version mismatch warnings:**
    - Run: `node --version` to check current version
-   - Ensure it matches `.nvmrc` or is >= 20.9.0
+   - Ensure it matches `.nvmrc` or is >= 22.14.0
    - Use `nvm use` or `fnm use` to switch versions
 
 **Updating Node.js Version:**
