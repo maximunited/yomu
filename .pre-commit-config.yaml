@@ -85,8 +85,8 @@ repos:
         name: Lint commit message
         stages: [commit-msg]
         additional_dependencies:
-          - '@commitlint/cli@20.5.3'
-          - '@commitlint/config-conventional@20.5.3'
+          - '@commitlint/cli@21.0.1'
+          - '@commitlint/config-conventional@21.0.1'
 
   # Security - Secret detection
   - repo: https://github.com/Yelp/detect-secrets
