@@ -36,6 +36,11 @@ function main() {
   log('🚀 Quick CI Check', 'blue');
   log('─'.repeat(30), 'blue');
 
+  // Set environment variables for build
+  process.env.SKIP_DB_PUSH = 'true';
+  process.env.DATABASE_URL =
+    process.env.DATABASE_URL || 'postgresql://localhost:5432/yomu';
+
   const results = [
     runCommand('npm run lint', 'Linting'),
     runCommand('npm run format:check', 'Format Check'),
