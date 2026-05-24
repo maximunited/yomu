@@ -13,7 +13,7 @@ if (process.env.SKIP_DB_PUSH) {
 
 try {
   console.log('📦 Pushing Prisma schema to database...');
-  execSync('prisma db push --skip-generate --accept-data-loss', {
+  execSync('prisma db push --accept-data-loss', {
     stdio: 'inherit',
   });
   console.log('✅ Database push completed');
