@@ -13,7 +13,8 @@ if (process.env.SKIP_DB_PUSH) {
 
 try {
   console.log('📦 Pushing Prisma schema to database...');
-  execSync('prisma db push --accept-data-loss', {
+  const databaseUrl = process.env.DATABASE_URL || 'postgresql://localhost:5432/yomu';
+  execSync(`prisma db push --accept-data-loss --url="${databaseUrl}"`, {
     stdio: 'inherit',
   });
   console.log('✅ Database push completed');
