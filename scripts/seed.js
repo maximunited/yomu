@@ -17,13 +17,11 @@
  * Notes:
  *   - Inline SVGs are used for new logos to avoid missing assets. Replace with files in public/images/brands/ when available.
  */
-const { PrismaClient } = require('@prisma/client');
+const { createPrismaClient, disconnectPrisma } = require('./prisma-client');
 
 console.log('Starting seed script...');
 
-const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
-});
+const prisma = createPrismaClient();
 
 const predefinedBrands = [
   {
@@ -879,7 +877,7 @@ async function seed() {
     console.error('Error seeding database:', error);
     console.error('Error stack:', error.stack);
   } finally {
-    await prisma.$disconnect();
+    await disconnectPrisma();
     console.log('Database disconnected');
   }
 }

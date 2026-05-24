@@ -1,6 +1,9 @@
-const { PrismaClient } = require('@prisma/client');
+const {
+  createPrismaClient,
+  disconnectPrisma,
+} = require('../../scripts/prisma-client');
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 async function testComplexMembershipApi() {
   try {
@@ -315,7 +318,7 @@ async function testComplexMembershipApi() {
   } catch (error) {
     console.error('❌ Test failed:', error);
   } finally {
-    await prisma.$disconnect();
+    await disconnectPrisma();
   }
 }
 

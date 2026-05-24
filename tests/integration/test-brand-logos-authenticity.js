@@ -2,9 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const http = require('http');
-const { PrismaClient } = require('@prisma/client');
+const {
+  createPrismaClient,
+  disconnectPrisma,
+} = require('../../scripts/prisma-client');
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 describe('Brand logos authenticity validation', () => {
   let brands = [];
@@ -16,7 +19,7 @@ describe('Brand logos authenticity validation', () => {
   });
 
   afterAll(async () => {
-    await prisma.$disconnect();
+    await disconnectPrisma();
   });
 
   it('should have actual logo files (not self-generated SVG text)', async () => {

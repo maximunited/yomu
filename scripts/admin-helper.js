@@ -1,8 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
+const { createPrismaClient, disconnectPrisma } = require('./prisma-client');
 const fs = require('fs');
 const path = require('path');
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 // Helper function to import brands from JSON file
 async function importBrandsFromJson(filePath) {
@@ -290,7 +290,7 @@ Examples:
       `);
   }
 
-  await prisma.$disconnect();
+  await disconnectPrisma();
 }
 
 // Run the script

@@ -38,8 +38,17 @@ function main() {
 
   // Set environment variables for build
   process.env.SKIP_DB_PUSH = 'true';
-  process.env.DATABASE_URL =
-    process.env.DATABASE_URL || 'postgresql://localhost:5432/yomu';
+
+  // Only fallback to local DB in development
+  if (!process.env.DATABASE_URL) {
+    if (process.env.NODE_ENV !== 'production') {
+      process.env.DATABASE_URL = 'postgresql://localhost:5432/yomu';
+      log('ℹ️  Using local development database', 'blue');
+    } else {
+      log('❌ DATABASE_URL is required in production', 'red');
+      process.exit(1);
+    }
+  }
 
   const results = [
     runCommand('npm run lint', 'Linting'),

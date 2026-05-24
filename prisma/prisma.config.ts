@@ -1,11 +1,9 @@
-import type { Config } from '@prisma/client';
+import { defineConfig, env } from 'prisma';
 
-const config: Config = {
+export default defineConfig({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL || 'postgresql://localhost:5432/yomu',
+      url: env('DATABASE_URL'),
     },
   },
-};
-
-export default config;
+});
