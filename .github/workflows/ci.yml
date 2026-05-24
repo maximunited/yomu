@@ -40,6 +40,7 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: '1'
           SKIP_DB_PUSH: 'true'
+          DATABASE_URL: 'postgresql://localhost:5432/yomu'
         run: npm run build
 
       - name: Run Jest tests (with coverage)

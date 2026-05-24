@@ -24,6 +24,8 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV SKIP_DB_PUSH=true
+ENV DATABASE_URL=postgresql://localhost:5432/yomu
 
 RUN npm run build
 

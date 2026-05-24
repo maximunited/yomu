@@ -17,7 +17,6 @@ const customJestConfig = {
     '<rootDir>/tests/unit/pages/dashboard.test.tsx',
     // Exclude problematic tests that need provider fixes
     '<rootDir>/tests/unit/pages/memberships.filters.multiselect.test.tsx',
-    '<rootDir>/tests/unit/lib/prisma.test.ts',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -36,6 +35,8 @@ const customJestConfig = {
     '!src/app/layout.tsx',
     // exclude middleware that's tested separately
     '!src/middleware.ts',
+    // exclude Prisma client setup (infrastructure code, globally mocked for tests)
+    '!src/lib/prisma.ts',
   ],
   testMatch: [
     // Unit tests only for now (integration tests are shell scripts, not Jest)

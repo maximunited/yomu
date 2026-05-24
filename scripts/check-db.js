@@ -1,6 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
+const { createPrismaClient, disconnectPrisma } = require('./prisma-client');
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 async function checkDatabase() {
   try {
@@ -140,7 +140,7 @@ async function checkDatabase() {
   } catch (error) {
     console.error('Error:', error);
   } finally {
-    await prisma.$disconnect();
+    await disconnectPrisma();
   }
 }
 

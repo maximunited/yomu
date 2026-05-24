@@ -1,6 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
+const { createPrismaClient, disconnectPrisma } = require('./prisma-client');
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 async function addGiraffePartnership() {
   try {
@@ -93,7 +93,7 @@ async function addGiraffePartnership() {
     console.error('❌ Error adding Giraffe partnership:', error);
     throw error;
   } finally {
-    await prisma.$disconnect();
+    await disconnectPrisma();
   }
 }
 

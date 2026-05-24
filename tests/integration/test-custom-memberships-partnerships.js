@@ -1,6 +1,9 @@
-const { PrismaClient } = require('@prisma/client');
+const {
+  createPrismaClient,
+  disconnectPrisma,
+} = require('../../scripts/prisma-client');
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 async function testCustomMembershipsPartnerships() {
   try {
@@ -34,11 +37,15 @@ async function testCustomMembershipsPartnerships() {
     console.log('\n2️⃣ Checking custom membership partnership capability:');
 
     // Look at the schema to see if custom memberships support partnerships
-    const customMembershipFields =
-      await prisma.$queryRaw`PRAGMA table_info(custom_memberships)`;
+    const customMembershipFields = await prisma.$queryRaw`
+      SELECT column_name, data_type, is_nullable
+      FROM information_schema.columns
+      WHERE table_name = 'custom_memberships'
+      ORDER BY ordinal_position
+    `;
     console.log('Custom membership table structure:');
     customMembershipFields.forEach((field) => {
-      console.log(`  ${field.name}: ${field.type}`);
+      console.log(`  ${field.column_name}: ${field.data_type}`);
     });
 
     // Check user membership table for custom memberships
@@ -286,7 +293,7 @@ async function testCustomMembershipsPartnerships() {
   } catch (error) {
     console.error('❌ Test failed:', error);
   } finally {
-    await prisma.$disconnect();
+    await disconnectPrisma();
   }
 }
 
