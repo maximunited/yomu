@@ -1,5 +1,5 @@
-# Use Node.js 18 Alpine as base image
-FROM node:lts-alpine AS base
+# Use Node.js 20 Alpine as base image
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps

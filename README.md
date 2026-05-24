@@ -85,9 +85,13 @@ YomU (יום-You) is a mobile-first web application that aggregates and displays
 
 ### Prerequisites
 
-- Node.js 20.9.0+
-- npm (Yarn is not currently supported due to dependency override requirements)
-- Git
+- **Node.js:** 20.9.0 or higher (any 20.x, 22.x, or 26.x version works)
+  - Recommended: Use [nvm](https://github.com/nvm-sh/nvm), [fnm](https://github.com/Schniz/fnm), or [volta](https://volta.sh)
+  - The project includes `.nvmrc` for automatic version detection
+- **npm:** 10.0.0 or higher (comes with Node.js)
+  - ⚠️ Yarn is not supported due to dependency override requirements
+- **Git:** Any recent version
+- **Docker** (optional): For containerized development/deployment
 
 ### Installation
 
