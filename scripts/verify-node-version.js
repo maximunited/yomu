@@ -105,14 +105,8 @@ function main() {
     log(`   Required: ${requiredVersionSpec}`, COLORS.red);
     log('', COLORS.reset);
     log('Please upgrade Node.js:', COLORS.yellow);
-    log(
-      '  - Using nvm: nvm install 20.9.0 && nvm use 20.9.0',
-      COLORS.yellow
-    );
-    log(
-      '  - Using fnm: fnm install 20.9.0 && fnm use 20.9.0',
-      COLORS.yellow
-    );
+    log('  - Using nvm: nvm install 20.9.0 && nvm use 20.9.0', COLORS.yellow);
+    log('  - Using fnm: fnm install 20.9.0 && fnm use 20.9.0', COLORS.yellow);
     log('  - Or download from: https://nodejs.org', COLORS.yellow);
     process.exit(1);
   }
