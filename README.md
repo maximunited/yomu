@@ -117,28 +117,49 @@ YomU (יום-You) is a mobile-first web application that aggregates and displays
    Update `.env` with your configuration:
 
    ```env
-   DATABASE_URL=file:./dev.db
+   # Database (PostgreSQL - see options below)
+   DATABASE_URL=postgresql://yomu:yomu@localhost:5432/yomu
+
+   # NextAuth Configuration
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=your-secret-key-here-change-in-production
+
+   # Google OAuth (Optional)
    GOOGLE_CLIENT_ID=your-google-client-id-here
    GOOGLE_CLIENT_SECRET=your-google-client-secret-here
    ```
 
-4. **Set up the database**
+4. **Choose a PostgreSQL setup method:**
 
+   **Option A: Docker Compose (Recommended)**
    ```bash
+   ./scripts/docker-setup.sh setup
+   ./scripts/docker-setup.sh start-dev
+   ./scripts/docker-setup.sh init-db
+   ```
+   Access at: http://localhost:3001
+
+   **Option B: Manual PostgreSQL Setup**
+   ```bash
+   # Install PostgreSQL first (see CLAUDE.md for instructions)
    npx prisma generate
    npx prisma db push
-   ```
-
-5. **Run the development server**
-
-   ```bash
+   npm run db:seed
    npm run dev
    ```
+   Access at: http://localhost:3000
 
-6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+   **Option C: Vercel Postgres (Development Database)**
+   ```bash
+   npm i -g vercel
+   vercel link
+   vercel env pull .env
+   npx prisma generate
+   npx prisma db push
+   npm run db:seed
+   npm run dev
+   ```
+   Access at: http://localhost:3000
 
 ## 🐳 Docker & Podman Support
 
@@ -299,14 +320,19 @@ npm run test:partnerships
 
 ### Backend
 
-- **Node.js**: JavaScript runtime
-- **Prisma ORM**: Database toolkit
-- **SQLite**: Local development database
+- **Node.js 22+**: JavaScript runtime
+- **Prisma 7**: Next-generation ORM with PostgreSQL driver adapter
+- **PostgreSQL 16**: Production-ready relational database
 - **bcryptjs**: Password hashing
 
 ### Database
 
-- **SQLite**: Local development (can be switched to PostgreSQL for production)
+- **PostgreSQL**: Used for all environments (local, CI, production)
+- **Docker Compose**: PostgreSQL service for local development
+- **Prisma Migrations**: Type-safe database schema management
+- **Vercel Postgres**: Managed PostgreSQL for production deployments
+
+> **Note:** This project uses PostgreSQL exclusively. SQLite is no longer supported (migrated to PostgreSQL with Prisma 7 upgrade).
 
 ### Auth
 
