@@ -25,7 +25,8 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV SKIP_DB_PUSH=true
-ENV DATABASE_URL=postgresql://localhost:5432/yomu
+# Dummy PostgreSQL URL for build-time env checks (no actual connection)
+ENV DATABASE_URL=postgresql://yomu:yomu@localhost:5432/yomu
 
 RUN npm run build
 
