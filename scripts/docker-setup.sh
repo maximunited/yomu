@@ -69,8 +69,8 @@ setup_env() {
         else
             print_warning "No .env.example found, creating basic .env"
             cat > .env << EOF
-# Database
-DATABASE_URL="file:/data/dev.db"
+# Database (PostgreSQL)
+DATABASE_URL="postgresql://yomu:yomu@localhost:5432/yomu"
 
 # NextAuth
 NEXTAUTH_URL="http://localhost:3000"
@@ -119,10 +119,16 @@ stop_services() {
 # Initialize database
 init_database() {
     print_status "Initializing database..."
-    "${COMPOSE_CMD_ARRAY[@]}" exec app npx prisma generate || true
-    "${COMPOSE_CMD_ARRAY[@]}" exec app npx prisma migrate deploy || true
-    "${COMPOSE_CMD_ARRAY[@]}" exec app node scripts/seed.js || true
-    print_success "Database initialized"
+    print_status "Generating Prisma client..."
+    "${COMPOSE_CMD_ARRAY[@]}" exec app npx prisma generate
+
+    print_status "Applying database schema..."
+    "${COMPOSE_CMD_ARRAY[@]}" exec app npx prisma db push --accept-data-loss
+
+    print_status "Seeding database..."
+    "${COMPOSE_CMD_ARRAY[@]}" exec app node scripts/seed.js
+
+    print_success "Database initialized successfully"
 }
 
 # View logs
@@ -156,12 +162,11 @@ backup_database() {
     backup_dir="./backups"
     mkdir -p "${backup_dir}"
     timestamp=$(date +%Y%m%d_%H%M%S)
-    backup_file="${backup_dir}/backup_${timestamp}.db"
+    backup_file="${backup_dir}/backup_${timestamp}.sql"
 
     print_status "Creating database backup..."
-    "${COMPOSE_CMD_ARRAY[@]}" exec db sqlite3 /data/dev.db ".backup /data/backup_${timestamp}.db"
-    "${CONTAINER_RUNTIME}" cp yomu-db:"/data/backup_${timestamp}.db" "${backup_file}"
-    print_success "Database backed up to: $backup_file"
+    "${COMPOSE_CMD_ARRAY[@]}" exec -T db pg_dump -U yomu yomu > "${backup_file}"
+    print_success "Database backed up to: ${backup_file}"
 }
 
 # Restore database
@@ -178,7 +183,7 @@ restore_database() {
     fi
 
     print_status "Restoring database from: ${backup_file}"
-    "${CONTAINER_RUNTIME}" cp "${backup_file}" yomu-db:/data/dev.db
+    cat "${backup_file}" | "${COMPOSE_CMD_ARRAY[@]}" exec -T db psql -U yomu yomu
     print_success "Database restored"
 }
 

@@ -389,6 +389,70 @@ For production deployments, consider using:
 - Traefik for automatic SSL
 - Docker Swarm for orchestration
 
+## Node.js Version in Containers
+
+### Understanding the Base Image
+
+YomU uses `node:22-alpine` as the base Docker image, which:
+- Includes Node.js 22.x LTS pre-installed
+- Uses Alpine Linux (lightweight, ~5MB base size)
+- Uses musl libc instead of glibc (fewer compatibility issues)
+- Receives automatic security updates for Node.js patches
+
+### Common Mistakes
+
+❌ **DO NOT do this:**
+```dockerfile
+# Inside container
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+RUN nvm install 22.14.0
+```
+
+✅ **DO this instead:**
+```dockerfile
+# Use official Node.js image (Node.js already included)
+FROM node:22-alpine AS base
+```
+
+### Troubleshooting GLIBC Errors
+
+If you encounter errors like:
+```bash
+node: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.27' not found
+```
+
+This means:
+1. You're trying to install Node.js manually in an old Linux distribution
+2. The Node.js binary requires newer system libraries than available
+3. **Solution:** Use the official `node:22-alpine` image (Node.js pre-installed)
+
+The Alpine Linux base image uses **musl libc** instead of glibc, which avoids these compatibility issues entirely.
+
+### Verifying Node.js Version in Container
+
+```bash
+# Check Node.js version
+docker compose exec app node --version
+
+# Should output: v22.x.x (where x is the latest patch version)
+```
+
+### Upgrading Node.js in Docker
+
+To upgrade the Node.js version used in containers:
+
+1. Update the base image in `Dockerfile` and `Dockerfile.dev`:
+   ```dockerfile
+   FROM node:24-alpine AS base  # Upgrade from 22 to 24
+   ```
+
+2. Rebuild images:
+   ```bash
+   docker compose build --no-cache
+   ```
+
+3. Test thoroughly before deploying to production
+
 ## Contributing
 
 When contributing to the Docker setup:

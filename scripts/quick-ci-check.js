@@ -42,7 +42,8 @@ function main() {
   // Only fallback to local DB in development
   if (!process.env.DATABASE_URL) {
     if (process.env.NODE_ENV !== 'production') {
-      process.env.DATABASE_URL = 'postgresql://localhost:5432/yomu';
+      // Dummy PostgreSQL URL for build-time env checks (no actual connection)
+      process.env.DATABASE_URL = 'postgresql://yomu:yomu@localhost:5432/yomu';
       log('ℹ️  Using local development database', 'blue');
     } else {
       log('❌ DATABASE_URL is required in production', 'red');

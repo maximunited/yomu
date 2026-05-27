@@ -266,6 +266,78 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret-here
 5. Seed the database: `npm run db:seed`
 6. Start dev server: `npm run dev`
 
+### Node.js Version Management
+
+**Minimum Version:** Node.js 22.14.0 (specified in `package.json` engines field)
+
+**Current Environment Versions:**
+- **Local Development:** Uses `.nvmrc` (Node.js 22.14.0 recommended)
+- **Docker Containers:** Uses `node:22-alpine` (Node.js 22.x LTS)
+- **GitHub Actions CI:** Uses `.nvmrc` for consistency
+
+**Version Semantics:**
+The `>=22.14.0` requirement in `package.json` means:
+- ✅ Any Node.js version 22.14.0 or higher is supported
+- ✅ Node.js 22.15.0, 23.0.0, 26.2.0 all work
+- ❌ Node.js 22.13.0, 20.x, 18.x will NOT work
+
+**For New Developers:**
+
+1. **Install Node.js using a version manager** (recommended):
+
+   ```bash
+   # Using nvm (https://github.com/nvm-sh/nvm)
+   nvm install
+   nvm use
+
+   # Using fnm (https://github.com/Schniz/fnm)
+   fnm install
+   fnm use
+
+   # Using volta (https://volta.sh)
+   volta install node
+   ```
+
+2. **Or install Node.js manually:**
+   - Download from https://nodejs.org (use 22.14.0 or higher)
+   - Verify: `node --version` should show v22.14.0 or higher
+
+**Docker Environments:**
+- The official `node:22-alpine` image includes Node.js and all required system libraries
+- **DO NOT attempt to manually install Node.js inside Docker containers**
+- If you encounter GLIBC errors, you're likely trying to install Node.js manually (not needed)
+- The Alpine Linux base uses musl libc, avoiding common GLIBC compatibility issues
+
+**CI/CD Environments:**
+- GitHub Actions uses `actions/setup-node@v4` which reads `.nvmrc` automatically
+- No manual Node.js installation needed in CI pipelines
+
+**Troubleshooting:**
+
+1. **GLIBC errors (e.g., "GLIBC_2.27 not found"):**
+   - This indicates attempting to install Node.js on an old Linux distribution
+   - In Docker: Use official `node:22-alpine` image (already included)
+   - On host systems: Use a version manager (nvm/fnm) or update your OS
+
+2. **"nvm is not compatible with npm config 'prefix' option":**
+   - Run: `npm config delete prefix` or `npm config set prefix $NVM_DIR/versions/node/v22.14.0`
+   - Then retry: `nvm install 22.14.0`
+
+3. **Version mismatch warnings:**
+   - Run: `node --version` to check current version
+   - Ensure it matches `.nvmrc` or is >= 22.14.0
+   - Use `nvm use` or `fnm use` to switch versions
+
+**Updating Node.js Version:**
+
+If you need to update the project's Node.js version:
+
+1. Update `.nvmrc`
+2. Update `package.json` engines.node field
+3. Update Dockerfile base images (`FROM node:XX-alpine`)
+4. Test in all environments (local, Docker, CI)
+5. Document in commit message and update CLAUDE.md
+
 ## Development Workflow
 
 ### Code Quality and Pre-commit Guidelines

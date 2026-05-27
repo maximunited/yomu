@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.9.0",
+    "node": ">=22.14.0",
     "npm": ">=10.0.0"
   },
   "config": {
@@ -130,6 +130,9 @@
     "postcss": "^8.5.10",
     "uuid": "^11.1.1",
     "@hono/node-server": "^1.19.13"
+  },
+  "_comment_overrides": {
+    "@hono/node-server": "Pinned to 1.19.13 - Prisma 7.8.0 transitively depends on 1.19.14 which may have compatibility issues. Override ensures stable version."
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
