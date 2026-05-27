@@ -150,7 +150,7 @@ Or create a new account via `/auth/signup`
 **Solution:** Create `.env` file with `DATABASE_URL=postgresql://...`
 
 ### "Cannot connect to database"
-**Docker:** Run `./scripts/docker-setup.sh status` - db should be "healthy"  
+**Docker:** Run `./scripts/docker-setup.sh status` - db should be "healthy"
 **Manual:** Check PostgreSQL is running: `pg_isready`
 
 ### "Prisma Client not generated"
@@ -160,7 +160,7 @@ Or create a new account via `/auth/signup`
 **Solution:** Run `npx prisma db push`
 
 ### Port 3000 already in use
-**Docker:** Use port 3001 instead (default for dev mode)  
+**Docker:** Use port 3001 instead (default for dev mode)
 **Manual:** Change `NEXTAUTH_URL` in `.env` to `http://localhost:3001` and run `npm run dev -- -p 3001`
 
 ---
@@ -230,7 +230,7 @@ npm run db:seed -- --mode=upsert
 
 - **Documentation:** See `CLAUDE.md` for detailed guides
 - **Issues:** Check existing issues or create a new one
-- **Logs:** 
+- **Logs:**
   - Docker: `./scripts/docker-setup.sh logs app`
   - Manual: Check terminal where `npm run dev` is running
 
