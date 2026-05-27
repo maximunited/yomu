@@ -81,21 +81,21 @@ This document provides instructions for running YomU using Docker or Podman with
 ### Production Stack (`compose.yml`)
 
 - **app**: Next.js application (production build)
-- **db**: SQLite database with persistent storage
+- **db**: PostgreSQL 16 database with persistent storage
 - **app-dev**: Development version with hot reload (optional)
 
 ### Development Stack
 
 - **app-dev**: Next.js development server with hot reload
-- **db**: SQLite database with persistent storage
+- **db**: PostgreSQL 16 database (shared with production stack)
 
 ## Environment Variables
 
 Create a `.env` file in the root directory:
 
 ```env
-# Database
-DATABASE_URL="file:/data/dev.db"
+# Database (PostgreSQL)
+DATABASE_URL="postgresql://yomu:yomu@localhost:5432/yomu"
 
 # NextAuth
 NEXTAUTH_URL="http://localhost:3000"
@@ -104,6 +104,8 @@ NEXTAUTH_SECRET="your-secret-key-here"
 # Node Environment
 NODE_ENV="production"
 ```
+
+**Note:** When running with Docker Compose, the database service is available at `db:5432` from inside containers, but `localhost:5432` from your host machine.
 
 ## Commands Reference
 
@@ -166,15 +168,18 @@ docker-compose exec app node scripts/seed.js
 ### Backup Database
 
 ```bash
-# Copy database from container
-docker cp yomu-db:/data/dev.db ./backup/dev.db
+# Create backup directory
+mkdir -p ./backup
+
+# Backup PostgreSQL database
+docker-compose exec -T db pg_dump -U yomu yomu > ./backup/yomu_$(date +%Y%m%d_%H%M%S).sql
 ```
 
 ### Restore Database
 
 ```bash
-# Copy database to container
-docker cp ./backup/dev.db yomu-db:/data/dev.db
+# Restore from backup file
+cat ./backup/yomu_YYYYMMDD_HHMMSS.sql | docker-compose exec -T db psql -U yomu yomu
 ```
 
 ## Development Workflow

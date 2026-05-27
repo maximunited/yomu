@@ -151,8 +151,10 @@ tests/
 ### Tech Stack
 
 - **Framework**: Next.js 15 with App Router and TypeScript
-- **Database**: SQLite (development) with Prisma ORM
-  - ⚠️ **Production Warning**: SQLite is for development only. For production, switch to PostgreSQL or MySQL by updating the Prisma schema and `DATABASE_URL` in `.env`
+- **Database**: PostgreSQL with Prisma ORM
+  - Migrated to PostgreSQL with Prisma 7 upgrade (commit 9427d10)
+  - Local development: Use Docker Compose PostgreSQL or Vercel Postgres
+  - Production: Vercel Postgres or any managed PostgreSQL service
 - **Authentication**: NextAuth.js with Google OAuth and email/password
 - **Styling**: Tailwind CSS with dark mode support
 - **Testing**: Jest for unit tests, Playwright for E2E tests
@@ -232,13 +234,87 @@ When working with benefits, always use the validation functions from `src/lib/be
 
 ## Initial Setup
 
+### Database Requirements
+
+**This project uses PostgreSQL exclusively.** The Prisma schema is configured for PostgreSQL only (migrated from SQLite in Prisma 7 upgrade).
+
+### Local Development Options
+
+Choose ONE of the following methods to run PostgreSQL locally:
+
+#### Option 1: Docker Compose (Recommended)
+
+Easiest setup - includes PostgreSQL automatically:
+
+```bash
+# One-time setup
+./scripts/docker-setup.sh setup
+
+# Start PostgreSQL + app
+./scripts/docker-setup.sh start-dev
+
+# Initialize database (first time only)
+./scripts/docker-setup.sh init-db
+```
+
+Your `.env` should use:
+```env
+DATABASE_URL=postgresql://yomu:yomu@localhost:5432/yomu
+```
+
+#### Option 2: Vercel Postgres (Development Database)
+
+Use Vercel's managed PostgreSQL for local development:
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Link project and pull environment
+vercel link
+vercel env pull .env
+
+# Setup database
+npx prisma generate
+npx prisma db push
+npm run db:seed
+npm run dev
+```
+
+#### Option 3: Local PostgreSQL Installation
+
+Install PostgreSQL manually on your system:
+
+**Windows:**
+- Download from https://www.postgresql.org/download/windows/
+- Use default port 5432
+
+**macOS:**
+```bash
+brew install postgresql@16
+brew services start postgresql@16
+createdb yomu
+```
+
+**Linux:**
+```bash
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo -u postgres createdb yomu
+```
+
+Then configure `.env`:
+```env
+DATABASE_URL=postgresql://postgres:password@localhost:5432/yomu
+```
+
 ### Environment Variables
 
-Create a `.env` file in the project root with the following required variables:
+Create a `.env` file in the project root:
 
 ```env
-# Database
-DATABASE_URL=file:./dev.db
+# Database (PostgreSQL)
+DATABASE_URL=postgresql://yomu:yomu@localhost:5432/yomu
 
 # NextAuth.js Configuration
 NEXTAUTH_URL=http://localhost:3000
@@ -250,21 +326,24 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret-here
 ```
 
 **Required for basic functionality:**
-- `DATABASE_URL`: SQLite database path (use `file:./dev.db` for local development)
+- `DATABASE_URL`: PostgreSQL connection string (format: `postgresql://user:password@host:port/database`)
 - `NEXTAUTH_URL`: The base URL of your application
 - `NEXTAUTH_SECRET`: Secret key for JWT encryption (generate with `openssl rand -base64 32`)
 
 **Optional:**
 - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: Only needed if enabling Google OAuth
 
-### First-Time Setup
+### First-Time Setup (Without Docker)
+
+If you're NOT using Docker Compose (Option 1), follow these steps:
 
 1. Install dependencies: `npm install`
-2. Create `.env` file with the required variables above
-3. Generate Prisma client: `npx prisma generate`
-4. Initialize database: `npx prisma db push`
-5. Seed the database: `npm run db:seed`
-6. Start dev server: `npm run dev`
+2. Ensure PostgreSQL is running (see Local Development Options above)
+3. Create `.env` file with the required variables above
+4. Generate Prisma client: `npx prisma generate`
+5. Initialize database: `npx prisma db push`
+6. Seed the database: `npm run db:seed`
+7. Start dev server: `npm run dev`
 
 ### Node.js Version Management
 
