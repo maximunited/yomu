@@ -61,6 +61,8 @@ yarn-error.log*
 .env
 .env.local
 .env*.local
+.env.production
+.env.vercel
 .envrc
 .direnv/
 # Allow .env.example as template

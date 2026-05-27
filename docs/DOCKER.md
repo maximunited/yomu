@@ -417,7 +417,7 @@ FROM node:22-alpine AS base
 ### Troubleshooting GLIBC Errors
 
 If you encounter errors like:
-```
+```bash
 node: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.27' not found
 ```
 

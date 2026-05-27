@@ -299,7 +299,7 @@ The `>=22.14.0` requirement in `package.json` means:
    ```
 
 2. **Or install Node.js manually:**
-   - Download from https://nodejs.org (use 20.x or higher)
+   - Download from https://nodejs.org (use 22.14.0 or higher)
    - Verify: `node --version` should show v22.14.0 or higher
 
 **Docker Environments:**

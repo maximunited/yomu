@@ -1,6 +1,9 @@
 #!/bin/bash
 # Database setup script - run after connecting Prisma to project
 
+# Fail fast on errors, undefined variables, and pipeline failures
+set -euo pipefail
+
 echo "📥 Pulling environment variables..."
 vercel env pull .env.local --yes
 
