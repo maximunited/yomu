@@ -18,7 +18,7 @@ This document provides a comprehensive overview of YomU's architecture across al
 
 ## Overview
 
-YomU is a Next.js 15 application designed for mobile-first birthday benefits aggregation. The architecture supports three distinct environments:
+YomU is a Next.js 16 application designed for mobile-first birthday benefits aggregation. The architecture supports three distinct environments:
 
 | Environment | Purpose | Database | Deployment |
 |------------|---------|----------|------------|
@@ -34,10 +34,10 @@ YomU is a Next.js 15 application designed for mobile-first birthday benefits agg
 
 ```
 ┌─────────────────────────────────┐
-│   Next.js 15 (App Router)       │
+│   Next.js 16 (App Router)       │
 │   ├── React 19                  │
-│   ├── TypeScript 5.x            │
-│   ├── Tailwind CSS 4.x          │
+│   ├── TypeScript 6.x            │
+│   ├── Tailwind CSS 3.x          │
 │   └── Lucide React (icons)      │
 └─────────────────────────────────┘
 ```

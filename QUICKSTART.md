@@ -85,8 +85,13 @@ createdb yomu
 sudo apt update
 sudo apt install postgresql postgresql-contrib
 sudo systemctl start postgresql
-sudo -u postgres createdb yomu
-sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+
+# Create dedicated user for YomU (choose your own password)
+sudo -u postgres psql << EOF
+CREATE USER yomu WITH PASSWORD 'your-secure-password-here';
+CREATE DATABASE yomu OWNER yomu;
+GRANT ALL PRIVILEGES ON DATABASE yomu TO yomu;
+EOF
 ```
 
 **Windows:**
@@ -109,7 +114,7 @@ npm install
 cp .env.example .env
 
 # 3. Edit .env and update DATABASE_URL:
-# DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/yomu"
+# DATABASE_URL="postgresql://yomu:your-secure-password-here@localhost:5432/yomu"
 
 # 4. Setup database
 npx prisma generate
