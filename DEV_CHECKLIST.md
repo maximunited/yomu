@@ -458,5 +458,5 @@ open coverage/lcov-report/index.html
 
 ---
 
-**Last Updated:** 2026-05-27  
+**Last Updated:** 2026-05-27
 **For detailed information, always refer to the full documentation files.**

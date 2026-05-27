@@ -114,24 +114,24 @@ This migration has already been completed. This checklist is for documentation p
 ## Troubleshooting
 
 ### "SQLite is not supported"
-**Problem:** Trying to use old SQLite configuration  
+**Problem:** Trying to use old SQLite configuration
 **Solution:** Update `DATABASE_URL` to use PostgreSQL format
 
 ### "Connection refused on port 5432"
-**Problem:** PostgreSQL is not running  
-**Solution:** 
+**Problem:** PostgreSQL is not running
+**Solution:**
 - Docker: `./scripts/docker-setup.sh start-dev`
 - Manual: `brew services start postgresql@16` (macOS) or `sudo systemctl start postgresql` (Linux)
 
 ### "Database 'yomu' does not exist"
-**Problem:** Database not created  
+**Problem:** Database not created
 **Solution:**
 - Docker: `./scripts/docker-setup.sh init-db`
 - Manual: `createdb yomu` then `npx prisma db push`
 
 ### "Prisma schema does not support sqlite"
-**Problem:** Old documentation or cached schema  
-**Solution:** 
+**Problem:** Old documentation or cached schema
+**Solution:**
 1. Run `npx prisma generate` to regenerate client
 2. Check `prisma/schema.prisma` - should say `provider = "postgresql"`
 3. Update `DATABASE_URL` to PostgreSQL format
