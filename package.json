@@ -87,7 +87,7 @@
     "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.4",
-    "@next/eslint-plugin-next": "^16.2.6",
+    "@next/eslint-plugin-next": "^16.2.7",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.3.0",
     "@testing-library/jest-dom": "^6.8.0",
@@ -107,14 +107,14 @@
     "husky": "^9.1.7",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "lint-staged": "^17.0.5",
+    "lint-staged": "^17.0.7",
     "msw": "^2.14.6",
     "playwright": "^1.55.0",
     "prettier": "^3.6.2",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0"
+    "typescript-eslint": "^8.60.1"
   },
   "overrides": {
     "braces": "^3.0.3",
