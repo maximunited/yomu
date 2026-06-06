@@ -99,7 +99,7 @@
     "@types/react-dom": "^19.1.9",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^9.39.4",
+    "eslint": "^10.4.1",
     "eslint-config-next": "^16.2.7",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
@@ -129,10 +129,12 @@
     "glob": "^10.0.0",
     "postcss": "^8.5.10",
     "uuid": "^11.1.1",
-    "@hono/node-server": "^1.19.13"
+    "@hono/node-server": "^1.19.13",
+    "eslint": "$eslint"
   },
   "_comment_overrides": {
-    "@hono/node-server": "Pinned to 1.19.13 - Prisma 7.8.0 transitively depends on 1.19.14 which may have compatibility issues. Override ensures stable version."
+    "@hono/node-server": "Pinned to 1.19.13 - Prisma 7.8.0 transitively depends on 1.19.14 which may have compatibility issues. Override ensures stable version.",
+    "eslint": "Forces eslint 10 everywhere, bypassing eslint-plugin-react's ^9.7 peer dep until it officially supports eslint 10."
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [

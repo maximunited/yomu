@@ -4,6 +4,7 @@ import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import nextPlugin from '@next/eslint-plugin-next';
+import { fixupPluginRules } from '@eslint/compat';
 
 export default tseslint.config(
   {
@@ -46,7 +47,7 @@ export default tseslint.config(
       },
     },
     plugins: {
-      react: reactPlugin,
+      react: fixupPluginRules(reactPlugin),
       'react-hooks': reactHooksPlugin,
       '@next/next': nextPlugin,
     },
