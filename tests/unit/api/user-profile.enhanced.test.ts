@@ -3,9 +3,21 @@ import { PUT, GET } from '@/app/api/user/profile/route';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest } from 'next/server';
 
-// Mock next-auth
-jest.mock('next-auth', () => ({
-  getServerSession: jest.fn(),
+// Mock Clerk auth
+jest.mock('@clerk/nextjs/server', () => ({
+  auth: jest.fn(() => Promise.resolve({ userId: 'user_test123' })),
+}));
+
+// Mock clerk-user helper
+jest.mock('@/lib/clerk-user', () => ({
+  getOrCreateUser: jest.fn(() =>
+    Promise.resolve({
+      id: 'user-123',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    })
+  ),
 }));
 
 // Mock prisma
@@ -19,19 +31,23 @@ jest.mock('@/lib/prisma', () => ({
   },
 }));
 
-// Mock auth options
-jest.mock('@/lib/auth', () => ({
-  authOptions: {},
-}));
-
 describe('/api/user/profile Enhanced Tests', () => {
-  const mockGetServerSession = require('next-auth').getServerSession;
+  const mockAuth = require('@clerk/nextjs/server').auth;
+  const mockGetOrCreateUser = require('@/lib/clerk-user').getOrCreateUser;
   const { prisma } = require('@/lib/prisma');
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Suppress console.log for tests
     jest.spyOn(console, 'log').mockImplementation(() => {});
+    // Reset default mocks
+    mockAuth.mockResolvedValue({ userId: 'user_test123' });
+    mockGetOrCreateUser.mockResolvedValue({
+      id: 'user-123',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    });
   });
 
   afterEach(() => {
@@ -40,10 +56,6 @@ describe('/api/user/profile Enhanced Tests', () => {
 
   describe('PUT /api/user/profile', () => {
     it('should update profile with valid session', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user-123', email: 'test@example.com' },
-      });
-
       prisma.user.update.mockResolvedValue({
         id: 'user-123',
         name: 'Updated Name',
@@ -87,10 +99,6 @@ describe('/api/user/profile Enhanced Tests', () => {
     });
 
     it('should handle anniversary date correctly', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user-123' },
-      });
-
       prisma.user.update.mockResolvedValue({
         id: 'user-123',
         name: 'Test User',
@@ -127,45 +135,8 @@ describe('/api/user/profile Enhanced Tests', () => {
       });
     });
 
-    it('should use test user when session is missing', async () => {
-      mockGetServerSession.mockResolvedValue(null);
-
-      prisma.user.findFirst.mockResolvedValue({
-        id: 'test-user-123',
-        email: 'test@example.com',
-      });
-
-      prisma.user.update.mockResolvedValue({
-        id: 'test-user-123',
-        name: 'Test User',
-      });
-
-      const requestBody = {
-        name: 'Test User',
-        dateOfBirth: '1990-01-01',
-      };
-
-      const request = new NextRequest(
-        'http://localhost:3000/api/user/profile',
-        {
-          method: 'PUT',
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      const response = await PUT(request);
-
-      expect(response.status).toBe(200);
-      expect(prisma.user.findFirst).toHaveBeenCalled();
-      expect(prisma.user.update).toHaveBeenCalledWith({
-        where: { id: 'test-user-123' },
-        data: expect.any(Object),
-      });
-    });
-
-    it('should return 401 when no session and no test user', async () => {
-      mockGetServerSession.mockResolvedValue(null);
-      prisma.user.findFirst.mockResolvedValue(null);
+    it('should return 401 when not authenticated', async () => {
+      mockAuth.mockResolvedValue({ userId: null });
 
       const request = new NextRequest(
         'http://localhost:3000/api/user/profile',
@@ -179,15 +150,10 @@ describe('/api/user/profile Enhanced Tests', () => {
       const data = await response.json();
 
       expect(response.status).toBe(401);
-      expect(data.message).toBe('unauthorized');
-      expect(data.error).toBe('AUTHENTICATION_REQUIRED');
+      expect(data.error).toBe('Unauthorized');
     });
 
     it('should handle database errors gracefully', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user-123' },
-      });
-
       prisma.user.update.mockRejectedValue(new Error('Database error'));
 
       const request = new NextRequest(
@@ -206,10 +172,6 @@ describe('/api/user/profile Enhanced Tests', () => {
     });
 
     it('should handle invalid JSON in request body', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user-123' },
-      });
-
       const request = new NextRequest(
         'http://localhost:3000/api/user/profile',
         {
@@ -224,10 +186,6 @@ describe('/api/user/profile Enhanced Tests', () => {
     });
 
     it('should handle profile picture updates', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user-123' },
-      });
-
       prisma.user.update.mockResolvedValue({
         id: 'user-123',
         name: 'Test User',
@@ -262,10 +220,6 @@ describe('/api/user/profile Enhanced Tests', () => {
 
   describe('GET /api/user/profile', () => {
     it('should return user profile with valid session', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user-123' },
-      });
-
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-123',
         name: 'Test User',
@@ -284,35 +238,18 @@ describe('/api/user/profile Enhanced Tests', () => {
       expect(data.user.email).toBe('test@example.com');
     });
 
-    it('should use test user when session is missing', async () => {
-      mockGetServerSession.mockResolvedValue(null);
-
-      prisma.user.findFirst.mockResolvedValue({
-        id: 'test-user-123',
-      });
-
-      prisma.user.findUnique.mockResolvedValue({
-        id: 'test-user-123',
-        name: 'Test User',
-        email: 'test@example.com',
-      });
+    it('should return 401 when not authenticated', async () => {
+      mockAuth.mockResolvedValue({ userId: null });
 
       const request = new NextRequest('http://localhost:3000/api/user/profile');
       const response = await GET(request);
+      const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(prisma.user.findFirst).toHaveBeenCalled();
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
-        where: { id: 'test-user-123' },
-        select: expect.any(Object),
-      });
+      expect(response.status).toBe(401);
+      expect(data.error).toBe('Unauthorized');
     });
 
     it('should handle user not found', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'nonexistent-user' },
-      });
-
       prisma.user.findUnique.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/user/profile');

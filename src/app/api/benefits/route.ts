@@ -1,36 +1,18 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreateUser } from '@/lib/clerk-user';
 import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
     console.log('=== Starting GET request to /api/benefits ===');
 
-    const session = await getServerSession(authOptions);
-    console.log('Session:', session ? 'Found' : 'Not found');
-
-    // For testing purposes, let's use a hardcoded user ID if session fails
-    let userId = session?.user?.id;
-
-    if (!userId) {
-      console.log('No session user ID, using test user ID');
-      // Get the first user from the database for testing
-      const testUser = await prisma.user.findFirst();
-      if (testUser) {
-        userId = testUser.id;
-        console.log('Using test user ID:', userId);
-      } else {
-        console.log('No users found in database');
-        return NextResponse.json(
-          {
-            message: 'unauthorized',
-            error: 'AUTHENTICATION_REQUIRED',
-          },
-          { status: 401 }
-        );
-      }
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const dbUser = await getOrCreateUser(clerkUserId);
+    const userId = dbUser.id;
 
     // Get user's memberships
     const userMemberships = await prisma.userMembership.findMany({

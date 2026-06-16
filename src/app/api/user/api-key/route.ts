@@ -1,24 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreateUser } from '@/lib/clerk-user';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { apiKey: true },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    const user = await getOrCreateUser(clerkUserId);
 
     return NextResponse.json({ apiKey: user.apiKey });
   } catch (error) {
@@ -32,9 +24,8 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -47,8 +38,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    const dbUser = await getOrCreateUser(clerkUserId);
     const user = await prisma.user.update({
-      where: { email: session.user.email },
+      where: { id: dbUser.id },
       data: { apiKey: apiKey.trim() },
       select: { apiKey: true },
     });

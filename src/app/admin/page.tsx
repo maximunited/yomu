@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 import {
   PlusIcon,
   PencilIcon,
@@ -13,8 +12,7 @@ import AdminForm from '@/components/AdminForm';
 import type { Brand, Benefit } from '@/types/admin';
 
 export default function AdminPage() {
-  const { status } = useSession();
-  const router = useRouter();
+  const { isLoaded, isSignedIn } = useUser();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,18 +20,11 @@ export default function AdminPage() {
   const [editingItem, setEditingItem] = useState<Brand | Benefit | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  // Redirect if not authenticated
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-    }
-  }, [status, router]);
-
-  useEffect(() => {
-    if (status === 'authenticated') {
+    if (isLoaded && isSignedIn) {
       loadData();
     }
-  }, [status]);
+  }, [isLoaded, isSignedIn]);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -140,7 +131,7 @@ export default function AdminPage() {
     setShowForm(true);
   };
 
-  if (status === 'loading' || isLoading) {
+  if (!isLoaded || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

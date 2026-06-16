@@ -11,7 +11,7 @@ import {
   CheckCircle,
   Circle,
 } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
 
@@ -41,7 +41,7 @@ interface Brand {
 }
 
 export default function MembershipsPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded, isSignedIn } = useUser();
   const { t, language } = useLanguage();
   const router = useRouter();
   const [customMembership, setCustomMembership] = useState({
@@ -66,13 +66,6 @@ export default function MembershipsPage() {
   const [availableBrands, setAvailableBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-    }
-  }, [status, router]);
 
   // Load available brands from database
   useEffect(() => {
@@ -379,10 +372,10 @@ export default function MembershipsPage() {
       }
     };
 
-    if (session) {
+    if (isSignedIn) {
       loadData();
     }
-  }, [session, t]);
+  }, [isSignedIn, t]);
 
   // Note: Do not early-return before all hooks are called. Authentication gates are placed later.
 
@@ -398,10 +391,10 @@ export default function MembershipsPage() {
 
   const handleSaveChanges = async () => {
     const previousScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-    if (!session) {
+    if (!isSignedIn) {
       console.error('No session available');
       alert(t('unauthorized'));
-      router.push('/auth/signin');
+      router.push('/sign-in');
       return;
     }
 
@@ -460,7 +453,7 @@ export default function MembershipsPage() {
 
         if (response.status === 401) {
           alert(t('unauthorized'));
-          router.push('/auth/signin');
+          router.push('/sign-in');
         } else if (response.status === 500) {
           alert(t('internalServerError'));
         } else {
@@ -668,7 +661,7 @@ export default function MembershipsPage() {
   }, [filteredMemberships, originalActiveMap, language]);
 
   // Authentication gates (placed after hooks to keep hook order stable)
-  if (status === 'loading') {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -681,7 +674,7 @@ export default function MembershipsPage() {
     );
   }
 
-  if (status === 'unauthenticated') {
+  if (!isSignedIn) {
     return null;
   }
 

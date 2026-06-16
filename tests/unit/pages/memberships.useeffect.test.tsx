@@ -13,9 +13,11 @@ jest.mock('next/navigation', () => ({
   })),
 }));
 
-// Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(),
+// Mock Clerk
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(),
+  useAuth: jest.fn(),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock fetch
@@ -86,10 +88,22 @@ describe('MembershipsPage useEffect Dependencies', () => {
     });
 
     // Mock authenticated session
-    const { useSession } = require('next-auth/react');
-    useSession.mockReturnValue({
-      data: { user: { id: 'test-user-id' } },
-      status: 'authenticated',
+    const { useUser, useAuth } = require('@clerk/nextjs');
+    useUser.mockReturnValue({
+      user: {
+        id: 'user_test123',
+        fullName: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+        primaryEmailAddress: { emailAddress: 'test@example.com' },
+      },
+      isLoaded: true,
+      isSignedIn: true,
+    });
+    useAuth.mockReturnValue({
+      userId: 'user_test123',
+      isLoaded: true,
+      isSignedIn: true,
     });
   });
 
@@ -145,10 +159,22 @@ describe('MembershipsPage useEffect Dependencies', () => {
     const initialFetchCount = fetchCallCount;
 
     // Change session but keep it authenticated
-    const { useSession } = require('next-auth/react');
-    useSession.mockReturnValue({
-      data: { user: { id: 'different-user-id' } },
-      status: 'authenticated',
+    const { useUser, useAuth } = require('@clerk/nextjs');
+    useUser.mockReturnValue({
+      user: {
+        id: 'user_different123',
+        fullName: 'Different User',
+        firstName: 'Different',
+        lastName: 'User',
+        primaryEmailAddress: { emailAddress: 'different@example.com' },
+      },
+      isLoaded: true,
+      isSignedIn: true,
+    });
+    useAuth.mockReturnValue({
+      userId: 'user_different123',
+      isLoaded: true,
+      isSignedIn: true,
     });
 
     // Re-render with new session

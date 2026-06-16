@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { Bell, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,8 +17,7 @@ interface Notification {
 }
 
 export default function NotificationsPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const { isLoaded } = useUser();
   const { t, language } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -53,12 +51,6 @@ export default function NotificationsPage() {
     },
   ]);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-    }
-  }, [status, router]);
-
   const markAsRead = (id: string) => {
     setNotifications((prev) =>
       prev.map((notification) =>
@@ -83,7 +75,7 @@ export default function NotificationsPage() {
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">

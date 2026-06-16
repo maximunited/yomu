@@ -51,8 +51,8 @@ export const testBenefits = {
 
 export const urls = {
   home: '/',
-  signin: '/auth/signin',
-  signup: '/auth/signup',
+  signin: '/sign-in',
+  signup: '/sign-up',
   dashboard: '/dashboard',
   memberships: '/memberships',
   onboarding: '/onboarding',

@@ -39,7 +39,7 @@ export default function HomePage() {
           <div className="flex items-center space-x-4">
             <DarkModeToggle />
             <LanguageSwitcher />
-            <Link href="/auth/signin">
+            <Link href="/sign-in">
               <Button
                 variant="outline"
                 className="border-2 border-gray-400 hover:border-gray-500"
@@ -47,7 +47,7 @@ export default function HomePage() {
                 {t('signIn')}
               </Button>
             </Link>
-            <Link href="/auth/signup">
+            <Link href="/sign-up">
               <Button>{t('signUp')}</Button>
             </Link>
           </div>
@@ -72,7 +72,7 @@ export default function HomePage() {
             {t('heroDescription')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/signup">
+            <Link href="/sign-up">
               <Button size="lg" className="text-lg px-8 py-4">
                 {t('getStarted')}
               </Button>

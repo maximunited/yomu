@@ -104,20 +104,55 @@ console.error = (...args) => {
   originalConsoleError(...args);
 };
 
-// Mock NextAuth
-jest.mock('next-auth/react', () => {
+// Mock Clerk
+jest.mock('@clerk/nextjs', () => {
   const React = require('react');
   return {
-    useSession: jest.fn(() => ({
-      data: null,
-      status: 'unauthenticated',
+    useUser: jest.fn(() => ({
+      user: null,
+      isLoaded: true,
+      isSignedIn: false,
     })),
-    signIn: jest.fn(),
-    signOut: jest.fn(),
-    SessionProvider: ({ children }) =>
+    useClerk: jest.fn(() => ({
+      signOut: jest.fn(),
+    })),
+    useAuth: jest.fn(() => ({
+      userId: null,
+      isLoaded: true,
+      isSignedIn: false,
+    })),
+    SignInButton: ({ children }) =>
+      React.createElement(React.Fragment, null, children),
+    SignUpButton: ({ children }) =>
+      React.createElement(React.Fragment, null, children),
+    ClerkProvider: ({ children }) =>
       React.createElement(React.Fragment, null, children),
   };
 });
+
+jest.mock('@clerk/nextjs/server', () => ({
+  auth: jest.fn(() => Promise.resolve({ userId: null })),
+  clerkClient: jest.fn(() =>
+    Promise.resolve({
+      users: {
+        getUser: jest.fn(),
+      },
+    })
+  ),
+  clerkMiddleware: jest.fn((handler) => handler),
+  createRouteMatcher: jest.fn(() => jest.fn(() => false)),
+}));
+
+jest.mock('@/lib/clerk-user', () => ({
+  getOrCreateUser: jest.fn(() =>
+    Promise.resolve({
+      id: 'user-1',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    })
+  ),
+}));
 
 // Mock Prisma
 jest.mock('@/lib/prisma', () => ({

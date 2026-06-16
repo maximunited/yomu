@@ -3,11 +3,16 @@ import { render, screen, waitFor, act } from '../../utils/test-helpers';
 import userEvent from '@testing-library/user-event';
 import DashboardPage from '@/app/dashboard/page';
 
-// Mock next-auth
-const mockUseSession = jest.fn();
-jest.mock('next-auth/react', () => ({
-  useSession: () => mockUseSession(),
-  signOut: jest.fn(),
+// Mock Clerk
+const mockUseUser = jest.fn();
+const mockUseAuth = jest.fn();
+jest.mock('@clerk/nextjs', () => ({
+  useUser: () => mockUseUser(),
+  useAuth: () => mockUseAuth(),
+  useClerk: jest.fn(() => ({
+    signOut: jest.fn(),
+  })),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock next/navigation
@@ -31,11 +36,21 @@ Object.assign(navigator, {
 describe('Dashboard Filters and Search', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseSession.mockReturnValue({
-      data: {
-        user: { id: 'user-1', name: 'Test User', email: 'test@example.com' },
+    mockUseUser.mockReturnValue({
+      user: {
+        id: 'user_test123',
+        fullName: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+        primaryEmailAddress: { emailAddress: 'test@example.com' },
       },
-      status: 'authenticated',
+      isLoaded: true,
+      isSignedIn: true,
+    });
+    mockUseAuth.mockReturnValue({
+      userId: 'user_test123',
+      isLoaded: true,
+      isSignedIn: true,
     });
     mockUseSearchParams.mockReturnValue(new URLSearchParams());
 
@@ -254,14 +269,20 @@ describe('Dashboard Filters and Search', () => {
     });
   });
 
-  it('should redirect unauthenticated users', () => {
-    mockUseSession.mockReturnValue({
-      data: null,
-      status: 'unauthenticated',
+  it('should not load data when unauthenticated', () => {
+    mockUseUser.mockReturnValue({
+      user: null,
+      isLoaded: true,
+      isSignedIn: false,
+    });
+    mockUseAuth.mockReturnValue({
+      userId: null,
+      isLoaded: true,
+      isSignedIn: false,
     });
 
     render(<DashboardPage />);
 
-    expect(mockPush).toHaveBeenCalledWith('/auth/signin');
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });

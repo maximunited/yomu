@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreateUser } from '@/lib/clerk-user';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    let userId = session?.user?.id;
-
-    if (!userId) {
-      const testUser = await prisma.user.findFirst();
-      if (testUser) {
-        userId = testUser.id;
-      } else {
-        return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
-      }
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const dbUser = await getOrCreateUser(clerkUserId);
+    const userId = dbUser.id;
 
     const { customMembershipId, benefit } = await request.json();
 
@@ -70,17 +65,12 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    let userId = session?.user?.id;
-
-    if (!userId) {
-      const testUser = await prisma.user.findFirst();
-      if (testUser) {
-        userId = testUser.id;
-      } else {
-        return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
-      }
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const dbUser = await getOrCreateUser(clerkUserId);
+    const userId = dbUser.id;
 
     const { customMembershipId, updates } = await request.json();
 
@@ -127,17 +117,12 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    let userId = session?.user?.id;
-
-    if (!userId) {
-      const testUser = await prisma.user.findFirst();
-      if (testUser) {
-        userId = testUser.id;
-      } else {
-        return NextResponse.json({ message: 'unauthorized' }, { status: 401 });
-      }
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const dbUser = await getOrCreateUser(clerkUserId);
+    const userId = dbUser.id;
 
     const { searchParams } = new URL(request.url);
     const customMembershipId = searchParams.get('id');

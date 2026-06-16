@@ -119,17 +119,21 @@ export const setupMockFetch = (responses: any[] = []) => {
   return mockFetch;
 };
 
-export const setupMockSession = (sessionData: any = null) => {
-  const mockUseSession = require('next-auth/react').useSession;
+export const setupMockClerkUser = (userData: any = null) => {
+  const mockUseUser = require('@clerk/nextjs').useUser;
 
-  if (sessionData) {
-    mockUseSession.mockReturnValue(sessionData);
+  if (userData) {
+    mockUseUser.mockReturnValue(userData);
   } else {
-    mockUseSession.mockReturnValue({
-      data: {
-        user: mockUser,
+    mockUseUser.mockReturnValue({
+      user: {
+        id: 'user_test123',
+        fullName: mockUser.name,
+        primaryEmailAddress: { emailAddress: mockUser.email },
+        imageUrl: 'https://example.com/avatar.png',
       },
-      status: 'authenticated',
+      isLoaded: true,
+      isSignedIn: true,
     });
   }
 };

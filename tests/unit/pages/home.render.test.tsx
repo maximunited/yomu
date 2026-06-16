@@ -12,13 +12,19 @@ jest.mock('next/navigation', () => ({
   })),
 }));
 
-// Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({
-    data: null,
-    status: 'unauthenticated',
+// Mock Clerk
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(() => ({
+    user: null,
+    isLoaded: true,
+    isSignedIn: false,
   })),
-  signIn: jest.fn(),
+  useAuth: jest.fn(() => ({
+    userId: null,
+    isLoaded: true,
+    isSignedIn: false,
+  })),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 const renderWithProviders = (component: React.ReactElement) => {
@@ -33,8 +39,8 @@ describe('HomePage (render)', () => {
     // auth links
     const links = screen.getAllByRole('link');
     const hrefs = links.map((l) => l.getAttribute('href'));
-    expect(hrefs).toContain('/auth/signin');
-    expect(hrefs).toContain('/auth/signup');
+    expect(hrefs).toContain('/sign-in');
+    expect(hrefs).toContain('/sign-up');
   });
 
   it('renders main content sections', () => {

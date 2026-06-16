@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { SessionProvider } from '@/components/providers/SessionProvider';
+import { ClerkProvider } from '@clerk/nextjs';
+import { heIL } from '@clerk/localizations';
 import { DarkModeProvider } from '@/contexts/DarkModeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
@@ -21,11 +22,11 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl">
       <body className={inter.className}>
-        <SessionProvider>
+        <ClerkProvider localization={heIL}>
           <DarkModeProvider>
             <LanguageProvider>{children}</LanguageProvider>
           </DarkModeProvider>
-        </SessionProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

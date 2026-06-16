@@ -1,14 +1,18 @@
-describe('middleware config', () => {
-  it('exports a simple middleware function', () => {
+describe('proxy config', () => {
+  it('exports a default middleware function', () => {
     jest.resetModules();
 
-    // Load the middleware module
-    const { middleware } = require('../../../middleware');
-    expect(typeof middleware).toBe('function');
+    const proxyModule = require('../../../proxy');
+    expect(proxyModule.default).toBeDefined();
+    expect(typeof proxyModule.default).toBe('function');
+  });
 
-    // Test that it returns NextResponse.next()
-    const mockRequest = {} as any;
-    const result = middleware(mockRequest);
-    expect(result).toBeDefined();
+  it('exports a matcher config', () => {
+    jest.resetModules();
+
+    const proxyModule = require('../../../proxy');
+    expect(proxyModule.config).toBeDefined();
+    expect(proxyModule.config.matcher).toBeDefined();
+    expect(Array.isArray(proxyModule.config.matcher)).toBe(true);
   });
 });

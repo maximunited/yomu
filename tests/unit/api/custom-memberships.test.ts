@@ -1,10 +1,23 @@
 import { POST, PUT, DELETE } from '@/app/api/custom-memberships/route';
 import { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreateUser } from '@/lib/clerk-user';
 
-// Mock NextAuth
-jest.mock('next-auth', () => ({
-  getServerSession: jest.fn(),
+// Mock Clerk auth
+jest.mock('@clerk/nextjs/server', () => ({
+  auth: jest.fn(() => Promise.resolve({ userId: 'user_test123' })),
+}));
+
+// Mock clerk-user helper
+jest.mock('@/lib/clerk-user', () => ({
+  getOrCreateUser: jest.fn(() =>
+    Promise.resolve({
+      id: 'user1',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    })
+  ),
 }));
 
 // Mock Prisma
@@ -24,27 +37,22 @@ jest.mock('@/lib/prisma', () => ({
   },
 }));
 
-// Mock auth options
-jest.mock('@/lib/auth', () => ({
-  authOptions: {},
-}));
-
 describe('/api/custom-memberships', () => {
   const { prisma } = require('@/lib/prisma');
-  const mockGetServerSession = getServerSession as jest.MockedFunction<
-    typeof getServerSession
-  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (auth as jest.Mock).mockResolvedValue({ userId: 'user_test123' });
+    (getOrCreateUser as jest.Mock).mockResolvedValue({
+      id: 'user1',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    });
   });
 
   describe('POST', () => {
     it('should create a custom benefit', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const mockCustomMembership = {
         id: 'custom1',
         userId: 'user1',
@@ -103,10 +111,6 @@ describe('/api/custom-memberships', () => {
     });
 
     it('should return 400 for missing fields', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const request = new NextRequest(
         'http://localhost:3000/api/custom-memberships',
         {
@@ -126,10 +130,6 @@ describe('/api/custom-memberships', () => {
     });
 
     it('should return 404 for non-existent custom membership', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       prisma.customMembership.findFirst.mockResolvedValue(null);
 
       const request = new NextRequest(
@@ -153,10 +153,6 @@ describe('/api/custom-memberships', () => {
 
   describe('PUT', () => {
     it('should update a custom membership', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const mockCustomMembership = {
         id: 'custom1',
         userId: 'user1',
@@ -191,10 +187,6 @@ describe('/api/custom-memberships', () => {
     });
 
     it('should return 400 for missing customMembershipId', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const request = new NextRequest(
         'http://localhost:3000/api/custom-memberships',
         {
@@ -215,10 +207,6 @@ describe('/api/custom-memberships', () => {
 
   describe('DELETE', () => {
     it('should delete a custom membership', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const mockCustomMembership = {
         id: 'custom1',
         userId: 'user1',
@@ -246,10 +234,6 @@ describe('/api/custom-memberships', () => {
     });
 
     it('should return 400 for missing id parameter', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const request = new NextRequest(
         'http://localhost:3000/api/custom-memberships',
         {
@@ -266,20 +250,8 @@ describe('/api/custom-memberships', () => {
   });
 
   describe('Authentication', () => {
-    it('should handle unauthenticated user with fallback', async () => {
-      mockGetServerSession.mockResolvedValue(null);
-      prisma.user.findFirst.mockResolvedValue({ id: 'testuser' });
-
-      const mockCustomMembership = {
-        id: 'custom1',
-        userId: 'testuser',
-      };
-
-      prisma.customMembership.findFirst.mockResolvedValue(mockCustomMembership);
-      prisma.customBenefit.create.mockResolvedValue({
-        id: 'benefit1',
-        title: 'Test',
-      });
+    it('should return 401 when not authenticated', async () => {
+      (auth as jest.Mock).mockResolvedValue({ userId: null });
 
       const request = new NextRequest(
         'http://localhost:3000/api/custom-memberships',
@@ -293,28 +265,10 @@ describe('/api/custom-memberships', () => {
       );
 
       const response = await POST(request);
-
-      expect(response.status).toBe(200);
-    });
-
-    it('should return 401 when no session and no test user', async () => {
-      mockGetServerSession.mockResolvedValue(null);
-      prisma.user.findFirst.mockResolvedValue(null);
-
-      const request = new NextRequest(
-        'http://localhost:3000/api/custom-memberships',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            customMembershipId: 'custom1',
-            benefit: { title: 'Test' },
-          }),
-        }
-      );
-
-      const response = await POST(request);
+      const data = await response.json();
 
       expect(response.status).toBe(401);
+      expect(data.error).toBe('Unauthorized');
     });
   });
 });

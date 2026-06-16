@@ -1,11 +1,13 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 import DashboardPage from '@/app/dashboard/page';
 
-// Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(),
-  signOut: jest.fn(),
+// Mock Clerk
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(),
+  useClerk: jest.fn(() => ({
+    signOut: jest.fn(),
+  })),
 }));
 
 // Mock next/navigation
@@ -20,18 +22,19 @@ jest.mock('next/navigation', () => ({
 global.fetch = jest.fn();
 
 describe('Used Benefits Feature', () => {
-  const mockSession = {
-    data: {
-      user: {
-        name: 'Test User',
-        email: 'test@example.com',
-      },
+  const mockUserReturn = {
+    user: {
+      id: 'user_test123',
+      fullName: 'Test User',
+      primaryEmailAddress: { emailAddress: 'test@example.com' },
+      imageUrl: 'https://example.com/avatar.png',
     },
-    status: 'authenticated',
+    isLoaded: true,
+    isSignedIn: true,
   };
 
   beforeEach(() => {
-    (useSession as jest.Mock).mockReturnValue(mockSession);
+    (useUser as jest.Mock).mockReturnValue(mockUserReturn);
     (global.fetch as jest.Mock).mockClear();
   });
 

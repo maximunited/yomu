@@ -67,7 +67,9 @@ export class AuthHelper {
     }
 
     // Wait for redirect to home or sign in page
-    await this.page.waitForURL(new RegExp(`(${urls.home}|${urls.signin})`));
+    await this.page.waitForURL(
+      new RegExp(`(${urls.home}|${urls.signin}|/sign-in)`)
+    );
   }
 
   /**

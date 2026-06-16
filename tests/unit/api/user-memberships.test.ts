@@ -1,10 +1,23 @@
 import { GET, POST } from '@/app/api/user/memberships/route';
 import { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreateUser } from '@/lib/clerk-user';
 
-// Mock NextAuth
-jest.mock('next-auth', () => ({
-  getServerSession: jest.fn(),
+// Mock Clerk auth
+jest.mock('@clerk/nextjs/server', () => ({
+  auth: jest.fn(() => Promise.resolve({ userId: 'user_test123' })),
+}));
+
+// Mock clerk-user helper
+jest.mock('@/lib/clerk-user', () => ({
+  getOrCreateUser: jest.fn(() =>
+    Promise.resolve({
+      id: 'user1',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    })
+  ),
 }));
 
 // Mock Prisma
@@ -28,27 +41,22 @@ jest.mock('@/lib/prisma', () => ({
   },
 }));
 
-// Mock auth options
-jest.mock('@/lib/auth', () => ({
-  authOptions: {},
-}));
-
 describe('/api/user/memberships', () => {
   const { prisma } = require('@/lib/prisma');
-  const mockGetServerSession = getServerSession as jest.MockedFunction<
-    typeof getServerSession
-  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (auth as jest.Mock).mockResolvedValue({ userId: 'user_test123' });
+    (getOrCreateUser as jest.Mock).mockResolvedValue({
+      id: 'user1',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    });
   });
 
   describe('GET', () => {
     it('should return user memberships when authenticated', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const mockBrandMemberships = [
         {
           id: 'mem1',
@@ -90,12 +98,8 @@ describe('/api/user/memberships', () => {
       expect(prisma.userMembership.findMany).toHaveBeenCalledTimes(2);
     });
 
-    it('should handle unauthenticated user with test fallback', async () => {
-      mockGetServerSession.mockResolvedValue(null);
-      prisma.user.findFirst.mockResolvedValue({ id: 'testuser' });
-
-      const mockMemberships: any[] = [];
-      prisma.userMembership.findMany.mockResolvedValue(mockMemberships);
+    it('should return 401 when not authenticated', async () => {
+      (auth as jest.Mock).mockResolvedValue({ userId: null });
 
       const request = new NextRequest(
         'http://localhost:3000/api/user/memberships'
@@ -103,29 +107,13 @@ describe('/api/user/memberships', () => {
       const response = await GET(request);
       const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(data.memberships).toEqual([]);
-    });
-
-    it('should return 401 when no session and no test user', async () => {
-      mockGetServerSession.mockResolvedValue(null);
-      prisma.user.findFirst.mockResolvedValue(null);
-
-      const request = new NextRequest(
-        'http://localhost:3000/api/user/memberships'
-      );
-      const response = await GET(request);
-
       expect(response.status).toBe(401);
+      expect(data.error).toBe('Unauthorized');
     });
   });
 
   describe('POST', () => {
     it('should create brand memberships', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const mockBrand = {
         id: 'brand1',
         name: 'Test Brand',
@@ -163,10 +151,6 @@ describe('/api/user/memberships', () => {
     });
 
     it('should create custom memberships', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       const mockCustomMembership = {
         id: 'custom1',
         name: 'Custom Brand',
@@ -203,10 +187,6 @@ describe('/api/user/memberships', () => {
     });
 
     it('should handle database errors', async () => {
-      mockGetServerSession.mockResolvedValue({
-        user: { id: 'user1' },
-      } as any);
-
       prisma.userMembership.updateMany.mockRejectedValue(
         new Error('Database error')
       );
@@ -225,6 +205,27 @@ describe('/api/user/memberships', () => {
       const response = await POST(request);
 
       expect(response.status).toBe(500);
+    });
+
+    it('should return 401 for POST when not authenticated', async () => {
+      (auth as jest.Mock).mockResolvedValue({ userId: null });
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            brandIds: ['brand1'],
+            customMemberships: [],
+          }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.error).toBe('Unauthorized');
     });
   });
 });

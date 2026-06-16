@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useUser, useClerk } from '@clerk/nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -68,7 +68,8 @@ interface UserMembership {
 }
 
 function DashboardPageContent() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
   const router = useRouter();
   const { t, language } = useLanguage();
   const [benefits, setBenefits] = useState<Benefit[]>([]);
@@ -95,16 +96,10 @@ function DashboardPageContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-    }
-  }, [status, router]);
-
-  useEffect(() => {
-    if (status === 'authenticated') {
+    if (isLoaded && isSignedIn) {
       fetchUserData();
     }
-  }, [status]);
+  }, [isLoaded, isSignedIn]);
 
   // Apply query-parameter driven filters (e.g., from notifications)
   useEffect(() => {
@@ -528,7 +523,7 @@ function DashboardPageContent() {
     );
   }
 
-  if (status === 'loading' || isLoading) {
+  if (!isLoaded || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -682,7 +677,7 @@ function DashboardPageContent() {
                     )}
                   </div>
                   <span className="text-sm font-medium text-black dark:text-white">
-                    {session?.user?.name || t('user')}
+                    {user?.fullName || t('user')}
                   </span>
                 </button>
                 <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -720,7 +715,7 @@ function DashboardPageContent() {
                     </Link>
                     <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
                     <button
-                      onClick={() => signOut({ callbackUrl: '/' })}
+                      onClick={() => signOut({ redirectUrl: '/' })}
                       className="w-full text-right rtl:text-right ltr:text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center"
                     >
                       <LogOut className="w-4 h-4 ml-2" />
@@ -739,7 +734,7 @@ function DashboardPageContent() {
         {/* Welcome Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {t('helloUser').replace('{name}', session?.user?.name || t('user'))}
+            {t('helloUser').replace('{name}', user?.fullName || t('user'))}
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
             {t('hereAreYourBirthdayBenefits')}

@@ -12,12 +12,25 @@ jest.mock('next/navigation', () => ({
   })),
 }));
 
-// Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({
-    data: { user: { id: '1', email: 'test@example.com' } },
-    status: 'authenticated',
+// Mock Clerk
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(() => ({
+    user: {
+      id: 'user_test123',
+      fullName: 'Test User',
+      firstName: 'Test',
+      lastName: 'User',
+      primaryEmailAddress: { emailAddress: 'test@example.com' },
+    },
+    isLoaded: true,
+    isSignedIn: true,
   })),
+  useAuth: jest.fn(() => ({
+    userId: 'user_test123',
+    isLoaded: true,
+    isSignedIn: true,
+  })),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock fetch
@@ -147,10 +160,16 @@ describe('MembershipsPage', () => {
 
   it('should redirect unauthenticated users', () => {
     // Mock unauthenticated session
-    const useSession = require('next-auth/react').useSession;
-    useSession.mockReturnValue({
-      data: null,
-      status: 'unauthenticated',
+    const clerk = require('@clerk/nextjs');
+    clerk.useUser.mockReturnValue({
+      user: null,
+      isLoaded: true,
+      isSignedIn: false,
+    });
+    clerk.useAuth.mockReturnValue({
+      userId: null,
+      isLoaded: true,
+      isSignedIn: false,
     });
 
     render(<MembershipsPage />);

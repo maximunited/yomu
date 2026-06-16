@@ -3,11 +3,16 @@ import { render, screen, waitFor, act } from '../../utils/test-helpers';
 import userEvent from '@testing-library/user-event';
 import SettingsPage from '@/app/settings/page';
 
-// Mock next-auth
-const mockUseSession = jest.fn();
-jest.mock('next-auth/react', () => ({
-  useSession: () => mockUseSession(),
-  signOut: jest.fn(),
+// Mock Clerk
+const mockUseUser = jest.fn();
+const mockUseAuth = jest.fn();
+jest.mock('@clerk/nextjs', () => ({
+  useUser: () => mockUseUser(),
+  useAuth: () => mockUseAuth(),
+  useClerk: jest.fn(() => ({
+    signOut: jest.fn(),
+  })),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock next/navigation
@@ -41,15 +46,21 @@ describe('Settings Page Form Handling', () => {
     jest.clearAllMocks();
     mockLocalStorage.clear();
 
-    mockUseSession.mockReturnValue({
-      data: {
-        user: {
-          id: 'user-1',
-          name: 'Test User',
-          email: 'test@example.com',
-        },
+    mockUseUser.mockReturnValue({
+      user: {
+        id: 'user_test123',
+        fullName: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+        primaryEmailAddress: { emailAddress: 'test@example.com' },
       },
-      status: 'authenticated',
+      isLoaded: true,
+      isSignedIn: true,
+    });
+    mockUseAuth.mockReturnValue({
+      userId: 'user_test123',
+      isLoaded: true,
+      isSignedIn: true,
     });
 
     // Mock successful profile API response

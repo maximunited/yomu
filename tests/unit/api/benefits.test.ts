@@ -1,12 +1,19 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-// Mock NextAuth first
-jest.mock('next-auth', () => ({
-  getServerSession: jest.fn(),
+// Mock Clerk auth
+jest.mock('@clerk/nextjs/server', () => ({
+  auth: jest.fn(() => Promise.resolve({ userId: 'user_test123' })),
 }));
 
-// Mock auth options
-jest.mock('@/lib/auth', () => ({
-  authOptions: {},
+// Mock clerk-user helper
+jest.mock('@/lib/clerk-user', () => ({
+  getOrCreateUser: jest.fn(() =>
+    Promise.resolve({
+      id: 'session-user-id',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    })
+  ),
 }));
 
 // Mock Prisma
@@ -25,17 +32,21 @@ jest.mock('@/lib/prisma', () => ({
 }));
 
 import { GET } from '@/app/api/benefits/route';
-import { getServerSession } from 'next-auth';
-
-const mockGetServerSession = getServerSession as jest.MockedFunction<
-  typeof getServerSession
->;
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreateUser } from '@/lib/clerk-user';
 
 describe('/api/benefits', () => {
   const { prisma } = require('@/lib/prisma');
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (auth as jest.Mock).mockResolvedValue({ userId: 'user_test123' });
+    (getOrCreateUser as jest.Mock).mockResolvedValue({
+      id: 'session-user-id',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+    });
   });
 
   afterEach(() => {
@@ -44,7 +55,6 @@ describe('/api/benefits', () => {
   });
 
   it('should return benefits list with authenticated user', async () => {
-    const mockSession = { user: { id: 'session-user-id' } };
     const mockMemberships = [
       {
         id: 'membership1',
@@ -91,7 +101,6 @@ describe('/api/benefits', () => {
       },
     ];
 
-    mockGetServerSession.mockResolvedValue(mockSession);
     prisma.userMembership.findMany.mockResolvedValue(mockMemberships);
     prisma.benefit.findMany.mockResolvedValue(mockBenefits);
 
@@ -117,71 +126,12 @@ describe('/api/benefits', () => {
     expect(consoleSpy).toHaveBeenCalledWith(
       '=== Starting GET request to /api/benefits ==='
     );
-    expect(consoleSpy).toHaveBeenCalledWith('Session:', 'Found');
 
     consoleSpy.mockRestore();
   });
 
-  it('should handle missing session and use test user', async () => {
-    const mockUser = { id: 'test-user-id' };
-    const mockMemberships = [];
-    const mockBenefits = [
-      {
-        id: '1',
-        title: 'Test Benefit',
-        description: 'Test Description',
-        brandId: 'brand1',
-        validityType: null, // Test null validity type fallback
-        validityDuration: null,
-        redemptionMethod: 'online',
-        isFree: false,
-        promoCode: null,
-        termsAndConditions: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        brand: {
-          id: 'brand1',
-          name: 'Test Brand',
-          logoUrl: 'https://example.com/logo.png',
-          website: 'https://example.com',
-          category: 'shopping',
-          actionUrl: null,
-          actionType: null,
-          actionLabel: null,
-        },
-      },
-    ];
-
-    mockGetServerSession.mockResolvedValue(null);
-    prisma.user.findFirst.mockResolvedValue(mockUser);
-    prisma.userMembership.findMany.mockResolvedValue(mockMemberships);
-    prisma.benefit.findMany.mockResolvedValue(mockBenefits);
-
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
-    const response = await GET();
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.benefits).toHaveLength(1);
-    expect(data.benefits[0].validityType).toBe('birthday_month'); // Fallback value
-    expect(data.memberships).toBe(0);
-
-    expect(consoleSpy).toHaveBeenCalledWith('Session:', 'Not found');
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'No session user ID, using test user ID'
-    );
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Using test user ID:',
-      'test-user-id'
-    );
-
-    consoleSpy.mockRestore();
-  });
-
-  it('should return 401 when no session and no users in database', async () => {
-    mockGetServerSession.mockResolvedValue(null);
-    prisma.user.findFirst.mockResolvedValue(null);
+  it('should return 401 when not authenticated', async () => {
+    (auth as jest.Mock).mockResolvedValue({ userId: null });
 
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -189,18 +139,12 @@ describe('/api/benefits', () => {
     const data = await response.json();
 
     expect(response.status).toBe(401);
-    expect(data).toEqual({
-      message: 'unauthorized',
-      error: 'AUTHENTICATION_REQUIRED',
-    });
+    expect(data).toEqual({ error: 'Unauthorized' });
 
-    expect(consoleSpy).toHaveBeenCalledWith('No users found in database');
     consoleSpy.mockRestore();
   });
 
   it('should handle user membership query errors', async () => {
-    const mockSession = { user: { id: 'session-user-id' } };
-    mockGetServerSession.mockResolvedValue(mockSession);
     prisma.userMembership.findMany.mockRejectedValue(
       new Error('Membership query failed')
     );
@@ -223,8 +167,6 @@ describe('/api/benefits', () => {
   });
 
   it('should handle benefit query errors', async () => {
-    const mockSession = { user: { id: 'session-user-id' } };
-    mockGetServerSession.mockResolvedValue(mockSession);
     prisma.userMembership.findMany.mockResolvedValue([]);
     prisma.benefit.findMany.mockRejectedValue(
       new Error('Benefit query failed')
@@ -241,7 +183,6 @@ describe('/api/benefits', () => {
   });
 
   it('should correctly transform benefits with all properties', async () => {
-    const mockSession = { user: { id: 'session-user-id' } };
     const mockBenefits = [
       {
         id: 'benefit-id',
@@ -269,7 +210,6 @@ describe('/api/benefits', () => {
       },
     ];
 
-    mockGetServerSession.mockResolvedValue(mockSession);
     prisma.userMembership.findMany.mockResolvedValue([]);
     prisma.benefit.findMany.mockResolvedValue(mockBenefits);
 
@@ -306,8 +246,6 @@ describe('/api/benefits', () => {
   });
 
   it('should call Prisma methods with correct parameters', async () => {
-    const mockSession = { user: { id: 'user-123' } };
-    mockGetServerSession.mockResolvedValue(mockSession);
     prisma.userMembership.findMany.mockResolvedValue([]);
     prisma.benefit.findMany.mockResolvedValue([]);
 
@@ -315,7 +253,7 @@ describe('/api/benefits', () => {
 
     expect(prisma.userMembership.findMany).toHaveBeenCalledWith({
       where: {
-        userId: 'user-123',
+        userId: 'session-user-id',
         isActive: true,
       },
       include: {

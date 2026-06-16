@@ -3,19 +3,28 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DashboardPage from '@/app/dashboard/page';
 
-// Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({
-    data: {
-      user: {
-        id: 'user-1',
-        name: 'Test User',
-        email: 'test@example.com',
-      },
+// Mock Clerk
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(() => ({
+    user: {
+      id: 'user_test123',
+      fullName: 'Test User',
+      firstName: 'Test',
+      lastName: 'User',
+      primaryEmailAddress: { emailAddress: 'test@example.com' },
     },
-    status: 'authenticated',
+    isLoaded: true,
+    isSignedIn: true,
   })),
-  signOut: jest.fn(),
+  useAuth: jest.fn(() => ({
+    userId: 'user_test123',
+    isLoaded: true,
+    isSignedIn: true,
+  })),
+  useClerk: jest.fn(() => ({
+    signOut: jest.fn(),
+  })),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock next/navigation
@@ -194,7 +203,7 @@ describe('DashboardPage', () => {
 
   it('should handle sign out', async () => {
     const user = userEvent.setup();
-    const mockSignOut = require('next-auth/react').signOut;
+    const mockSignOut = require('@clerk/nextjs').useClerk().signOut;
 
     await renderDashboard();
 
@@ -257,10 +266,16 @@ describe('DashboardPage', () => {
   });
 
   it('should handle unauthenticated state', () => {
-    const mockUseSession = require('next-auth/react').useSession;
-    mockUseSession.mockReturnValue({
-      data: null,
-      status: 'unauthenticated',
+    const clerk = require('@clerk/nextjs');
+    clerk.useUser.mockReturnValue({
+      user: null,
+      isLoaded: true,
+      isSignedIn: false,
+    });
+    clerk.useAuth.mockReturnValue({
+      userId: null,
+      isLoaded: true,
+      isSignedIn: false,
     });
 
     const mockRouter = require('next/navigation').useRouter;
@@ -269,6 +284,6 @@ describe('DashboardPage', () => {
 
     render(<DashboardPage />);
 
-    expect(mockPush).toHaveBeenCalledWith('/auth/signin');
+    expect(mockPush).toHaveBeenCalledWith('/sign-in');
   });
 });

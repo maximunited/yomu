@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getServerSession } from 'next-auth';
+import { auth } from '@clerk/nextjs/server';
 import * as prismaClient from '@/lib/prisma';
 import { PATCH, DELETE } from '@/app/api/admin/benefits/[id]/route';
-import '@/lib/auth';
 
-jest.mock('next-auth', () => ({ getServerSession: jest.fn() }));
+jest.mock('@clerk/nextjs/server', () => ({
+  auth: jest.fn(() => Promise.resolve({ userId: 'user_test123' })),
+}));
 jest.mock('@/lib/prisma', () => ({
   prisma: {
     benefit: { update: jest.fn(), delete: jest.fn() },
@@ -14,9 +15,9 @@ jest.mock('@/lib/prisma', () => ({
 
 describe('/api/admin/benefits/[id]', () => {
   beforeEach(() => {
-    (getServerSession as unknown as jest.Mock).mockResolvedValue({
-      user: { id: 'u1' },
-    } as any);
+    (auth as unknown as jest.Mock).mockResolvedValue({
+      userId: 'user_test123',
+    });
   });
 
   it('PATCH updates isActive', async () => {
@@ -44,5 +45,17 @@ describe('/api/admin/benefits/[id]', () => {
     } as any) as any;
     const res = await DELETE(req, { params: Promise.resolve({ id: 'b2' }) });
     expect(res.status).toBe(200);
+  });
+
+  it('PATCH returns 401 when not authenticated', async () => {
+    (auth as unknown as jest.Mock).mockResolvedValue({ userId: null });
+    const req = new Request('http://localhost', {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive: false }),
+    } as any) as any;
+    const res = await PATCH(req, { params: Promise.resolve({ id: 'b1' }) });
+    const json = await res.json();
+    expect(res.status).toBe(401);
+    expect(json.error).toBe('Unauthorized');
   });
 });

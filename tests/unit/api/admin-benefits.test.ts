@@ -1,19 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getServerSession } from 'next-auth';
+import { auth } from '@clerk/nextjs/server';
 import * as prismaClient from '@/lib/prisma';
 import { GET as GET_LIST, POST } from '@/app/api/admin/benefits/route';
-import '@/lib/auth'; // ensure module can be imported in handlers
 
-jest.mock('next-auth', () => ({ getServerSession: jest.fn() }));
+jest.mock('@clerk/nextjs/server', () => ({
+  auth: jest.fn(() => Promise.resolve({ userId: 'user_test123' })),
+}));
 jest.mock('@/lib/prisma', () => ({
   prisma: { benefit: { findMany: jest.fn(), create: jest.fn() } },
 }));
 
 describe('/api/admin/benefits', () => {
   beforeEach(() => {
-    (getServerSession as unknown as jest.Mock).mockResolvedValue({
-      user: { id: 'u1' },
-    } as any);
+    (auth as unknown as jest.Mock).mockResolvedValue({
+      userId: 'user_test123',
+    });
   });
 
   it('GET returns all benefits', async () => {
@@ -46,5 +47,13 @@ describe('/api/admin/benefits', () => {
     const json = await res.json();
     expect(res.status).toBe(201);
     expect(json).toEqual({ id: 'new1' });
+  });
+
+  it('GET returns 401 when not authenticated', async () => {
+    (auth as unknown as jest.Mock).mockResolvedValue({ userId: null });
+    const res = await GET_LIST();
+    const json = await res.json();
+    expect(res.status).toBe(401);
+    expect(json.error).toBe('Unauthorized');
   });
 });

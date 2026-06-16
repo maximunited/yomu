@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreateUser } from '@/lib/clerk-user';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const user = await getOrCreateUser(clerkUserId);
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+    const userWithBenefits = await prisma.user.findUnique({
+      where: { id: user.id },
       include: {
         usedBenefits: {
           include: {
@@ -29,11 +29,11 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!user) {
+    if (!userWithBenefits) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ usedBenefits: user.usedBenefits });
+    return NextResponse.json({ usedBenefits: userWithBenefits.usedBenefits });
   } catch (error) {
     console.error('Error fetching used benefits:', error);
     return NextResponse.json(
@@ -45,9 +45,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -60,13 +59,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    const user = await getOrCreateUser(clerkUserId);
 
     // Check if benefit exists
     const benefit = await prisma.benefit.findUnique({

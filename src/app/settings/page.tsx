@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useUser, useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
@@ -34,13 +34,14 @@ interface UserProfile {
 }
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
+  const { user } = useUser();
+  const { signOut } = useClerk();
   const router = useRouter();
   const { t, language, setLanguage } = useLanguage();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
-    name: session?.user?.name || '',
-    email: session?.user?.email || '',
+    name: user?.fullName || '',
+    email: user?.primaryEmailAddress?.emailAddress || '',
     dateOfBirth: '',
     anniversaryDate: '',
     profilePicture: '',
@@ -174,7 +175,7 @@ export default function SettingsPage() {
   };
 
   const handleLogout = () => {
-    signOut({ callbackUrl: '/' });
+    signOut({ redirectUrl: '/' });
   };
 
   const handleProfilePictureChange = (

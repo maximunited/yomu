@@ -12,12 +12,25 @@ jest.mock('next/navigation', () => ({
   })),
 }));
 
-// Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({
-    data: { user: { id: '1', email: 'test@example.com' } },
-    status: 'authenticated',
+// Mock Clerk
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(() => ({
+    user: {
+      id: 'user_test123',
+      fullName: 'Test User',
+      firstName: 'Test',
+      lastName: 'User',
+      primaryEmailAddress: { emailAddress: 'test@example.com' },
+    },
+    isLoaded: true,
+    isSignedIn: true,
   })),
+  useAuth: jest.fn(() => ({
+    userId: 'user_test123',
+    isLoaded: true,
+    isSignedIn: true,
+  })),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock LanguageContext

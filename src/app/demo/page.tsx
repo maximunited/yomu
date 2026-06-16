@@ -156,7 +156,7 @@ export default function DemoPage() {
               >
                 {t('demo') || 'דמו'}
               </span>
-              <Link href="/auth/signup">
+              <Link href="/sign-up">
                 <Button size="sm">{t('getStarted')}</Button>
               </Link>
             </div>
@@ -389,12 +389,12 @@ export default function DemoPage() {
             {t('signUpNow')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/signup">
+            <Link href="/sign-up">
               <Button size="lg" className="px-8 py-3">
                 {t('signUpNow')}
               </Button>
             </Link>
-            <Link href="/auth/signin">
+            <Link href="/sign-in">
               <Button variant="outline" size="lg" className="px-8 py-3">
                 {t('alreadyHaveAccount')}
               </Button>

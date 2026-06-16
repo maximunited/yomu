@@ -20,19 +20,23 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
-// Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({
-    data: {
-      user: {
-        id: 'user-1',
-        name: 'Test User',
-        email: 'test@example.com',
-      },
+// Mock Clerk
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(() => ({
+    user: {
+      id: 'user_test123',
+      fullName: 'Test User',
+      primaryEmailAddress: { emailAddress: 'test@example.com' },
+      imageUrl: 'https://example.com/avatar.png',
     },
-    status: 'authenticated',
+    isLoaded: true,
+    isSignedIn: true,
   })),
-  signOut: jest.fn(),
+  useClerk: jest.fn(() => ({
+    signOut: jest.fn(),
+  })),
+  SignInButton: ({ children }: { children: React.ReactNode }) => children,
+  SignUpButton: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock next/navigation
