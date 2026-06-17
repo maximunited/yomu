@@ -9,3 +9,4 @@ coverage
 .DS_Store
 *.md
 .secrets.baseline
+.wolf
