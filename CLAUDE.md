@@ -55,7 +55,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Admin Dashboard UI:**
 - Access at `/admin` route (e.g., `http://localhost:3000/admin`)
 - Provides web interface for brand and benefit management
-- **Requires authentication**: Redirects to `/auth/signin` if not logged in
+- **Requires authentication**: Protected by Clerk middleware
 - ⚠️ **Production**: Consider adding role-based access control (currently any authenticated user can access admin)
 
 **Command-Line Admin Tools:**
@@ -155,7 +155,7 @@ tests/
   - Migrated to PostgreSQL with Prisma 7 upgrade (commit 9427d10)
   - Local development: Use Docker Compose PostgreSQL or Vercel Postgres
   - Production: Vercel Postgres or any managed PostgreSQL service
-- **Authentication**: NextAuth.js with Google OAuth and email/password
+- **Authentication**: Clerk with Google OAuth and email/password (Hebrew-localized UI)
 - **Styling**: Tailwind CSS with dark mode support
 - **Testing**: Jest for unit tests, Playwright for E2E tests
 - **Internationalization**: Hebrew/English with RTL support
@@ -171,7 +171,7 @@ tests/
 - **Notification**: System notifications for benefits
 - **UsedBenefit**: Tracking of redeemed benefits to prevent duplicate use
 - **BrandPartnership**: Many-to-many relationships between brands for co-branded benefits
-- **Account/Session**: NextAuth.js authentication models
+- **User.clerkId**: Links Prisma User records to Clerk's external user IDs
 
 ### Key Architecture Patterns
 
@@ -187,9 +187,9 @@ The application has a sophisticated benefit validation system in `src/lib/benefi
 
 Multiple React contexts provide global state:
 
+- **ClerkProvider**: Authentication via Clerk (Hebrew localization with `@clerk/localizations`)
 - **DarkModeContext**: Global dark mode with localStorage persistence
 - **LanguageContext**: Hebrew/English switching with RTL support
-- **SessionProvider**: NextAuth.js session management
 
 #### Dashboard Logic
 
@@ -211,10 +211,15 @@ When working with benefits, always use the validation functions from `src/lib/be
 
 #### Authentication Flow
 
-- Custom email/password registration in `/auth/signup`
-- Google OAuth integration
-- JWT sessions with 30-day expiration
-- User profiles require dateOfBirth for benefit calculations
+- **Managed by Clerk** — sign-in at `/sign-in`, sign-up at `/sign-up` using Clerk's `<SignIn/>` and `<SignUp/>` components
+- Google OAuth configured in Clerk Dashboard (not via env vars)
+- Email/password authentication enabled in Clerk
+- Route protection via Clerk middleware in `proxy.ts` (Next.js 16 convention)
+- Server-side auth: `auth()` from `@clerk/nextjs/server`
+- Client-side auth: `useUser()` / `useClerk()` from `@clerk/nextjs`
+- Clerk-to-Prisma user linking via `src/lib/clerk-user.ts` (`getOrCreateUser()`)
+- Webhook at `/api/webhooks` syncs Clerk user events to Prisma User table
+- User profiles require dateOfBirth for benefit calculations (collected during onboarding)
 - Optional anniversaryDate field for anniversary benefits
 
 #### Internationalization
@@ -310,28 +315,34 @@ DATABASE_URL=postgresql://postgres:password@localhost:5432/yomu
 
 ### Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env.local` file in the project root:
 
 ```env
 # Database (PostgreSQL)
 DATABASE_URL=postgresql://yomu:yomu@localhost:5432/yomu
 
-# NextAuth.js Configuration
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-key-here-change-in-production
+# Clerk Authentication (get from https://dashboard.clerk.com → API Keys)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your-key-here
+CLERK_SECRET_KEY=sk_test_your-key-here
 
-# Google OAuth (optional, for Google sign-in)
-GOOGLE_CLIENT_ID=your-google-client-id-here
-GOOGLE_CLIENT_SECRET=your-google-client-secret-here
+# Clerk Webhook (from Clerk Dashboard → Webhooks)
+CLERK_WEBHOOK_SIGNING_SECRET=whsec_your-secret-here
+
+# Auth route configuration
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
 ```
 
 **Required for basic functionality:**
-- `DATABASE_URL`: PostgreSQL connection string (format: `postgresql://user:password@host:port/database`)
-- `NEXTAUTH_URL`: The base URL of your application
-- `NEXTAUTH_SECRET`: Secret key for JWT encryption (generate with `openssl rand -base64 32`)
+- `DATABASE_URL`: PostgreSQL connection string
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Clerk publishable key (safe for client-side)
+- `CLERK_SECRET_KEY`: Clerk secret key (server-side only)
 
-**Optional:**
-- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: Only needed if enabling Google OAuth
+**Required for production:**
+- `CLERK_WEBHOOK_SIGNING_SECRET`: For verifying Clerk webhook events
+
+**Note:** Google OAuth is configured in the Clerk Dashboard, not via environment variables.
 
 ### First-Time Setup (Without Docker)
 
@@ -546,7 +557,7 @@ export async function GET(
 
 #### Test Coverage Strategy
 
-- **Core Libraries**: lib/auth.ts, lib/benefit-validation.ts, lib/utils.ts heavily tested
+- **Core Libraries**: lib/benefit-validation.ts, lib/utils.ts heavily tested
 - **Page Components**: Comprehensive tests for home, settings, onboarding, demo, memberships
 - **UI Components**: Complete coverage for reusable components in components/ui/
 - **Context Providers**: DarkModeContext, LanguageContext tested with multiple scenarios
@@ -558,7 +569,7 @@ export async function GET(
 - **Hook Dependencies**: Mock useEffect dependencies correctly to prevent infinite loops
 - **Translation Testing**: Use actual translation values, not hardcoded expectations
 - **Async Testing**: Use waitFor() for components with loading states
-- **Provider Identification**: Use 'id' field for NextAuth providers, not 'name'
+- **Auth Mocking**: Mock `@clerk/nextjs` (useUser, useClerk, useAuth) and `@clerk/nextjs/server` (auth) in tests
 
 #### Running Specific Tests
 
@@ -624,19 +635,6 @@ useEffect(() => {
 const fetchData = useCallback(async () => {
   // fetch logic
 }, [params.id]); // only stable dependencies
-```
-
-#### "Cannot read properties of undefined (reading 'authorize')"
-
-**Problem**: NextAuth provider not found in tests
-**Solution**: Use 'id' field instead of 'name' to find providers
-
-```tsx
-// Bad
-const provider = authOptions.providers.find((p) => p.name === "credentials");
-
-// Good
-const provider = authOptions.providers.find((p) => p.id === "credentials");
 ```
 
 ### Pre-commit Hook Failures
