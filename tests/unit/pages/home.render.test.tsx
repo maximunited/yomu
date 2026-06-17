@@ -13,34 +13,40 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock Clerk
-jest.mock('@clerk/nextjs', () => ({
-  useUser: jest.fn(() => ({
-    user: null,
-    isLoaded: true,
-    isSignedIn: false,
-  })),
-  useAuth: jest.fn(() => ({
-    userId: null,
-    isLoaded: true,
-    isSignedIn: false,
-  })),
-  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
+jest.mock('@clerk/nextjs', () => {
+  const React = require('react');
+  return {
+    useUser: jest.fn(() => ({
+      user: null,
+      isLoaded: true,
+      isSignedIn: false,
+    })),
+    useAuth: jest.fn(() => ({
+      userId: null,
+      isLoaded: true,
+      isSignedIn: false,
+    })),
+    SignInButton: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+    SignUpButton: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+    UserButton: () => React.createElement('div', null, 'UserButton'),
+    Show: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+    ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
 
 const renderWithProviders = (component: React.ReactElement) => {
   return render(<DarkModeProvider>{component}</DarkModeProvider>);
 };
 
 describe('HomePage (render)', () => {
-  it('renders and shows auth links', () => {
+  it('renders and shows auth controls', () => {
     renderWithProviders(<HomePage />);
-    // header brand (get all occurrences and verify at least one exists)
-    expect(screen.getAllByText(/YomU/)).toHaveLength(3); // header, logo, footer
-    // auth links
-    const links = screen.getAllByRole('link');
-    const hrefs = links.map((l) => l.getAttribute('href'));
-    expect(hrefs).toContain('/sign-in');
-    expect(hrefs).toContain('/sign-up');
+    expect(screen.getAllByText(/YomU/)).toHaveLength(3);
+    expect(screen.getByText(/התחבר/i)).toBeInTheDocument();
+    expect(screen.getByText(/הרשמה/i)).toBeInTheDocument();
   });
 
   it('renders main content sections', () => {

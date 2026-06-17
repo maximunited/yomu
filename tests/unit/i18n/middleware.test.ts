@@ -2,7 +2,7 @@ describe('proxy config', () => {
   it('exports a default middleware function', () => {
     jest.resetModules();
 
-    const proxyModule = require('../../../proxy');
+    const proxyModule = require('../../../src/proxy');
     expect(proxyModule.default).toBeDefined();
     expect(typeof proxyModule.default).toBe('function');
   });
@@ -10,7 +10,7 @@ describe('proxy config', () => {
   it('exports a matcher config', () => {
     jest.resetModules();
 
-    const proxyModule = require('../../../proxy');
+    const proxyModule = require('../../../src/proxy');
     expect(proxyModule.config).toBeDefined();
     expect(proxyModule.config.matcher).toBeDefined();
     expect(Array.isArray(proxyModule.config.matcher)).toBe(true);

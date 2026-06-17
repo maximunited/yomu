@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { SignInButton, SignUpButton, Show, UserButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/Button';
 import { Gift, Calendar, Star, Users } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -39,17 +40,25 @@ export default function HomePage() {
           <div className="flex items-center space-x-4">
             <DarkModeToggle />
             <LanguageSwitcher />
-            <Link href="/sign-in">
-              <Button
-                variant="outline"
-                className="border-2 border-gray-400 hover:border-gray-500"
-              >
-                {t('signIn')}
-              </Button>
-            </Link>
-            <Link href="/sign-up">
-              <Button>{t('signUp')}</Button>
-            </Link>
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <Button
+                  variant="outline"
+                  className="border-2 border-gray-400 hover:border-gray-500"
+                >
+                  {t('signIn')}
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button>{t('signUp')}</Button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <Link href="/dashboard">
+                <Button variant="outline">{t('dashboard')}</Button>
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </Show>
           </div>
         </nav>
       </header>

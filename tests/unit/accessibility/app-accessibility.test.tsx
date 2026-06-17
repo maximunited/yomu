@@ -37,6 +37,10 @@ jest.mock('@clerk/nextjs', () => ({
   })),
   SignInButton: ({ children }: { children: React.ReactNode }) => children,
   SignUpButton: ({ children }: { children: React.ReactNode }) => children,
+  UserButton: () => React.createElement('div', null, 'UserButton'),
+  Show: ({ children }: { children: React.ReactNode }) =>
+    React.createElement(React.Fragment, null, children),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock next/navigation

@@ -125,6 +125,9 @@ jest.mock('@clerk/nextjs', () => {
       React.createElement(React.Fragment, null, children),
     SignUpButton: ({ children }) =>
       React.createElement(React.Fragment, null, children),
+    UserButton: () => React.createElement('div', null, 'UserButton'),
+    Show: ({ children }) =>
+      React.createElement(React.Fragment, null, children),
     ClerkProvider: ({ children }) =>
       React.createElement(React.Fragment, null, children),
   };
