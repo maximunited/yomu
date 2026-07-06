@@ -1,37 +1,33 @@
 name: Dependabot Auto-merge
 
-on:
-  workflow_run:
-    workflows: ['CI']
-    types: [completed]
+on: pull_request
 
 permissions:
-  pull-requests: write
   contents: write
+  pull-requests: write
 
 jobs:
   automerge:
     runs-on: ubuntu-latest
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.actor.login == 'dependabot[bot]'
+    if: >-
+      github.actor == 'dependabot[bot]' ||
+      github.actor == 'pre-commit-ci[bot]'
     steps:
-      - name: Merge Dependabot PR
+      - name: Fetch Dependabot metadata
+        if: github.actor == 'dependabot[bot]'
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Approve PR
+        run: gh pr review --approve "$PR_URL"
         env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: ${{ github.event.workflow_run.head_branch }}
-        run: |
-          PR=$(gh pr list \
-            --repo "$GITHUB_REPOSITORY" \
-            --head "$BRANCH" \
-            --state open \
-            --json number,author \
-            --jq '.[] | select(.author.login == "dependabot[bot]") | .number' \
-            | head -1)
-          if [ -n "$PR" ]; then
-            echo "Merging PR #$PR"
-            gh pr merge --squash --repo "$GITHUB_REPOSITORY" "$PR"
-          else
-            echo "No open Dependabot PR found for branch $BRANCH"
-          fi
+
+      - name: Enable auto-merge
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
