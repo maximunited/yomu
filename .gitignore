@@ -92,3 +92,5 @@ vulnerability-report.json
 
 .vercel
 .env*.local
+
+.vercel
