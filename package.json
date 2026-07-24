@@ -63,7 +63,7 @@
     "pre-ci": "npm ci && npm run prisma:generate"
   },
   "dependencies": {
-    "@clerk/localizations": "^4.12.1",
+    "@clerk/localizations": "^4.13.7",
     "@clerk/nextjs": "^7.6.0",
     "@headlessui/react": "^2.2.8",
     "@heroicons/react": "^2.2.0",
