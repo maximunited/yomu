@@ -236,6 +236,7 @@ export async function GET(request: NextRequest) {
       (membership) => ({
         id: membership.customMembership!.id,
         brandId: membership.customMembership!.id,
+        customMembershipId: membership.customMembership!.id,
         isActive: membership.isActive,
         remindEnabled: membership.remindEnabled,
         brand: {
@@ -309,9 +310,14 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // GET flattens custom memberships as brandId=customMembership.id, so accept
+    // brandId as either a real brand id or a custom membership id.
     const existing = await prisma.userMembership.findFirst({
       where: brandId
-        ? { userId, brandId }
+        ? {
+            userId,
+            OR: [{ brandId }, { customMembershipId: brandId }],
+          }
         : { userId, customMembershipId: customMembershipId as string },
     });
 

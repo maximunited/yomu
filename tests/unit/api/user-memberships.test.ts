@@ -261,11 +261,55 @@ describe('/api/user/memberships', () => {
       expect(response.status).toBe(200);
       expect(data.membership.remindEnabled).toBe(false);
       expect(prisma.userMembership.findFirst).toHaveBeenCalledWith({
-        where: { userId: 'user1', brandId: 'brand1' },
+        where: {
+          userId: 'user1',
+          OR: [{ brandId: 'brand1' }, { customMembershipId: 'brand1' }],
+        },
       });
       expect(prisma.userMembership.update).toHaveBeenCalledWith({
         where: { id: 'mem1' },
         data: { remindEnabled: false },
+      });
+    });
+
+    it('should update custom membership remind when PATCH uses GET brandId', async () => {
+      const customId = 'custom-cuid-1';
+      const existing = {
+        id: 'mem-custom',
+        userId: 'user1',
+        brandId: null,
+        customMembershipId: customId,
+        remindEnabled: true,
+        isActive: true,
+      };
+      prisma.userMembership.findFirst.mockResolvedValue(existing);
+      prisma.userMembership.update.mockResolvedValue({
+        ...existing,
+        remindEnabled: false,
+      });
+
+      // GET exposes custom memberships with brandId === customMembership.id
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            brandId: customId,
+            remindEnabled: false,
+          }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.membership.remindEnabled).toBe(false);
+      expect(prisma.userMembership.findFirst).toHaveBeenCalledWith({
+        where: {
+          userId: 'user1',
+          OR: [{ brandId: customId }, { customMembershipId: customId }],
+        },
       });
     });
 
@@ -467,6 +511,8 @@ describe('/api/user/memberships', () => {
       expect(response.status).toBe(200);
       expect(data.memberships[0].remindEnabled).toBe(false);
       expect(data.memberships[1].remindEnabled).toBe(true);
+      expect(data.memberships[1].customMembershipId).toBe('custom1');
+      expect(data.memberships[1].brandId).toBe('custom1');
     });
   });
 });

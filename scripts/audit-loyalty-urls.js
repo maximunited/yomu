@@ -240,7 +240,10 @@ function daysSince(isoDate) {
 }
 
 function mdEscape(s) {
-  return String(s ?? '').replace(/\|/g, '\\|');
+  // Escape backslashes first so pipe escaping is not undone
+  return String(s ?? '')
+    .replace(/\\/g, '\\\\')
+    .replace(/\|/g, '\\|');
 }
 
 async function main() {

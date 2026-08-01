@@ -1202,7 +1202,7 @@ function DashboardPageContent() {
         {/* Reminders — upcoming benefits for memberships with remindEnabled */}
         {filteredReminderBenefits.length > 0 && (
           <div className="mb-8">
-            <div className="flex items-center space-x-2 mb-4">
+            <div className="flex items-center gap-2 mb-4">
               <Bell className="w-6 h-6 text-purple-600" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {t('reminders')}
@@ -1219,7 +1219,7 @@ function DashboardPageContent() {
                   aria-label={`${t('reminderBadge')}: ${benefit.brand.name} - ${benefit.title}`}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 border-purple-200 dark:border-purple-800 flex flex-col h-full"
                 >
-                  <div className="flex items-center space-x-3 mb-3">
+                  <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                       <Image
                         src={benefit.brand.logoUrl}
