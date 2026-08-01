@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import {
@@ -10,6 +10,8 @@ import {
   Trash2,
   CheckCircle,
   Circle,
+  Bell,
+  BellOff,
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,12 +23,17 @@ interface Membership {
   description: string;
   category: string;
   isActive: boolean;
+  /** True when a UserMembership row exists in the DB for this brand/custom club */
+  hasPersistedMembership?: boolean;
+  remindEnabled?: boolean;
   icon: string;
   type: 'free' | 'paid';
   cost: string | null;
   partnerBrands?: Brand[];
   partnerCount?: number;
 }
+
+const isUnsavedCustomId = (id: string) => id.startsWith('custom-');
 
 interface Brand {
   id: string;
@@ -80,8 +87,11 @@ export default function MembershipsPage() {
 
           // Load user's existing memberships
           const userMembershipsResponse = await fetch('/api/user/memberships');
-          let userMemberships: Array<{ brandId: string; isActive: boolean }> =
-            [];
+          let userMemberships: Array<{
+            brandId: string;
+            isActive: boolean;
+            remindEnabled?: boolean;
+          }> = [];
           if (userMembershipsResponse.ok) {
             const userData = await userMembershipsResponse.json();
             userMemberships = userData.memberships || [];
@@ -89,6 +99,9 @@ export default function MembershipsPage() {
 
           // Create a set of active brand IDs for quick lookup
           const activeBrandIds = new Set(userMemberships.map((m) => m.brandId));
+          const remindByBrandId = new Map(
+            userMemberships.map((m) => [m.brandId, m.remindEnabled !== false])
+          );
 
           // Also fetch benefits to derive paid/free per brand when available
           const brandPaidMap = new Map<string, boolean>();
@@ -153,6 +166,8 @@ export default function MembershipsPage() {
                 activeBrandIds.has(brand.id) ||
                 brandsWithBenefits.has(brand.id) ||
                 brandsWithBenefits.has(brand.name),
+              hasPersistedMembership: activeBrandIds.has(brand.id),
+              remindEnabled: remindByBrandId.get(brand.id) ?? true,
               icon: brand.logoUrl,
               type: inferredPaid ? ('paid' as const) : ('free' as const),
               cost: inferredPaid ? ((brand as any).cost ?? null) : null,
@@ -266,27 +281,27 @@ export default function MembershipsPage() {
           },
           {
             id: '10',
-            name: 'מסעדת באקרו (רעננה)',
+            name: 'באקרו - Buckaroo',
             description: 'מנה ראשונה וקינוח מתנה',
             category: 'food',
             isActive: false,
-            icon: '/images/brands/bacaro.svg',
+            icon: '/images/brands/buckaroo.png',
             type: 'free',
             cost: null,
           },
           {
             id: '11',
-            name: 'שגב (מסעדה)',
+            name: 'שגב',
             description: 'מנה ראשונה',
             category: 'food',
             isActive: false,
-            icon: '/images/brands/shegev.svg',
+            icon: '/images/brands/segev.png',
             type: 'free',
             cost: null,
           },
           {
             id: '12',
-            name: "ג'מס",
+            name: "ג'מס - Jem's",
             description: 'חצי ליטר בירה',
             category: 'food',
             isActive: false,
@@ -296,7 +311,7 @@ export default function MembershipsPage() {
           },
           {
             id: '13',
-            name: 'פראג הקטנה (מסעדה)',
+            name: 'פראג הקטנה',
             description: "50 נק' מתנה",
             category: 'food',
             isActive: false,
@@ -316,11 +331,11 @@ export default function MembershipsPage() {
           },
           {
             id: '15',
-            name: 'מנמ עשה זאת בעצמך',
+            name: 'מנמ - MNM',
             description: '50 שח מתנה (מעל 300)',
             category: 'home',
             isActive: false,
-            icon: '/images/brands/menam.svg',
+            icon: '/images/brands/menam.png',
             type: 'free',
             cost: null,
           },
@@ -336,11 +351,11 @@ export default function MembershipsPage() {
           },
           {
             id: '17',
-            name: 'יומנגס',
-            description: 'הטבות על גלידה',
+            name: 'יומנגס - Humongous',
+            description: 'רשת המבורגרים - הטבות יום הולדת',
             category: 'food',
             isActive: false,
-            icon: '/images/brands/yomango.svg',
+            icon: '/images/brands/humongous.png',
             type: 'free',
             cost: null,
           },
@@ -387,6 +402,48 @@ export default function MembershipsPage() {
           : membership
       )
     );
+  };
+
+  const toggleRemind = async (id: string, e: MouseEvent) => {
+    e.stopPropagation();
+    const membership = memberships.find((m) => m.id === id);
+    if (!membership || !membership.isActive) return;
+
+    const next = !membership.remindEnabled;
+    setMemberships((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, remindEnabled: next } : m))
+    );
+
+    // Unsaved local custom clubs: keep remind preference in UI until POST save
+    if (isUnsavedCustomId(id)) return;
+
+    // Heuristic "active" brands (have benefits) may lack a UserMembership row
+    if (!membership.hasPersistedMembership) {
+      setMemberships((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, remindEnabled: !next } : m))
+      );
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/user/memberships', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandId: id,
+          remindEnabled: next,
+        }),
+      });
+      if (!res.ok) {
+        setMemberships((prev) =>
+          prev.map((m) => (m.id === id ? { ...m, remindEnabled: !next } : m))
+        );
+      }
+    } catch {
+      setMemberships((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, remindEnabled: !next } : m))
+      );
+    }
   };
 
   const handleSaveChanges = async () => {
@@ -438,7 +495,14 @@ export default function MembershipsPage() {
         console.log('Save successful:', result);
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
-        setOriginalMemberships(memberships); // Update original memberships after successful save
+        // Mark saved brand memberships as persisted so remind PATCH can succeed
+        const saved = memberships.map((m) =>
+          m.isActive && !isUnsavedCustomId(m.id)
+            ? { ...m, hasPersistedMembership: true }
+            : m
+        );
+        setMemberships(saved);
+        setOriginalMemberships(saved);
         // Restore scroll position to avoid jump after resorting
         if (typeof window !== 'undefined') {
           window.scrollTo(0, previousScrollY);
@@ -911,6 +975,23 @@ export default function MembershipsPage() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
+                    {membership.isActive &&
+                      (membership.hasPersistedMembership ||
+                        isUnsavedCustomId(membership.id)) && (
+                        <button
+                          type="button"
+                          onClick={(e) => toggleRemind(membership.id, e)}
+                          title={t('remindEnabled')}
+                          aria-label={t('remindEnabled')}
+                          className="p-1 rounded-full hover:bg-purple-100 dark:hover:bg-purple-900/40"
+                        >
+                          {membership.remindEnabled !== false ? (
+                            <Bell className="w-4 h-4 text-purple-600" />
+                          ) : (
+                            <BellOff className="w-4 h-4 text-gray-400" />
+                          )}
+                        </button>
+                      )}
                     {membership.isActive ? (
                       <CheckCircle className="w-5 h-5 text-purple-600" />
                     ) : (

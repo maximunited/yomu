@@ -73,13 +73,13 @@ YomU (יום-You) is a mobile-first web application that aggregates and displays
 
 ### Supported Brands & Services
 
-- **Food & Restaurants**: McDonald's, Starbucks, KFC, Buckaroo, Shegev, James, Little Prague, Humongous, Giraffe
-- **Fashion**: Fox, H&M, Max, Shilav
+- **Food & Restaurants**: McDonald's, Starbucks, KFC, Buckaroo, Shegev, Jem's, Little Prague, Humongous, Giraffe, BBB, Cafe Mandarin, M32
+- **Fashion**: Fox, H&M, Max, Shilav, Castro CU, Delta, WOW, Factory 54, Golf & Co, Honigman, Brill Group / Gali
 - **Health & Beauty**: Super-Pharm LifeStyle
-- **Transport**: Isracard
-- **Home & DIY**: BBB, Manam DIY
+- **Transport / Finance**: Isracard
+- **Home & DIY**: מנמ - MNM
 - **Grocery**: Shufersal, Mika Convenience Stores
-- **Entertainment**: Escape Room
+- **Entertainment / Leisure**: Escape Room, Jump / עונות
 
 ## 🚀 Getting Started
 
@@ -409,15 +409,43 @@ yomu/
 └── package.json               # Dependencies
 ```
 
-## 📦 Database Seeding
+## 📦 Database Seeding & Loyalty Catalog
 
 We use a single, unified seed entry point that covers brands, partnerships, and benefits.
 
 - Main script: `scripts/seed.js`
-- Run locally:
+- Canonical names (upsert renames legacy aliases): `יומנגס - Humongous`, `מנמ - MNM`, `באקרו - Buckaroo`, `ג'מס - Jem's`
+
+### Catalog sync (seed ↔ Notion)
+
+- **Source of truth for the app:** `scripts/seed.js` (and Prisma).
+- **Research / ops tracker:** Notion parent [YomU Loyalty](https://app.notion.com/p/3af88c000814817b9be2eb436202815f) — Brands + Benefits DBs with Brand↔Benefits relation. Membership fields (Joined, Member ID, Remind me) live on Brands only.
+- Sync direction: research in Notion → update seed → upsert DB. The audit script does **not** write Notion (no in-repo Notion token).
+
+### Verification & reminders
+
+| Field | Model | Meaning |
+| ----- | ----- | ------- |
+| `verified` | `Benefit` | `true` when research is solid; soft/uncertain clubs seed `false` |
+| `lastChecked` | `Benefit` | When the benefit/URL was last reviewed (`null` for soft brands) |
+| `remindEnabled` | `UserMembership` | Default `true`; PATCH `/api/user/memberships`; bell toggle on Memberships; dashboard Reminders section filters on this |
+
+Soft brands (seed `verified: false`): H&M, שילב, Shufersal, Isracard, Honigman, Brill Group / Gali, Jump / עונות.
+
+### Loyalty URL audit
+
+```bash
+npm run audit:loyalty-urls
+```
+
+- Script: `scripts/audit-loyalty-urls.js` — HEAD/GET checks brand/benefit URLs from seed (optional JSON override).
+- Scheduled monthly via `.github/workflows/audit-loyalty-urls.yml` (`continue-on-error`; does not block CI).
+
+### Seed commands
 
 ```bash
 # Prisma generate + schema push (first run)
+# Note: Neon may warn about dropping legacy User.password — prefer additive ALTERs for new columns
 npx prisma generate && npx prisma db push
 
 # Seed everything (clears existing data)
@@ -449,7 +477,9 @@ What it does (upsert):
 
 - Does NOT wipe data
 - Upserts brands by name and benefits by (brandId + title)
+- Renames legacy brand aliases to canonical names
 - Creates missing partnerships if needed
+- Sets `verified` / `lastChecked` per soft vs researched clubs
 
 Advanced: partial brand/benefit imports
 
@@ -474,10 +504,10 @@ Production/Shared envs
 
 The application uses Prisma with the following main models:
 
-- `User`: User accounts and profiles
+- `User`: User accounts and profiles (Clerk via `clerkId`)
 - `Brand`: Brand information and logos
-- `Benefit`: Birthday benefits and details
-- `UserMembership`: User's active memberships
+- `Benefit`: Birthday benefits and details (`verified`, `lastChecked`)
+- `UserMembership`: User's active memberships (`remindEnabled`)
 - `Notification`: User notifications
 - `CustomMembership`: User-defined membership programs
 - `BrandPartnership`: Brand partnership relationships

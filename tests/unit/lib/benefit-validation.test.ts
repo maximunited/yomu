@@ -243,6 +243,27 @@ describe('Benefit Validation', () => {
       expect(isBenefitActive(benefit, userDOB, dayAfter)).toBe(false);
     });
 
+    it('should validate Humongous seed benefit (exact birthday burger)', () => {
+      const humongous = validateBenefitData({
+        title: 'המבורגר חינם ביום הולדת',
+        description:
+          'המבורגר חינם ביום ההולדת עצמו לחברי מועדון Humongous (לא גלידה)',
+        brandId: 'humongous-brand',
+        redemptionMethod: 'in-store',
+        validityType: 'birthday_exact_date',
+        validityDuration: 1,
+      });
+      expect(humongous.isValid).toBe(true);
+
+      const benefit = { validityType: 'birthday_exact_date' };
+      expect(isBenefitActive(benefit, userDOB, new Date('2024-06-15'))).toBe(
+        true
+      );
+      expect(isBenefitActive(benefit, userDOB, new Date('2024-06-16'))).toBe(
+        false
+      );
+    });
+
     it('should validate birthday_entire_month correctly', () => {
       const benefit = { validityType: 'birthday_entire_month' };
 
@@ -253,6 +274,29 @@ describe('Benefit Validation', () => {
       // Different month
       const differentMonth = new Date('2024-07-15');
       expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+    });
+
+    it('should validate BBB seed benefit (Happy BBBirthday entire month)', () => {
+      const bbb = validateBenefitData({
+        title: 'Happy BBBirthday — שתייה ומנה ראשונה',
+        description: 'שתייה ומנה ראשונה מתנה בחודש יום ההולדת לחברי מועדון BBB',
+        brandId: 'bbb-brand',
+        redemptionMethod: 'in-store',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+      });
+      expect(bbb.isValid).toBe(true);
+
+      const benefit = { validityType: 'birthday_entire_month' };
+      expect(isBenefitActive(benefit, userDOB, new Date('2024-06-01'))).toBe(
+        true
+      );
+      expect(isBenefitActive(benefit, userDOB, new Date('2024-06-30'))).toBe(
+        true
+      );
+      expect(isBenefitActive(benefit, userDOB, new Date('2024-05-15'))).toBe(
+        false
+      );
     });
 
     it('should validate birthday_week_before_after correctly', () => {

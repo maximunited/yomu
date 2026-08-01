@@ -138,6 +138,14 @@ describe('translations', () => {
     expect(translations.en.escapeRoomBenefit).toBeDefined();
   });
 
+  it('should use canonical renamed brand labels', () => {
+    expect(translations.he.youmangus).toBe('יומנגס - Humongous');
+    expect(translations.en.youmangus).toBe('יומנגס - Humongous');
+    expect(translations.he.manamDIY).toBe('מנמ - MNM');
+    expect(translations.he.remindEnabled).toBeDefined();
+    expect(translations.en.remindEnabled).toBeDefined();
+  });
+
   describe('template strings', () => {
     it('should have placeholder strings that match format', () => {
       expect(translations.he.newNotificationsCount).toContain('{count}');

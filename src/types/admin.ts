@@ -24,4 +24,6 @@ export interface Benefit {
   validityDuration?: number;
   isFree: boolean;
   isActive: boolean;
+  lastChecked?: string | Date | null;
+  verified?: boolean;
 }

@@ -49,6 +49,8 @@ CREATE TABLE benefits (
   validityType TEXT NOT NULL,
   validityDuration INTEGER,
   isActive BOOLEAN DEFAULT true,
+  verified BOOLEAN DEFAULT false,
+  lastChecked TIMESTAMP,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -70,6 +72,16 @@ When adding a new benefit, ensure all required fields are provided:
 - **promoCode**: Promotional code if applicable
 - **url**: Direct link to the benefit
 - **validityDuration**: Number of days the benefit is valid (for reference)
+- **verified**: Research confidence flag (`true` when terms/URL confirmed; soft brands seed `false`)
+- **lastChecked**: When the benefit/URL was last reviewed (ISO timestamp; often `null` when `verified` is false)
+
+### Catalog examples (seed)
+
+| Brand | Validity | Notes |
+| ----- | -------- | ----- |
+| יומנגס - Humongous | `birthday_exact_date` | Free burger on exact birthday |
+| BBB | `birthday_entire_month` | Happy BBBirthday drink + starter |
+| Soft clubs (H&M, Honigman, etc.) | varies | Seed with `verified: false` until T&Cs confirmed |
 
 ### 4. Validation
 

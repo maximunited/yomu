@@ -47,6 +47,8 @@ export const mockBenefit = {
   validityDuration: 1,
   redemptionMethod: 'code',
   termsAndConditions: 'Valid only on birthday',
+  verified: true,
+  lastChecked: new Date('2026-08-01'),
   brand: {
     id: 'brand-1',
     name: 'Test Brand',
@@ -70,6 +72,7 @@ export const mockMembership = {
   userId: 'user-1',
   brandId: 'brand-1',
   isActive: true,
+  remindEnabled: true,
   brand: mockBrand,
 };
 

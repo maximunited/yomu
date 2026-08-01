@@ -81,6 +81,9 @@ export interface Translations {
   totalMemberships: string;
   selectedPrograms: string;
   moreProgramsMoreBenefits: string;
+  remindEnabled: string;
+  reminders: string;
+  reminderBadge: string;
   addCustomMembership: string;
   customMembershipName: string;
   customMembershipDescription: string;
@@ -564,6 +567,9 @@ export const translations: Record<Language, Translations> = {
     selectedPrograms: 'נבחרו תוכניות',
     moreProgramsMoreBenefits:
       'ככל שתבחרו יותר תוכניות, כך תקבלו יותר הטבות ליום הולדת',
+    remindEnabled: 'תזכורת לפני חלון ההטבה',
+    reminders: 'תזכורות',
+    reminderBadge: 'תזכורת',
     addCustomMembership: 'הוסף חברות מותאמת',
     customMembershipName: 'שם החברות',
     customMembershipDescription: 'תיאור',
@@ -861,25 +867,25 @@ export const translations: Record<Language, Translations> = {
     // New Services
     escapeRoom: 'אסקייפרום',
     escapeRoomBenefit: '50 שח הנחה בחודש יום הולדת',
-    bacaroRestaurant: 'מסעדת באקרו (רעננה)',
+    bacaroRestaurant: 'באקרו - Buckaroo',
     bacaroBenefit: 'מנה ראשונה וקינוח מתנה',
-    shegevRestaurant: 'שגב (מסעדה)',
+    shegevRestaurant: 'שגב',
     shegevBenefit: 'מנה ראשונה',
-    jamesBeer: "ג'מס",
+    jamesBeer: "ג'מס - Jem's",
     jamesBenefit: 'חצי ליטר בירה',
-    pragRestaurant: 'פראג הקטנה (מסעדה)',
+    pragRestaurant: 'פראג הקטנה',
     pragBenefit: "50 נק' מתנה",
     mikaConvenience: 'מיקה חנויות נוחות',
     mikaBenefit: '10 שח מתנה בהצגת תעודה',
     kfcBenefit: 'המבורגר 1+1',
-    manamDIY: 'מנמ עשה זאת בעצמך',
+    manamDIY: 'מנמ - MNM',
     manamBenefit: '50 שח מתנה (מעל 300)',
     shilav: 'שילב',
     shilavBenefit: 'הטבות מיוחדות',
-    youmangus: 'יומנגס',
-    youmangusBenefit: 'הטבות ייחודיות',
+    youmangus: 'יומנגס - Humongous',
+    youmangusBenefit: 'המבורגר חינם ביום הולדת',
     m32Burgers: 'M32 המבורגרים',
-    m32BurgersBenefit: '15% הנחה בחודש יום הולדת',
+    m32BurgersBenefit: '15% הנחה ביום הולדת',
     libiraRestaurant: 'מסעדת ליבירה',
     libiraRestaurantBenefit: 'בירה וקינוח בישיבה בלבד כל החודש',
 
@@ -1060,6 +1066,9 @@ export const translations: Record<Language, Translations> = {
     selectedPrograms: 'Selected Programs',
     moreProgramsMoreBenefits:
       "The more programs you select, the more birthday benefits you'll get",
+    remindEnabled: 'Remind before benefit window',
+    reminders: 'Reminders',
+    reminderBadge: 'Reminder',
     addCustomMembership: 'Add Custom Membership',
     customMembershipName: 'Membership Name',
     customMembershipDescription: 'Description',
@@ -1283,25 +1292,25 @@ export const translations: Record<Language, Translations> = {
     // New Services
     escapeRoom: 'Escape Room',
     escapeRoomBenefit: '50 NIS discount in birthday month',
-    bacaroRestaurant: 'Bacaro Restaurant (Raanana)',
+    bacaroRestaurant: 'Buckaroo',
     bacaroBenefit: 'Free appetizer and dessert',
-    shegevRestaurant: 'Shegev (Restaurant)',
+    shegevRestaurant: 'Shegev',
     shegevBenefit: 'Free appetizer',
-    jamesBeer: 'James',
+    jamesBeer: "Jem's",
     jamesBenefit: 'Half liter beer',
-    pragRestaurant: 'Little Prague (Restaurant)',
+    pragRestaurant: 'Little Prague',
     pragBenefit: '50 points bonus',
     mikaConvenience: 'Mika Convenience Stores',
     mikaBenefit: '10 NIS bonus with ID',
     kfcBenefit: '1+1 Burger',
-    manamDIY: 'Manam DIY',
+    manamDIY: 'MNM',
     manamBenefit: '50 NIS bonus (over 300)',
     shilav: 'Shilav',
     shilavBenefit: 'Special benefits',
-    youmangus: 'Youmangus',
-    youmangusBenefit: 'Unique benefits',
+    youmangus: 'יומנגס - Humongous',
+    youmangusBenefit: 'Free burger on birthday',
     m32Burgers: 'M32 Burgers',
-    m32BurgersBenefit: '15% discount in birthday month',
+    m32BurgersBenefit: '15% discount on birthday',
     libiraRestaurant: 'Libira Restaurant',
     libiraRestaurantBenefit: 'Beer and dessert for dine-in only all month',
 

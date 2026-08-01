@@ -1,3 +1,10 @@
+# OpenWolf
+
+@.wolf/OPENWOLF.md
+
+This project uses OpenWolf for context management. Read and follow .wolf/OPENWOLF.md every session. Check .wolf/cerebrum.md before generating code. Check .wolf/anatomy.md before reading files.
+
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -46,6 +53,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npx prisma studio` - Open Prisma Studio GUI (visual database browser)
 - `npm run db:studio` - Alias for Prisma Studio
 - `npm run db:seed` - Seed database (alias for `node scripts/seed.js`)
+- `npm run audit:loyalty-urls` - Monthly HEAD/GET audit of brand/benefit URLs from seed (also scheduled via `.github/workflows/audit-loyalty-urls.yml`)
 - `node scripts/seed.js --mode=fresh` - Wipe and reseed database completely
 - `node scripts/seed.js --mode=upsert` - Safe update without wiping data
 - `node scripts/seed.js --mode=upsert --brands="Giraffe,Nono & Mimi"` - Seed specific brands only
@@ -164,8 +172,8 @@ tests/
 
 - **User**: Authentication, profile data including dateOfBirth and optional anniversaryDate
 - **Brand**: Companies offering benefits (name, logoUrl, category, actionUrl for deep linking)
-- **Benefit**: Birthday benefits with validity types and redemption methods
-- **UserMembership**: Links users to brands they're members of
+- **Benefit**: Birthday benefits with validity types and redemption methods; `verified` + `lastChecked` for research confidence
+- **UserMembership**: Links users to brands they're members of; `remindEnabled` (default true) for dashboard reminders
 - **CustomMembership**: User-created memberships with custom benefits
 - **CustomBenefit**: Benefits linked to custom memberships
 - **Notification**: System notifications for benefits
@@ -198,6 +206,15 @@ The dashboard (`src/app/dashboard/page.tsx`) categorizes benefits:
 - **Active Benefits**: Currently valid based on user's birthday and validity rules
 - **Upcoming Benefits**: Will be active soon
 - **Membership Filtering**: Only shows benefits for user's active memberships
+- **Reminders**: Upcoming benefits for memberships where `remindEnabled !== false` (toggle via PATCH `/api/user/memberships`)
+
+#### Loyalty Catalog Sync
+
+- App catalog source of truth: `scripts/seed.js` → Prisma
+- Notion [YomU Loyalty](https://app.notion.com/p/3af88c000814817b9be2eb436202815f) tracks research (Brands + Benefits DBs); sync Notion → seed → upsert
+- Soft/uncertain benefits seed `verified: false` (H&M, שילב, Shufersal, Isracard, Honigman, Brill/Gali, Jump)
+- URL audit: `npm run audit:loyalty-urls` + monthly `.github/workflows/audit-loyalty-urls.yml` (non-blocking)
+- Neon caveat: prefer additive column ALTERs; full `db push` may warn about dropping legacy `User.password`
 
 ### Important Development Notes
 
@@ -232,10 +249,11 @@ When working with benefits, always use the validation functions from `src/lib/be
 
 - **Primary Script**: `scripts/seed.js` with mode-based operation
 - **Fresh Mode**: `--mode=fresh` wipes existing data and creates new (use for clean installs)
-- **Upsert Mode**: `--mode=upsert` safely updates without data loss (use for production updates)
+- **Upsert Mode**: `--mode=upsert` safely updates without data loss (use for production updates); renames legacy aliases to canonical names (`יומנגס - Humongous`, `מנמ - MNM`, etc.)
 - **Brand Filtering**: `--brands="Brand1,Brand2"` parameter for selective seeding
 - **Validation**: Ensures all benefits follow the specification in `docs/BENEFITS_SPECIFICATION.md`
 - **Partnership Support**: Automatically creates brand partnerships and co-branded benefits
+- **Verification**: Sets `Benefit.verified` / `lastChecked` from soft-brand list vs researched clubs
 
 ## Initial Setup
 

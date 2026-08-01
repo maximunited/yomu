@@ -1,0 +1,39 @@
+name: Loyalty URL Audit
+
+on:
+  schedule:
+    # Monthly on the 1st at 06:00 UTC
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-loyalty-urls
+  cancel-in-progress: true
+
+jobs:
+  audit_loyalty_urls:
+    name: Audit brand/benefit URLs
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run loyalty URL audit
+        # Non-blocking: 403s / flaky hosts must not fail the workflow
+        continue-on-error: true
+        run: npm run audit:loyalty-urls
