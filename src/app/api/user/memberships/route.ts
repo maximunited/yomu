@@ -236,7 +236,9 @@ export async function GET(request: NextRequest) {
       (membership) => ({
         id: membership.customMembership!.id,
         brandId: membership.customMembership!.id,
+        customMembershipId: membership.customMembership!.id,
         isActive: membership.isActive,
+        remindEnabled: membership.remindEnabled,
         brand: {
           id: membership.customMembership!.id,
           name: membership.customMembership!.name,
@@ -251,7 +253,10 @@ export async function GET(request: NextRequest) {
     );
 
     const allMemberships = [
-      ...brandMemberships,
+      ...brandMemberships.map((m) => ({
+        ...m,
+        remindEnabled: m.remindEnabled,
+      })),
       ...transformedCustomMemberships,
     ];
 
@@ -260,6 +265,77 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ memberships: allMemberships });
   } catch (error) {
     console.error('Error fetching memberships:', error);
+    return NextResponse.json(
+      {
+        message: 'internalServerError',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const dbUser = await getOrCreateUser(clerkUserId);
+    const userId = dbUser.id;
+
+    const body = await request.json();
+    const { brandId, customMembershipId, remindEnabled } = body as {
+      brandId?: string;
+      customMembershipId?: string;
+      remindEnabled?: boolean;
+    };
+
+    if (typeof remindEnabled !== 'boolean') {
+      return NextResponse.json(
+        { error: 'remindEnabled boolean is required' },
+        { status: 400 }
+      );
+    }
+    if (brandId && customMembershipId) {
+      return NextResponse.json(
+        { error: 'Provide brandId or customMembershipId, not both' },
+        { status: 400 }
+      );
+    }
+    if (!brandId && !customMembershipId) {
+      return NextResponse.json(
+        { error: 'brandId or customMembershipId is required' },
+        { status: 400 }
+      );
+    }
+
+    // GET flattens custom memberships as brandId=customMembership.id, so accept
+    // brandId as either a real brand id or a custom membership id.
+    const existing = await prisma.userMembership.findFirst({
+      where: brandId
+        ? {
+            userId,
+            OR: [{ brandId }, { customMembershipId: brandId }],
+          }
+        : { userId, customMembershipId: customMembershipId as string },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { error: 'Membership not found' },
+        { status: 404 }
+      );
+    }
+
+    const updated = await prisma.userMembership.update({
+      where: { id: existing.id },
+      data: { remindEnabled },
+    });
+
+    return NextResponse.json({ membership: updated });
+  } catch (error) {
+    console.error('Error updating membership remind setting:', error);
     return NextResponse.json(
       {
         message: 'internalServerError',

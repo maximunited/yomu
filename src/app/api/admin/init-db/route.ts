@@ -111,6 +111,8 @@ export async function POST() {
         "validityDuration" INTEGER,
         "isFree" BOOLEAN NOT NULL DEFAULT true,
         "isActive" BOOLEAN NOT NULL DEFAULT true,
+        "lastChecked" TIMESTAMP(3),
+        "verified" BOOLEAN NOT NULL DEFAULT false,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "benefits_brandId_fkey" FOREIGN KEY ("brandId") REFERENCES "brands" ("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -157,6 +159,7 @@ export async function POST() {
         "userId" TEXT NOT NULL,
         "brandId" TEXT,
         "isActive" BOOLEAN NOT NULL DEFAULT true,
+        "remindEnabled" BOOLEAN NOT NULL DEFAULT true,
         "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "customMembershipId" TEXT,
@@ -200,6 +203,17 @@ export async function POST() {
 
     // Execute each statement individually
     for (const sql of sqlStatements) {
+      await prisma.$executeRawUnsafe(sql);
+    }
+
+    // Additive upgrades for DBs created before verification/remind columns existed
+    // (CREATE TABLE IF NOT EXISTS does not alter existing tables)
+    const alterStatements = [
+      `ALTER TABLE "benefits" ADD COLUMN IF NOT EXISTS "lastChecked" TIMESTAMP(3)`,
+      `ALTER TABLE "benefits" ADD COLUMN IF NOT EXISTS "verified" BOOLEAN NOT NULL DEFAULT false`,
+      `ALTER TABLE "user_memberships" ADD COLUMN IF NOT EXISTS "remindEnabled" BOOLEAN NOT NULL DEFAULT true`,
+    ];
+    for (const sql of alterStatements) {
       await prisma.$executeRawUnsafe(sql);
     }
 

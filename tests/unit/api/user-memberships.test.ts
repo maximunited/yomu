@@ -1,4 +1,4 @@
-import { GET, POST } from '@/app/api/user/memberships/route';
+import { GET, POST, PATCH } from '@/app/api/user/memberships/route';
 import { NextRequest } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { getOrCreateUser } from '@/lib/clerk-user';
@@ -28,7 +28,9 @@ jest.mock('@/lib/prisma', () => ({
     },
     userMembership: {
       findMany: jest.fn(),
+      findFirst: jest.fn(),
       updateMany: jest.fn(),
+      update: jest.fn(),
       upsert: jest.fn(),
       create: jest.fn(),
     },
@@ -226,6 +228,291 @@ describe('/api/user/memberships', () => {
 
       expect(response.status).toBe(401);
       expect(data.error).toBe('Unauthorized');
+    });
+  });
+
+  describe('PATCH remindEnabled', () => {
+    it('should update remindEnabled for a brand membership', async () => {
+      const existing = {
+        id: 'mem1',
+        userId: 'user1',
+        brandId: 'brand1',
+        remindEnabled: true,
+        isActive: true,
+      };
+      const updated = { ...existing, remindEnabled: false };
+      prisma.userMembership.findFirst.mockResolvedValue(existing);
+      prisma.userMembership.update.mockResolvedValue(updated);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            brandId: 'brand1',
+            remindEnabled: false,
+          }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.membership.remindEnabled).toBe(false);
+      expect(prisma.userMembership.findFirst).toHaveBeenCalledWith({
+        where: {
+          userId: 'user1',
+          OR: [{ brandId: 'brand1' }, { customMembershipId: 'brand1' }],
+        },
+      });
+      expect(prisma.userMembership.update).toHaveBeenCalledWith({
+        where: { id: 'mem1' },
+        data: { remindEnabled: false },
+      });
+    });
+
+    it('should update custom membership remind when PATCH uses GET brandId', async () => {
+      const customId = 'custom-cuid-1';
+      const existing = {
+        id: 'mem-custom',
+        userId: 'user1',
+        brandId: null,
+        customMembershipId: customId,
+        remindEnabled: true,
+        isActive: true,
+      };
+      prisma.userMembership.findFirst.mockResolvedValue(existing);
+      prisma.userMembership.update.mockResolvedValue({
+        ...existing,
+        remindEnabled: false,
+      });
+
+      // GET exposes custom memberships with brandId === customMembership.id
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            brandId: customId,
+            remindEnabled: false,
+          }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.membership.remindEnabled).toBe(false);
+      expect(prisma.userMembership.findFirst).toHaveBeenCalledWith({
+        where: {
+          userId: 'user1',
+          OR: [{ brandId: customId }, { customMembershipId: customId }],
+        },
+      });
+    });
+
+    it('should update remindEnabled for a custom membership', async () => {
+      const existing = {
+        id: 'mem2',
+        userId: 'user1',
+        customMembershipId: 'custom1',
+        remindEnabled: false,
+        isActive: true,
+      };
+      const updated = { ...existing, remindEnabled: true };
+      prisma.userMembership.findFirst.mockResolvedValue(existing);
+      prisma.userMembership.update.mockResolvedValue(updated);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            customMembershipId: 'custom1',
+            remindEnabled: true,
+          }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.membership.remindEnabled).toBe(true);
+      expect(prisma.userMembership.findFirst).toHaveBeenCalledWith({
+        where: { userId: 'user1', customMembershipId: 'custom1' },
+      });
+      expect(prisma.userMembership.update).toHaveBeenCalledWith({
+        where: { id: 'mem2' },
+        data: { remindEnabled: true },
+      });
+    });
+
+    it('should return 400 when remindEnabled is missing', async () => {
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ brandId: 'brand1' }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toMatch(/remindEnabled/);
+      expect(prisma.userMembership.update).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 when neither brandId nor customMembershipId is provided', async () => {
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ remindEnabled: true }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toMatch(/brandId or customMembershipId/);
+    });
+
+    it('should return 400 when both brandId and customMembershipId are provided', async () => {
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            brandId: 'brand1',
+            customMembershipId: 'custom1',
+            remindEnabled: true,
+          }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toMatch(/not both/);
+      expect(prisma.userMembership.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('should return 404 when membership row does not exist', async () => {
+      prisma.userMembership.findFirst.mockResolvedValue(null);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            brandId: 'brand1',
+            remindEnabled: false,
+          }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(data.error).toBe('Membership not found');
+      expect(prisma.userMembership.update).not.toHaveBeenCalled();
+    });
+
+    it('should return 401 when not authenticated', async () => {
+      (auth as jest.Mock).mockResolvedValue({ userId: null });
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            brandId: 'brand1',
+            remindEnabled: false,
+          }),
+        }
+      );
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.error).toBe('Unauthorized');
+    });
+
+    it('should return 500 when prisma update fails', async () => {
+      prisma.userMembership.findFirst.mockResolvedValue({
+        id: 'mem1',
+        userId: 'user1',
+        brandId: 'brand1',
+      });
+      prisma.userMembership.update.mockRejectedValue(new Error('DB error'));
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            brandId: 'brand1',
+            remindEnabled: false,
+          }),
+        }
+      );
+
+      const response = await PATCH(request);
+
+      expect(response.status).toBe(500);
+    });
+  });
+
+  describe('GET remindEnabled', () => {
+    it('should include remindEnabled on brand and custom memberships', async () => {
+      prisma.userMembership.findMany
+        .mockResolvedValueOnce([
+          {
+            id: 'mem1',
+            brandId: 'brand1',
+            isActive: true,
+            remindEnabled: false,
+            brand: { id: 'brand1', name: 'BBB', logoUrl: 'logo.png' },
+          },
+        ])
+        .mockResolvedValueOnce([
+          {
+            id: 'mem2',
+            customMembershipId: 'custom1',
+            isActive: true,
+            remindEnabled: true,
+            customMembership: {
+              id: 'custom1',
+              name: 'Custom Brand',
+              icon: 'icon.png',
+              description: 'Custom description',
+              category: 'food',
+              type: 'free',
+              cost: null,
+            },
+          },
+        ]);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/memberships'
+      );
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.memberships[0].remindEnabled).toBe(false);
+      expect(data.memberships[1].remindEnabled).toBe(true);
+      expect(data.memberships[1].customMembershipId).toBe('custom1');
+      expect(data.memberships[1].brandId).toBe('custom1');
     });
   });
 });

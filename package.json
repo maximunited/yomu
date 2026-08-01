@@ -43,6 +43,7 @@
     "verify:docker": "npm run test:docker",
     "admin:help": "node scripts/admin-helper.js",
     "db:seed": "node scripts/seed.js",
+    "audit:loyalty-urls": "node scripts/audit-loyalty-urls.js",
     "assets:brands": "node scripts/download-brand-logos.js",
     "prepare": "husky",
     "db:studio": "npx prisma studio",
@@ -86,7 +87,7 @@
     "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^9.39.4",
-    "@next/eslint-plugin-next": "^16.2.11",
+    "@next/eslint-plugin-next": "^16.2.12",
     "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.0",
@@ -126,14 +127,17 @@
     "external-editor": "^3.1.0",
     "inflight": "npm:lru-cache@^10.0.0",
     "glob": "^10.0.0",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.18",
+    "sharp": "^0.35.3",
+    "fast-uri": "^3.1.5",
     "uuid": "^11.1.1",
-    "@hono/node-server": "^1.19.13",
     "eslint": "$eslint"
   },
   "_comment_overrides": {
-    "@hono/node-server": "Pinned to 1.19.13 - Prisma 7.8.0 transitively depends on 1.19.14 which may have compatibility issues. Override ensures stable version.",
-    "eslint": "Forces eslint 10 everywhere, bypassing eslint-plugin-react's ^9.7 peer dep until it officially supports eslint 10."
+    "eslint": "Forces eslint 10 everywhere, bypassing eslint-plugin-react's ^9.7 peer dep until it officially supports eslint 10.",
+    "postcss": "Floor above 8.5.17 for GHSA-r28c-9q8g-f849 (Next still declares 8.4.31).",
+    "sharp": "Floor at 0.35.x for libvips CVEs (Next optionalDependency still ^0.34.5).",
+    "fast-uri": "Floor above 3.1.3 for GHSA-v2hh-gcrm-f6hx (ajv pulls ^3.0.1)."
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [

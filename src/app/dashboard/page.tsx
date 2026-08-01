@@ -33,9 +33,11 @@ import type { Translations } from '@/lib/translations';
 
 interface Benefit {
   id: string;
+  brandId?: string;
   title: string;
   description: string;
   brand: {
+    id?: string;
     name: string;
     logoUrl: string;
     category: string;
@@ -57,6 +59,7 @@ interface UserMembership {
   id: string;
   brandId: string;
   isActive: boolean;
+  remindEnabled?: boolean;
   brand: {
     id: string;
     name: string;
@@ -570,9 +573,20 @@ function DashboardPageContent() {
 
   console.log('Upcoming benefits count:', upcomingBenefits.length);
 
+  const remindBrandIds = new Set(
+    userMemberships
+      .filter((m) => m.isActive && m.remindEnabled !== false)
+      .map((m) => m.brandId)
+  );
+
+  const reminderUpcomingBenefits = upcomingBenefits.filter((b) =>
+    remindBrandIds.has(b.brandId || b.brand?.id)
+  );
+
   // Apply search and filters
   const filteredActiveBenefits = filterBenefits(activeBenefits);
   const filteredUpcomingBenefits = filterBenefits(upcomingBenefits);
+  const filteredReminderBenefits = filterBenefits(reminderUpcomingBenefits);
 
   // Get unique categories from benefits
   const allCategories = Array.from(
@@ -1185,6 +1199,65 @@ function DashboardPageContent() {
           </div>
         </div>
 
+        {/* Reminders — upcoming benefits for memberships with remindEnabled */}
+        {filteredReminderBenefits.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Bell className="w-6 h-6 text-purple-600" />
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {t('reminders')}
+              </h2>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                ({filteredReminderBenefits.length})
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredReminderBenefits.map((benefit) => (
+                <div
+                  key={`remind-${benefit.id}`}
+                  role="article"
+                  aria-label={`${t('reminderBadge')}: ${benefit.brand.name} - ${benefit.title}`}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 border-purple-200 dark:border-purple-800 flex flex-col h-full"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                      <Image
+                        src={benefit.brand.logoUrl}
+                        alt={benefit.brand.name}
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {benefit.brand.name}
+                      </h3>
+                      <span className="text-sm text-purple-600 font-medium">
+                        {getValidityText(benefit)}
+                      </span>
+                    </div>
+                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      {t('reminderBadge')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                    {benefit.title}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push(`/benefit/${benefit.id}`)}
+                    className="mt-auto"
+                  >
+                    {t('moreDetails')}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Coming Soon Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -1245,6 +1318,11 @@ function DashboardPageContent() {
                   >
                     {benefit.isFree ? t('free') : t('paid')}
                   </span>
+                  {remindBrandIds.has(benefit.brandId || benefit.brand?.id) && (
+                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      {t('reminderBadge')}
+                    </span>
+                  )}
                   {isRecentlyAdded(benefit) && (
                     <span
                       title={t('recentlyAdded')}

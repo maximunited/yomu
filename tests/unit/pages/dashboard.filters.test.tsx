@@ -130,8 +130,8 @@ describe('Dashboard Filters and Search', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByText('הטבות על מזון מהיר')[0]).toBeInTheDocument();
-      expect(screen.getByText('Coffee Discount')).toBeInTheDocument();
+      expect(screen.getAllByText('Free Pizza')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Coffee Discount').length).toBeGreaterThan(0);
     });
 
     // Search for "pizza"
@@ -141,7 +141,7 @@ describe('Dashboard Filters and Search', () => {
     await user.type(searchInput, 'pizza');
 
     await waitFor(() => {
-      expect(screen.getAllByText('הטבות על מזון מהיר')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Free Pizza')[0]).toBeInTheDocument();
       expect(screen.queryByText('Coffee Discount')).not.toBeInTheDocument();
     });
   });
@@ -154,8 +154,8 @@ describe('Dashboard Filters and Search', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByText('הטבות על מזון מהיר')[0]).toBeInTheDocument();
-      expect(screen.getByText('Coffee Discount')).toBeInTheDocument();
+      expect(screen.getAllByText('Free Pizza')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Coffee Discount').length).toBeGreaterThan(0);
     });
 
     // Find and use category filter
@@ -168,9 +168,7 @@ describe('Dashboard Filters and Search', () => {
       await user.click(foodButton);
 
       await waitFor(() => {
-        expect(
-          screen.getAllByText('הטבות על מזון מהיר')[0]
-        ).toBeInTheDocument();
+        expect(screen.getAllByText('Free Pizza')[0]).toBeInTheDocument();
         expect(screen.queryByText('Coffee Discount')).not.toBeInTheDocument();
       });
     }
@@ -184,7 +182,7 @@ describe('Dashboard Filters and Search', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByText('הטבות על מזון מהיר')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Free Pizza')[0]).toBeInTheDocument();
     });
 
     // Look for filter toggle button
@@ -205,7 +203,7 @@ describe('Dashboard Filters and Search', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByText('הטבות על מזון מהיר')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Free Pizza')[0]).toBeInTheDocument();
     });
 
     // Search for something that doesn't exist
@@ -215,7 +213,7 @@ describe('Dashboard Filters and Search', () => {
     await user.type(searchInput, 'nonexistent');
 
     await waitFor(() => {
-      expect(screen.queryByText('הטבות על מזון מהיר')).not.toBeInTheDocument();
+      expect(screen.queryByText('Free Pizza')).not.toBeInTheDocument();
       expect(screen.queryByText('Coffee Discount')).not.toBeInTheDocument();
     });
   });
@@ -228,8 +226,8 @@ describe('Dashboard Filters and Search', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByText('הטבות על מזון מהיר')[0]).toBeInTheDocument();
-      expect(screen.getByText('Coffee Discount')).toBeInTheDocument();
+      expect(screen.getAllByText('Free Pizza')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Coffee Discount').length).toBeGreaterThan(0);
     });
 
     const searchInput = screen.getByPlaceholderText(
@@ -245,8 +243,8 @@ describe('Dashboard Filters and Search', () => {
     // Clear search
     await user.clear(searchInput);
     await waitFor(() => {
-      expect(screen.getAllByText('הטבות על מזון מהיר')[0]).toBeInTheDocument();
-      expect(screen.getByText('Coffee Discount')).toBeInTheDocument();
+      expect(screen.getAllByText('Free Pizza')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Coffee Discount').length).toBeGreaterThan(0);
     });
   });
 

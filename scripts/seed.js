@@ -23,6 +23,17 @@ console.log('Starting seed script...');
 
 const prisma = createPrismaClient();
 
+/** Soft / uncertain research — benefits seed with verified: false */
+const SOFT_BRAND_NAMES = new Set([
+  'H&M',
+  'שילב',
+  'Shufersal',
+  'Isracard',
+  'Honigman',
+  'Brill Group / Gali',
+  'Jump / עונות',
+]);
+
 const predefinedBrands = [
   {
     name: "McDonald's",
@@ -30,6 +41,9 @@ const predefinedBrands = [
     website: 'https://www.mcdonalds.co.il',
     description: 'הטבות על מזון מהיר',
     category: 'food',
+    actionUrl: 'https://www.mcdonalds.co.il',
+    actionType: 'website',
+    actionLabel: "לאתר McDonald's",
   },
   {
     name: 'Super-Pharm - LifeStyle',
@@ -37,6 +51,9 @@ const predefinedBrands = [
     website: 'https://www.super-pharm.co.il',
     description: 'הטבות על מוצרי בריאות ויופי',
     category: 'health',
+    actionUrl: 'https://www.super-pharm.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'Fox',
@@ -44,6 +61,9 @@ const predefinedBrands = [
     website: 'https://www.fox.co.il',
     description: 'הטבות על ביגוד והנעלה',
     category: 'fashion',
+    actionUrl: 'https://www.fox.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'Isracard',
@@ -51,6 +71,9 @@ const predefinedBrands = [
     website: 'https://www.isracard.co.il',
     description: 'הטבות על דלק ותחבורה',
     category: 'transport',
+    actionUrl: 'https://www.isracard.co.il',
+    actionType: 'website',
+    actionLabel: 'לאתר Isracard',
   },
   {
     name: 'H&M',
@@ -58,6 +81,9 @@ const predefinedBrands = [
     website: 'https://www.hm.com/il',
     description: 'הטבות על ביגוד והנעלה',
     category: 'fashion',
+    actionUrl: 'https://www.hm.com/il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'BBB',
@@ -65,6 +91,9 @@ const predefinedBrands = [
     website: 'https://www.burgus.co.il/',
     description: 'רשת מסעדות המבורגרים (BBB) – הטבות יום הולדת במסעדות הרשת',
     category: 'food',
+    actionUrl: 'https://www.burgus.co.il/club',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'Shufersal',
@@ -72,6 +101,9 @@ const predefinedBrands = [
     website: 'https://www.shufersal.co.il',
     description: 'הטבות על מוצרי מזון',
     category: 'grocery',
+    actionUrl: 'https://www.shufersal.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'KFC',
@@ -79,6 +111,9 @@ const predefinedBrands = [
     website: 'https://www.kfc.co.il',
     description: 'הטבות על מזון מהיר',
     category: 'food',
+    actionUrl: 'https://www.kfc.co.il',
+    actionType: 'website',
+    actionLabel: 'לאתר KFC',
   },
   {
     name: 'Nono & Mimi',
@@ -116,6 +151,9 @@ const predefinedBrands = [
     website: 'https://www.escaperoom.co.il',
     description: 'חדרי בריחה - 50 שח הנחה בחודש יומולדת',
     category: 'entertainment',
+    actionUrl: 'https://www.escaperoom.co.il',
+    actionType: 'website',
+    actionLabel: 'לאתר אסקייפרום',
   },
   {
     name: 'באקרו - Buckaroo',
@@ -123,6 +161,9 @@ const predefinedBrands = [
     website: 'https://www.buckaroobbq.co.il',
     description: 'מסעדת בשרים - קינוח ומנה ראשונה מתנה',
     category: 'food',
+    actionUrl: 'https://www.buckaroobbq.co.il',
+    actionType: 'website',
+    actionLabel: 'לאתר באקרו',
   },
   {
     name: 'שגב',
@@ -130,6 +171,9 @@ const predefinedBrands = [
     website: 'https://www.segevchef.com',
     description: 'מסעדה - מנה ראשונה מתנה',
     category: 'food',
+    actionUrl: 'https://www.segevchef.com',
+    actionType: 'website',
+    actionLabel: 'לאתר שגב',
   },
   {
     name: "ג'מס - Jem's",
@@ -137,6 +181,9 @@ const predefinedBrands = [
     website: 'https://www.jems.co.il',
     description: 'חצי ליטר בירה מתנה',
     category: 'food',
+    actionUrl: 'https://www.jems.co.il',
+    actionType: 'website',
+    actionLabel: "לאתר ג'מס",
   },
   {
     name: 'פראג הקטנה',
@@ -144,6 +191,9 @@ const predefinedBrands = [
     website: 'https://littleprague.co.il/',
     description: "מסעדה צ'כית אותנטית - כל החודש",
     category: 'food',
+    actionUrl: 'https://littleprague.co.il/',
+    actionType: 'website',
+    actionLabel: 'לאתר פראג הקטנה',
   },
   {
     name: 'מיקה חנויות נוחות',
@@ -151,13 +201,19 @@ const predefinedBrands = [
     website: 'https://www.mika.co.il',
     description: '10 שח מתנה בהצגת תעודה מזהה',
     category: 'convenience',
+    actionUrl: 'https://www.mika.co.il',
+    actionType: 'website',
+    actionLabel: 'לאתר מיקה',
   },
   {
-    name: 'מנמ',
+    name: 'מנמ - MNM',
     logoUrl: '/images/brands/menam.png',
-    website: 'https://www.menam.co.il',
+    website: 'https://www.mnmltd.co.il/',
     description: '50 שח מתנה בקנייה מעל 300 שח',
     category: 'home',
+    actionUrl: 'https://www.mnmltd.co.il/',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'שילב',
@@ -165,20 +221,29 @@ const predefinedBrands = [
     website: 'https://www.shilav.co.il',
     description: 'הטבות על מוצרי תינוקות',
     category: 'baby',
+    actionUrl: 'https://www.shilav.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
-    name: 'יומנגס',
+    name: 'יומנגס - Humongous',
     logoUrl: '/images/brands/humongous.png',
     website: 'https://www.humongous.co.il/',
-    description: 'הטבות על גלידה',
+    description: 'רשת המבורגרים - הטבות יום הולדת',
     category: 'food',
+    actionUrl: 'https://www.humongous.co.il/fat',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'M32 המבורגרים',
     logoUrl: '/images/brands/m32.png',
     website: 'https://www.m32.co.il',
-    description: '15% הנחה בחודש יומולדת',
+    description: '15% הנחה ביום הולדת',
     category: 'food',
+    actionUrl: 'https://www.m32.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'מסעדת ליבירה',
@@ -186,19 +251,116 @@ const predefinedBrands = [
     website: 'https://www.libira.co.il',
     description: 'בירה וקינוח בישיבה בלבד כל החודש',
     category: 'food',
+    actionUrl: 'https://www.libira.co.il',
+    actionType: 'website',
+    actionLabel: 'לאתר ליבירה',
+  },
+  // Researched clubs (Notion — In YomU was false)
+  {
+    name: 'Castro CU',
+    logoUrl: '/images/brands/castro.svg',
+    website: 'https://www.castro.co.il',
+    description: 'מועדון CU - 20% הנחה בחודש יום ההולדת',
+    category: 'fashion',
+    actionUrl: 'https://www.castro.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Delta',
+    logoUrl: '/images/brands/delta.svg',
+    website: 'https://www.delta.co.il',
+    description: '15% הנחה על רכישה אחת בחודש יום ההולדת',
+    category: 'fashion',
+    actionUrl: 'https://www.delta.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'WOW',
+    logoUrl: '/images/brands/wow.svg',
+    website: 'https://www.wow.co.il',
+    description: 'מועדון לקוחות - 50% הנחה בחודש יום ההולדת',
+    category: 'fashion',
+    actionUrl: 'https://www.wow.co.il/customers-club',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Cafe Mandarin',
+    logoUrl: '/images/brands/cafe-mandarin.svg',
+    website: 'https://www.mandarin.org.il',
+    description: 'מועדון לקוחות - 25% הנחה עד ₪300',
+    category: 'food',
+    actionUrl: 'https://www.mandarin.org.il/club',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Factory 54',
+    logoUrl: '/images/brands/factory54.svg',
+    website: 'https://www.factory54.co.il',
+    description: 'מועדון לקוחות - מתנת יום הולדת (~₪49/שנה)',
+    category: 'fashion',
+    actionUrl: 'https://www.factory54.co.il/club',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Golf & Co',
+    logoUrl: '/images/brands/golf.svg',
+    website: 'https://www.golf.co.il',
+    description: 'מועדון לקוחות - הטבת יום הולדת',
+    category: 'fashion',
+    actionUrl: 'https://www.golf.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Honigman',
+    logoUrl: '/images/brands/honigman.svg',
+    website: 'https://www.honigman.com',
+    description: 'מתנת יום הולדת (תנאים לא ודאיים — לאימות)',
+    category: 'fashion',
+    actionUrl: 'https://www.honigman.com',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Brill Group / Gali',
+    logoUrl: '/images/brands/gali.svg',
+    website: 'https://www.gali.co.il',
+    description: '~20% הנחה ביום הולדת (לאימות)',
+    category: 'fashion',
+    actionUrl: 'https://www.gali.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Jump / עונות',
+    logoUrl: '/images/brands/jump.svg',
+    website: 'https://www.jump.co.il',
+    description: 'מתנת יום הולדת ~₪50 (לאימות)',
+    category: 'fashion',
+    actionUrl: 'https://www.jump.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   // DREAM CARD brands
   {
     name: 'Terminal X',
     logoUrl: '/images/brands/terminal-x.png',
-    website: 'https://www.terminal-x.com',
+    website: 'https://www.terminalx.com',
     description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
     category: 'fashion',
+    actionUrl: 'https://www.terminalx.com',
+    actionType: 'website',
+    actionLabel: 'לאתר Terminal X',
   },
   {
     name: 'Billabong',
     logoUrl: '/images/brands/billabong.png',
-    website: 'https://www.billabong.co.il',
+    website: 'https://www.billabong.com',
     description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
     category: 'fashion',
   },
@@ -212,35 +374,35 @@ const predefinedBrands = [
   {
     name: "The Children's Place",
     logoUrl: '/images/brands/tcp.png',
-    website: 'https://www.childrensplace.co.il',
+    website: 'https://www.dreamcard.co.il',
     description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
     category: 'kids',
   },
   {
     name: 'Aerie',
     logoUrl: '/images/brands/aerie.png',
-    website: 'https://www.aerie.co.il',
+    website: 'https://www.dreamcard.co.il',
     description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
     category: 'fashion',
   },
   {
     name: 'American Eagle',
     logoUrl: '/images/brands/american-eagle.png',
-    website: 'https://www.ae.co.il',
+    website: 'https://www.dreamcard.co.il',
     description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
     category: 'fashion',
   },
   {
     name: 'Mango',
     logoUrl: '/images/brands/mango.png',
-    website: 'https://www.mango.co.il',
+    website: 'https://shop.mango.com/il',
     description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
     category: 'fashion',
   },
   {
     name: 'Fox Home',
     logoUrl: '/images/brands/fox-home.png',
-    website: 'https://www.fox.co.il/home',
+    website: 'https://www.fox.co.il',
     description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
     category: 'home',
   },
@@ -268,9 +430,12 @@ const predefinedBrands = [
   {
     name: 'Cafe Greg',
     logoUrl: '/images/brands/cafe-greg.png',
-    website: 'https://www.cafegreg.co.il',
+    website: 'https://gregcafe.co.il/',
     description: 'Complimentary Belgian waffle',
     category: 'food',
+    actionUrl: 'https://gregcafe.co.il/club/',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'MAC Cosmetics',
@@ -318,7 +483,7 @@ const predefinedBrands = [
   {
     name: 'Max Brenner',
     logoUrl: '/images/brands/max-brenner.png',
-    website: 'https://www.maxbrenner.co.il',
+    website: 'https://www.maxbrenner.com',
     description: 'Complimentary hot chocolate',
     category: 'food',
   },
@@ -332,7 +497,7 @@ const predefinedBrands = [
   {
     name: 'The Body Shop',
     logoUrl: '/images/brands/body-shop.png',
-    website: 'https://www.thebodyshop.co.il',
+    website: 'https://www.thebodyshop.com',
     description: 'Birthday voucher (e.g., ~₪25)',
     category: 'beauty',
   },
@@ -349,6 +514,9 @@ const predefinedBrands = [
     website: 'https://www.dreamcard.co.il',
     description: '30% discount at each participating brand',
     category: 'multi-brand',
+    actionUrl: 'https://www.dreamcard.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
 ];
 
@@ -399,17 +567,34 @@ async function seed() {
     }
 
     console.log('Creating/updating brands...');
+    // Legacy names → current seed names (rename-safe upsert)
+    const brandNameAliases = {
+      'יומנגס - Humongous': ['יומנגס'],
+      'מנמ - MNM': ['מנמ', 'מנמ עשה זאת בעצמך'],
+      'באקרו - Buckaroo': ['מסעדת באקרו (רעננה)', 'באקרו'],
+      "ג'מס - Jem's": ["ג'מס"],
+      שגב: ['שגב (מסעדה)'],
+      'פראג הקטנה': ['פראג הקטנה (מסעדה)'],
+    };
+
     async function upsertBrandByName(brand) {
       if (!shouldIncludeBrand(brand.name)) return null;
+      const aliases = brandNameAliases[brand.name] || [];
       const existing = await prisma.brand.findFirst({
-        where: { name: brand.name },
+        where: {
+          OR: [{ name: brand.name }, ...aliases.map((name) => ({ name }))],
+        },
       });
       if (existing) {
         const updated = await prisma.brand.update({
           where: { id: existing.id },
           data: brand,
         });
-        console.log(`Updated brand: ${brand.name}`);
+        console.log(
+          existing.name === brand.name
+            ? `Updated brand: ${brand.name}`
+            : `Renamed brand: ${existing.name} → ${brand.name}`
+        );
         return updated;
       }
       const created = await prisma.brand.create({ data: brand });
@@ -453,8 +638,8 @@ async function seed() {
         description: 'קבלו המבורגר חינם ביום הולדתכם',
         termsAndConditions: 'תקף רק ביום ההולדת עצמו, לא ניתן להעביר לאחרים',
         redemptionMethod: 'app',
-        promoCode: 'BIRTHDAY2024',
-        url: 'https://www.mcdonalds.co.il/birthday',
+        promoCode: null,
+        url: 'https://www.mcdonalds.co.il',
         validityType: 'birthday_exact_date',
         validityDuration: 1,
         isFree: true,
@@ -495,10 +680,171 @@ async function seed() {
         termsAndConditions: 'תקף לחודש שלם, לא ניתן לשלב עם מבצעים אחרים',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.super-pharm.co.il/birthday',
+        url: 'https://www.super-pharm.co.il',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: false,
+      },
+      // BBB — Happy BBBirthday drink + starter
+      {
+        brandId: createdBrands.find((b) => b.name === 'BBB')?.id,
+        title: 'Happy BBBirthday — שתייה ומנה ראשונה',
+        description:
+          'שתייה ומנה ראשונה מתנה בחודש יום ההולדת לחברי מועדון BBB (burgus.co.il/club)',
+        termsAndConditions:
+          'למימוש בחודש יום ההולדת לפי תקנון המועדון באתר BBB',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.burgus.co.il/club',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
+      },
+      // Humongous — free burger on exact birthday
+      {
+        brandId: createdBrands.find((b) => b.name === 'יומנגס - Humongous')?.id,
+        title: 'המבורגר חינם ביום הולדת',
+        description:
+          'המבורגר חינם ביום ההולדת עצמו לחברי מועדון Humongous (לא גלידה)',
+        termsAndConditions:
+          'תקף ביום ההולדת בלבד | הצטרפות למועדון ב-humongous.co.il/fat',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.humongous.co.il/fat',
+        validityType: 'birthday_exact_date',
+        validityDuration: 1,
+        isFree: true,
+      },
+      // M32 — 15% on birthday
+      {
+        brandId: createdBrands.find((b) => b.name === 'M32 המבורגרים')?.id,
+        title: '15% הנחה ביום הולדת',
+        description: '15% הנחה ביום ההולדת במסעדות M32',
+        termsAndConditions: 'לפי תקנון המועדון באתר M32',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.m32.co.il',
+        validityType: 'birthday_exact_date',
+        validityDuration: 1,
+        isFree: false,
+      },
+      // Castro CU
+      {
+        brandId: createdBrands.find((b) => b.name === 'Castro CU')?.id,
+        title: '20% הנחה בחודש יום ההולדת',
+        description: '20% הנחה לחברי מועדון CU בחודש יום ההולדת',
+        termsAndConditions: 'לפי תקנון מועדון CU באתר Castro',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.castro.co.il',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      // Delta
+      {
+        brandId: createdBrands.find((b) => b.name === 'Delta')?.id,
+        title: '15% הנחה על רכישה אחת',
+        description: '15% הנחה על רכישה אחת בחודש יום ההולדת',
+        termsAndConditions: 'רכישה אחת בחודש יום ההולדת | לפי תקנון המועדון',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.delta.co.il',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      // WOW
+      {
+        brandId: createdBrands.find((b) => b.name === 'WOW')?.id,
+        title: '50% הנחה בחודש יום ההולדת',
+        description: '50% הנחה לחברי מועדון WOW בחודש יום ההולדת',
+        termsAndConditions: 'לפי תקנון המועדון ב-wow.co.il/customers-club',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.wow.co.il/customers-club',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      // Cafe Mandarin
+      {
+        brandId: createdBrands.find((b) => b.name === 'Cafe Mandarin')?.id,
+        title: '25% הנחה עד ₪300',
+        description: '25% הנחה עד תקרת ₪300 בחודש יום ההולדת',
+        termsAndConditions: 'לפי תקנון המועדון ב-mandarin.org.il/club',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.mandarin.org.il/club',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      // Factory 54
+      {
+        brandId: createdBrands.find((b) => b.name === 'Factory 54')?.id,
+        title: 'מתנת יום הולדת',
+        description: 'מתנת יום הולדת לחברי מועדון Factory 54 (~₪49/שנה)',
+        termsAndConditions: 'חברות בתשלום | לפי תקנון המועדון באתר',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.factory54.co.il/club',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      // Golf & Co
+      {
+        brandId: createdBrands.find((b) => b.name === 'Golf & Co')?.id,
+        title: 'הטבת יום הולדת למועדון',
+        description: 'הטבת יום הולדת לחברי מועדון Golf & Co',
+        termsAndConditions: 'לפי תקנון המועדון באתר Golf',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.golf.co.il',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
+      },
+      // Honigman (soft)
+      {
+        brandId: createdBrands.find((b) => b.name === 'Honigman')?.id,
+        title: 'מתנת יום הולדת',
+        description:
+          'מתנת יום הולדת לחברי מועדון Honigman (תנאים לא ודאיים — לאימות)',
+        termsAndConditions: 'לא מאומת במלואו | יש לאשר מול האתר',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.honigman.com',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
+      },
+      // Brill Group / Gali (soft)
+      {
+        brandId: createdBrands.find((b) => b.name === 'Brill Group / Gali')?.id,
+        title: '~20% הנחה ביום הולדת',
+        description: 'כ־20% הנחה ביום הולדת (לאימות מול Gali / Brill Group)',
+        termsAndConditions: 'לא מאומת במלואו | יש לאשר מול האתר',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.gali.co.il',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      // Jump / עונות (soft)
+      {
+        brandId: createdBrands.find((b) => b.name === 'Jump / עונות')?.id,
+        title: 'מתנת יום הולדת ~₪50',
+        description: 'מתנת יום הולדת בסך כ־₪50 (לאימות)',
+        termsAndConditions: 'לא מאומת במלואו | יש לאשר מול האתר',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.jump.co.il',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
       },
       {
         brandId: createdBrands.find((b) => b.name === 'אסקייפרום')?.id,
@@ -508,7 +854,7 @@ async function seed() {
         termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.escape-room.co.il/birthday',
+        url: 'https://www.escaperoom.co.il/',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -520,7 +866,7 @@ async function seed() {
         termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.bacaro.co.il/birthday',
+        url: 'https://www.buckaroobbq.co.il/',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -532,7 +878,7 @@ async function seed() {
         termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.libira.co.il/birthday',
+        url: 'https://www.libira.co.il',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -544,7 +890,7 @@ async function seed() {
         termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://littleprague.co.il/birthday',
+        url: 'https://littleprague.co.il/',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -556,7 +902,7 @@ async function seed() {
         termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.segevchef.com/birthday',
+        url: 'https://www.segevchef.com',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -568,7 +914,7 @@ async function seed() {
         termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.james.co.il/birthday',
+        url: 'https://www.jems.co.il/',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -581,7 +927,7 @@ async function seed() {
           'תקף לכל החודש הקלנדרי של יום ההולדת, נדרשת הצגת תעודה מזהה',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.mika.co.il/birthday',
+        url: 'https://www.mika.co.il',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -593,20 +939,20 @@ async function seed() {
         termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.kfc.co.il/birthday',
+        url: 'https://www.kfc.co.il',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
       },
       {
-        brandId: createdBrands.find((b) => b.name === 'מנמ')?.id,
+        brandId: createdBrands.find((b) => b.name === 'מנמ - MNM')?.id,
         title: '50 שח מתנה בקנייה מעל 300 שח',
         description: '50 שח מתנה בקנייה מעל 300 שח כל החודש',
         termsAndConditions:
           'תקף לכל החודש הקלנדרי של יום ההולדת, בקנייה מעל 300 שח',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.menam.co.il/birthday',
+        url: 'https://www.mnmltd.co.il/',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: false,
@@ -648,7 +994,7 @@ async function seed() {
           'Requires the purchase of a main course. Verification Status: Verified',
         redemptionMethod: 'app',
         promoCode: null,
-        url: 'https://www.cafegreg.co.il',
+        url: 'https://gregcafe.co.il/club/',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -746,7 +1092,7 @@ async function seed() {
           'Based on Australian program. Requires local verification. 14 days before/after birthday. Verification Status: Requires Confirmation',
         redemptionMethod: 'app',
         promoCode: null,
-        url: 'https://www.maxbrenner.co.il',
+        url: 'https://www.maxbrenner.com',
         validityType: 'birthday_plus_period',
         validityDuration: 14,
         isFree: true,
@@ -774,7 +1120,7 @@ async function seed() {
           'Based on UK/SA programs. Value in ILS requires local verification. Verification Status: Requires Confirmation',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.thebodyshop.co.il',
+        url: 'https://www.thebodyshop.com',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -839,6 +1185,7 @@ async function seed() {
       },
     ];
 
+    const now = new Date();
     await Promise.all(
       sampleBenefits.map(async (benefit) => {
         if (!benefit.brandId) return null;
@@ -848,24 +1195,31 @@ async function seed() {
         });
         if (!brand || !shouldIncludeBrand(brand.name)) return null;
 
+        const isSoft = SOFT_BRAND_NAMES.has(brand.name);
+        const benefitData = {
+          ...benefit,
+          verified: !isSoft,
+          lastChecked: isSoft ? null : now,
+        };
+
         // Upsert by (brandId + title)
         const existing = await prisma.benefit.findFirst({
           where: { brandId: benefit.brandId, title: benefit.title },
         });
         if (mode === 'fresh') {
-          const created = await prisma.benefit.create({ data: benefit });
+          const created = await prisma.benefit.create({ data: benefitData });
           console.log(`Created benefit: ${benefit.title}`);
           return created;
         }
         if (existing) {
           const updated = await prisma.benefit.update({
             where: { id: existing.id },
-            data: benefit,
+            data: benefitData,
           });
           console.log(`Updated benefit: ${benefit.title}`);
           return updated;
         }
-        const created = await prisma.benefit.create({ data: benefit });
+        const created = await prisma.benefit.create({ data: benefitData });
         console.log(`Created benefit: ${benefit.title}`);
         return created;
       })
