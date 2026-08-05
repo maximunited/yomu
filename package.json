@@ -142,11 +142,11 @@
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
       "prettier --write",
-      "npm run test -- --bail --findRelatedTests"
+      "npm run test -- --bail --findRelatedTests --passWithNoTests"
     ],
     "tests/**/*.{js,jsx,ts,tsx}": [
       "prettier --write",
-      "npm run test -- --bail --findRelatedTests"
+      "npm run test -- --bail --findRelatedTests --passWithNoTests"
     ],
     "*.config.{js,ts,mjs}": [
       "prettier --write"
