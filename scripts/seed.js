@@ -346,6 +346,16 @@ const predefinedBrands = [
     actionType: 'website',
     actionLabel: 'הצטרפות למועדון',
   },
+  {
+    name: 'Burgers Bar',
+    logoUrl: '/images/brands/burgers-bar.svg',
+    website: 'https://burgersbar.co.il',
+    description: '10% הנחה בחודש יום ההולדת',
+    category: 'food',
+    actionUrl: 'https://burgersbar.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
   // DREAM CARD brands
   {
     name: 'Terminal X',
@@ -845,6 +855,20 @@ async function seed() {
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
+      },
+      // Burgers Bar — 10% off birthday month
+      {
+        brandId: createdBrands.find((b) => b.name === 'Burgers Bar')?.id,
+        title: '10% הנחה בחודש יום ההולדת',
+        description: '10% הנחה בחודש יום ההולדת ברשת Burgers Bar',
+        termsAndConditions:
+          'לא ניתן לשלב עם מבצעים אחרים (no double discounts) | לפי תקנון המועדון',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://burgersbar.co.il',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
       },
       {
         brandId: createdBrands.find((b) => b.name === 'אסקייפרום')?.id,

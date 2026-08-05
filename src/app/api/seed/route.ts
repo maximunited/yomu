@@ -270,6 +270,16 @@ const predefinedBrands = [
     actionLabel: 'הצטרפות למועדון',
   },
   {
+    name: 'Burgers Bar',
+    logoUrl: '/images/brands/burgers-bar.svg',
+    website: 'https://burgersbar.co.il',
+    description: '10% הנחה בחודש יום ההולדת',
+    category: 'food',
+    actionUrl: 'https://burgersbar.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
     name: 'מסעדת ליבירה',
     logoUrl: '/images/brands/libira.png',
     website: 'https://www.libira.co.il',
@@ -555,6 +565,19 @@ export async function POST(request: NextRequest) {
         url: 'https://www.jump.co.il',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
+      },
+      {
+        brandId: createdBrands.find((b) => b.name === 'Burgers Bar')?.id,
+        title: '10% הנחה בחודש יום ההולדת',
+        description: '10% הנחה בחודש יום ההולדת ברשת Burgers Bar',
+        termsAndConditions:
+          'לא ניתן לשלב עם מבצעים אחרים (no double discounts) | לפי תקנון המועדון',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://burgersbar.co.il',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
       },
       // Minna Tomei: Free sushi roll during birthday month
       {
