@@ -78,6 +78,12 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: 'react-dom'
         update-types: ['version-update:semver-major']
+      # TS 7.0.x ships without the stable compiler API typescript-eslint needs;
+      # that API lands in TS 7.1+ (see typescript-eslint/typescript-eslint#12518
+      # and #10940). Block only the 7.0.x line so Dependabot can still propose
+      # 7.1+ once typescript-eslint adds support - remove this once it does.
+      - dependency-name: 'typescript'
+        versions: ['>= 7.0.a, < 7.1']
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: 'github-actions'
