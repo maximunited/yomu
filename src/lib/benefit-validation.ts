@@ -8,6 +8,150 @@ export interface BenefitValidationRule {
   displayText: string;
 }
 
+/** Server/client Active vs Upcoming vs neither (calendar-day windows). */
+export type BenefitWindowStatus = 'active' | 'upcoming' | 'none';
+
+/**
+ * Product default for “today” when the API evaluates windows without `asOf`.
+ * YomU is Israel-first; Vercel hosts run UTC, so wall-clock `new Date()` alone
+ * misclassifies Active/Upcoming near Israel midnight.
+ */
+export const DEFAULT_BENEFIT_TIMEZONE = 'Asia/Jerusalem';
+
+/** Allowlisted IANA zones for `?tz=` / `Time-Zone` (fallback: DEFAULT). */
+export const ALLOWED_BENEFIT_TIMEZONES: ReadonlySet<string> = new Set([
+  DEFAULT_BENEFIT_TIMEZONE,
+  'UTC',
+]);
+
+/** Injectable “today” for unit/API tests. Null ⇒ real `new Date()`. */
+let benefitNowOverride: Date | null = null;
+
+export function getBenefitNow(): Date {
+  return benefitNowOverride
+    ? new Date(benefitNowOverride.getTime())
+    : new Date();
+}
+
+/** Fix or clear the clock used when callers omit `currentDate`. */
+export function setBenefitClock(now: Date | null): void {
+  benefitNowOverride = now ? new Date(now.getTime()) : null;
+}
+
+export function resetBenefitClock(): void {
+  benefitNowOverride = null;
+}
+
+/**
+ * Resolve an optional client timezone against the allowlist.
+ * Unknown / missing → Asia/Jerusalem.
+ */
+export function resolveBenefitTimeZone(
+  timeZone: string | null | undefined
+): string {
+  const trimmed = timeZone?.trim();
+  if (trimmed && ALLOWED_BENEFIT_TIMEZONES.has(trimmed)) return trimmed;
+  return DEFAULT_BENEFIT_TIMEZONE;
+}
+
+/**
+ * Calendar Y/M/D for an instant in `timeZone`, as a Date at process-local
+ * midnight of that day (so getFullYear/getMonth/getDate match the zone’s day).
+ */
+export function getCalendarDayInTimeZone(
+  instant: Date = getBenefitNow(),
+  timeZone: string = DEFAULT_BENEFIT_TIMEZONE
+): Date {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: resolveBenefitTimeZone(timeZone),
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  }).formatToParts(instant);
+
+  const year = Number(parts.find((p) => p.type === 'year')?.value);
+  const month = Number(parts.find((p) => p.type === 'month')?.value);
+  const day = Number(parts.find((p) => p.type === 'day')?.value);
+
+  if (!year || !month || !day) {
+    return new Date(
+      instant.getFullYear(),
+      instant.getMonth(),
+      instant.getDate()
+    );
+  }
+
+  return new Date(year, month - 1, day);
+}
+
+/** `YYYY-MM-DD` for a Date’s process-local calendar day. */
+export function localCalendarDayKey(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** True when both instants fall on the same process-local calendar day. */
+export function isSameLocalCalendarDay(a: Date, b: Date): boolean {
+  return localCalendarDayKey(a) === localCalendarDayKey(b);
+}
+
+/**
+ * Parse `YYYY-MM-DD` as a local calendar day (no UTC shift).
+ * Returns null when missing or invalid.
+ */
+export function parseAsOfDate(asOf: string | null | undefined): Date | null {
+  if (!asOf) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(asOf.trim());
+  if (!match) return null;
+  const year = Number(match[1]);
+  const monthIndex = Number(match[2]) - 1;
+  const day = Number(match[3]);
+  const date = new Date(year, monthIndex, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== monthIndex ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+  return date;
+}
+
+/**
+ * Classify a benefit window for a user DOB on a given calendar day.
+ * Prefer this (or API `windowStatus`) over re-deriving Active/Upcoming on the client.
+ */
+export function getBenefitWindowStatus(
+  benefitOrValidityType: string | { validityType: string },
+  userDOB: Date | null,
+  currentDate: Date = getBenefitNow()
+): BenefitWindowStatus {
+  if (!userDOB) return 'none';
+
+  const benefit =
+    typeof benefitOrValidityType === 'string'
+      ? { validityType: benefitOrValidityType }
+      : benefitOrValidityType;
+
+  if (isBenefitActive(benefit, userDOB, currentDate)) return 'active';
+  if (getUpcomingBenefits(benefit, userDOB, currentDate)) return 'upcoming';
+  return 'none';
+}
+
+/** Attach `windowStatus` without mutating the source object. */
+export function withBenefitWindowStatus<T extends { validityType: string }>(
+  benefit: T,
+  userDOB: Date | null,
+  currentDate: Date = getBenefitNow()
+): T & { windowStatus: BenefitWindowStatus } {
+  return {
+    ...benefit,
+    windowStatus: getBenefitWindowStatus(benefit, userDOB, currentDate),
+  };
+}
+
 function startOfLocalDay(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
@@ -283,7 +427,7 @@ export function getUpcomingBenefits(
     | { id?: string; validityType: string; [key: string]: any }
     | Array<{ id?: string; validityType: string; [key: string]: any }>,
   userDOB: Date | null,
-  currentDate: Date = new Date()
+  currentDate: Date = getBenefitNow()
 ): boolean | Array<{ id?: string; validityType: string; [key: string]: any }> {
   if (!userDOB) return Array.isArray(benefitOrBenefits) ? [] : false;
 
@@ -346,7 +490,7 @@ export function isBenefitActive(
 export function isBenefitActive(
   benefitOrValidityType: string | { validityType: string },
   userDOB: Date | null,
-  currentDate: Date = new Date()
+  currentDate: Date = getBenefitNow()
 ): boolean {
   if (!userDOB) return false;
 

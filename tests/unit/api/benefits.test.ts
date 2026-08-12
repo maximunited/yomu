@@ -34,6 +34,7 @@ jest.mock('@/lib/prisma', () => ({
 import { GET } from '@/app/api/benefits/route';
 import { auth } from '@clerk/nextjs/server';
 import { getOrCreateUser } from '@/lib/clerk-user';
+import { setBenefitClock, resetBenefitClock } from '@/lib/benefit-validation';
 
 describe('/api/benefits', () => {
   const { prisma } = require('@/lib/prisma');
@@ -46,10 +47,12 @@ describe('/api/benefits', () => {
       clerkId: 'user_test123',
       email: 'test@example.com',
       name: 'Test User',
+      dateOfBirth: new Date(1990, 5, 15), // Jun 15
     });
   });
 
   afterEach(() => {
+    resetBenefitClock();
     // Clear console mocks after each test
     jest.restoreAllMocks();
   });
@@ -114,6 +117,7 @@ describe('/api/benefits', () => {
     expect(data.benefits).toBeDefined();
     expect(data.memberships).toBe(1);
     expect(data.benefits).toHaveLength(1);
+    expect(data.evaluatedAt).toBeDefined();
 
     const benefit = data.benefits[0];
     expect(benefit.title).toBe('Birthday Discount');
@@ -122,12 +126,255 @@ describe('/api/benefits', () => {
     expect(benefit.url).toBe('https://example.com');
     expect(benefit.brand.name).toBe('Test Brand');
     expect(benefit.brand.actionUrl).toBe('https://action.example.com');
+    expect(benefit.windowStatus).toMatch(/^(active|upcoming|none)$/);
 
     expect(consoleSpy).toHaveBeenCalledWith(
       '=== Starting GET request to /api/benefits ==='
     );
 
     consoleSpy.mockRestore();
+  });
+
+  it('should classify windowStatus using asOf and user DOB', async () => {
+    const mockBenefits = [
+      {
+        id: 'exact',
+        title: 'Exact day',
+        description: 'Only on birthday',
+        brandId: 'brand1',
+        validityType: 'birthday_exact_date',
+        validityDuration: 1,
+        redemptionMethod: 'in-store',
+        isFree: true,
+        promoCode: null,
+        termsAndConditions: null,
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-02'),
+        brand: {
+          id: 'brand1',
+          name: 'Test Brand',
+          logoUrl: 'https://example.com/logo.png',
+          website: 'https://example.com',
+          category: 'food',
+          actionUrl: null,
+          actionType: null,
+          actionLabel: null,
+        },
+      },
+      {
+        id: 'month',
+        title: 'Whole month',
+        description: 'Birthday month',
+        brandId: 'brand1',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        redemptionMethod: 'in-store',
+        isFree: false,
+        promoCode: null,
+        termsAndConditions: null,
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-02'),
+        brand: {
+          id: 'brand1',
+          name: 'Test Brand',
+          logoUrl: 'https://example.com/logo.png',
+          website: 'https://example.com',
+          category: 'food',
+          actionUrl: null,
+          actionType: null,
+          actionLabel: null,
+        },
+      },
+    ];
+
+    prisma.userMembership.findMany.mockResolvedValue([]);
+    prisma.benefit.findMany.mockResolvedValue(mockBenefits);
+
+    const req = {
+      nextUrl: {
+        searchParams: new URLSearchParams('asOf=2024-06-15'),
+      },
+    } as unknown as import('next/server').NextRequest;
+
+    const response = await GET(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    // Local calendar day 2024-06-15 — ISO may be prior UTC day depending on TZ
+    const evaluated = new Date(data.evaluatedAt);
+    expect(evaluated.getFullYear()).toBe(2024);
+    expect(evaluated.getMonth()).toBe(5);
+    expect(evaluated.getDate()).toBe(15);
+
+    const byId = Object.fromEntries(
+      data.benefits.map((b: { id: string; windowStatus: string }) => [
+        b.id,
+        b.windowStatus,
+      ])
+    );
+    expect(byId.exact).toBe('active');
+    expect(byId.month).toBe('active');
+  });
+
+  it('should evaluate without asOf using Asia/Jerusalem calendar day', async () => {
+    const mockBenefits = [
+      {
+        id: 'exact',
+        title: 'Exact day',
+        description: 'Only on birthday',
+        brandId: 'brand1',
+        validityType: 'birthday_exact_date',
+        validityDuration: 1,
+        redemptionMethod: 'in-store',
+        isFree: true,
+        promoCode: null,
+        termsAndConditions: null,
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-02'),
+        brand: {
+          id: 'brand1',
+          name: 'Test Brand',
+          logoUrl: 'https://example.com/logo.png',
+          website: 'https://example.com',
+          category: 'food',
+          actionUrl: null,
+          actionType: null,
+          actionLabel: null,
+        },
+      },
+    ];
+
+    prisma.userMembership.findMany.mockResolvedValue([]);
+    prisma.benefit.findMany.mockResolvedValue(mockBenefits);
+
+    // UTC evening of Jun 14 = already Jun 15 in Asia/Jerusalem
+    setBenefitClock(new Date(Date.UTC(2024, 5, 14, 22, 30, 0)));
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.timeZone).toBe('Asia/Jerusalem');
+    const evaluated = new Date(data.evaluatedAt);
+    expect(evaluated.getFullYear()).toBe(2024);
+    expect(evaluated.getMonth()).toBe(5);
+    expect(evaluated.getDate()).toBe(15);
+    expect(data.benefits[0].windowStatus).toBe('active');
+  });
+
+  it('should honor allowlisted tz=UTC and ignore unknown tz', async () => {
+    prisma.userMembership.findMany.mockResolvedValue([]);
+    prisma.benefit.findMany.mockResolvedValue([]);
+
+    setBenefitClock(new Date(Date.UTC(2024, 5, 14, 22, 30, 0)));
+
+    const utcReq = {
+      nextUrl: { searchParams: new URLSearchParams('tz=UTC') },
+      headers: { get: () => null },
+    } as unknown as import('next/server').NextRequest;
+
+    const utcRes = await GET(utcReq);
+    const utcData = await utcRes.json();
+    expect(utcData.timeZone).toBe('UTC');
+    const utcDay = new Date(utcData.evaluatedAt);
+    expect(utcDay.getDate()).toBe(14);
+
+    const badReq = {
+      nextUrl: {
+        searchParams: new URLSearchParams('tz=America/New_York'),
+      },
+      headers: { get: () => null },
+    } as unknown as import('next/server').NextRequest;
+
+    const badRes = await GET(badReq);
+    const badData = await badRes.json();
+    expect(badData.timeZone).toBe('Asia/Jerusalem');
+    expect(new Date(badData.evaluatedAt).getDate()).toBe(15);
+  });
+
+  it('should mark exact-date benefit upcoming when asOf is far from DOB', async () => {
+    const mockBenefits = [
+      {
+        id: 'exact',
+        title: 'Exact day',
+        description: 'Only on birthday',
+        brandId: 'brand1',
+        validityType: 'birthday_exact_date',
+        validityDuration: 1,
+        redemptionMethod: 'in-store',
+        isFree: true,
+        promoCode: null,
+        termsAndConditions: null,
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-02'),
+        brand: {
+          id: 'brand1',
+          name: 'Test Brand',
+          logoUrl: 'https://example.com/logo.png',
+          website: 'https://example.com',
+          category: 'food',
+          actionUrl: null,
+          actionType: null,
+          actionLabel: null,
+        },
+      },
+    ];
+
+    prisma.userMembership.findMany.mockResolvedValue([]);
+    prisma.benefit.findMany.mockResolvedValue(mockBenefits);
+
+    const req = {
+      nextUrl: {
+        searchParams: new URLSearchParams('asOf=2024-01-10'),
+      },
+    } as unknown as import('next/server').NextRequest;
+
+    const response = await GET(req);
+    const data = await response.json();
+
+    expect(data.benefits[0].windowStatus).toBe('upcoming');
+  });
+
+  it('should return windowStatus none when user has no DOB', async () => {
+    (getOrCreateUser as jest.Mock).mockResolvedValue({
+      id: 'session-user-id',
+      clerkId: 'user_test123',
+      email: 'test@example.com',
+      name: 'Test User',
+      dateOfBirth: null,
+    });
+
+    prisma.userMembership.findMany.mockResolvedValue([]);
+    prisma.benefit.findMany.mockResolvedValue([
+      {
+        id: '1',
+        title: 'Birthday Discount',
+        description: '10% off',
+        brandId: 'brand1',
+        validityType: 'birthday_exact_date',
+        validityDuration: 1,
+        redemptionMethod: 'in-store',
+        isFree: true,
+        promoCode: null,
+        termsAndConditions: null,
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-02'),
+        brand: {
+          id: 'brand1',
+          name: 'Test Brand',
+          logoUrl: 'https://example.com/logo.png',
+          website: 'https://example.com',
+          category: 'food',
+          actionUrl: null,
+          actionType: null,
+          actionLabel: null,
+        },
+      },
+    ]);
+
+    const response = await GET();
+    const data = await response.json();
+    expect(data.benefits[0].windowStatus).toBe('none');
   });
 
   it('should return 401 when not authenticated', async () => {
@@ -242,7 +489,9 @@ describe('/api/benefits', () => {
       isFree: false,
       createdAt: '2023-06-01T00:00:00.000Z',
       updatedAt: '2023-06-02T00:00:00.000Z',
+      windowStatus: expect.stringMatching(/^(active|upcoming|none)$/),
     });
+    expect(data.evaluatedAt).toBeDefined();
   });
 
   it('should call Prisma methods with correct parameters', async () => {

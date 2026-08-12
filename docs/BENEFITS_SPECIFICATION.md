@@ -125,6 +125,32 @@ Benefits appear in the "Coming Soon" section when:
 2. Benefit is not currently active but will be active soon
 3. User is a member of the brand offering the benefit
 
+### Server-driven windows (source of truth)
+
+`GET /api/benefits` classifies each benefit with `windowStatus`:
+
+| Value | Meaning |
+| ----- | ------- |
+| `active` | Valid for the user on the evaluation day |
+| `upcoming` | Not active now; next birthday/anniversary occurrence is upcoming |
+| `none` | No DOB, unknown validity type, or not Active/Upcoming |
+
+- **Timezone:** When `asOf` is omitted, “today” is the calendar day in `Asia/Jerusalem` (YomU product default), **not** the server host timezone (Vercel is UTC). Optional `?tz=` query or `Time-Zone` header may override with an allowlisted IANA zone (`Asia/Jerusalem`, `UTC`); unknown values fall back to `Asia/Jerusalem`. Response includes `timeZone` used.
+- Optional query `?asOf=YYYY-MM-DD` pins the evaluation day (process-local calendar components, no UTC shift).
+- Response also includes `evaluatedAt` (ISO timestamp of the day used).
+- Dashboard prefers `windowStatus` when present **and** `evaluatedAt` is still the same local calendar day; otherwise it falls back to `isBenefitActive` / `getUpcomingBenefits`. On tab focus/visibility, it refetches when the local day has rolled.
+
+Helpers:
+
+- `getBenefitWindowStatus(benefit, userDOB, currentDate?)`
+- `withBenefitWindowStatus(benefit, userDOB, currentDate?)`
+- `setBenefitClock` / `resetBenefitClock` / `getBenefitNow` — injectable clock for unit tests
+- `parseAsOfDate('YYYY-MM-DD')` — calendar-day parse for API `asOf`
+- `getCalendarDayInTimeZone(instant?, timeZone?)` / `resolveBenefitTimeZone(tz?)` — timezone-aware “today”
+- `localCalendarDayKey` / `isSameLocalCalendarDay` — client stale-window checks
+
+Calendar-day deltas and Feb 29 → Feb 28 (non-leap) behavior live in `isWithinBirthdayWindow` / `getObservedBirthday`; do not reintroduce month-scoped shortcuts.
+
 ## Testing Benefits
 
 ### 1. Validation Testing
@@ -151,11 +177,21 @@ console.log(validation.isValid, validation.errors);
 Test if a benefit is active for a user:
 
 ```javascript
-import { isBenefitActive } from "@/lib/benefit-validation";
+import {
+  isBenefitActive,
+  getBenefitWindowStatus,
+  setBenefitClock,
+  resetBenefitClock,
+} from "@/lib/benefit-validation";
 
-const userDOB = new Date("1990-08-15");
-const currentDate = new Date();
-const isActive = isBenefitActive(benefit, userDOB, currentDate);
+const userDOB = new Date(1990, 7, 15); // Aug 15 local
+setBenefitClock(new Date(2024, 7, 15));
+try {
+  const isActive = isBenefitActive(benefit, userDOB);
+  const window = getBenefitWindowStatus(benefit, userDOB); // 'active'
+} finally {
+  resetBenefitClock();
+}
 ```
 
 ## Seeding Benefits
