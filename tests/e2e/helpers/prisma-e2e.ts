@@ -2,17 +2,19 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
+import { assertE2EDbWriteAllowed } from './e2e-db-guard';
+
 let pool: Pool | undefined;
 let prisma: PrismaClient | undefined;
 
-/** Shared Prisma client for Playwright setup / fixtures (not the Next.js singleton). */
+/**
+ * Shared Prisma client for Playwright setup / fixtures (not the Next.js singleton).
+ * Fail-closed: requires E2E_ALLOW_DB_SEED=1 and a local (or explicitly allowed remote) DATABASE_URL.
+ */
 export function getE2EPrisma(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    throw new Error(
-      'DATABASE_URL is required for authenticated e2e Prisma seeding'
-    );
-  }
+  assertE2EDbWriteAllowed();
+
+  const connectionString = process.env.DATABASE_URL!;
 
   if (!pool) {
     pool = new Pool({ connectionString });

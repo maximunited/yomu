@@ -64,6 +64,12 @@ setup('authenticate and save storage state', async ({ page }) => {
       'DATABASE_URL is required for authenticated e2e (Prisma DOB seed hard-fails without it)'
     );
   }
+  if (process.env.E2E_ALLOW_DB_SEED !== '1') {
+    throw new Error(
+      'E2E_ALLOW_DB_SEED=1 is required for authenticated e2e Prisma seeding ' +
+        '(DOB upsert + golden-path brands). Use a disposable/local database only.'
+    );
+  }
 
   const clerkUser = await ensureE2EUser(email!, password);
 

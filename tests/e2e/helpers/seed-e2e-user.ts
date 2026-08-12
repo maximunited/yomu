@@ -11,7 +11,8 @@ export type SeedE2EUserInput = {
 
 /**
  * Upsert the Clerk e2e user into Prisma with a known DOB.
- * Hard-fails on missing DB URL, missing clerkId/email, or Prisma errors.
+ * Hard-fails on missing seed opt-in / unsafe DATABASE_URL (via getE2EPrisma),
+ * missing clerkId/email, or Prisma errors.
  */
 export async function seedE2EUserWithDOB(
   input: SeedE2EUserInput

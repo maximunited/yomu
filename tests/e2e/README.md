@@ -24,7 +24,8 @@ tests/e2e/
 │   ├── auth-helpers.ts       # Authentication helper functions
 │   ├── clerk-env.ts          # Load .env.local for Clerk testing
 │   ├── dob.ts                # Relative DOB helpers for golden path
-│   ├── prisma-e2e.ts         # Prisma client for e2e seeds
+│   ├── e2e-db-guard.ts       # Fail-closed DATABASE_URL / seed opt-in guards
+│   ├── prisma-e2e.ts         # Prisma client for e2e seeds (requires guards)
 │   ├── seed-e2e-user.ts      # Hard-fail Clerk→Prisma DOB upsert
 │   ├── seed-benefit-golden-path.ts
 │   └── page-helpers.ts       # Common page interaction helpers
@@ -185,12 +186,25 @@ Authenticated specs (`*.authenticated.spec.ts`) use `@clerk/testing` + Playwrigh
 
 ### Required env (`.env.local`)
 
+Use a **dedicated Clerk e2e user** and a **disposable database** (local Docker
+Postgres preferred). Never point authenticated setup at production.
+
 | Variable | Purpose |
 | -------- | ------- |
-| `E2E_CLERK_USER_EMAIL` | Clerk user for authenticated project |
+| `E2E_CLERK_USER_EMAIL` | Dedicated Clerk user for authenticated project (not a real customer) |
 | `CLERK_SECRET_KEY` / `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk API + testing token |
-| `DATABASE_URL` | Prisma DOB + golden-path seed (required; setup **hard-fails** if seed fails) |
+| `DATABASE_URL` | Disposable DB for Prisma DOB + golden-path seed (setup **hard-fails** if seed fails) |
+| `E2E_ALLOW_DB_SEED` | Must be `1` before any e2e Prisma write (DOB upsert + golden-path brands) |
+| `E2E_ALLOW_REMOTE_DB` | Optional `1` only for a disposable remote DB (never production). Default allowlist: `localhost`, `127.0.0.1`, `::1`, `db`, `postgres`, `postgresql` |
 | `E2E_CLERK_USER_PASSWORD` | Optional; only needed if setup must create the Clerk user |
+
+Example (local Docker Postgres):
+
+```env
+E2E_CLERK_USER_EMAIL=e2e-yomu@example.com
+E2E_ALLOW_DB_SEED=1
+DATABASE_URL=postgresql://yomu:yomu@localhost:5432/yomu
+```
 
 Without `E2E_CLERK_USER_EMAIL`, Playwright skips the `chromium-authenticated`
 project entirely — public specs still run.
@@ -201,11 +215,12 @@ Setup upserts the Clerk e2e user into Prisma with a **relative DOB** (birthday
 10 days from today) so Active vs Upcoming stay deterministic without injecting a
 server clock. Specs under `*.authenticated.spec.ts` that exercise benefit
 windows (see `benefits-golden-path.authenticated.spec.ts`) seed dedicated
-`E2E Golden *` brands/benefits and assert Active Now / Coming Soon (and
-`remindEnabled` when feasible).
+`E2E Golden *` brands/benefits (`verified: false`) and assert Active Now /
+Coming Soon (and `remindEnabled` when feasible).
 
-If Prisma DOB seeding fails (missing `DATABASE_URL`, DB down, upsert error),
-authenticated setup throws — tests must not green-pass without benefit logic.
+Prisma writes are fail-closed: missing `E2E_ALLOW_DB_SEED=1`, a non-local
+`DATABASE_URL` without `E2E_ALLOW_REMOTE_DB=1`, DB down, or upsert errors all
+hard-fail authenticated setup — tests must not green-pass without benefit logic.
 
 ```bash
 # Authenticated project only (needs env above)

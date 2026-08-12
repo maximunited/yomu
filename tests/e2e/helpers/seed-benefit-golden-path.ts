@@ -134,8 +134,9 @@ async function upsertBenefit(input: {
     validityDuration: input.validityDuration,
     isFree: true,
     isActive: true,
-    verified: true,
-    lastChecked: new Date(),
+    // Never publish e2e fixtures as verified catalog entries
+    verified: false,
+    lastChecked: null,
   };
   if (existing) {
     return prisma.benefit.update({
