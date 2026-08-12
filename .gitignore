@@ -87,6 +87,7 @@ prisma/*.sqlite-journal
 # security audit reports
 audit-report.json
 vulnerability-report.json
+loyalty-url-status.json
 
 # Claude Code local settings (user-specific)
 .claude/

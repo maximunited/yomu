@@ -441,14 +441,18 @@ We use a single, unified seed entry point that covers brands, partnerships, and 
 
 Soft brands (seed `verified: false`): H&M, שילב, Shufersal, Isracard, Honigman, Brill Group / Gali, Jump / עונות.
 
-### Loyalty URL audit
+### Loyalty URL audit & catalog ops
 
 ```bash
-npm run audit:loyalty-urls
+npm run catalog:drift          # blocking in CI — seed structure
+npm run audit:loyalty-urls     # monthly non-blocking URL HEAD/GET
+npm run catalog:stale          # seasonal verified refresh queue
 ```
 
-- Script: `scripts/audit-loyalty-urls.js` — HEAD/GET checks brand/benefit URLs from seed (optional JSON override).
+- Drift / stale / last-good status: see [`docs/CATALOG_OPS.md`](docs/CATALOG_OPS.md).
+- Script: `scripts/audit-loyalty-urls.js` — HEAD/GET checks brand `website`, distinct `actionUrl`, and benefit URLs from seed (optional `--out=loyalty-url-status.json`).
 - Scheduled monthly via `.github/workflows/audit-loyalty-urls.yml` (`continue-on-error`; does not block CI).
+- `catalog:drift` is **blocking** in `.github/workflows/ci.yml` (no DB/Notion required).
 
 ### Seed commands
 

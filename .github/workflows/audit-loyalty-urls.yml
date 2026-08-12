@@ -36,4 +36,18 @@ jobs:
       - name: Run loyalty URL audit
         # Non-blocking: 403s / flaky hosts must not fail the workflow
         continue-on-error: true
-        run: npm run audit:loyalty-urls
+        run: npm run audit:loyalty-urls -- --out=loyalty-url-status.json
+
+      - name: Upload last-good URL status
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: loyalty-url-status
+          path: loyalty-url-status.json
+          if-no-files-found: ignore
+
+      - name: Seasonal verified refresh queue (seed)
+        # Non-blocking informational queue from seed researched brands
+        continue-on-error: true
+        run: npm run catalog:stale

@@ -46,6 +46,8 @@
     "admin:help": "node scripts/admin-helper.js",
     "db:seed": "node scripts/seed.js",
     "audit:loyalty-urls": "node scripts/audit-loyalty-urls.js",
+    "catalog:drift": "node scripts/check-catalog-drift.js",
+    "catalog:stale": "node scripts/report-stale-verified.js",
     "assets:brands": "node scripts/download-brand-logos.js",
     "prepare": "husky",
     "db:studio": "npx prisma studio",
