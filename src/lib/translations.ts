@@ -134,6 +134,14 @@ export interface Translations {
   newBenefit: string;
   benefitExpiring: string;
   birthdayMonthStart: string;
+  /** Proactive reminder — expects {brand} */
+  reminderUpcomingTitle: string;
+  /** Proactive reminder — expects {benefit}, {brand}, {days} */
+  reminderUpcomingMessage: string;
+  /** Active-start reminder — expects {brand} */
+  reminderActiveTitle: string;
+  /** Active-start reminder — expects {benefit}, {brand} */
+  reminderActiveMessage: string;
 
   // Benefit Details
   benefitDetails: string;
@@ -628,6 +636,12 @@ export const translations: Record<Language, Translations> = {
     newBenefit: 'הטבה חדשה',
     benefitExpiring: 'הטבה פוקעת',
     birthdayMonthStart: 'חודש יום הולדת התחיל',
+    reminderUpcomingTitle: 'תזכורת: הטבה מ-{brand} מתקרבת',
+    reminderUpcomingMessage:
+      'ההטבה "{benefit}" מ-{brand} תהיה פעילה בעוד {days} ימים. אל תשכחו לנצל!',
+    reminderActiveTitle: 'ההטבה מ-{brand} פעילה עכשיו',
+    reminderActiveMessage:
+      'ההטבה "{benefit}" מ-{brand} פעילה היום. כדאי לנצל לפני שחלון התוקף ייגמר.',
 
     // Benefit Details
     benefitDetails: 'פרטי ההטבה',
@@ -1129,6 +1143,12 @@ export const translations: Record<Language, Translations> = {
     newBenefit: 'New Benefit',
     benefitExpiring: 'Benefit Expiring',
     birthdayMonthStart: 'Birthday Month Started',
+    reminderUpcomingTitle: 'Reminder: {brand} benefit coming up',
+    reminderUpcomingMessage:
+      '"{benefit}" from {brand} becomes active in {days} days. Don\'t miss it!',
+    reminderActiveTitle: '{brand} benefit is active now',
+    reminderActiveMessage:
+      '"{benefit}" from {brand} is active today. Redeem it before the window closes.',
 
     // Benefit Details
     benefitDetails: 'Benefit Details',

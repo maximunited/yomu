@@ -15,6 +15,9 @@ export const PUBLIC_ROUTES = [
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhooks(.*)',
+  // Cron is public to Clerk; each /api/cron/* route must gate itself
+  // (GET: CRON_SECRET only; POST may allow requireAdmin for manual runs).
+  '/api/cron(.*)',
   '/api/benefits(.*)',
   '/api/brands(.*)',
 ] as const;
