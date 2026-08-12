@@ -15,6 +15,8 @@ export const PUBLIC_ROUTES = [
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhooks(.*)',
+  // Cron is public to Clerk but gated by CRON_SECRET (or admin) inside the route.
+  '/api/cron(.*)',
   '/api/benefits(.*)',
   '/api/brands(.*)',
 ] as const;
