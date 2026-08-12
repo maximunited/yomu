@@ -27,7 +27,19 @@ describe('/api/test-users', () => {
     requireAdmin.mockResolvedValue({ ok: true, userId: 'admin_1' });
   });
 
-  it('should return 401/403 when not admin', async () => {
+  it('should return 401 when unauthenticated', async () => {
+    const { NextResponse } = require('next/server');
+    requireAdmin.mockResolvedValue({
+      ok: false,
+      response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
+    });
+
+    const response = await GET(createMockRequest());
+    expect(response.status).toBe(401);
+    expect(mockPrisma.user.findMany).not.toHaveBeenCalled();
+  });
+
+  it('should return 403 when authenticated but not admin', async () => {
     const { NextResponse } = require('next/server');
     requireAdmin.mockResolvedValue({
       ok: false,

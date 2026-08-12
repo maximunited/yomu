@@ -63,8 +63,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Admin Dashboard UI:**
 - Access at `/admin` route (e.g., `http://localhost:3000/admin`)
 - Provides web interface for brand and benefit management
-- **Requires authentication**: Protected by Clerk middleware
-- ⚠️ **Production**: Consider adding role-based access control (currently any authenticated user can access admin)
+- **Requires authentication + admin RBAC**: Clerk middleware + `requireAdmin()` (`publicMetadata.role === 'admin'` or `ADMIN_USER_IDS`)
+- Dangerous routes (`/api/seed`, `/api/setup`, `/api/test-*`, `/api/admin/*`) are not on the public allowlist; API seed also needs `ALLOW_API_SEED=1`
+- Contract tests / how to run them: `docs/ADMIN_API_SECURITY.md`
 
 **Command-Line Admin Tools:**
 - `npm run admin:help` - Show admin helper script usage
