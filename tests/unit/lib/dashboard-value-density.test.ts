@@ -3,6 +3,7 @@ import {
   compareUpcomingBenefits,
   getDaysUntilReopens,
   getDaysUntilWindowEnds,
+  getTrustBadgeKind,
   isEndingSoon,
   parseRedemptionChecklist,
   wasRedeemedPreviousCycle,
@@ -91,6 +92,52 @@ describe('dashboard-value-density', () => {
         })
       ).toEqual(['app']);
     });
+
+    it('does not treat show-app / show_app as In app', () => {
+      expect(
+        parseRedemptionChecklist({
+          validityType: 'birthday_exact_date',
+          redemptionMethod: 'show-app',
+        })
+      ).not.toContain('app');
+      expect(
+        parseRedemptionChecklist({
+          validityType: 'birthday_exact_date',
+          redemptionMethod: 'show_app',
+        })
+      ).not.toContain('app');
+    });
+
+    it('still detects genuine app wording in terms', () => {
+      expect(
+        parseRedemptionChecklist({
+          validityType: 'birthday_exact_date',
+          redemptionMethod: 'in-store',
+          termsAndConditions: 'Redeem in the mobile app',
+        })
+      ).toContain('app');
+      expect(
+        parseRedemptionChecklist({
+          validityType: 'birthday_exact_date',
+          termsAndConditions: 'מימוש דרך האפליקציה',
+        })
+      ).toContain('app');
+    });
+  });
+
+  describe('getTrustBadgeKind', () => {
+    it('shows verified only when verified === true', () => {
+      expect(getTrustBadgeKind(true)).toBe('verified');
+    });
+
+    it('shows soft only when verified === false', () => {
+      expect(getTrustBadgeKind(false)).toBe('soft');
+    });
+
+    it('omits badge when verified is missing or null', () => {
+      expect(getTrustBadgeKind(undefined)).toBeNull();
+      expect(getTrustBadgeKind(null)).toBeNull();
+    });
   });
 
   describe('used-benefit next-year memory', () => {
@@ -120,7 +167,7 @@ describe('dashboard-value-density', () => {
       ).toBe(true);
     });
 
-    it('after marking used during open window, reopens next year', () => {
+    it('while currently in open window after marking used, returns 0 (no long countdown)', () => {
       const now = new Date(2026, 7, 20);
       const usedAt = new Date(2026, 7, 18);
       const days = getDaysUntilReopens(
@@ -129,7 +176,7 @@ describe('dashboard-value-density', () => {
         usedAt,
         now
       );
-      expect(days).toBeGreaterThan(300);
+      expect(days).toBe(0);
       expect(
         wasRedeemedPreviousCycle(
           { validityType: 'birthday_entire_month' },
@@ -138,6 +185,23 @@ describe('dashboard-value-density', () => {
           now
         )
       ).toBe(false);
+    });
+
+    it('after open window ends, counts days until next-year reopen', () => {
+      const now = new Date(2026, 8, 5); // Sep 5 — month window closed
+      const usedAt = new Date(2026, 7, 18);
+      const days = getDaysUntilReopens(
+        { validityType: 'birthday_entire_month' },
+        dob,
+        usedAt,
+        now
+      );
+      expect(days).toBe(
+        Math.round(
+          (new Date(2027, 7, 1).getTime() - new Date(2026, 8, 5).getTime()) /
+            (24 * 60 * 60 * 1000)
+        )
+      );
     });
   });
 });

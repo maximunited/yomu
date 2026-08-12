@@ -34,6 +34,7 @@ import {
   formatLastChecked,
   getDaysUntilReopens,
   getDaysUntilWindowEnds,
+  getTrustBadgeKind,
   isEndingSoon,
   parseRedemptionChecklist,
   wasRedeemedPreviousCycle,
@@ -370,27 +371,29 @@ function DashboardPageContent() {
   const renderTrustAndChecklist = (benefit: Benefit) => {
     const checklist = parseRedemptionChecklist(benefit);
     const lastCheckedLabel = formatLastChecked(benefit.lastChecked, language);
-    const verified = benefit.verified === true;
+    const trustKind = getTrustBadgeKind(benefit.verified);
 
     return (
       <div className="mb-3 space-y-2">
-        <div className="flex flex-wrap gap-2 items-center">
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${
-              verified
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-700'
-                : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-700'
-            }`}
-            title={
-              lastCheckedLabel
-                ? t('lastCheckedOn').replace('{date}', lastCheckedLabel)
-                : undefined
-            }
-          >
-            {verified ? t('trustVerified') : t('trustSoft')}
-            {lastCheckedLabel ? ` · ${lastCheckedLabel}` : ''}
-          </span>
-        </div>
+        {trustKind && (
+          <div className="flex flex-wrap gap-2 items-center">
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${
+                trustKind === 'verified'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-700'
+                  : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-700'
+              }`}
+              title={
+                lastCheckedLabel
+                  ? t('lastCheckedOn').replace('{date}', lastCheckedLabel)
+                  : undefined
+              }
+            >
+              {trustKind === 'verified' ? t('trustVerified') : t('trustSoft')}
+              {lastCheckedLabel ? ` · ${lastCheckedLabel}` : ''}
+            </span>
+          </div>
+        )}
         {checklist.length > 0 && (
           <div>
             <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">

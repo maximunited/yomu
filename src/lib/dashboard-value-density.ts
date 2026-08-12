@@ -193,7 +193,8 @@ export function getDaysUntilWindowOpens(
 
 /**
  * After a UsedBenefit mark: days until the *next* window that starts after usedAt
- * (and not before today). Prefer next cycle if still inside the used window year.
+ * (and not before today). If the benefit is currently in an open window, return 0
+ * so UI does not show a next-year "opens again" countdown while Active Now.
  */
 export function getDaysUntilReopens(
   benefit: Pick<ValueDensityBenefit, 'validityType'>,
@@ -207,25 +208,49 @@ export function getDaysUntilReopens(
   const normalized = normalizeValidityType(benefit.validityType);
   if (normalized === 'always') return null;
 
+  // Currently active → no reopen countdown (window is open now).
+  const currentWindow = getNearestBenefitWindow(benefit, userDOB, currentDate);
+  if (currentWindow) {
+    const winStart = startOfLocalDay(currentWindow.start);
+    const winEnd = startOfLocalDay(currentWindow.end);
+    if (
+      today.getTime() >= winStart.getTime() &&
+      today.getTime() <= winEnd.getTime()
+    ) {
+      return 0;
+    }
+  }
+
   const y = currentDate.getFullYear();
   const candidates: Date[] = [];
   for (const year of [y - 1, y, y + 1, y + 2]) {
     const bounds = windowBoundsForYear(normalized, userDOB, year);
     if (!bounds) continue;
     const start = startOfLocalDay(bounds.start);
-    // Next open after the redemption (and not already past without being future)
+    // Next open after the redemption and strictly after today
     if (start.getTime() > used.getTime() && start.getTime() > today.getTime()) {
       candidates.push(start);
     }
   }
   if (candidates.length === 0) {
-    // Still inside an open window after marking used → next calendar cycle
     const nextYear = windowBoundsForYear(normalized, userDOB, y + 1);
     if (!nextYear) return null;
     return Math.max(0, daysBetween(today, nextYear.start));
   }
   candidates.sort((a, b) => a.getTime() - b.getTime());
   return daysBetween(today, candidates[0]);
+}
+
+/**
+ * Trust badge state from optional verified flag.
+ * Missing/null verified → omit badge (do not treat as unverified).
+ */
+export function getTrustBadgeKind(
+  verified: boolean | null | undefined
+): 'verified' | 'soft' | null {
+  if (verified === true) return 'verified';
+  if (verified === false) return 'soft';
+  return null;
 }
 
 export function wasRedeemedPreviousCycle(
@@ -313,6 +338,25 @@ function haystackForTerms(benefit: ValueDensityBenefit): string {
     .toLowerCase();
 }
 
+/** Explicit app redemption methods — not show-app / show_app. */
+const APP_REDEMPTION_METHODS = new Set([
+  'app',
+  'mobile-app',
+  'mobile_app',
+  'in-app',
+  'in_app',
+]);
+
+/**
+ * True when method/text indicates genuine app redemption.
+ * Hyphenated tokens like show-app must not match via `\bapp\b`.
+ */
+function hasAppRedemptionEvidence(method: string, text: string): boolean {
+  if (APP_REDEMPTION_METHODS.has(method)) return true;
+  // Hebrew "אפליקצ*" or standalone "app" / "mobile app" (no hyphen/underscore neighbors)
+  return /אפליקצ|mobile\s+app|(?<![\w-])app(?![\w-])/.test(text);
+}
+
 /**
  * Structured redemption checklist from existing fields only.
  * Keys are only included when evidence is present.
@@ -324,7 +368,7 @@ export function parseRedemptionChecklist(
   const method = (benefit.redemptionMethod || '').toLowerCase().trim();
   const text = haystackForTerms(benefit);
 
-  if (method === 'app' || /אפליקצ|app\b|mobile app/.test(text)) {
+  if (hasAppRedemptionEvidence(method, text)) {
     keys.add('app');
   }
   if (
