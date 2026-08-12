@@ -15,4 +15,16 @@ describe('proxy config', () => {
     expect(proxyModule.config.matcher).toBeDefined();
     expect(Array.isArray(proxyModule.config.matcher)).toBe(true);
   });
+
+  it('exports PUBLIC_ROUTES for allowlist contracts', () => {
+    jest.resetModules();
+
+    const proxyModule = require('../../../src/proxy');
+    expect(Array.isArray(proxyModule.PUBLIC_ROUTES)).toBe(true);
+    expect(proxyModule.PUBLIC_ROUTES).not.toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/seed|setup|test-prisma|test-users|admin/),
+      ])
+    );
+  });
 });

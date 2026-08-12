@@ -95,3 +95,7 @@ vulnerability-report.json
 .env*.local
 
 .vercel
+
+# Local git worktrees
+.worktrees/
+

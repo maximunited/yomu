@@ -50,6 +50,16 @@ describe('/api/admin/benefits', () => {
     expect(json).toEqual({ id: 'new1' });
   });
 
+  it('returns 401 when unauthenticated', async () => {
+    const { NextResponse } = require('next/server');
+    requireAdmin.mockResolvedValueOnce({
+      ok: false,
+      response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
+    });
+    const res = await GET_LIST();
+    expect(res.status).toBe(401);
+  });
+
   it('returns 403 when not admin', async () => {
     const { NextResponse } = require('next/server');
     requireAdmin.mockResolvedValueOnce({
