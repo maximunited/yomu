@@ -28,8 +28,19 @@ import {
   getUpcomingBenefits,
   getValidityDisplayText,
 } from '@/lib/benefit-validation';
+import {
+  compareActiveBenefits,
+  compareUpcomingBenefits,
+  formatLastChecked,
+  getDaysUntilReopens,
+  getDaysUntilWindowEnds,
+  getTrustBadgeKind,
+  isEndingSoon,
+  parseRedemptionChecklist,
+  wasRedeemedPreviousCycle,
+  type RedemptionChecklistKey,
+} from '@/lib/dashboard-value-density';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { Translations } from '@/lib/translations';
 
 interface Benefit {
   id: string;
@@ -53,6 +64,8 @@ interface Benefit {
   redemptionMethod: string;
   termsAndConditions?: string;
   isFree?: boolean;
+  verified?: boolean;
+  lastChecked?: string | null;
 }
 
 interface UserMembership {
@@ -336,6 +349,107 @@ function DashboardPageContent() {
     return getValidityDisplayText(benefit.validityType, language as any);
   };
 
+  const checklistLabel = (key: RedemptionChecklistKey): string => {
+    switch (key) {
+      case 'card':
+        return t('redeemNeedsCard');
+      case 'app':
+        return t('redeemNeedsApp');
+      case 'code':
+        return t('redeemNeedsCode');
+      case 'inStore':
+        return t('redeemInStore');
+      case 'online':
+        return t('redeemOnline');
+      case 'noStacking':
+        return t('redeemNoStacking');
+      default:
+        return key;
+    }
+  };
+
+  const renderTrustAndChecklist = (benefit: Benefit) => {
+    const checklist = parseRedemptionChecklist(benefit);
+    const lastCheckedLabel = formatLastChecked(benefit.lastChecked, language);
+    const trustKind = getTrustBadgeKind(benefit.verified);
+
+    return (
+      <div className="mb-3 space-y-2">
+        {trustKind && (
+          <div className="flex flex-wrap gap-2 items-center">
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${
+                trustKind === 'verified'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-700'
+                  : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-700'
+              }`}
+              title={
+                lastCheckedLabel
+                  ? t('lastCheckedOn').replace('{date}', lastCheckedLabel)
+                  : undefined
+              }
+            >
+              {trustKind === 'verified' ? t('trustVerified') : t('trustSoft')}
+              {lastCheckedLabel ? ` · ${lastCheckedLabel}` : ''}
+            </span>
+          </div>
+        )}
+        {checklist.length > 0 && (
+          <div>
+            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t('redemptionChecklist')}
+            </p>
+            <ul className="flex flex-wrap gap-1.5 list-none p-0 m-0">
+              {checklist.map((item) => (
+                <li
+                  key={item}
+                  className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
+                >
+                  {checklistLabel(item)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderUsedMemory = (benefit: Benefit) => {
+    if (!usedBenefits.has(benefit.id)) return null;
+    const usedAt = usedBenefits.get(benefit.id);
+    const daysUntilReopen = getDaysUntilReopens(benefit, userDOB, usedAt);
+    const priorCycle = wasRedeemedPreviousCycle(benefit, userDOB, usedAt);
+
+    return (
+      <div className="mb-3 flex flex-wrap gap-2 items-center">
+        {priorCycle && (
+          <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600">
+            {t('redeemedLastYear')}
+          </span>
+        )}
+        {daysUntilReopen !== null && daysUntilReopen > 0 && (
+          <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-700">
+            {t('opensAgainInDays').replace('{days}', String(daysUntilReopen))}
+          </span>
+        )}
+      </div>
+    );
+  };
+
+  const renderUrgencyBadge = (benefit: Benefit) => {
+    if (!isEndingSoon(benefit, userDOB)) return null;
+    const daysLeft = getDaysUntilWindowEnds(benefit, userDOB);
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-900/40 dark:text-rose-200 dark:border-rose-700">
+        {t('endingSoon')}
+        {daysLeft !== null
+          ? ` · ${t('endingInDays').replace('{days}', String(daysLeft))}`
+          : ''}
+      </span>
+    );
+  };
+
   const containsHebrew = (text: string | undefined) =>
     /[\u0590-\u05FF]/.test(text || '');
 
@@ -593,9 +707,13 @@ function DashboardPageContent() {
     remindBrandIds.has(b.brandId || b.brand?.id)
   );
 
-  // Apply search and filters
-  const filteredActiveBenefits = filterBenefits(activeBenefits);
-  const filteredUpcomingBenefits = filterBenefits(upcomingBenefits);
+  // Apply search and filters, then value-density sort (ending soon → free > %)
+  const filteredActiveBenefits = filterBenefits(activeBenefits).sort((a, b) =>
+    compareActiveBenefits(a, b, userDOB)
+  );
+  const filteredUpcomingBenefits = filterBenefits(upcomingBenefits).sort(
+    (a, b) => compareUpcomingBenefits(a, b, userDOB)
+  );
   const filteredReminderBenefits = filterBenefits(reminderUpcomingBenefits);
 
   // Get unique categories from benefits
@@ -1002,228 +1120,308 @@ function DashboardPageContent() {
           )}
         </div>
 
-        {/* Active Now Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <Star className="w-6 h-6 text-purple-600" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {t('activeNow')}
-              </h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                ({filteredActiveBenefits.length})
-              </span>
-            </div>
+        {/* This month for me — Active now → ending soon → upcoming */}
+        <section className="mb-8" aria-labelledby="this-month-for-me-heading">
+          <div className="mb-6">
+            <h2
+              id="this-month-for-me-heading"
+              className="text-xl font-bold text-gray-900 dark:text-white"
+            >
+              {t('thisMonthForMe')}
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {t('thisMonthForMeSubtitle')}
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredActiveBenefits.map((benefit) => (
-              <div
-                key={benefit.id}
-                role="article"
-                aria-label={`${benefit.brand.name} - ${benefit.title}`}
-                className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 flex flex-col h-full ${
-                  usedBenefits.has(benefit.id)
-                    ? 'bg-gray-50 border-2 border-green-200 shadow-green-100'
-                    : 'bg-white border-2 border-transparent'
-                }`}
-              >
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-white">
-                    {benefit.brand.logoUrl?.startsWith('data:image/svg') ? (
-                      <img
-                        src={benefit.brand.logoUrl}
-                        alt={benefit.brand.name}
-                        className="w-full h-full object-contain"
-                        style={{ imageRendering: 'auto' }}
-                      />
-                    ) : (
-                      <img
-                        src={benefit.brand.logoUrl}
-                        alt={benefit.brand.name}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">
-                      {benefit.brand.name}
-                    </h3>
-                    <span className="text-sm text-purple-600 font-medium">
-                      {getValidityText(benefit)}
-                    </span>
-                  </div>
-                </div>
 
-                {/* Category Tag */}
-                <div className="mb-3 flex flex-wrap gap-2 items-center">
-                  <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                      benefit.brand.category
-                    )}`}
-                  >
-                    {getCategoryDisplayName(benefit.brand.category)}
-                  </span>
-                  {/* Membership Type Label */}
-                  <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                      benefit.isFree
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-orange-100 text-orange-800'
-                    }`}
-                  >
-                    {benefit.isFree ? t('free') : t('paid')}
-                  </span>
-                  {isRecentlyAdded(benefit) && (
+          {/* Active Now Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <Star className="w-6 h-6 text-purple-600" />
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {t('activeNow')}
+                </h2>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  ({filteredActiveBenefits.length})
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredActiveBenefits.map((benefit) => (
+                <div
+                  key={benefit.id}
+                  role="article"
+                  aria-label={`${benefit.brand.name} - ${benefit.title}`}
+                  className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 flex flex-col h-full dark:bg-gray-800 ${
+                    usedBenefits.has(benefit.id)
+                      ? 'bg-gray-50 border-2 border-green-200 shadow-green-100 dark:border-green-700'
+                      : 'bg-white border-2 border-transparent'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-white">
+                      {benefit.brand.logoUrl?.startsWith('data:image/svg') ? (
+                        <img
+                          src={benefit.brand.logoUrl}
+                          alt={benefit.brand.name}
+                          className="w-full h-full object-contain"
+                          style={{ imageRendering: 'auto' }}
+                        />
+                      ) : (
+                        <img
+                          src={benefit.brand.logoUrl}
+                          alt={benefit.brand.name}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {benefit.brand.name}
+                      </h3>
+                      <span className="text-sm text-purple-600 font-medium">
+                        {getValidityText(benefit)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Category Tag */}
+                  <div className="mb-3 flex flex-wrap gap-2 items-center">
                     <span
-                      title={t('recentlyAdded')}
-                      aria-label={t('recentlyAdded')}
-                      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
+                        benefit.brand.category
+                      )}`}
                     >
-                      <Sparkles className="w-3 h-3" />
-                      {t('recentlyAdded')}
+                      {getCategoryDisplayName(benefit.brand.category)}
                     </span>
-                  )}
-                  {/* Used Status */}
-                  {usedBenefits.has(benefit.id) && (
-                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                      ✓ {t('usedOn')}{' '}
-                      {new Date(
-                        usedBenefits.get(benefit.id) || Date.now()
-                      ).toLocaleDateString()}
-                    </span>
-                  )}
-                </div>
-
-                <h4 className="font-bold text-lg text-gray-900 mb-2">
-                  {getBenefitTitle(benefit)}
-                </h4>
-                <p className="text-gray-600 text-sm mb-4 flex-grow">
-                  {getBenefitDescription(benefit)}
-                </p>
-
-                {benefit.promoCode && (
-                  <div className="flex items-center space-x-2 mb-4">
-                    <span className="text-sm text-gray-700 font-medium">
-                      {t('couponCode')}:
-                    </span>
-                    <code className="bg-purple-100 border border-purple-200 px-3 py-2 rounded-md text-sm font-mono text-purple-800 font-bold">
-                      {benefit.promoCode}
-                    </code>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => copyToClipboard(benefit.promoCode!)}
-                      className="bg-purple-600 text-white hover:bg-purple-700"
+                    {/* Membership Type Label */}
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                        benefit.isFree
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-orange-100 text-orange-800'
+                      }`}
                     >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-
-                <div className="flex gap-2 mt-auto">
-                  {/* Used/Unused Button */}
-                  <Button
-                    variant={
-                      usedBenefits.has(benefit.id) ? 'default' : 'outline'
-                    }
-                    size="sm"
-                    onClick={() =>
-                      usedBenefits.has(benefit.id)
-                        ? unmarkBenefitAsUsed(benefit.id)
-                        : markBenefitAsUsed(benefit.id)
-                    }
-                    disabled={usedBenefitsLoading}
-                    aria-disabled={usedBenefitsLoading}
-                    aria-busy={usedBenefitsLoading}
-                    title={
-                      usedBenefitsLoading
-                        ? t('loading')
-                        : usedBenefits.has(benefit.id)
-                          ? t('unmarkAsUsed')
-                          : t('markAsUsed')
-                    }
-                    className={`flex-1 transition-all duration-200 whitespace-nowrap overflow-hidden text-ellipsis min-w-0 ${
-                      usedBenefits.has(benefit.id)
-                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
-                        : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
-                    } ${
-                      usedBenefitsLoading ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {usedBenefitsLoading ? (
-                      <>
-                        <span className="animate-spin mr-1">⏳</span>
-                        <span className="truncate">{t('loading')}</span>
-                      </>
-                    ) : usedBenefits.has(benefit.id) ? (
-                      <>
-                        <span className="mr-1 flex-shrink-0">✓</span>
-                        <span className="truncate">{t('unmarkAsUsed')}</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="mr-1 flex-shrink-0">○</span>
-                        <span className="truncate">{t('markAsUsed')}</span>
-                      </>
+                      {benefit.isFree ? t('free') : t('paid')}
+                    </span>
+                    {renderUrgencyBadge(benefit)}
+                    {isRecentlyAdded(benefit) && (
+                      <span
+                        title={t('recentlyAdded')}
+                        aria-label={t('recentlyAdded')}
+                        className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        {t('recentlyAdded')}
+                      </span>
                     )}
-                  </Button>
+                    {/* Used Status */}
+                    {usedBenefits.has(benefit.id) && (
+                      <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                        ✓ {t('usedOn')}{' '}
+                        {new Date(
+                          usedBenefits.get(benefit.id) || Date.now()
+                        ).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
 
-                  {/* Contextual action button based on brand category */}
-                  {(benefit.brand.actionUrl || benefit.url) && (
+                  {renderTrustAndChecklist(benefit)}
+                  {renderUsedMemory(benefit)}
+
+                  <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-2">
+                    {getBenefitTitle(benefit)}
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow">
+                    {getBenefitDescription(benefit)}
+                  </p>
+
+                  {benefit.promoCode && (
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse mb-4">
+                      <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                        {t('couponCode')}:
+                      </span>
+                      <code className="bg-purple-100 border border-purple-200 px-3 py-2 rounded-md text-sm font-mono text-purple-800 font-bold">
+                        {benefit.promoCode}
+                      </code>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => copyToClipboard(benefit.promoCode!)}
+                        className="bg-purple-600 text-white hover:bg-purple-700"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 mt-auto">
+                    {/* Used/Unused Button */}
+                    <Button
+                      variant={
+                        usedBenefits.has(benefit.id) ? 'default' : 'outline'
+                      }
+                      size="sm"
+                      onClick={() =>
+                        usedBenefits.has(benefit.id)
+                          ? unmarkBenefitAsUsed(benefit.id)
+                          : markBenefitAsUsed(benefit.id)
+                      }
+                      disabled={usedBenefitsLoading}
+                      aria-disabled={usedBenefitsLoading}
+                      aria-busy={usedBenefitsLoading}
+                      title={
+                        usedBenefitsLoading
+                          ? t('loading')
+                          : usedBenefits.has(benefit.id)
+                            ? t('unmarkAsUsed')
+                            : t('markAsUsed')
+                      }
+                      className={`flex-1 transition-all duration-200 whitespace-nowrap overflow-hidden text-ellipsis min-w-0 ${
+                        usedBenefits.has(benefit.id)
+                          ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
+                          : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
+                      } ${
+                        usedBenefitsLoading
+                          ? 'opacity-50 cursor-not-allowed'
+                          : ''
+                      }`}
+                    >
+                      {usedBenefitsLoading ? (
+                        <>
+                          <span className="animate-spin mr-1">⏳</span>
+                          <span className="truncate">{t('loading')}</span>
+                        </>
+                      ) : usedBenefits.has(benefit.id) ? (
+                        <>
+                          <span className="mr-1 flex-shrink-0">✓</span>
+                          <span className="truncate">{t('unmarkAsUsed')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="mr-1 flex-shrink-0">○</span>
+                          <span className="truncate">{t('markAsUsed')}</span>
+                        </>
+                      )}
+                    </Button>
+
+                    {/* Contextual action button based on brand category */}
+                    {(benefit.brand.actionUrl || benefit.url) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          window.open(
+                            benefit.brand.actionUrl || benefit.url,
+                            '_blank'
+                          )
+                        }
+                        title={benefit.brand.actionLabel || t('buyNow')}
+                        className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
+                      >
+                        <ExternalLink className="w-4 h-4 ml-1 flex-shrink-0" />
+                        <span className="truncate">
+                          {benefit.brand.actionLabel || t('buyNow')}
+                        </span>
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        window.open(
-                          benefit.brand.actionUrl || benefit.url,
-                          '_blank'
-                        )
-                      }
-                      title={benefit.brand.actionLabel || t('buyNow')}
+                      onClick={() => router.push(`/benefit/${benefit.id}`)}
+                      title={t('moreDetails')}
                       className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
                     >
-                      <ExternalLink className="w-4 h-4 ml-1 flex-shrink-0" />
-                      <span className="truncate">
-                        {benefit.brand.actionLabel || t('buyNow')}
-                      </span>
+                      <span className="truncate">{t('moreDetails')}</span>
                     </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => router.push(`/benefit/${benefit.id}`)}
-                    title={t('moreDetails')}
-                    className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
-                  >
-                    <span className="truncate">{t('moreDetails')}</span>
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Reminders — upcoming benefits for memberships with remindEnabled */}
-        {filteredReminderBenefits.length > 0 && (
+          {/* Reminders — upcoming benefits for memberships with remindEnabled */}
+          {filteredReminderBenefits.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Bell className="w-6 h-6 text-purple-600" />
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {t('reminders')}
+                </h2>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  ({filteredReminderBenefits.length})
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredReminderBenefits.map((benefit) => (
+                  <div
+                    key={`remind-${benefit.id}`}
+                    role="article"
+                    aria-label={`${t('reminderBadge')}: ${benefit.brand.name} - ${benefit.title}`}
+                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 border-purple-200 dark:border-purple-800 flex flex-col h-full"
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                        <Image
+                          src={benefit.brand.logoUrl}
+                          alt={benefit.brand.name}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {benefit.brand.name}
+                        </h3>
+                        <span className="text-sm text-purple-600 font-medium">
+                          {getValidityText(benefit)}
+                        </span>
+                      </div>
+                      <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        {t('reminderBadge')}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                      {benefit.title}
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => router.push(`/benefit/${benefit.id}`)}
+                      className="mt-auto"
+                    >
+                      {t('moreDetails')}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Coming Soon Section */}
           <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Bell className="w-6 h-6 text-purple-600" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {t('reminders')}
-              </h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                ({filteredReminderBenefits.length})
-              </span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <Calendar className="w-6 h-6 text-orange-600" />
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {t('comingSoon')}
+                </h2>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  ({filteredUpcomingBenefits.length})
+                </span>
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredReminderBenefits.map((benefit) => (
+              {filteredUpcomingBenefits.map((benefit) => (
                 <div
-                  key={`remind-${benefit.id}`}
+                  key={benefit.id}
                   role="article"
-                  aria-label={`${t('reminderBadge')}: ${benefit.brand.name} - ${benefit.title}`}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 border-purple-200 dark:border-purple-800 flex flex-col h-full"
+                  aria-label={`${benefit.brand.name} - ${benefit.title}`}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow opacity-90 flex flex-col h-full"
                 >
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
                     <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                       <Image
                         src={benefit.brand.logoUrl}
@@ -1237,168 +1435,116 @@ function DashboardPageContent() {
                       <h3 className="font-semibold text-gray-900 dark:text-white">
                         {benefit.brand.name}
                       </h3>
-                      <span className="text-sm text-purple-600 font-medium">
+                      <span className="text-sm text-orange-600 font-medium">
                         {getValidityText(benefit)}
                       </span>
                     </div>
-                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                      {t('reminderBadge')}
-                    </span>
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                    {benefit.title}
+
+                  {/* Category Tag */}
+                  <div className="mb-3 flex flex-wrap gap-2 items-center">
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
+                        benefit.brand.category
+                      )}`}
+                    >
+                      {getCategoryDisplayName(benefit.brand.category)}
+                    </span>
+                    {/* Membership Type Label */}
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                        benefit.isFree
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-orange-100 text-orange-800'
+                      }`}
+                    >
+                      {benefit.isFree ? t('free') : t('paid')}
+                    </span>
+                    {remindBrandIds.has(
+                      benefit.brandId || benefit.brand?.id
+                    ) && (
+                      <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        {t('reminderBadge')}
+                      </span>
+                    )}
+                    {isRecentlyAdded(benefit) && (
+                      <span
+                        title={t('recentlyAdded')}
+                        aria-label={t('recentlyAdded')}
+                        className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        {t('recentlyAdded')}
+                      </span>
+                    )}
+                  </div>
+
+                  {renderTrustAndChecklist(benefit)}
+                  {renderUsedMemory(benefit)}
+
+                  <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-2">
+                    {getBenefitTitle(benefit)}
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow">
+                    {getBenefitDescription(benefit)}
                   </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => router.push(`/benefit/${benefit.id}`)}
-                    className="mt-auto"
-                  >
-                    {t('moreDetails')}
-                  </Button>
+
+                  <div className="flex gap-2 mt-auto">
+                    <Button
+                      variant={
+                        usedBenefits.has(benefit.id) ? 'default' : 'outline'
+                      }
+                      size="sm"
+                      onClick={() =>
+                        usedBenefits.has(benefit.id)
+                          ? unmarkBenefitAsUsed(benefit.id)
+                          : markBenefitAsUsed(benefit.id)
+                      }
+                      disabled={usedBenefitsLoading}
+                      aria-disabled={usedBenefitsLoading}
+                      aria-busy={usedBenefitsLoading}
+                      title={
+                        usedBenefitsLoading
+                          ? t('loading')
+                          : usedBenefits.has(benefit.id)
+                            ? t('unmarkAsUsed')
+                            : t('markAsUsed')
+                      }
+                      className={`flex-1 transition-all duration-200 whitespace-nowrap overflow-hidden text-ellipsis min-w-0 ${
+                        usedBenefits.has(benefit.id)
+                          ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
+                          : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
+                      } ${
+                        usedBenefitsLoading
+                          ? 'opacity-50 cursor-not-allowed'
+                          : ''
+                      }`}
+                    >
+                      {usedBenefitsLoading ? (
+                        <>
+                          <span className="animate-spin mr-1 flex-shrink-0">
+                            ⏳
+                          </span>
+                          <span className="truncate">{t('loading')}</span>
+                        </>
+                      ) : usedBenefits.has(benefit.id) ? (
+                        <>
+                          <span className="mr-1 flex-shrink-0">✓</span>
+                          <span className="truncate">{t('unmarkAsUsed')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="mr-1 flex-shrink-0">○</span>
+                          <span className="truncate">{t('markAsUsed')}</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        )}
-
-        {/* Coming Soon Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <Calendar className="w-6 h-6 text-orange-600" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {t('comingSoon')}
-              </h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                ({filteredUpcomingBenefits.length})
-              </span>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredUpcomingBenefits.map((benefit) => (
-              <div
-                key={benefit.id}
-                role="article"
-                aria-label={`${benefit.brand.name} - ${benefit.title}`}
-                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow opacity-75 flex flex-col h-full"
-              >
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                    <Image
-                      src={benefit.brand.logoUrl}
-                      alt={benefit.brand.name}
-                      width={48}
-                      height={48}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">
-                      {benefit.brand.name}
-                    </h3>
-                    <span className="text-sm text-orange-600 font-medium">
-                      {getValidityText(benefit)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Category Tag */}
-                <div className="mb-3 flex flex-wrap gap-2 items-center">
-                  <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                      benefit.brand.category
-                    )}`}
-                  >
-                    {getCategoryDisplayName(benefit.brand.category)}
-                  </span>
-                  {/* Membership Type Label */}
-                  <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                      benefit.isFree
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-orange-100 text-orange-800'
-                    }`}
-                  >
-                    {benefit.isFree ? t('free') : t('paid')}
-                  </span>
-                  {remindBrandIds.has(benefit.brandId || benefit.brand?.id) && (
-                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                      {t('reminderBadge')}
-                    </span>
-                  )}
-                  {isRecentlyAdded(benefit) && (
-                    <span
-                      title={t('recentlyAdded')}
-                      aria-label={t('recentlyAdded')}
-                      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      {t('recentlyAdded')}
-                    </span>
-                  )}
-                </div>
-
-                <h4 className="font-bold text-lg text-gray-900 mb-2">
-                  {getBenefitTitle(benefit)}
-                </h4>
-                <p className="text-gray-600 text-sm mb-4 flex-grow">
-                  {getBenefitDescription(benefit)}
-                </p>
-
-                <div className="flex gap-2 mt-auto">
-                  <Button
-                    variant={
-                      usedBenefits.has(benefit.id) ? 'default' : 'outline'
-                    }
-                    size="sm"
-                    onClick={() =>
-                      usedBenefits.has(benefit.id)
-                        ? unmarkBenefitAsUsed(benefit.id)
-                        : markBenefitAsUsed(benefit.id)
-                    }
-                    disabled={usedBenefitsLoading}
-                    aria-disabled={usedBenefitsLoading}
-                    aria-busy={usedBenefitsLoading}
-                    title={
-                      usedBenefitsLoading
-                        ? t('loading')
-                        : usedBenefits.has(benefit.id)
-                          ? t('unmarkAsUsed')
-                          : t('markAsUsed')
-                    }
-                    className={`flex-1 transition-all duration-200 whitespace-nowrap overflow-hidden text-ellipsis min-w-0 ${
-                      usedBenefits.has(benefit.id)
-                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-md'
-                        : 'bg-white hover:bg-green-50 border-green-300 text-green-700 hover:text-green-800'
-                    } ${
-                      usedBenefitsLoading ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {usedBenefitsLoading ? (
-                      <>
-                        <span className="animate-spin mr-1 flex-shrink-0">
-                          ⏳
-                        </span>
-                        <span className="truncate">{t('loading')}</span>
-                      </>
-                    ) : usedBenefits.has(benefit.id) ? (
-                      <>
-                        <span className="mr-1 flex-shrink-0">✓</span>
-                        <span className="truncate">{t('unmarkAsUsed')}</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="mr-1 flex-shrink-0">○</span>
-                        <span className="truncate">{t('markAsUsed')}</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        </section>
 
         {/* Error handling */}
         {errorMessage && (
@@ -1454,13 +1600,30 @@ function DashboardPageContent() {
                           </p>
                         </div>
                       </div>
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center gap-2 flex-wrap">
                         <span className="text-xs text-gray-500">
                           {t('usedOn')}{' '}
                           {new Date(
                             usedBenefits.get(benefit.id) || Date.now()
                           ).toLocaleDateString()}
                         </span>
+                        {(() => {
+                          const usedAt = usedBenefits.get(benefit.id);
+                          const days = getDaysUntilReopens(
+                            benefit,
+                            userDOB,
+                            usedAt
+                          );
+                          if (days === null || days <= 0) return null;
+                          return (
+                            <span className="text-xs text-blue-700 dark:text-blue-300">
+                              {t('opensAgainInDays').replace(
+                                '{days}',
+                                String(days)
+                              )}
+                            </span>
+                          );
+                        })()}
                         <Button
                           variant="outline"
                           size="sm"
