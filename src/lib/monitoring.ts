@@ -13,13 +13,10 @@ type CaptureContext = {
 };
 
 /** Matches common email shapes in free-form Sentry strings. */
-const EMAIL_LIKE =
-  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+const EMAIL_LIKE = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
 
 function hasDsn(): boolean {
-  return Boolean(
-    process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
-  );
+  return Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN);
 }
 
 /** SHA-256 hex prefix of a normalized email — safe for ops correlation. */

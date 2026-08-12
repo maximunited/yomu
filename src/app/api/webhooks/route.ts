@@ -29,8 +29,7 @@ export async function POST(req: NextRequest) {
         if (existingUser) {
           // Only link when unclaimed — never rebind another Clerk account
           if (existingUser.clerkId && existingUser.clerkId !== id) {
-            const msg =
-              'Webhook user.created: duplicate email link refused';
+            const msg = 'Webhook user.created: duplicate email link refused';
             console.error(msg, {
               emailHash: hashEmailPrefix(email),
               existingClerkId: existingUser.clerkId,

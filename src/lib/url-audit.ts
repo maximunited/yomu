@@ -51,7 +51,13 @@ function getFallback(url: string): Promise<UrlCheckResult> {
     try {
       parsed = new URL(url);
     } catch {
-      resolve({ url, ok: false, blocked: false, status: null, error: 'invalid URL' });
+      resolve({
+        url,
+        ok: false,
+        blocked: false,
+        status: null,
+        error: 'invalid URL',
+      });
       return;
     }
     const lib = parsed.protocol === 'https:' ? https : http;
@@ -99,7 +105,13 @@ export function checkUrl(url: string): Promise<UrlCheckResult> {
     try {
       parsed = new URL(url);
     } catch {
-      resolve({ url, ok: false, blocked: false, status: null, error: 'invalid URL' });
+      resolve({
+        url,
+        ok: false,
+        blocked: false,
+        status: null,
+        error: 'invalid URL',
+      });
       return;
     }
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
@@ -249,8 +261,9 @@ export async function runUrlAudit(
   }
 
   await Promise.all(
-    Array.from({ length: Math.min(concurrency, Math.max(unique.length, 1)) }, () =>
-      worker()
+    Array.from(
+      { length: Math.min(concurrency, Math.max(unique.length, 1)) },
+      () => worker()
     )
   );
 

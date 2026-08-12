@@ -1,4 +1,8 @@
-import { capUrlAuditJobs, runUrlAudit, type UrlAuditJob } from '@/lib/url-audit';
+import {
+  capUrlAuditJobs,
+  runUrlAudit,
+  type UrlAuditJob,
+} from '@/lib/url-audit';
 
 describe('runUrlAudit', () => {
   it('rejects unsupported protocols without network I/O', async () => {

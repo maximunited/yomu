@@ -119,7 +119,7 @@ describe('AdminPage', () => {
           json: async () => ({ last: null, persistence: 'database' }),
         });
       }
-      return Promise.resolve({ ok: true, json: async () => ([]) });
+      return Promise.resolve({ ok: true, json: async () => [] });
     });
 
     render(<AdminPage />);
