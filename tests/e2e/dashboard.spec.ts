@@ -17,7 +17,10 @@ test.describe('Dashboard Functionality', () => {
 
   test('should redirect unauthenticated users to sign in', async ({ page }) => {
     await authHelper.clearAuth();
-    await page.goto(urls.dashboard);
+    await page.goto(urls.dashboard, {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000,
+    });
 
     await page.waitForURL(/sign-in/, { timeout: 15000 });
     expect(page.url()).toMatch(/sign-in/);

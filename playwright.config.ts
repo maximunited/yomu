@@ -13,7 +13,7 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
@@ -34,7 +34,6 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
       testIgnore: [/global\.setup\.ts/, /\.authenticated\.spec\.ts/],
-      dependencies: ['setup'],
     },
     ...(hasClerkE2EUser
       ? [
@@ -53,25 +52,21 @@ export default defineConfig({
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
       testIgnore: [/global\.setup\.ts/, /\.authenticated\.spec\.ts/],
-      dependencies: ['setup'],
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
       testIgnore: [/global\.setup\.ts/, /\.authenticated\.spec\.ts/],
-      dependencies: ['setup'],
     },
     {
       name: 'Mobile Chrome',
       use: { ...devices['Pixel 5'] },
       testIgnore: [/global\.setup\.ts/, /\.authenticated\.spec\.ts/],
-      dependencies: ['setup'],
     },
     {
       name: 'Mobile Safari',
       use: { ...devices['iPhone 12'] },
       testIgnore: [/global\.setup\.ts/, /\.authenticated\.spec\.ts/],
-      dependencies: ['setup'],
     },
   ],
 

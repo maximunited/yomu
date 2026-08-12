@@ -4,11 +4,11 @@ export class PageHelper {
   constructor(private page: Page) {}
 
   /**
-   * Wait for page to load completely
+   * Wait for page to be usable. Prefer domcontentloaded — Clerk keeps
+   * websockets/polling alive so networkidle often never settles (esp. Firefox).
    */
   async waitForPageLoad() {
-    await this.page.waitForLoadState('networkidle');
-    await this.page.waitForFunction(() => document.readyState === 'complete');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**

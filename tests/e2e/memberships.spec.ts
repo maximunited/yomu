@@ -14,10 +14,13 @@ test.describe('Memberships Management', () => {
 
   test('should redirect unauthenticated users to sign in', async ({ page }) => {
     await authHelper.clearAuth();
-    await page.goto(urls.memberships);
+    await page.goto(urls.memberships, {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000,
+    });
 
     // Should redirect to sign in page
-    await page.waitForURL(new RegExp(urls.signin), { timeout: 10000 });
+    await page.waitForURL(/sign-in/, { timeout: 15000 });
     expect(page.url()).toContain('/sign-in');
   });
 

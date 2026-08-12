@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { AuthHelper } from './helpers/auth-helpers';
-import { PageHelper } from './helpers/page-helpers';
 import { urls } from './fixtures/test-data';
 
 const clerkIdentifier =
@@ -10,17 +9,15 @@ const clerkPassword =
 
 test.describe('Authentication Flow', () => {
   let authHelper: AuthHelper;
-  let pageHelper: PageHelper;
 
   test.beforeEach(async ({ page }) => {
     authHelper = new AuthHelper(page);
-    pageHelper = new PageHelper(page);
     await authHelper.clearAuth();
   });
 
   test('should load sign in page', async ({ page }) => {
-    await page.goto(urls.signin);
-    await pageHelper.waitForPageLoad();
+    await authHelper.gotoSettled(urls.signin);
+    await expect(page).toHaveURL(/sign-in/);
 
     await expect(page).toHaveTitle(/YomU|יום-You|Sign in|התחברות/i);
     await expect(page.locator(clerkIdentifier).first()).toBeVisible({
@@ -29,8 +26,8 @@ test.describe('Authentication Flow', () => {
   });
 
   test('should load sign up page', async ({ page }) => {
-    await page.goto(urls.signup);
-    await pageHelper.waitForPageLoad();
+    await authHelper.gotoSettled(urls.signup);
+    await expect(page).toHaveURL(/sign-up/);
 
     await expect(
       page
@@ -42,8 +39,7 @@ test.describe('Authentication Flow', () => {
   });
 
   test('should show Clerk form controls on sign in', async ({ page }) => {
-    await page.goto(urls.signin);
-    await pageHelper.waitForPageLoad();
+    await authHelper.gotoSettled(urls.signin);
 
     const identifier = page.locator(clerkIdentifier).first();
     await expect(identifier).toBeVisible({ timeout: 15000 });
@@ -62,8 +58,7 @@ test.describe('Authentication Flow', () => {
   test('should navigate between sign in and sign up pages', async ({
     page,
   }) => {
-    await page.goto(urls.signin);
-    await pageHelper.waitForPageLoad();
+    await authHelper.gotoSettled(urls.signin);
 
     const signUpLink = page
       .locator('a[href*="sign-up"], a:has-text("Sign up"), a:has-text("הירשם")')
@@ -72,7 +67,7 @@ test.describe('Authentication Flow', () => {
       await signUpLink.click();
       await expect(page).toHaveURL(/sign-up/);
     } else {
-      await page.goto(urls.signup);
+      await authHelper.gotoSettled(urls.signup);
       await expect(page).toHaveURL(/sign-up/);
     }
 
@@ -82,36 +77,37 @@ test.describe('Authentication Flow', () => {
     if (await signInLink.isVisible().catch(() => false)) {
       await signInLink.click();
     } else {
-      await page.goto(urls.signin);
+      await authHelper.gotoSettled(urls.signin);
     }
     await expect(page).toHaveURL(/sign-in/);
   });
 
   test('should be responsive on auth pages', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto(urls.signin);
-    await pageHelper.waitForPageLoad();
+    await authHelper.gotoSettled(urls.signin);
     await expect(page.locator(clerkIdentifier).first()).toBeVisible({
       timeout: 15000,
     });
   });
 
   test('should handle browser back/forward on auth pages', async ({ page }) => {
-    await page.goto(urls.signin);
-    await pageHelper.waitForPageLoad();
-    await page.goto(urls.signup);
-    await pageHelper.waitForPageLoad();
-    await page.goBack();
+    await authHelper.gotoSettled(urls.signin);
+    await authHelper.gotoSettled(urls.signup);
+    await page.goBack({ waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/sign-in/);
-    await page.goForward();
+    try {
+      await page.goForward({ waitUntil: 'domcontentloaded' });
+    } catch {
+      // Firefox sometimes cancels history forward under Clerk redirects
+      await authHelper.gotoSettled(urls.signup);
+    }
     await expect(page).toHaveURL(/sign-up/);
   });
 
   test('should have accessible interactive controls on auth pages', async ({
     page,
   }) => {
-    await page.goto(urls.signin);
-    await pageHelper.waitForPageLoad();
+    await authHelper.gotoSettled(urls.signin);
     await expect(page.locator(clerkIdentifier).first()).toBeVisible({
       timeout: 15000,
     });

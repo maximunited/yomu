@@ -119,8 +119,12 @@ test.describe('Mobile Responsiveness', () => {
   });
 
   test('should work on tablet viewport', async ({ browser }) => {
+    // Explicit viewport — spreading device descriptors can be ignored when the
+    // parent project is already a phone profile (Pixel 5 / iPhone 12).
     const context = await browser.newContext({
-      ...devices['iPad Pro'],
+      viewport: { width: 1024, height: 1366 },
+      hasTouch: true,
+      isMobile: true,
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
@@ -135,11 +139,8 @@ test.describe('Mobile Responsiveness', () => {
     const nav = page.locator('nav, header').first();
     await expect(nav).toBeVisible();
 
-    // Check layout doesn't break
     const viewport = page.viewportSize();
-    if (viewport) {
-      expect(viewport.width).toBeGreaterThan(768); // Tablet width
-    }
+    expect(viewport?.width).toBeGreaterThan(768);
 
     await context.close();
   });
@@ -209,7 +210,8 @@ test.describe('Mobile Responsiveness', () => {
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
 
-    await page.goto(urls.dashboard);
+    await page.goto(urls.dashboard, { waitUntil: 'domcontentloaded' });
+    await page.waitForURL(/sign-in|dashboard/, { timeout: 15000 });
 
     // If redirected to sign in, that's expected
     if (page.url().includes('/sign-in')) {
@@ -222,7 +224,7 @@ test.describe('Mobile Responsiveness', () => {
 
       // Test scrolling
       const main = page.locator('main');
-      await main.hover();
+      await expect(main).toBeVisible();
 
       // Simulate scroll gesture
       await page.mouse.wheel(0, 100);
@@ -258,17 +260,19 @@ test.describe('Mobile Responsiveness', () => {
 
   test('should work with zoom levels', async ({ browser }) => {
     const context = await browser.newContext({
-      ...devices['iPhone 12'],
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true,
     });
     const page = await context.newPage();
     pageHelper = new PageHelper(page);
 
-    await page.goto(urls.home);
+    await page.goto(urls.home, { waitUntil: 'domcontentloaded' });
     await pageHelper.waitForPageLoad();
 
     // Test with 150% zoom
     await page.setViewportSize({ width: 250, height: 541 }); // Simulates zoom
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(300);
 
     // Content should still be accessible
     await expect(page.locator('main')).toBeVisible();

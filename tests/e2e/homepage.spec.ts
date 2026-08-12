@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { PageHelper } from './helpers/page-helpers';
+import {
+  ensureDarkModeByToggle,
+  isDocumentDark,
+  waitForDarkModeHydration,
+} from './helpers/dark-mode-helpers';
 import { urls } from './fixtures/test-data';
 
 test.describe('Homepage and Navigation', () => {
@@ -46,32 +51,36 @@ test.describe('Homepage and Navigation', () => {
   });
 
   test('should have working footer links', async ({ page }) => {
-    await page.goto(urls.home);
+    await page.goto(urls.home, { waitUntil: 'domcontentloaded' });
     await pageHelper.waitForPageLoad();
 
     // Check for footer
     const footer = page.locator('footer, [role="contentinfo"]').first();
-    if (await footer.isVisible()) {
-      // Test privacy and terms links if they exist
-      const privacyLink = footer
-        .locator(
-          'a[href*="privacy"], a:has-text("פרטיות"), a:has-text("Privacy")'
-        )
-        .first();
-      if (await privacyLink.isVisible()) {
-        await privacyLink.click();
-        await expect(page).toHaveURL(urls.privacy);
-        await page.goBack();
-      }
+    if (!(await footer.isVisible().catch(() => false))) {
+      return;
+    }
 
-      const termsLink = footer
-        .locator('a[href*="terms"], a:has-text("תנאים"), a:has-text("Terms")')
-        .first();
-      if (await termsLink.isVisible()) {
-        await termsLink.click();
-        await expect(page).toHaveURL(urls.terms);
-        await page.goBack();
-      }
+    const privacyLink = footer
+      .locator(
+        'a[href*="privacy"], a:has-text("פרטיות"), a:has-text("Privacy")'
+      )
+      .first();
+    if (await privacyLink.isVisible().catch(() => false)) {
+      await Promise.all([
+        page.waitForURL(/privacy/, { timeout: 15000 }),
+        privacyLink.click(),
+      ]);
+      await page.goBack({ waitUntil: 'domcontentloaded' });
+    }
+
+    const termsLink = footer
+      .locator('a[href*="terms"], a:has-text("תנאים"), a:has-text("Terms")')
+      .first();
+    if (await termsLink.isVisible().catch(() => false)) {
+      await Promise.all([
+        page.waitForURL(/terms/, { timeout: 15000 }),
+        termsLink.click(),
+      ]);
     }
   });
 
@@ -131,74 +140,55 @@ test.describe('Homepage and Navigation', () => {
   test('should have proper dark mode toggle functionality', async ({
     page,
   }) => {
-    await page.goto(urls.home);
-    await pageHelper.waitForPageLoad();
+    await page.goto(urls.home, { waitUntil: 'domcontentloaded' });
+    await waitForDarkModeHydration(page);
 
-    // Look for dark mode toggle with improved selectors
     const darkModeToggle = page
       .locator(
-        '[data-testid="dark-mode-toggle"], ' +
-          'button[aria-label*="dark"], ' +
-          'button[aria-label*="light"], ' +
-          'button[aria-label*="mode"], ' +
-          'button:has-text("🌙"), ' +
-          'button:has-text("☀"), ' +
-          '.lucide-moon, ' +
-          '.lucide-sun'
+        'button[aria-label*="dark"], button[aria-label*="light"], button[aria-label*="mode"]'
       )
       .first();
 
-    if (await darkModeToggle.isVisible()) {
-      // Get initial state
-      const initialIsDark = await page.evaluate(() => {
-        return document.documentElement.classList.contains('dark');
-      });
+    const initialIsDark = await isDocumentDark(page);
+    const initialAriaLabel = await darkModeToggle.getAttribute('aria-label');
 
-      const initialAriaLabel = await darkModeToggle.getAttribute('aria-label');
-
-      // Verify initial state consistency
-      if (initialIsDark) {
-        expect(initialAriaLabel).toContain('light');
-      } else {
-        expect(initialAriaLabel).toContain('dark');
-      }
-
-      // Toggle dark mode
-      await darkModeToggle.click();
-      await page.waitForTimeout(300);
-
-      // Check if theme changed
-      const newIsDark = await page.evaluate(() => {
-        return document.documentElement.classList.contains('dark');
-      });
-
-      const newAriaLabel = await darkModeToggle.getAttribute('aria-label');
-
-      // Verify the toggle worked
-      expect(newIsDark).toBe(!initialIsDark);
-
-      // Verify aria-label updated correctly
-      if (newIsDark) {
-        expect(newAriaLabel).toContain('light');
-      } else {
-        expect(newAriaLabel).toContain('dark');
-      }
-
-      // Verify localStorage persistence
-      const savedTheme = await page.evaluate(() => {
-        return localStorage.getItem('darkMode');
-      });
-      expect(savedTheme).toBe(newIsDark.toString());
-
-      // Test that preference persists after page reload
-      await page.reload();
-      await pageHelper.waitForPageLoad();
-
-      const persistedIsDark = await page.evaluate(() => {
-        return document.documentElement.classList.contains('dark');
-      });
-      expect(persistedIsDark).toBe(newIsDark);
+    if (initialIsDark) {
+      expect(initialAriaLabel).toContain('light');
+    } else {
+      expect(initialAriaLabel).toContain('dark');
     }
+
+    await darkModeToggle.click();
+    await page.waitForFunction(
+      (wasDark) =>
+        document.documentElement.classList.contains('dark') !== wasDark,
+      initialIsDark
+    );
+
+    const newIsDark = await isDocumentDark(page);
+    expect(newIsDark).toBe(!initialIsDark);
+
+    const newAriaLabel = await darkModeToggle.getAttribute('aria-label');
+    if (newIsDark) {
+      expect(newAriaLabel).toContain('light');
+    } else {
+      expect(newAriaLabel).toContain('dark');
+    }
+
+    const savedTheme = await page.evaluate(() =>
+      localStorage.getItem('darkMode')
+    );
+    expect(savedTheme).toBe(newIsDark.toString());
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await waitForDarkModeHydration(page);
+    await page.waitForFunction(
+      (expected) =>
+        document.documentElement.classList.contains('dark') === expected,
+      newIsDark
+    );
+
+    expect(await isDocumentDark(page)).toBe(newIsDark);
   });
 
   test('should have proper color contrast in both modes', async ({ page }) => {
@@ -292,41 +282,18 @@ test.describe('Homepage and Navigation', () => {
   test('should maintain dark mode preference across navigation', async ({
     page,
   }) => {
-    await page.goto(urls.home);
-    await pageHelper.waitForPageLoad();
+    await page.goto(urls.home, { waitUntil: 'domcontentloaded' });
+    await ensureDarkModeByToggle(page);
 
-    const darkModeToggle = page.locator('button[aria-label*="mode"]').first();
+    const pagesToTest = [urls.about, urls.contact, urls.home];
 
-    if (await darkModeToggle.isVisible()) {
-      // Enable dark mode
-      const initialIsDark = await page.evaluate(() => {
-        return document.documentElement.classList.contains('dark');
-      });
-
-      if (!initialIsDark) {
-        await darkModeToggle.click();
-        await page.waitForTimeout(300);
-      }
-
-      // Verify dark mode is enabled
-      const isDarkEnabled = await page.evaluate(() => {
-        return document.documentElement.classList.contains('dark');
-      });
-      expect(isDarkEnabled).toBe(true);
-
-      // Navigate to different pages and verify dark mode persists
-      const pagesToTest = [urls.about, urls.contact, urls.home];
-
-      for (const url of pagesToTest) {
-        await page.goto(url);
-        await pageHelper.waitForPageLoad();
-
-        const isDarkPersisted = await page.evaluate(() => {
-          return document.documentElement.classList.contains('dark');
-        });
-
-        expect(isDarkPersisted).toBe(true);
-      }
+    for (const url of pagesToTest) {
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+      await waitForDarkModeHydration(page);
+      await page.waitForFunction(() =>
+        document.documentElement.classList.contains('dark')
+      );
+      expect(await isDocumentDark(page)).toBe(true);
     }
   });
 
@@ -394,33 +361,16 @@ test.describe('Homepage and Navigation', () => {
   });
 
   test('should handle browser refresh with dark mode', async ({ page }) => {
-    await page.goto(urls.home);
-    await pageHelper.waitForPageLoad();
+    await page.goto(urls.home, { waitUntil: 'domcontentloaded' });
+    await ensureDarkModeByToggle(page);
 
-    const darkModeToggle = page.locator('button[aria-label*="mode"]').first();
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await waitForDarkModeHydration(page);
+    await page.waitForFunction(() =>
+      document.documentElement.classList.contains('dark')
+    );
 
-    if (await darkModeToggle.isVisible()) {
-      // Enable dark mode
-      await darkModeToggle.click();
-      await page.waitForTimeout(300);
-
-      const isDarkBeforeRefresh = await page.evaluate(() => {
-        return document.documentElement.classList.contains('dark');
-      });
-
-      // Refresh the page
-      await page.reload();
-      await pageHelper.waitForPageLoad();
-
-      // Dark mode should persist after refresh
-      const isDarkAfterRefresh = await page.evaluate(() => {
-        return document.documentElement.classList.contains('dark');
-      });
-
-      expect(isDarkAfterRefresh).toBe(isDarkBeforeRefresh);
-    }
-
-    // Page should load normally after refresh
+    expect(await isDocumentDark(page)).toBe(true);
     await expect(page.locator('main')).toBeVisible();
     await expect(page).toHaveTitle(/YomU|יום-You/);
   });

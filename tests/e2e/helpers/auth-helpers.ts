@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { testUsers, urls } from '../fixtures/test-data';
+import { safeGoto } from './navigation';
 
 /** Clerk sign-in identifier field (email/username). */
 const clerkIdentifier = () =>
@@ -120,20 +121,51 @@ export class AuthHelper {
   async clearAuth() {
     await this.page.context().clearCookies();
     try {
+      // about:blank first avoids racing an in-flight Clerk redirect
+      await this.page.goto('about:blank', { waitUntil: 'domcontentloaded' });
       await this.page.goto(urls.home, {
         waitUntil: 'domcontentloaded',
         timeout: 15000,
       });
-      await this.page.evaluate(() => {
+      await this.page.evaluate(async () => {
         try {
           localStorage.clear();
           sessionStorage.clear();
         } catch {
           // ignore
         }
+        try {
+          // Clerk can persist client tokens in IndexedDB
+          const dbs = await indexedDB.databases?.();
+          if (dbs) {
+            await Promise.all(
+              dbs
+                .filter((db) => db.name)
+                .map(
+                  (db) =>
+                    new Promise<void>((resolve) => {
+                      const req = indexedDB.deleteDatabase(db.name!);
+                      req.onsuccess = () => resolve();
+                      req.onerror = () => resolve();
+                      req.onblocked = () => resolve();
+                    })
+                )
+            );
+          }
+        } catch {
+          // ignore
+        }
       });
+      await this.page.context().clearCookies();
     } catch {
       // ignore navigation/storage failures in auth teardown
     }
+  }
+
+  /**
+   * Navigate to a path without racing Clerk client redirects.
+   */
+  async gotoSettled(path: string) {
+    await safeGoto(this.page, path);
   }
 }
