@@ -91,6 +91,9 @@ vulnerability-report.json
 # Claude Code local settings (user-specific)
 .claude/
 
+# Local git worktrees
+.worktrees/
+
 .vercel
 .env*.local
 

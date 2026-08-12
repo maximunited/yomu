@@ -191,7 +191,89 @@ Edit `.husky/pre-commit` to change what runs before commits.
 
 Create environment-specific configurations in the CI scripts based on `NODE_ENV`.
 
-## 📚 Related Documentation
+## E2E Chromium Smoke (PR CI)
+
+PRs and `master` are gated by a **public Chromium-only** Playwright smoke in
+`.github/workflows/e2e-chromium-smoke.yml` (not inside `ci.yml`).
+
+| Trigger | When it runs |
+| ------- | ------------ |
+| `workflow_run` after successful `CI` | Same-repo `pull_request` (posts check **E2E Chromium Smoke** on the PR head SHA) |
+| `push` to `master` | Direct smoke on the merged/default branch |
+
+### Why not inside `ci.yml` on `pull_request`?
+
+Clerk’s Next.js middleware requires a **valid** `CLERK_SECRET_KEY` for public
+pages to boot (verified: omitting the key or using a dummy `sk_test_…`
+placeholder fails handshake / `Missing secretKey`). Injecting
+`secrets.CLERK_SECRET_KEY` into a `pull_request` job lets same-repo PR code
+(exfiltrate via a malicious `package.json` script, workflow edit, etc.).
+
+`workflow_run` always executes the workflow file from the **default branch**,
+so a PR cannot rewrite the secret-handling steps before the smoke runs.
+Fork PRs are skipped (`head_repository` must match this repo).
+
+**Amplifier:** never set `E2E_CLERK_USER_EMAIL` on this job. With a secret
+present, that env unlocks `global.setup` + `chromium-authenticated`. The
+workflow asserts it is unset and that keys are `pk_test_` / `sk_test_`.
+
+### Decision (approaches considered)
+
+| Approach | Pros | Cons | Chosen? |
+| -------- | ---- | ---- | ------- |
+| `workflow_run` (+ push `master`) with Clerk app secrets, no E2E user | Gates PRs without giving `pull_request` workflows the secret; default-branch workflow definition | Extra workflow; check reported via Checks API; forks skipped | Yes |
+| Parallel job in `ci.yml` on `pull_request` with `CLERK_SECRET_KEY` | Simple; visible on PR | Same-repo PR secret exfiltration | No (removed) |
+| Omit `CLERK_SECRET_KEY` / dummy placeholder on PR | No secret exposure | App does not boot (Clerk middleware) | No (verified broken) |
+| Secret-bearing e2e only on push `master` (no PR gate) | Safest secret posture | Does not gate PRs | No |
+| Postgres service + seed + authenticated specs | Deeper coverage | Needs `E2E_CLERK_*`; out of smoke scope | No (local/nightly later) |
+
+**webServer:** keep Playwright’s `npm run dev` (already in `playwright.config.ts`).
+CI sets `reuseExistingServer: false`, 120s timeout, `workers: 1`, `retries: 2`.
+
+**Browsers:** under `CI=true`, firefox/webkit/mobile projects are omitted unless
+`E2E_FULL_BROWSERS=1` (local/nightly). Authenticated projects still require
+`E2E_CLERK_USER_EMAIL` and are **not** set in this smoke.
+
+### Required GitHub Actions secrets
+
+| Secret | Purpose |
+| ------ | ------- |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | App + Clerk UI on public pages (`/sign-in`, redirects) |
+| `CLERK_SECRET_KEY` | Server-side Clerk for Next.js middleware |
+
+**MUST** be a dedicated Clerk **development** instance:
+
+- Publishable: `pk_test_…` only (never `pk_live_`)
+- Secret: `sk_test_…` only (never `sk_live_`)
+
+The smoke workflow fails closed if either key is missing the `_test_` prefix.
+Do **not** put production Clerk keys in GitHub Actions.
+
+Do **not** set `E2E_CLERK_USER_EMAIL` on the smoke job (that enables
+`chromium-authenticated` + `global.setup`).
+
+Branch protection: require the check name **E2E Chromium Smoke** (created by
+the `workflow_run` job for PRs).
+
+### Local commands
+
+```bash
+# Same as CI smoke (chromium public only)
+npm run test:e2e:ci
+
+# Explicit chromium project
+npm run test:e2e:chromium
+
+# Full multi-browser locally (default when CI unset)
+npm run test:e2e
+
+# Nightly-style multi-browser under CI env
+CI=true E2E_FULL_BROWSERS=1 npm run test:e2e
+```
+
+Install browsers once: `npx playwright install` (CI installs chromium only).
+
+---
 
 - [GitHub Actions Workflows](../.github/workflows/)
 - [Jest Testing Guide](./TESTING.md)

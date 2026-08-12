@@ -25,6 +25,8 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:ci": "playwright test --project=chromium",
     "test:e2e:mobile": "playwright test --project='Mobile Chrome' --project='Mobile Safari'",
     "test:e2e:accessibility": "playwright test tests/e2e/accessibility.spec.ts",
     "test:e2e:auth": "playwright test tests/e2e/auth.spec.ts",
