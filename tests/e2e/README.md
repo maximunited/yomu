@@ -22,8 +22,15 @@ tests/e2e/
 │   └── test-data.ts          # Test data constants and mock objects
 ├── helpers/
 │   ├── auth-helpers.ts       # Authentication helper functions
+│   ├── clerk-env.ts          # Load .env.local for Clerk testing
+│   ├── dob.ts                # Relative DOB helpers for golden path
+│   ├── e2e-db-guard.ts       # Fail-closed DATABASE_URL / seed opt-in guards
+│   ├── prisma-e2e.ts         # Prisma client for e2e seeds (requires guards)
+│   ├── seed-e2e-user.ts      # Hard-fail Clerk→Prisma DOB upsert
+│   ├── seed-benefit-golden-path.ts
 │   └── page-helpers.ts       # Common page interaction helpers
-├── screenshots/              # Screenshots captured during test failures
+├── global.setup.ts           # Clerk storageState + DOB seed
+├── *.authenticated.spec.ts   # Signed-in specs (storageState)
 ├── auth.spec.ts             # Authentication flow tests
 ├── homepage.spec.ts         # Homepage and navigation tests
 ├── dashboard.spec.ts        # Dashboard functionality tests
@@ -31,7 +38,7 @@ tests/e2e/
 ├── benefits.spec.ts         # Benefit usage and detail tests
 ├── accessibility.spec.ts    # Accessibility compliance tests
 ├── mobile.spec.ts          # Mobile responsiveness tests
-└── README.md               # This file
+└── README.md               # This document
 ```
 
 ## Available Commands
@@ -173,12 +180,58 @@ Tests simulate real user behavior:
 
 ## Authentication Strategy
 
-Since E2E tests run against a real application:
+Authenticated specs (`*.authenticated.spec.ts`) use `@clerk/testing` + Playwright
+`storageState` from `playwright/.clerk/user.json` (gitignored). Setup lives in
+`global.setup.ts` and only runs when `E2E_CLERK_USER_EMAIL` is set.
 
-1. **Mock authentication**: Tests use mock credentials that may not authenticate
-2. **State checking**: Tests verify the application's response to authentication attempts
-3. **Fallback testing**: If authentication fails, tests verify error handling
-4. **Conditional flows**: Tests adapt based on whether authentication succeeds
+### Required env (`.env.local`)
+
+Use a **dedicated Clerk e2e user** and a **disposable database** (local Docker
+Postgres preferred). Never point authenticated setup at production.
+
+| Variable | Purpose |
+| -------- | ------- |
+| `E2E_CLERK_USER_EMAIL` | Dedicated Clerk user for authenticated project (not a real customer) |
+| `CLERK_SECRET_KEY` / `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk API + testing token |
+| `DATABASE_URL` | Disposable DB for Prisma DOB + golden-path seed (setup **hard-fails** if seed fails) |
+| `E2E_ALLOW_DB_SEED` | Must be `1` before any e2e Prisma write (DOB upsert + golden-path brands) |
+| `E2E_ALLOW_REMOTE_DB` | Optional `1` only for a disposable remote DB (never production). Default allowlist: `localhost`, `127.0.0.1`, `::1`, `db`, `postgres`, `postgresql` |
+| `E2E_CLERK_USER_PASSWORD` | Optional; only needed if setup must create the Clerk user |
+
+Example (local Docker Postgres):
+
+```env
+E2E_CLERK_USER_EMAIL=e2e-yomu@example.com
+E2E_ALLOW_DB_SEED=1
+DATABASE_URL=postgresql://yomu:yomu@localhost:5432/yomu
+```
+
+Without `E2E_CLERK_USER_EMAIL`, Playwright skips the `chromium-authenticated`
+project entirely — public specs still run.
+
+### DOB + benefit golden path
+
+Setup upserts the Clerk e2e user into Prisma with a **relative DOB** (birthday
+10 days from today) so Active vs Upcoming stay deterministic without injecting a
+server clock. Specs under `*.authenticated.spec.ts` that exercise benefit
+windows (see `benefits-golden-path.authenticated.spec.ts`) seed dedicated
+`E2E Golden *` brands/benefits (`verified: false`) and assert Active Now /
+Coming Soon (and `remindEnabled` when feasible).
+
+Prisma writes are fail-closed: missing `E2E_ALLOW_DB_SEED=1`, a non-local
+`DATABASE_URL` without `E2E_ALLOW_REMOTE_DB=1`, DB down, or upsert errors all
+hard-fail authenticated setup — tests must not green-pass without benefit logic.
+
+```bash
+# Authenticated project only (needs env above)
+npx playwright test --project=chromium-authenticated
+
+# Golden-path benefit window spec
+npx playwright test tests/e2e/benefits-golden-path.authenticated.spec.ts --project=chromium-authenticated
+```
+
+Public (unauthenticated) specs ignore storage state and must keep working without
+Clerk e2e env.
 
 ## Accessibility Testing
 
