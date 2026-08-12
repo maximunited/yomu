@@ -28,13 +28,14 @@ describe('proxy PUBLIC_ROUTES', () => {
     expect(leaked).toBe(false);
   });
 
-  it('still allows webhooks and marketing surfaces', () => {
+  it('still allows webhooks, cron, and marketing surfaces', () => {
     expect(PUBLIC_ROUTES).toEqual(
       expect.arrayContaining([
         '/',
         '/sign-in(.*)',
         '/sign-up(.*)',
         '/api/webhooks(.*)',
+        '/api/cron(.*)',
       ])
     );
   });
