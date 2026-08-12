@@ -19,10 +19,26 @@ model User {
   apiKey            String             @default("key123")
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @default(now()) @updatedAt
-  customMemberships CustomMembership[]
-  notifications     Notification[]
-  usedBenefits      UsedBenefit[]
-  memberships       UserMembership[]
+  customMemberships    CustomMembership[]
+  notifications        Notification[]
+  usedBenefits         UsedBenefit[]
+  memberships          UserMembership[]
+  additionalBirthdays  AdditionalBirthday[]
+}
+
+/// Extra DOBs (spouse/kids/etc.) for multi-profile birthday benefit views.
+/// Anniversary stays on User.anniversaryDate — not duplicated here.
+model AdditionalBirthday {
+  id          String   @id @default(cuid())
+  userId      String
+  label       String
+  dateOfBirth DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("additional_birthdays")
 }
 
 model Brand {

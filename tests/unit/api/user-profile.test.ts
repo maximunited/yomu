@@ -93,6 +93,14 @@ describe('/api/user/profile', () => {
           dateOfBirth: true,
           anniversaryDate: true,
           profilePicture: true,
+          additionalBirthdays: {
+            orderBy: { createdAt: 'asc' },
+            select: {
+              id: true,
+              label: true,
+              dateOfBirth: true,
+            },
+          },
         },
       });
 
@@ -244,8 +252,107 @@ describe('/api/user/profile', () => {
         data: {
           name: 'Updated Name Only',
           dateOfBirth: undefined,
-          anniversaryDate: undefined,
           profilePicture: undefined,
+        },
+      });
+    });
+
+    it('should clear anniversaryDate when null is sent', async () => {
+      const mockUpdatedUser = {
+        id: 'session-user-id',
+        name: 'Test User',
+        email: 'test@example.com',
+        dateOfBirth: new Date('1990-01-01'),
+        anniversaryDate: null,
+        profilePicture: null,
+      };
+      prisma.user.update.mockResolvedValue(mockUpdatedUser);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/profile',
+        {
+          method: 'PUT',
+          body: JSON.stringify({
+            name: 'Test User',
+            dateOfBirth: '1990-01-01',
+            anniversaryDate: null,
+          }),
+        }
+      );
+      const response = await PUT(request);
+      expect(response.status).toBe(200);
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'session-user-id' },
+        data: {
+          name: 'Test User',
+          dateOfBirth: new Date('1990-01-01'),
+          anniversaryDate: null,
+          profilePicture: undefined,
+        },
+      });
+    });
+
+    it('should leave anniversaryDate unchanged when empty string is sent', async () => {
+      const mockUpdatedUser = {
+        id: 'session-user-id',
+        name: 'Test User',
+        email: 'test@example.com',
+        dateOfBirth: new Date('1990-01-01'),
+        anniversaryDate: new Date('2020-06-15'),
+        profilePicture: 'data:image/png;base64,abc',
+      };
+      prisma.user.update.mockResolvedValue(mockUpdatedUser);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/profile',
+        {
+          method: 'PUT',
+          body: JSON.stringify({
+            profilePicture: 'data:image/png;base64,abc',
+            anniversaryDate: '',
+          }),
+        }
+      );
+      const response = await PUT(request);
+      expect(response.status).toBe(200);
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'session-user-id' },
+        data: {
+          name: undefined,
+          dateOfBirth: undefined,
+          profilePicture: 'data:image/png;base64,abc',
+        },
+      });
+    });
+
+    it('should leave anniversaryDate unchanged when omitted on picture-only save', async () => {
+      const mockUpdatedUser = {
+        id: 'session-user-id',
+        name: 'Test User',
+        email: 'test@example.com',
+        dateOfBirth: new Date('1990-01-01'),
+        anniversaryDate: new Date('2020-06-15'),
+        profilePicture: 'data:image/png;base64,xyz',
+      };
+      prisma.user.update.mockResolvedValue(mockUpdatedUser);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/profile',
+        {
+          method: 'PUT',
+          body: JSON.stringify({
+            profilePicture: 'data:image/png;base64,xyz',
+          }),
+        }
+      );
+      const response = await PUT(request);
+      expect(response.status).toBe(200);
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'session-user-id' },
+        data: {
+          name: undefined,
+          dateOfBirth: undefined,
+          profilePicture: 'data:image/png;base64,xyz',
         },
       });
     });

@@ -6,6 +6,8 @@ import {
   isBenefitActive,
   getUpcomingBenefits,
   ALL_VALIDITY_TYPES,
+  getReferenceDateForBenefit,
+  isBenefitActiveForContext,
 } from '@/lib/benefit-validation';
 
 describe('Benefit Validation', () => {
@@ -726,6 +728,60 @@ describe('Benefit Validation', () => {
       expect(ALL_VALIDITY_TYPES).toHaveLength(
         Object.keys(VALIDITY_TYPES).length
       );
+    });
+  });
+
+  describe('BenefitDateContext helpers', () => {
+    const dob = new Date('1990-06-15');
+    const anniversary = new Date('2015-03-20');
+
+    it('routes anniversary validity types to anniversaryDate', () => {
+      expect(
+        getReferenceDateForBenefit('anniversary_exact_date', {
+          dateOfBirth: dob,
+          anniversaryDate: anniversary,
+        })
+      ).toEqual(anniversary);
+    });
+
+    it('routes birthday validity types to dateOfBirth', () => {
+      expect(
+        getReferenceDateForBenefit('birthday_entire_month', {
+          dateOfBirth: dob,
+          anniversaryDate: anniversary,
+        })
+      ).toEqual(dob);
+    });
+
+    it('activates anniversary benefits only with anniversaryDate', () => {
+      const benefit = { validityType: 'anniversary_entire_month' };
+      const onAnniversaryMonth = new Date('2024-03-10');
+      expect(
+        isBenefitActiveForContext(
+          benefit,
+          { dateOfBirth: dob, anniversaryDate: anniversary },
+          onAnniversaryMonth
+        )
+      ).toBe(true);
+      expect(
+        isBenefitActiveForContext(
+          benefit,
+          { dateOfBirth: dob, anniversaryDate: null },
+          onAnniversaryMonth
+        )
+      ).toBe(false);
+    });
+
+    it('activates birthday benefits for selected DOB independently of anniversary', () => {
+      const benefit = { validityType: 'birthday_exact_date' };
+      const familyDob = new Date('2010-08-13');
+      expect(
+        isBenefitActiveForContext(
+          benefit,
+          { dateOfBirth: familyDob, anniversaryDate: anniversary },
+          new Date('2024-08-13')
+        )
+      ).toBe(true);
     });
   });
 });

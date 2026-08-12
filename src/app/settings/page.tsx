@@ -33,6 +33,12 @@ interface UserProfile {
   profilePicture?: string;
 }
 
+interface AdditionalBirthdayRow {
+  id: string;
+  label: string;
+  dateOfBirth: string;
+}
+
 export default function SettingsPage() {
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -46,6 +52,12 @@ export default function SettingsPage() {
     anniversaryDate: '',
     profilePicture: '',
   });
+  const [additionalBirthdays, setAdditionalBirthdays] = useState<
+    AdditionalBirthdayRow[]
+  >([]);
+  const [newBirthdayLabel, setNewBirthdayLabel] = useState('');
+  const [newBirthdayDob, setNewBirthdayDob] = useState('');
+  const [isSavingBirthday, setIsSavingBirthday] = useState(false);
   const [notifications, setNotifications] = useState({
     email: true,
     push: true,
@@ -87,6 +99,24 @@ export default function SettingsPage() {
                     .split('T')[0]
                 : '',
             }));
+            if (Array.isArray(data.user.additionalBirthdays)) {
+              setAdditionalBirthdays(
+                data.user.additionalBirthdays.map(
+                  (b: {
+                    id: string;
+                    label: string;
+                    dateOfBirth: string | Date;
+                  }) => ({
+                    id: b.id,
+                    label: b.label,
+                    dateOfBirth:
+                      typeof b.dateOfBirth === 'string'
+                        ? b.dateOfBirth.split('T')[0]
+                        : new Date(b.dateOfBirth).toISOString().split('T')[0],
+                  })
+                )
+              );
+            }
           }
         }
       } catch (error) {
@@ -141,7 +171,10 @@ export default function SettingsPage() {
         body: JSON.stringify({
           name: profile.name,
           dateOfBirth: profile.dateOfBirth,
-          anniversaryDate: profile.anniversaryDate,
+          // Explicit null clears; empty form field = clear intent on full save
+          anniversaryDate: profile.anniversaryDate
+            ? profile.anniversaryDate
+            : null,
           profilePicture: profile.profilePicture,
         }),
       });
@@ -174,6 +207,59 @@ export default function SettingsPage() {
     }
   };
 
+  const handleAddAdditionalBirthday = async () => {
+    if (!newBirthdayLabel.trim() || !newBirthdayDob) return;
+    setIsSavingBirthday(true);
+    try {
+      const response = await fetch('/api/user/additional-birthdays', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          label: newBirthdayLabel.trim(),
+          dateOfBirth: newBirthdayDob,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const created = data.additionalBirthday;
+        setAdditionalBirthdays((prev) => [
+          ...prev,
+          {
+            id: created.id,
+            label: created.label,
+            dateOfBirth: new Date(created.dateOfBirth)
+              .toISOString()
+              .split('T')[0],
+          },
+        ]);
+        setNewBirthdayLabel('');
+        setNewBirthdayDob('');
+      } else {
+        const err = await response.json().catch(() => ({}));
+        if (err.message === 'additionalBirthdayLimitReached') {
+          alert(t('additionalBirthdayLimitReached'));
+        }
+      }
+    } catch (error) {
+      console.error('Error adding birthday:', error);
+    } finally {
+      setIsSavingBirthday(false);
+    }
+  };
+
+  const handleRemoveAdditionalBirthday = async (id: string) => {
+    try {
+      const response = await fetch(`/api/user/additional-birthdays/${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setAdditionalBirthdays((prev) => prev.filter((b) => b.id !== id));
+      }
+    } catch (error) {
+      console.error('Error removing birthday:', error);
+    }
+  };
+
   const handleLogout = () => {
     signOut({ redirectUrl: '/' });
   };
@@ -200,16 +286,14 @@ export default function SettingsPage() {
 
   const saveProfilePicture = async (profilePicture: string) => {
     try {
+      // Partial save: omit anniversaryDate so '' cannot clear an existing value
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: profile.name,
-          dateOfBirth: profile.dateOfBirth,
-          anniversaryDate: profile.anniversaryDate,
-          profilePicture: profilePicture,
+          profilePicture,
         }),
       });
 
@@ -392,6 +476,73 @@ export default function SettingsPage() {
                     disabled={!isEditing}
                     className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                   />
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-gray-200 dark:border-gray-600">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+                  {t('additionalBirthdays')}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  {t('additionalBirthdaysDescription')}
+                </p>
+                {additionalBirthdays.length === 0 ? (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    {t('noAdditionalBirthdays')}
+                  </p>
+                ) : (
+                  <ul className="space-y-3 mb-4">
+                    {additionalBirthdays.map((b) => (
+                      <li
+                        key={b.id}
+                        className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 dark:border-gray-600 px-3 py-2"
+                      >
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">
+                            {b.label}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {b.dateOfBirth}
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveAdditionalBirthday(b.id)}
+                        >
+                          {t('removeAdditionalBirthday')}
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Input
+                    placeholder={t('additionalBirthdayLabelPlaceholder')}
+                    value={newBirthdayLabel}
+                    onChange={(e) => setNewBirthdayLabel(e.target.value)}
+                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    aria-label={t('additionalBirthdayLabel')}
+                  />
+                  <Input
+                    type="date"
+                    value={newBirthdayDob}
+                    onChange={(e) => setNewBirthdayDob(e.target.value)}
+                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    aria-label={t('additionalBirthdayDob')}
+                  />
+                  <Button
+                    onClick={handleAddAdditionalBirthday}
+                    disabled={
+                      isSavingBirthday ||
+                      !newBirthdayLabel.trim() ||
+                      !newBirthdayDob
+                    }
+                  >
+                    {isSavingBirthday
+                      ? t('saving')
+                      : t('addAdditionalBirthday')}
+                  </Button>
                 </div>
               </div>
 

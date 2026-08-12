@@ -213,6 +213,17 @@ export async function POST() {
         CONSTRAINT "used_benefits_benefitId_fkey" FOREIGN KEY ("benefitId") REFERENCES "benefits" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "used_benefits_userId_benefitId_key" UNIQUE ("userId", "benefitId")
       )`,
+
+      // additional_birthdays (family / other DOBs)
+      `CREATE TABLE IF NOT EXISTS "additional_birthdays" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "userId" TEXT NOT NULL,
+        "label" TEXT NOT NULL,
+        "dateOfBirth" TIMESTAMP(3) NOT NULL,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "additional_birthdays_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+      )`,
     ];
 
     // Execute each statement individually
@@ -247,6 +258,7 @@ export async function POST() {
         'user_memberships',
         'notifications',
         'used_benefits',
+        'additional_birthdays',
       ],
     });
   } catch (error) {

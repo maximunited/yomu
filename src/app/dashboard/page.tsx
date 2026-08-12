@@ -24,8 +24,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import {
-  isBenefitActive,
-  getUpcomingBenefits,
+  isBenefitActiveForContext,
+  isBenefitUpcomingForContext,
   getValidityDisplayText,
 } from '@/lib/benefit-validation';
 import {
@@ -41,6 +41,13 @@ import {
   type RedemptionChecklistKey,
 } from '@/lib/dashboard-value-density';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveSelectedBenefitDates } from '@/lib/family-profile-context';
+
+interface AdditionalBirthday {
+  id: string;
+  label: string;
+  dateOfBirth: string;
+}
 
 interface Benefit {
   id: string;
@@ -91,6 +98,11 @@ function DashboardPageContent() {
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [userMemberships, setUserMemberships] = useState<UserMembership[]>([]);
   const [userDOB, setUserDOB] = useState<Date | null>(null);
+  const [anniversaryDate, setAnniversaryDate] = useState<Date | null>(null);
+  const [additionalBirthdays, setAdditionalBirthdays] = useState<
+    AdditionalBirthday[]
+  >([]);
+  const [selectedProfileId, setSelectedProfileId] = useState<string>('self');
   const [userProfilePicture, setUserProfilePicture] = useState<string | null>(
     null
   );
@@ -117,6 +129,52 @@ function DashboardPageContent() {
     if (isLoaded && isSignedIn) {
       fetchUserData();
     }
+  }, [isLoaded, isSignedIn]);
+
+  // Refresh family DOBs when returning from settings (deleted profiles / anniversary)
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
+    const refreshFamilyProfiles = async () => {
+      try {
+        const profileResponse = await fetch('/api/user/profile');
+        if (!profileResponse.ok) return;
+        const profileData = await profileResponse.json();
+        if (!profileData.user) return;
+
+        if (profileData.user.dateOfBirth) {
+          setUserDOB(new Date(profileData.user.dateOfBirth));
+        }
+        if (profileData.user.anniversaryDate) {
+          setAnniversaryDate(new Date(profileData.user.anniversaryDate));
+        } else {
+          setAnniversaryDate(null);
+        }
+        const extras = Array.isArray(profileData.user.additionalBirthdays)
+          ? profileData.user.additionalBirthdays
+          : [];
+        setAdditionalBirthdays(extras);
+        setSelectedProfileId((prev) =>
+          prev === 'self' || extras.some((b: { id: string }) => b.id === prev)
+            ? prev
+            : 'self'
+        );
+      } catch (error) {
+        console.error('Error refreshing family profiles:', error);
+      }
+    };
+
+    const onFocusOrVisible = () => {
+      if (document.visibilityState === 'hidden') return;
+      void refreshFamilyProfiles();
+    };
+
+    window.addEventListener('focus', onFocusOrVisible);
+    document.addEventListener('visibilitychange', onFocusOrVisible);
+    return () => {
+      window.removeEventListener('focus', onFocusOrVisible);
+      document.removeEventListener('visibilitychange', onFocusOrVisible);
+    };
   }, [isLoaded, isSignedIn]);
 
   // Apply query-parameter driven filters (e.g., from notifications)
@@ -147,6 +205,20 @@ function DashboardPageContent() {
           setUserDOB(new Date(profileData.user.dateOfBirth));
           console.log('Set user DOB:', new Date(profileData.user.dateOfBirth));
         }
+        if (profileData.user.anniversaryDate) {
+          setAnniversaryDate(new Date(profileData.user.anniversaryDate));
+        } else {
+          setAnniversaryDate(null);
+        }
+        const extras = Array.isArray(profileData.user.additionalBirthdays)
+          ? profileData.user.additionalBirthdays
+          : [];
+        setAdditionalBirthdays(extras);
+        setSelectedProfileId((prev) =>
+          prev === 'self' || extras.some((b: { id: string }) => b.id === prev)
+            ? prev
+            : 'self'
+        );
         if (profileData.user.profilePicture) {
           setUserProfilePicture(profileData.user.profilePicture);
           console.log('Set user profile picture');
@@ -665,19 +737,36 @@ function DashboardPageContent() {
   const currentMonth = new Date().getMonth();
   const currentDay = new Date().getDate();
 
+  const {
+    dateOfBirth: selectedBirthday,
+    anniversaryDate: contextAnniversary,
+    effectiveProfileId,
+  } = resolveSelectedBenefitDates({
+    selectedProfileId,
+    userDOB,
+    anniversaryDate,
+    additionalBirthdays,
+  });
+
+  const benefitDateContext = {
+    dateOfBirth: selectedBirthday,
+    anniversaryDate: contextAnniversary,
+  };
+
   // Debug logging
   console.log('Current month:', currentMonth, 'Current day:', currentDay);
   console.log('User DOB:', userDOB);
-  if (userDOB) {
+  console.log('Selected profile:', effectiveProfileId, selectedBirthday);
+  if (selectedBirthday) {
     console.log(
-      'User birthday month:',
-      userDOB.getMonth(),
-      'User birthday day:',
-      userDOB.getDate()
+      'Selected birthday month:',
+      selectedBirthday.getMonth(),
+      'day:',
+      selectedBirthday.getDate()
     );
   }
 
-  // Filter benefits based on validity type and user's birthday
+  // Filter benefits based on validity type and selected profile dates
   console.log('=== Filtering benefits ===');
   console.log('Total benefits:', benefits.length);
   console.log(
@@ -686,13 +775,13 @@ function DashboardPageContent() {
   );
 
   const activeBenefits = benefits.filter((b) => {
-    return isBenefitActive(b, userDOB);
+    return isBenefitActiveForContext(b, benefitDateContext);
   });
 
   console.log('Active benefits count:', activeBenefits.length);
 
   const upcomingBenefits = benefits.filter((b) => {
-    return getUpcomingBenefits(b, userDOB);
+    return isBenefitUpcomingForContext(b, benefitDateContext);
   });
 
   console.log('Upcoming benefits count:', upcomingBenefits.length);
@@ -872,6 +961,30 @@ function DashboardPageContent() {
           <p className="text-gray-600 dark:text-gray-300 mb-6">
             {t('hereAreYourBirthdayBenefits')}
           </p>
+
+          {additionalBirthdays.length > 0 && (
+            <div className="mb-6 max-w-md mx-auto">
+              <label
+                htmlFor="benefit-profile"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                {t('viewingBenefitsFor')}
+              </label>
+              <select
+                id="benefit-profile"
+                value={selectedProfileId}
+                onChange={(e) => setSelectedProfileId(e.target.value)}
+                className="w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2"
+              >
+                <option value="self">{t('myBirthday')}</option>
+                {additionalBirthdays.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Membership Summary */}
           <div className="bg-white rounded-lg p-4 mb-6 max-w-md mx-auto">
