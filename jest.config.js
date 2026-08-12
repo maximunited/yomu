@@ -11,6 +11,7 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   testPathIgnorePatterns: [
+    '/.worktrees/',
     '/.next/',
     '/node_modules/',
     '/tests/utils/',

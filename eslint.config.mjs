@@ -21,6 +21,7 @@ export default tseslint.config(
       'playwright/.clerk/**',
       '.wolf/**',
       '.codegraph/**',
+      '.worktrees/**',
       '.cursor/**',
       '*.config.js',
       '*.config.mjs',
