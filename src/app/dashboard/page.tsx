@@ -26,7 +26,11 @@ import {
 import {
   isBenefitActiveForContext,
   isBenefitUpcomingForContext,
+  isAnniversaryValidityType,
   getValidityDisplayText,
+  isSameLocalCalendarDay,
+  localCalendarDayKey,
+  type BenefitWindowStatus,
 } from '@/lib/benefit-validation';
 import {
   compareActiveBenefits,
@@ -73,6 +77,8 @@ interface Benefit {
   isFree?: boolean;
   verified?: boolean;
   lastChecked?: string | null;
+  /** Server-computed Active/Upcoming window; prefer over client filter when set. */
+  windowStatus?: BenefitWindowStatus;
 }
 
 interface UserMembership {
@@ -96,6 +102,12 @@ function DashboardPageContent() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const [benefits, setBenefits] = useState<Benefit[]>([]);
+  const [benefitsEvaluatedAt, setBenefitsEvaluatedAt] = useState<Date | null>(
+    null
+  );
+  const [benefitsFetchedLocalDay, setBenefitsFetchedLocalDay] = useState<
+    string | null
+  >(null);
   const [userMemberships, setUserMemberships] = useState<UserMembership[]>([]);
   const [userDOB, setUserDOB] = useState<Date | null>(null);
   const [anniversaryDate, setAnniversaryDate] = useState<Date | null>(null);
@@ -176,6 +188,28 @@ function DashboardPageContent() {
       document.removeEventListener('visibilitychange', onFocusOrVisible);
     };
   }, [isLoaded, isSignedIn]);
+
+  // Refetch when the local calendar day rolls (tab focus / visibility).
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !benefitsFetchedLocalDay) return;
+
+    const maybeRefetchForNewDay = () => {
+      if (localCalendarDayKey() !== benefitsFetchedLocalDay) {
+        void fetchUserData();
+      }
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') maybeRefetchForNewDay();
+    };
+
+    window.addEventListener('focus', maybeRefetchForNewDay);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('focus', maybeRefetchForNewDay);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [isLoaded, isSignedIn, benefitsFetchedLocalDay]);
 
   // Apply query-parameter driven filters (e.g., from notifications)
   useEffect(() => {
@@ -285,6 +319,12 @@ function DashboardPageContent() {
         console.log('Filtered benefits count:', userBenefits.length);
 
         setBenefits(userBenefits);
+        setBenefitsFetchedLocalDay(localCalendarDayKey());
+        if (benefitsData.evaluatedAt) {
+          setBenefitsEvaluatedAt(new Date(benefitsData.evaluatedAt));
+        } else {
+          setBenefitsEvaluatedAt(null);
+        }
       } else {
         console.log('Benefits response not ok:', await benefitsResponse.text());
         setErrorMessage(t('profileLoadError'));
@@ -774,13 +814,36 @@ function DashboardPageContent() {
     benefits.map((b) => ({ id: b.id, validityType: b.validityType }))
   );
 
+  // Trust API windowStatus only while evaluation day matches the client's local day.
+  // After midnight (before refetch), or non-self profiles, fall back to client context filters.
+  const trustServerWindowStatus =
+    benefitsEvaluatedAt != null &&
+    isSameLocalCalendarDay(benefitsEvaluatedAt, new Date());
+
   const activeBenefits = benefits.filter((b) => {
+    // API windowStatus is for the signed-in user's DOB only (self profile).
+    if (
+      effectiveProfileId === 'self' &&
+      !isAnniversaryValidityType(b.validityType) &&
+      b.windowStatus != null &&
+      trustServerWindowStatus
+    ) {
+      return b.windowStatus === 'active';
+    }
     return isBenefitActiveForContext(b, benefitDateContext);
   });
 
   console.log('Active benefits count:', activeBenefits.length);
 
   const upcomingBenefits = benefits.filter((b) => {
+    if (
+      effectiveProfileId === 'self' &&
+      !isAnniversaryValidityType(b.validityType) &&
+      b.windowStatus != null &&
+      trustServerWindowStatus
+    ) {
+      return b.windowStatus === 'upcoming';
+    }
     return isBenefitUpcomingForContext(b, benefitDateContext);
   });
 
