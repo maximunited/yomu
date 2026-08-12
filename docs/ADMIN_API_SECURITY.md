@@ -32,3 +32,7 @@ Auth is mocked (`@clerk/nextjs/server` or `requireAdmin`). Playwright is not req
 2. Set `ADMIN_USER_IDS=user_xxx` (comma-separated Clerk user ids).
 
 Never put seed/setup/test routes back on the public allowlist.
+
+## Related: reminders cron
+
+Daily benefit reminders use `/api/cron/reminders` (Clerk-public like webhooks) gated by `CRON_SECRET` Bearer **or** `requireAdmin()`. See [REMINDERS.md](./REMINDERS.md).
