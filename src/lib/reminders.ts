@@ -64,8 +64,52 @@ export function normalizeValidityType(validityType: string): string {
 }
 
 /**
+ * Start of the activation window that contains `currentDate`, or null
+ * if today is outside every nearby window.
+ */
+export function getActivationWindowStart(
+  validityType: string,
+  userDOB: Date,
+  currentDate: Date = new Date()
+): Date | null {
+  const normalized = normalizeValidityType(validityType);
+  if (normalized === 'always') return null;
+
+  const offsets = REMINDER_WINDOW_OFFSETS[normalized];
+  if (!offsets) return null;
+
+  const today = startOfLocalDay(currentDate);
+  const y = today.getFullYear();
+
+  for (const year of [y - 1, y, y + 1]) {
+    let windowStart: Date;
+    let windowEnd: Date;
+    if (offsets.entireMonth) {
+      windowStart = new Date(year, userDOB.getMonth(), 1);
+      windowEnd = new Date(year, userDOB.getMonth() + 1, 0);
+    } else {
+      const birthday = getObservedBirthday(userDOB, year);
+      windowStart = addDays(birthday, -offsets.daysBefore);
+      windowEnd = addDays(birthday, offsets.daysAfter);
+    }
+
+    const start = startOfLocalDay(windowStart);
+    const end = startOfLocalDay(windowEnd);
+    if (
+      today.getTime() >= start.getTime() &&
+      today.getTime() <= end.getTime()
+    ) {
+      return start;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Next calendar day the benefit becomes Active for this DOB
- * (or today if already active). Null when not remindable.
+ * (or the start of the current window if already active).
+ * Null when not remindable.
  */
 export function getNextBenefitActivationDate(
   validityType: string,
@@ -78,8 +122,13 @@ export function getNextBenefitActivationDate(
   const offsets = REMINDER_WINDOW_OFFSETS[normalized];
   if (!offsets) return null;
 
+  // While active, return window *start* (not today) so daysUntil === 0
+  // only on the first active day — avoids daily reminder_active spam.
   if (isBenefitActive({ validityType: normalized }, userDOB, currentDate)) {
-    return startOfLocalDay(currentDate);
+    return (
+      getActivationWindowStart(normalized, userDOB, currentDate) ??
+      startOfLocalDay(currentDate)
+    );
   }
 
   const today = startOfLocalDay(currentDate);
@@ -103,8 +152,8 @@ export function getNextBenefitActivationDate(
 }
 
 /**
- * Days until Active (0 = active today / already active).
- * Null when validity type is not remindable.
+ * Days until Active (0 = first day of the active window; negative = later
+ * in the same window; positive = upcoming). Null when not remindable.
  */
 export function getDaysUntilBenefitActive(
   validityType: string,
@@ -237,6 +286,7 @@ export function collectReminderCandidates(
       );
       if (daysUntil === null) continue;
 
+      // First day of the activation window only (not every day while Active).
       if (daysUntil === 0 && notifyOnActive) {
         out.push({
           userId: membership.user.id,
@@ -393,12 +443,38 @@ export async function runReminderPipeline(
 
   for (const candidate of candidates) {
     try {
+      // Upcoming: same calendar day. Active: since window open (defense in depth
+      // if a candidate ever slipped through mid-window).
+      let createdAtRange = dayRange;
+      if (candidate.reminderType === REMINDER_TYPE_ACTIVE) {
+        const membership = memberships.find(
+          (m) => m.user.id === candidate.userId
+        );
+        const dob = membership?.user.dateOfBirth;
+        if (dob) {
+          const windowStart = getActivationWindowStart(
+            candidate.validityType,
+            dob,
+            currentDate
+          );
+          if (windowStart) {
+            createdAtRange = {
+              gte: startOfLocalDay(windowStart),
+              lt: addDays(startOfLocalDay(currentDate), 1),
+            };
+          }
+        }
+      }
+
       const existing = await db.notification.findFirst({
         where: {
           userId: candidate.userId,
           benefitId: candidate.benefitId,
           type: candidate.reminderType,
-          createdAt: { gte: dayRange.gte, lt: dayRange.lt },
+          createdAt: {
+            gte: createdAtRange.gte,
+            lt: createdAtRange.lt,
+          },
         },
         select: { id: true },
       });

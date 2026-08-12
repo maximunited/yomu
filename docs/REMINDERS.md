@@ -19,8 +19,8 @@ Push / WhatsApp are **not** wired (settings UI toggles only; no half-built sende
 1. Load active memberships with `remindEnabled: true` and brand benefits.
 2. Reuse `isBenefitActive` / observed-birthday windows from `src/lib/benefit-validation.ts` via `src/lib/reminders.ts`.
 3. If days-until-Active ∈ lead days (default `7,3,1` via `REMINDER_LEAD_DAYS`) → create `reminder_upcoming`.
-4. If Active today and `REMINDER_NOTIFY_ON_ACTIVE` is truthy (default) → create `reminder_active`.
-5. Dedupe: same `userId` + `benefitId` + `type` on the same local calendar day → skip.
+4. If today is the **first** day of Active and `REMINDER_NOTIFY_ON_ACTIVE` is truthy (default) → create `reminder_active` (not every day of a multi-day window).
+5. Dedupe: upcoming = same local calendar day; active = any `reminder_active` for that user+benefit since the window opened → skip.
 6. Optional email when `RESEND_API_KEY` + `RESEND_FROM_EMAIL` + user email are set.
 
 `remindEnabled: false` memberships are never scanned (`where: { remindEnabled: true }` and a second guard in `collectReminderCandidates`).

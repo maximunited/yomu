@@ -79,6 +79,14 @@ describe('getDaysUntilBenefitActive', () => {
     );
   });
 
+  it('returns negative daysUntil mid entire-month window (not 0)', () => {
+    const dob = new Date(1990, 5, 15);
+    const june15 = new Date(2026, 5, 15);
+    expect(
+      getDaysUntilBenefitActive('birthday_entire_month', dob, june15)
+    ).toBe(-14);
+  });
+
   it('accounts for daysBefore on week window', () => {
     const dob = new Date(1990, 5, 15);
     // Window opens June 8 (birthday - 7)
@@ -106,6 +114,25 @@ describe('getDaysUntilBenefitActive', () => {
     expect(next?.getFullYear()).toBe(2026);
     expect(next?.getMonth()).toBe(5);
     expect(next?.getDate()).toBe(15);
+  });
+
+  it('returns negative daysUntil after the first active day of a window', () => {
+    const dob = new Date(1990, 5, 15);
+    // Window June 8–22; mid-window June 15 → days until start = -7
+    expect(
+      getDaysUntilBenefitActive(
+        'birthday_week_before_after',
+        dob,
+        new Date(2026, 5, 15)
+      )
+    ).toBe(-7);
+    expect(
+      getNextBenefitActivationDate(
+        'birthday_week_before_after',
+        dob,
+        new Date(2026, 5, 15)
+      )?.getDate()
+    ).toBe(8);
   });
 });
 
@@ -162,6 +189,142 @@ describe('collectReminderCandidates', () => {
     });
     expect(candidates).toHaveLength(1);
     expect(candidates[0].reminderType).toBe(REMINDER_TYPE_ACTIVE);
+  });
+
+  it('emits active only on first day of a multi-day window, not mid-window', () => {
+    const dob = new Date(1990, 5, 15);
+    // week_before_after: window June 8–22 for birthday June 15
+    const firstActive = new Date(2026, 5, 8);
+    const midWindow = new Date(2026, 5, 15);
+    const lateWindow = new Date(2026, 5, 20);
+    const m = membership({
+      dob,
+      benefits: [
+        {
+          id: 'ben1',
+          title: 'Free dessert',
+          validityType: 'birthday_week_before_after',
+          isActive: true,
+        },
+      ],
+    });
+
+    expect(
+      collectReminderCandidates([m], {
+        currentDate: firstActive,
+        notifyOnActive: true,
+        leadDays: [7, 3, 1],
+      })
+    ).toEqual([
+      expect.objectContaining({
+        reminderType: REMINDER_TYPE_ACTIVE,
+        daysUntilActive: 0,
+      }),
+    ]);
+
+    expect(
+      collectReminderCandidates([m], {
+        currentDate: midWindow,
+        notifyOnActive: true,
+        leadDays: [7, 3, 1],
+      })
+    ).toHaveLength(0);
+
+    expect(
+      collectReminderCandidates([m], {
+        currentDate: lateWindow,
+        notifyOnActive: true,
+        leadDays: [7, 3, 1],
+      })
+    ).toHaveLength(0);
+  });
+
+  it('emits active only on the 1st for entire-month windows', () => {
+    const dob = new Date(1990, 5, 15);
+    const m = membership({
+      dob,
+      benefits: [
+        {
+          id: 'ben1',
+          title: 'Month gift',
+          validityType: 'birthday_entire_month',
+          isActive: true,
+        },
+      ],
+    });
+
+    expect(
+      collectReminderCandidates([m], {
+        currentDate: new Date(2026, 5, 1),
+        notifyOnActive: true,
+        leadDays: [],
+      })
+    ).toHaveLength(1);
+
+    expect(
+      collectReminderCandidates([m], {
+        currentDate: new Date(2026, 5, 15),
+        notifyOnActive: true,
+        leadDays: [],
+      })
+    ).toHaveLength(0);
+  });
+
+  it('does not spam reminder_active across every day of birthday_entire_month', () => {
+    const dob = new Date(1990, 5, 15);
+    const m = membership({
+      dob,
+      benefits: [
+        {
+          id: 'ben1',
+          title: 'Month gift',
+          validityType: 'birthday_entire_month',
+          isActive: true,
+        },
+      ],
+    });
+
+    const activeDays: number[] = [];
+    for (let day = 1; day <= 30; day += 1) {
+      const candidates = collectReminderCandidates([m], {
+        currentDate: new Date(2026, 5, day),
+        notifyOnActive: true,
+        leadDays: [7, 3, 1],
+      });
+      const actives = candidates.filter(
+        (c) => c.reminderType === REMINDER_TYPE_ACTIVE
+      );
+      if (actives.length > 0) activeDays.push(day);
+    }
+
+    expect(activeDays).toEqual([1]);
+  });
+
+  it('keeps lead-day upcoming reminders unchanged before a multi-day window', () => {
+    const dob = new Date(1990, 5, 15);
+    // Window opens June 8; 7 days before that is June 1
+    const sevenBeforeOpen = new Date(2026, 5, 1);
+    const m = membership({
+      dob,
+      benefits: [
+        {
+          id: 'ben1',
+          title: 'Free dessert',
+          validityType: 'birthday_week_before_after',
+          isActive: true,
+        },
+      ],
+    });
+
+    const candidates = collectReminderCandidates([m], {
+      currentDate: sevenBeforeOpen,
+      leadDays: [7, 3, 1],
+      notifyOnActive: true,
+      language: 'en',
+    });
+    expect(candidates).toHaveLength(1);
+    expect(candidates[0].reminderType).toBe(REMINDER_TYPE_UPCOMING);
+    expect(candidates[0].daysUntilActive).toBe(7);
   });
 
   it('skips active reminder when notifyOnActive is false', () => {
@@ -282,5 +445,50 @@ describe('runReminderPipeline', () => {
         }),
       })
     );
+  });
+
+  it('does not create reminder_active every day across a multi-day window', async () => {
+    const m = membership({
+      dob: new Date(1990, 5, 15),
+      benefits: [
+        {
+          id: 'ben1',
+          title: 'Free dessert',
+          validityType: 'birthday_week_before_after',
+          isActive: true,
+        },
+      ],
+    });
+    const db: ReminderPrisma = {
+      userMembership: { findMany: jest.fn().mockResolvedValue([m]) },
+      notification: {
+        findFirst: jest.fn().mockResolvedValue(null),
+        create: jest.fn().mockResolvedValue({ id: 'n1' }),
+      },
+    };
+
+    const firstDay = await runReminderPipeline(db, {
+      currentDate: new Date(2026, 5, 8),
+      notifyOnActive: true,
+      leadDays: [7, 3, 1],
+      language: 'en',
+      sendEmail: async () => false,
+    });
+    expect(firstDay.candidates).toBe(1);
+    expect(firstDay.created).toBe(1);
+
+    for (const day of [9, 12, 15, 20, 22]) {
+      (db.notification.create as jest.Mock).mockClear();
+      const mid = await runReminderPipeline(db, {
+        currentDate: new Date(2026, 5, day),
+        notifyOnActive: true,
+        leadDays: [7, 3, 1],
+        language: 'en',
+        sendEmail: async () => false,
+      });
+      expect(mid.candidates).toBe(0);
+      expect(mid.created).toBe(0);
+      expect(db.notification.create).not.toHaveBeenCalled();
+    }
   });
 });
