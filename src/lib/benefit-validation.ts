@@ -145,20 +145,20 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
     displayText: 'validity3DaysAfter',
   },
 
-  // Anniversary benefits (for testing purposes, uses userDOB as anniversary date)
+  // Anniversary benefits — callers should pass anniversaryDate as the reference date
   anniversary_exact_date: {
     validityType: 'anniversary_exact_date',
     description: 'Only valid on the exact anniversary date',
-    validationLogic: (userDOB, currentDate) =>
-      isExactBirthday(userDOB, currentDate),
+    validationLogic: (anniversaryDate, currentDate) =>
+      isExactBirthday(anniversaryDate, currentDate),
     displayText: 'validOnlyOnBirthday',
   },
 
   anniversary_entire_month: {
     validityType: 'anniversary_entire_month',
     description: 'Valid for the entire anniversary month',
-    validationLogic: (userDOB, currentDate) => {
-      return userDOB.getMonth() === currentDate.getMonth();
+    validationLogic: (anniversaryDate, currentDate) => {
+      return anniversaryDate.getMonth() === currentDate.getMonth();
     },
     displayText: 'validForEntireMonth',
   },
@@ -166,8 +166,8 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
   anniversary_week_before_after: {
     validityType: 'anniversary_week_before_after',
     description: 'Valid for a week before and after the anniversary',
-    validationLogic: (userDOB, currentDate) =>
-      isWithinBirthdayWindow(userDOB, currentDate, 7, 7),
+    validationLogic: (anniversaryDate, currentDate) =>
+      isWithinBirthdayWindow(anniversaryDate, currentDate, 7, 7),
     displayText: 'validForWeek',
   },
 };
@@ -368,3 +368,53 @@ export function isBenefitActive(
 
 // Export all validity types for reference
 export const ALL_VALIDITY_TYPES = Object.keys(VALIDITY_TYPES);
+
+export function isAnniversaryValidityType(validityType: string): boolean {
+  const normalized = LEGACY_VALIDITY_TYPES[validityType] || validityType;
+  return normalized.startsWith('anniversary_');
+}
+
+/** Dates used when evaluating benefits for a selected profile. */
+export type BenefitDateContext = {
+  dateOfBirth: Date | null;
+  anniversaryDate?: Date | null;
+};
+
+/**
+ * Pick DOB vs anniversaryDate for a validity type.
+ * Birthday (+ always) → dateOfBirth; anniversary_* → anniversaryDate.
+ */
+export function getReferenceDateForBenefit(
+  validityType: string,
+  context: BenefitDateContext
+): Date | null {
+  if (isAnniversaryValidityType(validityType)) {
+    return context.anniversaryDate ?? null;
+  }
+  return context.dateOfBirth;
+}
+
+export function isBenefitActiveForContext(
+  benefitOrValidityType: string | { validityType: string },
+  context: BenefitDateContext,
+  currentDate: Date = new Date()
+): boolean {
+  const validityType =
+    typeof benefitOrValidityType === 'string'
+      ? benefitOrValidityType
+      : benefitOrValidityType.validityType;
+  return isBenefitActive(
+    benefitOrValidityType,
+    getReferenceDateForBenefit(validityType, context),
+    currentDate
+  );
+}
+
+export function isBenefitUpcomingForContext(
+  benefit: { id?: string; validityType: string; [key: string]: any },
+  context: BenefitDateContext,
+  currentDate: Date = new Date()
+): boolean {
+  const ref = getReferenceDateForBenefit(benefit.validityType, context);
+  return getUpcomingBenefits(benefit, ref, currentDate);
+}

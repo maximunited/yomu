@@ -206,11 +206,15 @@ The system includes comprehensive error handling:
 
 ## Future Enhancements
 
-1. **Anniversary Support**: Full implementation of anniversary-based benefits
-2. **Custom Validity Periods**: Allow custom day ranges
-3. **Seasonal Benefits**: Benefits tied to seasons or holidays
-4. **Geographic Benefits**: Location-based benefit availability
-5. **Dynamic Pricing**: Benefits that change based on user behavior
+1. **Custom Validity Periods**: Allow custom day ranges
+2. **Seasonal Benefits**: Benefits tied to seasons or holidays
+3. **Geographic Benefits**: Location-based benefit availability
+4. **Dynamic Pricing**: Benefits that change based on user behavior
+
+## Multi-DOB / Anniversary (shipped)
+
+- `User.anniversaryDate` drives `anniversary_*` validity types via `isBenefitActiveForContext`.
+- `AdditionalBirthday` rows (label + DOB) unlock family/other birthday views; dashboard profile switcher selects the active DOB.
 
 ## Support
 

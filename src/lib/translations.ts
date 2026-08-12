@@ -126,6 +126,20 @@ export interface Translations {
   anniversaryDate: string;
   optional: string;
   profilePicture: string;
+  additionalBirthdays: string;
+  additionalBirthdaysDescription: string;
+  addAdditionalBirthday: string;
+  additionalBirthdayLabel: string;
+  additionalBirthdayLabelPlaceholder: string;
+  additionalBirthdayDob: string;
+  removeAdditionalBirthday: string;
+  noAdditionalBirthdays: string;
+  viewingBenefitsFor: string;
+  myBirthday: string;
+  saveAdditionalBirthday: string;
+  additionalBirthdayLimitReached: string;
+  onboardingDatesTitle: string;
+  onboardingDatesDescription: string;
   clickToChange: string;
   editProfile: string;
   emailPermanent: string;
@@ -645,6 +659,22 @@ export const translations: Record<Language, Translations> = {
     anniversaryDate: 'תאריך נישואין',
     optional: 'אופציונלי',
     profilePicture: 'תמונת פרופיל',
+    additionalBirthdays: 'ימי הולדת נוספים',
+    additionalBirthdaysDescription:
+      'הוסיפו בני משפחה (בן/בת זוג, ילדים) כדי לראות הטבות לפי תאריך הלידה שלהם',
+    addAdditionalBirthday: 'הוסף יום הולדת',
+    additionalBirthdayLabel: 'שם / תיאור',
+    additionalBirthdayLabelPlaceholder: 'לדוגמה: בן/בת זוג, מיה',
+    additionalBirthdayDob: 'תאריך לידה',
+    removeAdditionalBirthday: 'הסר',
+    noAdditionalBirthdays: 'עדיין לא נוספו ימי הולדת',
+    viewingBenefitsFor: 'מציג הטבות עבור',
+    myBirthday: 'שלי',
+    saveAdditionalBirthday: 'שמור',
+    additionalBirthdayLimitReached: 'ניתן להוסיף עד 10 ימי הולדת',
+    onboardingDatesTitle: 'מתי חוגגים?',
+    onboardingDatesDescription:
+      'תאריך הלידה נדרש לחישוב הטבות. תאריך נישואין אופציונלי להטבות יום שנה.',
     clickToChange: 'לחץ לשינוי',
     editProfile: 'ערוך פרופיל',
     emailPermanent: 'כתובת האימייל קבועה ולא ניתנת לשינוי',
@@ -1167,6 +1197,22 @@ export const translations: Record<Language, Translations> = {
     anniversaryDate: 'Anniversary Date',
     optional: 'Optional',
     profilePicture: 'Profile Picture',
+    additionalBirthdays: 'Additional birthdays',
+    additionalBirthdaysDescription:
+      'Add family members (spouse, kids) to view benefits for their dates of birth',
+    addAdditionalBirthday: 'Add birthday',
+    additionalBirthdayLabel: 'Name / label',
+    additionalBirthdayLabelPlaceholder: 'e.g. Spouse, Maya',
+    additionalBirthdayDob: 'Date of birth',
+    removeAdditionalBirthday: 'Remove',
+    noAdditionalBirthdays: 'No additional birthdays yet',
+    viewingBenefitsFor: 'Viewing benefits for',
+    myBirthday: 'Me',
+    saveAdditionalBirthday: 'Save',
+    additionalBirthdayLimitReached: 'You can add up to 10 birthdays',
+    onboardingDatesTitle: 'When do you celebrate?',
+    onboardingDatesDescription:
+      'Date of birth is required for birthday benefits. Anniversary is optional for anniversary benefits.',
     clickToChange: 'Click to change',
     editProfile: 'Edit Profile',
     emailPermanent: 'Email address is permanent and cannot be changed',

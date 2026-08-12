@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import {
   Check,
   Gift,
@@ -96,6 +97,8 @@ export default function OnboardingPage() {
   const { t } = useLanguage();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [anniversaryDate, setAnniversaryDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [brandsLoading, setBrandsLoading] = useState(true);
   const [brandsError, setBrandsError] = useState(false);
@@ -175,6 +178,10 @@ export default function OnboardingPage() {
   };
 
   const handleSubmit = async () => {
+    if (!dateOfBirth) {
+      alert(t('dateOfBirth'));
+      return;
+    }
     if (selectedBrands.length === 0) {
       alert(t('onboardingSelectAtLeastOne'));
       return;
@@ -182,6 +189,20 @@ export default function OnboardingPage() {
 
     setIsLoading(true);
     try {
+      const profileResponse = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          dateOfBirth,
+          anniversaryDate: anniversaryDate || null,
+        }),
+      });
+      if (!profileResponse.ok) {
+        throw new Error(t('profileUpdateError'));
+      }
+
       const response = await fetch('/api/user/memberships', {
         method: 'POST',
         headers: {
@@ -233,6 +254,38 @@ export default function OnboardingPage() {
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8 max-w-xl mx-auto">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                {t('onboardingDatesTitle')}
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                {t('onboardingDatesDescription')}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('dateOfBirth')}
+                  </label>
+                  <Input
+                    type="date"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('anniversaryDate')} ({t('optional')})
+                  </label>
+                  <Input
+                    type="date"
+                    value={anniversaryDate}
+                    onChange={(e) => setAnniversaryDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
               {brands.map((brand) => {
                 const IconComponent =
@@ -290,7 +343,9 @@ export default function OnboardingPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
                   onClick={handleSubmit}
-                  disabled={isLoading || selectedBrands.length === 0}
+                  disabled={
+                    isLoading || selectedBrands.length === 0 || !dateOfBirth
+                  }
                   className="px-8 py-3"
                 >
                   {isLoading

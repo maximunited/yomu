@@ -3,6 +3,19 @@ import { auth } from '@clerk/nextjs/server';
 import { getOrCreateUser } from '@/lib/clerk-user';
 import { prisma } from '@/lib/prisma';
 
+/** Empty string / null clears anniversary; omitted leaves unchanged. */
+function resolveAnniversaryUpdate(
+  anniversaryDate: unknown
+): Date | null | undefined {
+  if (anniversaryDate === undefined) return undefined;
+  if (anniversaryDate === null || anniversaryDate === '') return null;
+  if (typeof anniversaryDate === 'string') {
+    const d = new Date(anniversaryDate);
+    return Number.isNaN(d.getTime()) ? undefined : d;
+  }
+  return undefined;
+}
+
 export async function PUT(request: NextRequest) {
   try {
     console.log('=== Starting PUT request to /api/user/profile ===');
@@ -25,7 +38,8 @@ export async function PUT(request: NextRequest) {
       profilePicture: profilePicture ? 'present' : 'not present',
     });
 
-    // Update user profile
+    const anniversaryUpdate = resolveAnniversaryUpdate(anniversaryDate);
+
     const updatedUser = await prisma.user.update({
       where: {
         id: userId,
@@ -33,9 +47,9 @@ export async function PUT(request: NextRequest) {
       data: {
         name: name || undefined,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
-        anniversaryDate: anniversaryDate
-          ? new Date(anniversaryDate)
-          : undefined,
+        ...(anniversaryUpdate !== undefined
+          ? { anniversaryDate: anniversaryUpdate }
+          : {}),
         profilePicture: profilePicture || undefined,
       },
     });
@@ -87,6 +101,14 @@ export async function GET(request: NextRequest) {
         dateOfBirth: true,
         anniversaryDate: true,
         profilePicture: true,
+        additionalBirthdays: {
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            label: true,
+            dateOfBirth: true,
+          },
+        },
       },
     });
 

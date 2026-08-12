@@ -92,7 +92,7 @@ describe('/api/user/profile Enhanced Tests', () => {
         data: {
           name: 'Updated Name',
           dateOfBirth: new Date('1990-01-01'),
-          anniversaryDate: undefined,
+          anniversaryDate: null,
           profilePicture: undefined,
         },
       });
