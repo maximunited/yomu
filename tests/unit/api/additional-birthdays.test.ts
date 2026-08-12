@@ -13,18 +13,29 @@ jest.mock('@/lib/clerk-user', () => ({
   ),
 }));
 
-jest.mock('@/lib/prisma', () => ({
-  prisma: {
-    additionalBirthday: {
-      findMany: jest.fn(),
-      count: jest.fn(),
-      create: jest.fn(),
-      findFirst: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
+jest.mock('@/lib/prisma', () => {
+  const additionalBirthday = {
+    findMany: jest.fn(),
+    count: jest.fn(),
+    create: jest.fn(),
+    findFirst: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  };
+  const $executeRaw = jest.fn();
+  return {
+    prisma: {
+      additionalBirthday,
+      $executeRaw,
+      $transaction: jest.fn(async (fn: (tx: unknown) => unknown) =>
+        fn({
+          additionalBirthday,
+          $executeRaw,
+        })
+      ),
     },
-  },
-}));
+  };
+});
 
 import { GET, POST } from '@/app/api/user/additional-birthdays/route';
 import { PUT, DELETE } from '@/app/api/user/additional-birthdays/[id]/route';
@@ -38,6 +49,13 @@ describe('/api/user/additional-birthdays', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (auth as jest.Mock).mockResolvedValue({ userId: 'user_test123' });
+    prisma.$transaction.mockImplementation(
+      async (fn: (tx: unknown) => unknown) =>
+        fn({
+          additionalBirthday: prisma.additionalBirthday,
+          $executeRaw: prisma.$executeRaw,
+        })
+    );
   });
 
   describe('GET', () => {
@@ -72,7 +90,7 @@ describe('/api/user/additional-birthdays', () => {
   });
 
   describe('POST', () => {
-    it('creates an additional birthday', async () => {
+    it('creates an additional birthday inside a locked transaction', async () => {
       prisma.additionalBirthday.count.mockResolvedValue(0);
       prisma.additionalBirthday.create.mockResolvedValue({
         id: 'ab-2',
@@ -97,6 +115,11 @@ describe('/api/user/additional-birthdays', () => {
 
       expect(response.status).toBe(201);
       expect(data.additionalBirthday.label).toBe('Spouse');
+      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(prisma.$executeRaw).toHaveBeenCalled();
+      expect(prisma.additionalBirthday.count).toHaveBeenCalledWith({
+        where: { userId: 'user-1' },
+      });
     });
 
     it('rejects missing label', async () => {
@@ -109,9 +132,10 @@ describe('/api/user/additional-birthdays', () => {
       );
       const response = await POST(request);
       expect(response.status).toBe(400);
+      expect(prisma.$transaction).not.toHaveBeenCalled();
     });
 
-    it('enforces max of 10', async () => {
+    it('enforces max of 10 inside the transaction', async () => {
       prisma.additionalBirthday.count.mockResolvedValue(10);
       const request = new NextRequest(
         'http://localhost:3000/api/user/additional-birthdays',
@@ -127,6 +151,8 @@ describe('/api/user/additional-birthdays', () => {
       const data = await response.json();
       expect(response.status).toBe(400);
       expect(data.message).toBe('additionalBirthdayLimitReached');
+      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(prisma.additionalBirthday.create).not.toHaveBeenCalled();
     });
   });
 

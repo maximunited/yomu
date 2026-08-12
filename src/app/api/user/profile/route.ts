@@ -3,12 +3,19 @@ import { auth } from '@clerk/nextjs/server';
 import { getOrCreateUser } from '@/lib/clerk-user';
 import { prisma } from '@/lib/prisma';
 
-/** Empty string / null clears anniversary; omitted leaves unchanged. */
+/**
+ * Anniversary update semantics for partial PUTs:
+ * - omitted / '' → leave unchanged (picture-only saves must not clear)
+ * - null → explicit clear
+ * - valid date string → set
+ */
 function resolveAnniversaryUpdate(
   anniversaryDate: unknown
 ): Date | null | undefined {
-  if (anniversaryDate === undefined) return undefined;
-  if (anniversaryDate === null || anniversaryDate === '') return null;
+  if (anniversaryDate === undefined || anniversaryDate === '') {
+    return undefined;
+  }
+  if (anniversaryDate === null) return null;
   if (typeof anniversaryDate === 'string') {
     const d = new Date(anniversaryDate);
     return Number.isNaN(d.getTime()) ? undefined : d;

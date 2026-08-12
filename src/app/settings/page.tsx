@@ -171,7 +171,10 @@ export default function SettingsPage() {
         body: JSON.stringify({
           name: profile.name,
           dateOfBirth: profile.dateOfBirth,
-          anniversaryDate: profile.anniversaryDate,
+          // Explicit null clears; empty form field = clear intent on full save
+          anniversaryDate: profile.anniversaryDate
+            ? profile.anniversaryDate
+            : null,
           profilePicture: profile.profilePicture,
         }),
       });
@@ -283,16 +286,14 @@ export default function SettingsPage() {
 
   const saveProfilePicture = async (profilePicture: string) => {
     try {
+      // Partial save: omit anniversaryDate so '' cannot clear an existing value
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: profile.name,
-          dateOfBirth: profile.dateOfBirth,
-          anniversaryDate: profile.anniversaryDate,
-          profilePicture: profilePicture,
+          profilePicture,
         }),
       });
 

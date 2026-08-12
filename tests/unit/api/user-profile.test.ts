@@ -292,6 +292,71 @@ describe('/api/user/profile', () => {
       });
     });
 
+    it('should leave anniversaryDate unchanged when empty string is sent', async () => {
+      const mockUpdatedUser = {
+        id: 'session-user-id',
+        name: 'Test User',
+        email: 'test@example.com',
+        dateOfBirth: new Date('1990-01-01'),
+        anniversaryDate: new Date('2020-06-15'),
+        profilePicture: 'data:image/png;base64,abc',
+      };
+      prisma.user.update.mockResolvedValue(mockUpdatedUser);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/profile',
+        {
+          method: 'PUT',
+          body: JSON.stringify({
+            profilePicture: 'data:image/png;base64,abc',
+            anniversaryDate: '',
+          }),
+        }
+      );
+      const response = await PUT(request);
+      expect(response.status).toBe(200);
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'session-user-id' },
+        data: {
+          name: undefined,
+          dateOfBirth: undefined,
+          profilePicture: 'data:image/png;base64,abc',
+        },
+      });
+    });
+
+    it('should leave anniversaryDate unchanged when omitted on picture-only save', async () => {
+      const mockUpdatedUser = {
+        id: 'session-user-id',
+        name: 'Test User',
+        email: 'test@example.com',
+        dateOfBirth: new Date('1990-01-01'),
+        anniversaryDate: new Date('2020-06-15'),
+        profilePicture: 'data:image/png;base64,xyz',
+      };
+      prisma.user.update.mockResolvedValue(mockUpdatedUser);
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/user/profile',
+        {
+          method: 'PUT',
+          body: JSON.stringify({
+            profilePicture: 'data:image/png;base64,xyz',
+          }),
+        }
+      );
+      const response = await PUT(request);
+      expect(response.status).toBe(200);
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'session-user-id' },
+        data: {
+          name: undefined,
+          dateOfBirth: undefined,
+          profilePicture: 'data:image/png;base64,xyz',
+        },
+      });
+    });
+
     it('should return 401 for PUT when not authenticated', async () => {
       (auth as jest.Mock).mockResolvedValue({ userId: null });
 

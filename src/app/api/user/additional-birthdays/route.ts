@@ -3,6 +3,15 @@ import { auth } from '@clerk/nextjs/server';
 import { getOrCreateUser } from '@/lib/clerk-user';
 import { prisma } from '@/lib/prisma';
 
+export const MAX_ADDITIONAL_BIRTHDAYS = 10;
+
+class AdditionalBirthdayLimitError extends Error {
+  constructor() {
+    super('additionalBirthdayLimitReached');
+    this.name = 'AdditionalBirthdayLimitError';
+  }
+}
+
 function parseDateOfBirth(value: unknown): Date | null {
   if (typeof value !== 'string' || !value.trim()) return null;
   const d = new Date(value);
@@ -66,29 +75,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingCount = await prisma.additionalBirthday.count({
-      where: { userId: dbUser.id },
-    });
-    if (existingCount >= 10) {
-      return NextResponse.json(
-        { message: 'additionalBirthdayLimitReached' },
-        { status: 400 }
-      );
-    }
+    const created = await prisma.$transaction(async (tx) => {
+      // Serialize creates per user so concurrent POSTs cannot soft-cap race past 10.
+      await tx.$executeRaw`SELECT 1 FROM "User" WHERE id = ${dbUser.id} FOR UPDATE`;
 
-    const created = await prisma.additionalBirthday.create({
-      data: {
-        userId: dbUser.id,
-        label,
-        dateOfBirth,
-      },
-      select: {
-        id: true,
-        label: true,
-        dateOfBirth: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      const existingCount = await tx.additionalBirthday.count({
+        where: { userId: dbUser.id },
+      });
+      if (existingCount >= MAX_ADDITIONAL_BIRTHDAYS) {
+        throw new AdditionalBirthdayLimitError();
+      }
+
+      return tx.additionalBirthday.create({
+        data: {
+          userId: dbUser.id,
+          label,
+          dateOfBirth,
+        },
+        select: {
+          id: true,
+          label: true,
+          dateOfBirth: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
     });
 
     return NextResponse.json(
@@ -96,6 +107,12 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
+    if (error instanceof AdditionalBirthdayLimitError) {
+      return NextResponse.json(
+        { message: 'additionalBirthdayLimitReached' },
+        { status: 400 }
+      );
+    }
     console.error('Error creating additional birthday:', error);
     return NextResponse.json(
       {

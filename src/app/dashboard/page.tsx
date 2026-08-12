@@ -41,6 +41,7 @@ import {
   type RedemptionChecklistKey,
 } from '@/lib/dashboard-value-density';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveSelectedBenefitDates } from '@/lib/family-profile-context';
 
 interface AdditionalBirthday {
   id: string;
@@ -130,6 +131,52 @@ function DashboardPageContent() {
     }
   }, [isLoaded, isSignedIn]);
 
+  // Refresh family DOBs when returning from settings (deleted profiles / anniversary)
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
+    const refreshFamilyProfiles = async () => {
+      try {
+        const profileResponse = await fetch('/api/user/profile');
+        if (!profileResponse.ok) return;
+        const profileData = await profileResponse.json();
+        if (!profileData.user) return;
+
+        if (profileData.user.dateOfBirth) {
+          setUserDOB(new Date(profileData.user.dateOfBirth));
+        }
+        if (profileData.user.anniversaryDate) {
+          setAnniversaryDate(new Date(profileData.user.anniversaryDate));
+        } else {
+          setAnniversaryDate(null);
+        }
+        const extras = Array.isArray(profileData.user.additionalBirthdays)
+          ? profileData.user.additionalBirthdays
+          : [];
+        setAdditionalBirthdays(extras);
+        setSelectedProfileId((prev) =>
+          prev === 'self' || extras.some((b: { id: string }) => b.id === prev)
+            ? prev
+            : 'self'
+        );
+      } catch (error) {
+        console.error('Error refreshing family profiles:', error);
+      }
+    };
+
+    const onFocusOrVisible = () => {
+      if (document.visibilityState === 'hidden') return;
+      void refreshFamilyProfiles();
+    };
+
+    window.addEventListener('focus', onFocusOrVisible);
+    document.addEventListener('visibilitychange', onFocusOrVisible);
+    return () => {
+      window.removeEventListener('focus', onFocusOrVisible);
+      document.removeEventListener('visibilitychange', onFocusOrVisible);
+    };
+  }, [isLoaded, isSignedIn]);
+
   // Apply query-parameter driven filters (e.g., from notifications)
   useEffect(() => {
     const recent = searchParams?.get('recent');
@@ -167,6 +214,11 @@ function DashboardPageContent() {
           ? profileData.user.additionalBirthdays
           : [];
         setAdditionalBirthdays(extras);
+        setSelectedProfileId((prev) =>
+          prev === 'self' || extras.some((b: { id: string }) => b.id === prev)
+            ? prev
+            : 'self'
+        );
         if (profileData.user.profilePicture) {
           setUserProfilePicture(profileData.user.profilePicture);
           console.log('Set user profile picture');
@@ -685,25 +737,26 @@ function DashboardPageContent() {
   const currentMonth = new Date().getMonth();
   const currentDay = new Date().getDate();
 
-  const selectedBirthday: Date | null =
-    selectedProfileId === 'self'
-      ? userDOB
-      : (() => {
-          const match = additionalBirthdays.find(
-            (b) => b.id === selectedProfileId
-          );
-          return match ? new Date(match.dateOfBirth) : userDOB;
-        })();
+  const {
+    dateOfBirth: selectedBirthday,
+    anniversaryDate: contextAnniversary,
+    effectiveProfileId,
+  } = resolveSelectedBenefitDates({
+    selectedProfileId,
+    userDOB,
+    anniversaryDate,
+    additionalBirthdays,
+  });
 
   const benefitDateContext = {
     dateOfBirth: selectedBirthday,
-    anniversaryDate: selectedProfileId === 'self' ? anniversaryDate : null,
+    anniversaryDate: contextAnniversary,
   };
 
   // Debug logging
   console.log('Current month:', currentMonth, 'Current day:', currentDay);
   console.log('User DOB:', userDOB);
-  console.log('Selected profile:', selectedProfileId, selectedBirthday);
+  console.log('Selected profile:', effectiveProfileId, selectedBirthday);
   if (selectedBirthday) {
     console.log(
       'Selected birthday month:',
