@@ -197,7 +197,11 @@ test.describe('Dark Mode Functionality', () => {
         expect(isDarkOnSignIn).toBe(true);
 
         // Try to sign in (even if it fails, dark mode should persist)
-        const emailInput = page.locator('input[type="email"]').first();
+        const emailInput = page
+          .locator(
+            'input[name="identifier"], input[type="email"], input[name="emailAddress"]'
+          )
+          .first();
         const passwordInput = page.locator('input[type="password"]').first();
         const signInButton = page.locator('button[type="submit"]').first();
 
@@ -475,8 +479,8 @@ test.describe('Dark Mode Functionality', () => {
         // Ensure toggle is accessible on mobile
         await expect(darkModeToggle).toBeVisible();
 
-        // Test touch interaction
-        await darkModeToggle.tap();
+        // Test interaction (click works on desktop chromium; tap needs hasTouch)
+        await darkModeToggle.click();
         await page.waitForTimeout(300);
 
         const isDark = await page.evaluate(() => {

@@ -19,35 +19,33 @@ test.describe('Dashboard Functionality', () => {
     await authHelper.clearAuth();
     await page.goto(urls.dashboard);
 
-    // Should redirect to sign in page
-    await page.waitForURL(new RegExp(urls.signin), { timeout: 10000 });
-    expect(page.url()).toContain('/auth/signin');
+    await page.waitForURL(/sign-in/, { timeout: 15000 });
+    expect(page.url()).toMatch(/sign-in/);
   });
 
   test('should load dashboard for authenticated users', async ({ page }) => {
-    // Mock authentication by going to sign in page first
     await page.goto(urls.signin);
     await pageHelper.waitForPageLoad();
 
-    // Fill in mock credentials (this will likely fail in real environment)
-    // In real E2E, you'd have a test user set up
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'password123');
+    const identifier = page
+      .locator(
+        'input[name="identifier"], input[type="email"], input[name="emailAddress"]'
+      )
+      .first();
+    await expect(identifier).toBeVisible({ timeout: 15000 });
+    await identifier.fill('test@example.com');
 
-    // Try to submit - this tests the flow even if auth fails
-    await page.click('button[type="submit"]');
+    const continueBtn = page
+      .getByRole('button', { name: /continue|המשך|sign in|התחבר/i })
+      .first();
+    await continueBtn.click();
+    await page.waitForTimeout(1500);
 
-    // Wait a moment to see what happens
-    await page.waitForTimeout(2000);
-
-    // If we get to dashboard, test it; otherwise test the sign in flow worked
     if (page.url().includes('/dashboard')) {
       await pageHelper.waitForPageLoad();
       await expect(page.locator('main')).toBeVisible();
     } else {
-      // Authentication failed as expected in test environment
-      // Test that we stayed on sign in page or got feedback
-      expect(page.url()).toContain('/auth');
+      expect(page.url()).toMatch(/sign-in/);
     }
   });
 
@@ -79,7 +77,7 @@ test.describe('Dashboard Functionality', () => {
       }
     } else {
       // Not authenticated - this is expected behavior
-      expect(page.url()).toContain('/auth/signin');
+      expect(page.url()).toContain('/sign-in');
     }
   });
 

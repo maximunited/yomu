@@ -6,9 +6,16 @@ async function testAPI() {
     console.log('Response status:', response.status);
     console.log('Response headers:', response.headers.get('content-type'));
 
+    // Unauthenticated callers must be rejected (route requires Clerk session)
+    if (response.status === 401) {
+      console.log('OK: unauthenticated /api/benefits correctly returns 401');
+      return;
+    }
+
     if (!response.ok) {
       const text = await response.text();
       console.error('API Error Response:', text.substring(0, 200) + '...');
+      process.exitCode = 1;
       return;
     }
 
@@ -17,6 +24,7 @@ async function testAPI() {
       const text = await response.text();
       console.error('Expected JSON but got:', contentType);
       console.error('Response body:', text.substring(0, 200) + '...');
+      process.exitCode = 1;
       return;
     }
 
@@ -33,6 +41,7 @@ async function testAPI() {
     console.error(
       'Make sure your development server is running on http://localhost:3000'
     );
+    process.exitCode = 1;
   }
 }
 

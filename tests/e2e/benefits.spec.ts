@@ -18,8 +18,8 @@ test.describe('Benefit Usage and Details', () => {
     await page.goto('/benefit/test-benefit-id');
 
     // If redirected to sign in, it's expected behavior
-    if (page.url().includes('/auth/signin')) {
-      expect(page.url()).toContain('/auth/signin');
+    if (page.url().includes('/sign-in')) {
+      expect(page.url()).toContain('/sign-in');
       return;
     }
 

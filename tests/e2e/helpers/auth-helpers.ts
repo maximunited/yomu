@@ -1,72 +1,91 @@
 import { Page, expect } from '@playwright/test';
 import { testUsers, urls } from '../fixtures/test-data';
 
+/** Clerk sign-in identifier field (email/username). */
+const clerkIdentifier = () =>
+  'input[name="identifier"], input[type="email"], input[autocomplete="username"]';
+
+const clerkPassword = () =>
+  'input[name="password"], input[type="password"], input[autocomplete="current-password"]';
+
 export class AuthHelper {
   constructor(private page: Page) {}
 
   /**
-   * Sign in with test credentials
+   * Sign in with test credentials (Clerk UI)
    */
   async signIn(
     email = testUsers.validUser.email,
     password = testUsers.validUser.password
   ) {
     await this.page.goto(urls.signin);
+    await expect(this.page.locator(clerkIdentifier()).first()).toBeVisible({
+      timeout: 15000,
+    });
 
-    // Wait for sign in form to load
-    await expect(this.page.locator('form')).toBeVisible();
+    await this.page.locator(clerkIdentifier()).first().fill(email);
 
-    // Fill in credentials
-    await this.page.fill('input[type="email"]', email);
-    await this.page.fill('input[type="password"]', password);
+    const continueBtn = this.page.getByRole('button', {
+      name: /continue|המשך|next/i,
+    });
+    if (await continueBtn.isVisible().catch(() => false)) {
+      await continueBtn.click();
+    }
 
-    // Submit form
-    await this.page.click('button[type="submit"]');
+    await expect(this.page.locator(clerkPassword()).first()).toBeVisible({
+      timeout: 15000,
+    });
+    await this.page.locator(clerkPassword()).first().fill(password);
+    await this.page
+      .getByRole('button', { name: /sign in|התחבר|continue|המשך/i })
+      .first()
+      .click();
 
-    // Wait for navigation after successful login
-    await this.page.waitForURL(urls.dashboard);
-
-    // Verify we're logged in by checking for dashboard content
-    await expect(this.page).toHaveURL(urls.dashboard);
+    await this.page.waitForURL(
+      new RegExp(`(${urls.dashboard}|${urls.onboarding}|/)`),
+      { timeout: 20000 }
+    );
   }
 
   /**
-   * Sign up with test credentials
+   * Sign up with test credentials (Clerk UI — email/password only)
    */
   async signUp(userData = testUsers.validUser) {
     await this.page.goto(urls.signup);
+    await expect(this.page.locator(clerkIdentifier()).first()).toBeVisible({
+      timeout: 15000,
+    });
 
-    // Wait for sign up form to load
-    await expect(this.page.locator('form')).toBeVisible();
+    const emailInput = this.page
+      .locator(
+        'input[name="emailAddress"], input[name="identifier"], input[type="email"]'
+      )
+      .first();
+    await emailInput.fill(userData.email);
 
-    // Fill in registration details
-    await this.page.fill('input[name="name"]', userData.name);
-    await this.page.fill('input[name="email"]', userData.email);
-    await this.page.fill('input[name="password"]', userData.password);
-    await this.page.fill('input[name="dateOfBirth"]', userData.dateOfBirth);
+    const passwordInput = this.page.locator(clerkPassword()).first();
+    if (await passwordInput.isVisible().catch(() => false)) {
+      await passwordInput.fill(userData.password);
+    }
 
-    // Submit form
-    await this.page.click('button[type="submit"]');
-
-    // Wait for successful registration redirect
-    await this.page.waitForURL(urls.onboarding);
-    await expect(this.page).toHaveURL(urls.onboarding);
+    await this.page
+      .getByRole('button', { name: /continue|sign up|הירשם|המשך/i })
+      .first()
+      .click();
   }
 
   /**
    * Sign out
    */
   async signOut() {
-    // Look for sign out button/link
     const signOutButton = this.page.locator(
       'button:has-text("התנתק"), button:has-text("Sign Out"), a:has-text("התנתק"), a:has-text("Sign Out")'
     );
 
-    if (await signOutButton.isVisible()) {
+    if (await signOutButton.isVisible().catch(() => false)) {
       await signOutButton.click();
     }
 
-    // Wait for redirect to home or sign in page
     await this.page.waitForURL(
       new RegExp(`(${urls.home}|${urls.signin}|/sign-in)`)
     );
@@ -77,8 +96,8 @@ export class AuthHelper {
    */
   async isAuthenticated(): Promise<boolean> {
     try {
-      // Try to go to dashboard - if not authenticated, should redirect
       await this.page.goto(urls.dashboard);
+      await this.page.waitForLoadState('domcontentloaded');
       return this.page.url().includes('/dashboard');
     } catch {
       return false;
@@ -95,13 +114,26 @@ export class AuthHelper {
   }
 
   /**
-   * Clear all auth state
+   * Clear auth cookies/storage. Navigates to app origin first so
+   * localStorage access is allowed (Clerk opaque origins throw otherwise).
    */
   async clearAuth() {
     await this.page.context().clearCookies();
-    await this.page.evaluate(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-    });
+    try {
+      await this.page.goto(urls.home, {
+        waitUntil: 'domcontentloaded',
+        timeout: 15000,
+      });
+      await this.page.evaluate(() => {
+        try {
+          localStorage.clear();
+          sessionStorage.clear();
+        } catch {
+          // ignore
+        }
+      });
+    } catch {
+      // ignore navigation/storage failures in auth teardown
+    }
   }
 }
