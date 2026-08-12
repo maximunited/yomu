@@ -105,3 +105,20 @@ loyalty-url-status.json
 
 # Admin ops runtime artifacts (URL audit last report)
 .data/
+
+# OpenWolf — allowlist protocol; block runtime/telemetry
+.wolf/*
+!.wolf/OPENWOLF.md
+!.wolf/identity.md
+!.wolf/config.json
+!.wolf/cron-manifest.json
+!.wolf/reframe-frameworks.md
+!.wolf/hooks/
+.wolf/hooks/_session.json
+!.wolf/hooks/*.js
+!.wolf/hooks/package.json
+
+# CodeGraph — only the nested ignore file
+.codegraph/*
+!.codegraph/.gitignore
+
