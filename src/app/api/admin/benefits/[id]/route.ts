@@ -57,6 +57,17 @@ export async function PATCH(
         isFree: body.isFree,
         isActive: body.isActive,
         brandId: body.brandId,
+        verified: body.verified,
+        lastChecked:
+          typeof body.verified === 'boolean'
+            ? body.verified
+              ? new Date()
+              : null
+            : body.lastChecked !== undefined
+              ? body.lastChecked
+                ? new Date(body.lastChecked)
+                : null
+              : undefined,
         updatedAt: new Date(),
       },
     });

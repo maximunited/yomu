@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/admin-auth';
+import { captureException } from '@/lib/monitoring';
 
 const SOFT_BRAND_NAMES = new Set([
   'H&M',
@@ -754,6 +755,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error seeding database:', error);
+    await captureException(error, {
+      tags: { area: 'api-seed', stage: 'post' },
+    });
     return NextResponse.json({ message: 'databaseSeedError' }, { status: 500 });
   }
 }

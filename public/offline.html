@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>YomU — Offline</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background: linear-gradient(160deg, #0f172a 0%, #1e293b 55%, #334155 100%);
+        color: #f8fafc;
+        padding: 1.5rem;
+        text-align: center;
+      }
+      h1 {
+        font-size: 1.75rem;
+        margin: 0 0 0.5rem;
+        letter-spacing: 0.02em;
+      }
+      p {
+        margin: 0 auto 1.25rem;
+        max-width: 22rem;
+        line-height: 1.5;
+        color: #cbd5e1;
+      }
+      a {
+        display: inline-block;
+        padding: 0.65rem 1.1rem;
+        border-radius: 0.5rem;
+        background: #38bdf8;
+        color: #0f172a;
+        text-decoration: none;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>YomU</h1>
+      <p>
+        You’re offline. The installable shell is cached, but the benefit catalog
+        needs a network connection.
+      </p>
+      <a href="/dashboard">Retry dashboard</a>
+    </main>
+  </body>
+</html>

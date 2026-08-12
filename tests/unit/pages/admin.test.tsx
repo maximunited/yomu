@@ -98,6 +98,10 @@ describe('AdminPage', () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [{ id: '1', title: 'Test Benefit', brandId: '1' }],
+      })
+      .mockResolvedValue({
+        ok: true,
+        json: async () => ({ last: null }),
       });
 
     render(<AdminPage />);
@@ -105,6 +109,9 @@ describe('AdminPage', () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('/api/brands');
       expect(global.fetch).toHaveBeenCalledWith('/api/admin/benefits');
+    });
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith('/api/admin/url-audit');
     });
   });
 

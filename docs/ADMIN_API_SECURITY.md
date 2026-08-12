@@ -33,6 +33,15 @@ Auth is mocked (`@clerk/nextjs/server` or `requireAdmin`). Playwright is not req
 
 Never put seed/setup/test routes back on the public allowlist.
 
+## Admin ops routes (platform enhancements)
+
+| Route | Gate | Purpose |
+| ----- | ---- | ------- |
+| `PATCH /api/admin/benefits/bulk` | `requireAdmin` | Bulk set `verified` + `lastChecked` |
+| `GET/POST /api/admin/url-audit` | `requireAdmin` | Read last / run DB URL audit |
+
+See `docs/PLATFORM_OPS.md`.
+
 ## Related: reminders cron
 
 Daily benefit reminders use `/api/cron/reminders` (Clerk-public like webhooks):
