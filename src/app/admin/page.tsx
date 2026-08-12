@@ -12,7 +12,7 @@ import AdminForm from '@/components/AdminForm';
 import type { Brand, Benefit } from '@/types/admin';
 
 export default function AdminPage() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,11 +20,15 @@ export default function AdminPage() {
   const [editingItem, setEditingItem] = useState<Brand | Benefit | null>(null);
   const [showForm, setShowForm] = useState(false);
 
+  const isAdmin = user?.publicMetadata?.role === 'admin';
+
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
+    if (isLoaded && isSignedIn && isAdmin) {
       loadData();
+    } else if (isLoaded) {
+      setIsLoading(false);
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, isAdmin]);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -137,6 +141,20 @@ export default function AdminPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isSignedIn || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <div className="text-center space-y-2">
+          <h1 className="text-xl font-semibold text-gray-900">Access denied</h1>
+          <p className="text-gray-600 max-w-md">
+            Admin role required. Set Clerk publicMetadata.role to
+            &quot;admin&quot; or list your user id in ADMIN_USER_IDS.
+          </p>
         </div>
       </div>
     );

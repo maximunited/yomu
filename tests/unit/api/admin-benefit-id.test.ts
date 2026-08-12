@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { auth } from '@clerk/nextjs/server';
 import * as prismaClient from '@/lib/prisma';
 import { PATCH, DELETE } from '@/app/api/admin/benefits/[id]/route';
 
-jest.mock('@clerk/nextjs/server', () => ({
-  auth: jest.fn(() => Promise.resolve({ userId: 'user_test123' })),
+jest.mock('@/lib/admin-auth', () => ({
+  requireAdmin: jest.fn(() =>
+    Promise.resolve({ ok: true, userId: 'user_admin' })
+  ),
 }));
 jest.mock('@/lib/prisma', () => ({
   prisma: {
@@ -14,10 +15,10 @@ jest.mock('@/lib/prisma', () => ({
 }));
 
 describe('/api/admin/benefits/[id]', () => {
+  const { requireAdmin } = require('@/lib/admin-auth');
+
   beforeEach(() => {
-    (auth as unknown as jest.Mock).mockResolvedValue({
-      userId: 'user_test123',
-    });
+    requireAdmin.mockResolvedValue({ ok: true, userId: 'user_admin' });
   });
 
   it('PATCH updates isActive', async () => {
@@ -39,23 +40,29 @@ describe('/api/admin/benefits/[id]', () => {
     (
       prismaClient.prisma.notification.deleteMany as jest.Mock
     ).mockResolvedValueOnce({});
-    (prismaClient.prisma.benefit.delete as jest.Mock).mockResolvedValueOnce({});
+    (prismaClient.prisma.benefit.delete as jest.Mock).mockResolvedValueOnce({
+      id: 'b1',
+    });
     const req = new Request('http://localhost', {
       method: 'DELETE',
     } as any) as any;
-    const res = await DELETE(req, { params: Promise.resolve({ id: 'b2' }) });
+    const res = await DELETE(req, { params: Promise.resolve({ id: 'b1' }) });
     expect(res.status).toBe(200);
+    expect(prismaClient.prisma.notification.deleteMany).toHaveBeenCalled();
+    expect(prismaClient.prisma.benefit.delete).toHaveBeenCalled();
   });
 
-  it('PATCH returns 401 when not authenticated', async () => {
-    (auth as unknown as jest.Mock).mockResolvedValue({ userId: null });
+  it('returns 403 when not admin', async () => {
+    const { NextResponse } = require('next/server');
+    requireAdmin.mockResolvedValueOnce({
+      ok: false,
+      response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }),
+    });
     const req = new Request('http://localhost', {
       method: 'PATCH',
       body: JSON.stringify({ isActive: false }),
     } as any) as any;
     const res = await PATCH(req, { params: Promise.resolve({ id: 'b1' }) });
-    const json = await res.json();
-    expect(res.status).toBe(401);
-    expect(json.error).toBe('Unauthorized');
+    expect(res.status).toBe(403);
   });
 });

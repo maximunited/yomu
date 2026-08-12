@@ -10,8 +10,9 @@
  *   - Limit to specific brands (comma-separated):
  *       node scripts/seed.js --mode=upsert --brands="Giraffe,Nono & Mimi"
  * What it does:
- *   - Clears existing data (benefits, memberships, brands)
- *   - Creates brands (including co-brands like Nono & Mimi and Giraffe)
+ *   - On --mode=fresh only: clears benefits, memberships, partnerships, brands
+ *   - Default mode is upsert (no wipe)
+ *   - Creates/updates brands (including co-brands like Nono & Mimi and Giraffe)
  *   - Creates a brand partnership (Nono & Mimi ↔ Giraffe)
  *   - Seeds benefits, including a co-branded sample and a Giraffe-specific benefit
  * Notes:
@@ -109,7 +110,7 @@ const predefinedBrands = [
     name: 'KFC',
     logoUrl: '/images/brands/kfc.png',
     website: 'https://www.kfc.co.il',
-    description: 'הטבות על מזון מהיר',
+    description: '1+1 על המבורגר קלאסי או זינגר בחודש יום ההולדת',
     category: 'food',
     actionUrl: 'https://www.kfc.co.il',
     actionType: 'website',
@@ -169,7 +170,7 @@ const predefinedBrands = [
     name: 'שגב',
     logoUrl: '/images/brands/segev.png',
     website: 'https://www.segevchef.com',
-    description: 'מסעדה - מנה ראשונה מתנה',
+    description: 'מנה ראשונה מתנה בישיבה בלבד כל החודש',
     category: 'food',
     actionUrl: 'https://www.segevchef.com',
     actionType: 'website',
@@ -179,7 +180,7 @@ const predefinedBrands = [
     name: "ג'מס - Jem's",
     logoUrl: '/images/brands/james.png',
     website: 'https://www.jems.co.il',
-    description: 'חצי ליטר בירה מתנה',
+    description: 'חצי ליטר בירה מתנה בישיבה בלבד כל החודש',
     category: 'food',
     actionUrl: 'https://www.jems.co.il',
     actionType: 'website',
@@ -239,7 +240,7 @@ const predefinedBrands = [
     name: 'M32 המבורגרים',
     logoUrl: '/images/brands/m32.png',
     website: 'https://www.m32.co.il',
-    description: '15% הנחה ביום הולדת',
+    description: '15% הנחה בחודש יום ההולדת',
     category: 'food',
     actionUrl: 'https://www.m32.co.il',
     actionType: 'website',
@@ -353,6 +354,16 @@ const predefinedBrands = [
     description: '10% הנחה בחודש יום ההולדת',
     category: 'food',
     actionUrl: 'https://burgersbar.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Burger Station',
+    logoUrl: '/images/brands/burger-station.png',
+    website: 'https://burgerstation.co.il',
+    description: 'תוספת חינם בחודש יום ההולדת - מועדון Station+',
+    category: 'food',
+    actionUrl: 'https://burgerstation.co.il/club/',
     actionType: 'website',
     actionLabel: 'הצטרפות למועדון',
   },
@@ -538,15 +549,6 @@ async function seed() {
     await prisma.$connect();
     console.log('Database connected successfully');
 
-    // Clear existing data
-    console.log('Clearing existing data...');
-    await prisma.benefit.deleteMany();
-    await prisma.userMembership.deleteMany();
-    await prisma.brand.deleteMany();
-
-    console.log('Cleared existing data');
-
-    // Create brands
     // Args
     const rawArgs = process.argv.slice(2);
     const args = rawArgs.reduce((acc, arg) => {
@@ -554,7 +556,7 @@ async function seed() {
       acc[k] = v === undefined ? true : v;
       return acc;
     }, {});
-    const mode = (args.mode || 'fresh').toLowerCase(); // 'fresh' | 'upsert'
+    const mode = (args.mode || 'upsert').toLowerCase(); // 'fresh' | 'upsert'
     const brandFilter = (args.brands || '')
       .split(',')
       .map((s) => s.trim())
@@ -563,13 +565,19 @@ async function seed() {
     const shouldIncludeBrand = (name) =>
       brandFilter.length === 0 || brandFilter.includes(name);
 
-    // Optional wipe on fresh
+    // Wipe only on fresh — never delete before mode is known
     if (mode === 'fresh') {
+      if (brandFilter.length > 0) {
+        throw new Error(
+          'Refusing --mode=fresh with --brands=. Fresh wipe is global; omit --brands or use --mode=upsert.'
+        );
+      }
       console.log('Mode: fresh. Clearing existing data...');
       await prisma.benefit.deleteMany();
       await prisma.userMembership.deleteMany();
       await prisma.brandPartnership.deleteMany();
       await prisma.brand.deleteMany();
+      console.log('Cleared existing data');
     } else {
       console.log(
         'Mode: upsert. Existing data will be updated/created without wiping.'
@@ -621,10 +629,7 @@ async function seed() {
     // Create brand partnerships (co-branding)
     const nono = createdBrands.find((b) => b.name === 'Nono & Mimi');
     const giraffe = createdBrands.find((b) => b.name === 'Giraffe');
-    if (
-      (nono && giraffe && shouldIncludeBrand('Nono & Mimi')) ||
-      shouldIncludeBrand('Giraffe')
-    ) {
+    if (nono && giraffe) {
       // Ensure unique pair once (A->B)
       const existing = await prisma.brandPartnership.findFirst({
         where: { brandAId: nono.id, brandBId: giraffe.id },
@@ -725,17 +730,18 @@ async function seed() {
         validityDuration: 1,
         isFree: true,
       },
-      // M32 — 15% on birthday
+      // M32 — 15% off birthday month (2nd member purchase only)
       {
         brandId: createdBrands.find((b) => b.name === 'M32 המבורגרים')?.id,
-        title: '15% הנחה ביום הולדת',
-        description: '15% הנחה ביום ההולדת במסעדות M32',
-        termsAndConditions: 'לפי תקנון המועדון באתר M32',
+        title: '15% הנחה בחודש יום ההולדת',
+        description: '15% הנחה בחודש יום ההולדת במסעדות M32',
+        termsAndConditions:
+          'ההנחה חלה רק על הרכישה השנייה כחבר מועדון (לא על רכישת ההצטרפות) | לפי תקנון המועדון באתר M32',
         redemptionMethod: 'in-store',
         promoCode: null,
         url: 'https://www.m32.co.il',
-        validityType: 'birthday_exact_date',
-        validityDuration: 1,
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
         isFree: false,
       },
       // Castro CU
@@ -870,6 +876,21 @@ async function seed() {
         validityDuration: 30,
         isFree: false,
       },
+      // Burger Station — free side dish birthday month (Station+)
+      {
+        brandId: createdBrands.find((b) => b.name === 'Burger Station')?.id,
+        title: 'תוספת חינם בחודש יום ההולדת',
+        description:
+          'תוספת חינם בחודש יום ההולדת לחברי מועדון Station+ ברשת בורגר סטיישן',
+        termsAndConditions:
+          'מועדון Station+ חינמי | לפי תקנון המועדון ב-burgerstation.co.il/club | מגבלות שילוב לפי תקנון האתר',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://burgerstation.co.il/club/',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
+      },
       {
         brandId: createdBrands.find((b) => b.name === 'אסקייפרום')?.id,
         title: '50 שח הנחה בחודש יומולדת',
@@ -922,8 +943,10 @@ async function seed() {
       {
         brandId: createdBrands.find((b) => b.name === 'שגב')?.id,
         title: 'מנה ראשונה מתנה',
-        description: 'מנה ראשונה מתנה כל החודש',
-        termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
+        description:
+          'מנה ראשונה מתנה בחודש יום ההולדת — בישיבה בלבד',
+        termsAndConditions:
+          'תקף לכל החודש הקלנדרי של יום ההולדת | למימוש בישיבה בלבד | אין כפל מבצעים',
         redemptionMethod: 'in-store',
         promoCode: null,
         url: 'https://www.segevchef.com',
@@ -934,8 +957,10 @@ async function seed() {
       {
         brandId: createdBrands.find((b) => b.name === "ג'מס - Jem's")?.id,
         title: 'חצי ליטר בירה מתנה',
-        description: 'חצי ליטר בירה מתנה כל החודש',
-        termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
+        description:
+          'חצי ליטר בירה מתנה בחודש יום ההולדת — בישיבה בלבד (לא לטייק אוויי / משלוחים)',
+        termsAndConditions:
+          'תקף לכל החודש הקלנדרי של יום ההולדת | למימוש בישיבה בלבד (לא לטייק אוויי / משלוחים)',
         redemptionMethod: 'in-store',
         promoCode: null,
         url: 'https://www.jems.co.il/',
@@ -956,11 +981,14 @@ async function seed() {
         validityDuration: 30,
         isFree: true,
       },
+      // KFC — 1+1 classic burger or Zinger (birthday month; 2nd member purchase only)
       {
         brandId: createdBrands.find((b) => b.name === 'KFC')?.id,
-        title: 'המבורגר 1+1 מתנה',
-        description: 'המבורגר 1+1 מתנה כל החודש',
-        termsAndConditions: 'תקף לכל החודש הקלנדרי של יום ההולדת',
+        title: '1+1 על המבורגר קלאסי או זינגר',
+        description:
+          '1+1 על המבורגר קלאסי או זינגר בחודש יום ההולדת לחברי מועדון KFC',
+        termsAndConditions:
+          'ההטבה חלה רק על הרכישה השנייה כחבר מועדון (לא על רכישת ההצטרפות) | תקף לכל החודש הקלנדרי של יום ההולדת | לפי תקנון המועדון באתר KFC',
         redemptionMethod: 'in-store',
         promoCode: null,
         url: 'https://www.kfc.co.il',
@@ -1209,6 +1237,16 @@ async function seed() {
       },
     ];
 
+    // Legacy benefit titles → current titles (rename-safe upsert by brand)
+    const benefitTitleAliases = {
+      'M32 המבורגרים': {
+        '15% הנחה בחודש יום ההולדת': ['15% הנחה ביום הולדת'],
+      },
+      KFC: {
+        '1+1 על המבורגר קלאסי או זינגר': ['המבורגר 1+1 מתנה'],
+      },
+    };
+
     const now = new Date();
     await Promise.all(
       sampleBenefits.map(async (benefit) => {
@@ -1226,9 +1264,17 @@ async function seed() {
           lastChecked: isSoft ? null : now,
         };
 
-        // Upsert by (brandId + title)
+        // Upsert by (brandId + title), including legacy title aliases
+        const titleAliases =
+          benefitTitleAliases[brand.name]?.[benefit.title] || [];
         const existing = await prisma.benefit.findFirst({
-          where: { brandId: benefit.brandId, title: benefit.title },
+          where: {
+            brandId: benefit.brandId,
+            OR: [
+              { title: benefit.title },
+              ...titleAliases.map((title) => ({ title })),
+            ],
+          },
         });
         if (mode === 'fresh') {
           const created = await prisma.benefit.create({ data: benefitData });

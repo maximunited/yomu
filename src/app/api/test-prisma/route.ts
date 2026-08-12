@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/admin-auth';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
+  const gate = await requireAdmin();
+  if (!gate.ok) return gate.response;
+
   try {
-    // Test database connection
     const brandCount = await prisma.brand.count();
 
     return NextResponse.json({

@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { auth } from '@clerk/nextjs/server';
 import * as prismaClient from '@/lib/prisma';
 import { GET as GET_LIST, POST } from '@/app/api/admin/benefits/route';
 
-jest.mock('@clerk/nextjs/server', () => ({
-  auth: jest.fn(() => Promise.resolve({ userId: 'user_test123' })),
+jest.mock('@/lib/admin-auth', () => ({
+  requireAdmin: jest.fn(() =>
+    Promise.resolve({ ok: true, userId: 'user_admin' })
+  ),
 }));
 jest.mock('@/lib/prisma', () => ({
   prisma: { benefit: { findMany: jest.fn(), create: jest.fn() } },
 }));
 
 describe('/api/admin/benefits', () => {
+  const { requireAdmin } = require('@/lib/admin-auth');
+
   beforeEach(() => {
-    (auth as unknown as jest.Mock).mockResolvedValue({
-      userId: 'user_test123',
-    });
+    requireAdmin.mockResolvedValue({ ok: true, userId: 'user_admin' });
   });
 
   it('GET returns all benefits', async () => {
@@ -49,11 +50,13 @@ describe('/api/admin/benefits', () => {
     expect(json).toEqual({ id: 'new1' });
   });
 
-  it('GET returns 401 when not authenticated', async () => {
-    (auth as unknown as jest.Mock).mockResolvedValue({ userId: null });
+  it('returns 403 when not admin', async () => {
+    const { NextResponse } = require('next/server');
+    requireAdmin.mockResolvedValueOnce({
+      ok: false,
+      response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }),
+    });
     const res = await GET_LIST();
-    const json = await res.json();
-    expect(res.status).toBe(401);
-    expect(json.error).toBe('Unauthorized');
+    expect(res.status).toBe(403);
   });
 });

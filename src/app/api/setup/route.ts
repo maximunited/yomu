@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/admin-auth';
 
-// Database setup endpoint - checks if schema exists
+// Database setup endpoint - checks if schema exists (admin only)
 export async function GET() {
+  const gate = await requireAdmin();
+  if (!gate.ok) return gate.response;
+
   try {
-    // Try to query the database to check if tables exist
     await prisma.user.count();
 
     return NextResponse.json({

@@ -93,7 +93,9 @@ function DashboardPageContent() {
   const searchParams = useSearchParams();
 
   // Used benefits state
-  const [usedBenefits, setUsedBenefits] = useState<Set<string>>(new Set());
+  const [usedBenefits, setUsedBenefits] = useState<Map<string, string>>(
+    new Map()
+  );
   const [usedBenefitsLoading, setUsedBenefitsLoading] = useState(false);
   const [usedBenefitsError, setUsedBenefitsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -173,30 +175,28 @@ function DashboardPageContent() {
           activeMemberships.map((m) => m.brand?.name).filter(Boolean)
         );
         console.log('Active brand IDs:', Array.from(activeBrandIds));
-        const userBenefits = benefitsData.benefits.filter(
-          (benefit: {
-            brandId?: string;
-            brand?: { name: string };
-            validityType: string;
-            id: string;
-            title: string;
-            description: string;
-          }) => {
-            // No memberships: show everything (demo/fallback)
-            if (!hasAnyMemberships) return true;
-            // Match by id when available
-            if (benefit.brandId) return activeBrandIds.has(benefit.brandId);
-            // Match by name when available. If we don't have names on memberships, include.
-            if (benefit.brand?.name) {
-              return (
-                activeBrandNames.size === 0 ||
-                activeBrandNames.has(benefit.brand.name)
-              );
-            }
-            // Unknown brand shape: include to avoid hiding due to fixture gaps
-            return true;
-          }
-        );
+        // No memberships → empty catalog (CTA via empty states), not full demo dump
+        const userBenefits = !hasAnyMemberships
+          ? []
+          : benefitsData.benefits.filter(
+              (benefit: {
+                brandId?: string;
+                brand?: { name: string };
+                validityType: string;
+                id: string;
+                title: string;
+                description: string;
+              }) => {
+                if (benefit.brandId) return activeBrandIds.has(benefit.brandId);
+                if (benefit.brand?.name) {
+                  return (
+                    activeBrandNames.size === 0 ||
+                    activeBrandNames.has(benefit.brand.name)
+                  );
+                }
+                return false;
+              }
+            );
         console.log('Filtered benefits count:', userBenefits.length);
 
         setBenefits(userBenefits);
@@ -222,10 +222,14 @@ function DashboardPageContent() {
       if (response && response.ok) {
         const data = await response.json();
         const list = Array.isArray(data.usedBenefits) ? data.usedBenefits : [];
-        const usedBenefitIds = new Set<string>(
-          list.map((ub: { benefitId: string }) => ub.benefitId)
-        );
-        setUsedBenefits(usedBenefitIds);
+        const usedMap = new Map<string, string>();
+        for (const ub of list as Array<{
+          benefitId: string;
+          usedAt?: string;
+        }>) {
+          usedMap.set(ub.benefitId, ub.usedAt || new Date().toISOString());
+        }
+        setUsedBenefits(usedMap);
       } else {
         // Non-critical failure; proceed without blocking the page
         console.log('Used benefits not available');
@@ -257,7 +261,13 @@ function DashboardPageContent() {
       if (response.ok) {
         const data = await response.json();
         console.log('Success response:', data);
-        setUsedBenefits((prev) => new Set([...prev, benefitId]));
+        const usedAt =
+          data?.usedBenefit?.usedAt || data?.usedAt || new Date().toISOString();
+        setUsedBenefits((prev) => {
+          const next = new Map(prev);
+          next.set(benefitId, usedAt);
+          return next;
+        });
         // Inline UI indicates success by turning the button green; no blocking alert
       } else {
         const errorText = await response.text();
@@ -290,9 +300,9 @@ function DashboardPageContent() {
 
       if (response.ok) {
         setUsedBenefits((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(benefitId);
-          return newSet;
+          const next = new Map(prev);
+          next.delete(benefitId);
+          return next;
         });
         // Inline UI indicates success by reverting the button style; no alert
       } else {
@@ -633,20 +643,11 @@ function DashboardPageContent() {
         })
     );
 
-  // Membership summary count: prefer user's active memberships; if none, fallback to available brands
+  // Membership summary: active memberships only (never invent brand count)
   const activeMembershipCount = userMemberships.filter(
     (m) => m.isActive
   ).length;
-  const availableBrandCount = new Set(
-    benefits
-      .map(
-        (b: { brandId?: string; brand?: { id?: string; name?: string } }) =>
-          b.brandId || b.brand?.id || b.brand?.name
-      )
-      .filter(Boolean)
-  ).size;
-  const membershipCountDisplay =
-    activeMembershipCount > 0 ? activeMembershipCount : availableBrandCount;
+  const membershipCountDisplay = activeMembershipCount;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -1085,7 +1086,10 @@ function DashboardPageContent() {
                   {/* Used Status */}
                   {usedBenefits.has(benefit.id) && (
                     <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                      ✓ {t('usedOn')} {new Date().toLocaleDateString()}
+                      ✓ {t('usedOn')}{' '}
+                      {new Date(
+                        usedBenefits.get(benefit.id) || Date.now()
+                      ).toLocaleDateString()}
                     </span>
                   )}
                 </div>
@@ -1452,7 +1456,10 @@ function DashboardPageContent() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-500">
-                          {t('usedOn')} {new Date().toLocaleDateString()}
+                          {t('usedOn')}{' '}
+                          {new Date(
+                            usedBenefits.get(benefit.id) || Date.now()
+                          ).toLocaleDateString()}
                         </span>
                         <Button
                           variant="outline"

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/admin-auth';
 
 const SOFT_BRAND_NAMES = new Set([
   'H&M',
@@ -68,7 +69,7 @@ const predefinedBrands = [
     name: 'KFC',
     logoUrl: '/images/brands/kfc.png',
     website: 'https://www.kfc.co.il',
-    description: 'הטבות על מזון מהיר',
+    description: '1+1 על המבורגר קלאסי או זינגר בחודש יום ההולדת',
     category: 'food',
   },
   {
@@ -121,14 +122,14 @@ const predefinedBrands = [
     name: 'שגב',
     logoUrl: '/images/brands/segev.png',
     website: 'https://www.segevchef.com',
-    description: 'מנה ראשונה',
+    description: 'מנה ראשונה מתנה בישיבה בלבד כל החודש',
     category: 'food',
   },
   {
     name: "ג'מס - Jem's",
     logoUrl: '/images/brands/james.png',
     website: 'https://www.jems.co.il',
-    description: 'חצי ליטר בירה',
+    description: 'חצי ליטר בירה מתנה בישיבה בלבד כל החודש',
     category: 'food',
   },
   {
@@ -173,7 +174,7 @@ const predefinedBrands = [
     name: 'M32 המבורגרים',
     logoUrl: '/images/brands/m32.png',
     website: 'https://www.m32.co.il',
-    description: '15% הנחה ביום הולדת',
+    description: '15% הנחה בחודש יום ההולדת',
     category: 'food',
     actionUrl: 'https://www.m32.co.il',
     actionType: 'website',
@@ -276,6 +277,16 @@ const predefinedBrands = [
     description: '10% הנחה בחודש יום ההולדת',
     category: 'food',
     actionUrl: 'https://burgersbar.co.il',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
+    name: 'Burger Station',
+    logoUrl: '/images/brands/burger-station.png',
+    website: 'https://burgerstation.co.il',
+    description: 'תוספת חינם בחודש יום ההולדת - מועדון Station+',
+    category: 'food',
+    actionUrl: 'https://burgerstation.co.il/club/',
     actionType: 'website',
     actionLabel: 'הצטרפות למועדון',
   },
@@ -395,8 +406,22 @@ const predefinedBrands = [
 ];
 
 export async function POST(request: NextRequest) {
+  const gate = await requireAdmin();
+  if (!gate.ok) return gate.response;
+
+  // Prefer CLI seed in all environments. Opt-in only via ALLOW_API_SEED=1.
+  if (process.env.ALLOW_API_SEED !== '1') {
+    return NextResponse.json(
+      {
+        error:
+          'API seed is disabled. Use `node scripts/seed.js --mode=upsert` (set ALLOW_API_SEED=1 to override).',
+      },
+      { status: 403 }
+    );
+  }
+
   try {
-    // Clear existing brands and benefits
+    // Clear existing brands and benefits (admin + ALLOW_API_SEED only)
     await prisma.benefit.deleteMany();
     await prisma.userMembership.deleteMany();
     await prisma.brand.deleteMany();
@@ -458,14 +483,30 @@ export async function POST(request: NextRequest) {
       },
       {
         brandId: createdBrands.find((b) => b.name === 'M32 המבורגרים')?.id,
-        title: '15% הנחה ביום הולדת',
-        description: '15% הנחה ביום ההולדת במסעדות M32',
-        termsAndConditions: 'לפי תקנון המועדון באתר M32',
+        title: '15% הנחה בחודש יום ההולדת',
+        description: '15% הנחה בחודש יום ההולדת במסעדות M32',
+        termsAndConditions:
+          'ההנחה חלה רק על הרכישה השנייה כחבר מועדון (לא על רכישת ההצטרפות) | לפי תקנון המועדון באתר M32',
         redemptionMethod: 'in-store',
         promoCode: null,
         url: 'https://www.m32.co.il',
-        validityType: 'birthday_exact_date',
-        validityDuration: 1,
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      {
+        brandId: createdBrands.find((b) => b.name === 'KFC')?.id,
+        title: '1+1 על המבורגר קלאסי או זינגר',
+        description:
+          '1+1 על המבורגר קלאסי או זינגר בחודש יום ההולדת לחברי מועדון KFC',
+        termsAndConditions:
+          'ההטבה חלה רק על הרכישה השנייה כחבר מועדון (לא על רכישת ההצטרפות) | תקף לכל החודש הקלנדרי של יום ההולדת | לפי תקנון המועדון באתר KFC',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.kfc.co.il',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
       },
       {
         brandId: createdBrands.find((b) => b.name === 'Castro CU')?.id,
@@ -578,6 +619,47 @@ export async function POST(request: NextRequest) {
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: false,
+      },
+      {
+        brandId: createdBrands.find((b) => b.name === 'Burger Station')?.id,
+        title: 'תוספת חינם בחודש יום ההולדת',
+        description:
+          'תוספת חינם בחודש יום ההולדת לחברי מועדון Station+ ברשת בורגר סטיישן',
+        termsAndConditions:
+          'מועדון Station+ חינמי | לפי תקנון המועדון ב-burgerstation.co.il/club | מגבלות שילוב לפי תקנון האתר',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://burgerstation.co.il/club/',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
+      },
+      {
+        brandId: createdBrands.find((b) => b.name === 'שגב')?.id,
+        title: 'מנה ראשונה מתנה',
+        description: 'מנה ראשונה מתנה בחודש יום ההולדת — בישיבה בלבד',
+        termsAndConditions:
+          'תקף לכל החודש הקלנדרי של יום ההולדת | למימוש בישיבה בלבד | אין כפל מבצעים',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.segevchef.com',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
+      },
+      {
+        brandId: createdBrands.find((b) => b.name === "ג'מס - Jem's")?.id,
+        title: 'חצי ליטר בירה מתנה',
+        description:
+          'חצי ליטר בירה מתנה בחודש יום ההולדת — בישיבה בלבד (לא לטייק אוויי / משלוחים)',
+        termsAndConditions:
+          'תקף לכל החודש הקלנדרי של יום ההולדת | למימוש בישיבה בלבד (לא לטייק אוויי / משלוחים)',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.jems.co.il/',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
       },
       // Minna Tomei: Free sushi roll during birthday month
       {

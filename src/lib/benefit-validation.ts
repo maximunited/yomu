@@ -8,6 +8,60 @@ export interface BenefitValidationRule {
   displayText: string;
 }
 
+function startOfLocalDay(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+/** Signed day delta: positive = current is after anchor. */
+function daysSince(anchor: Date, current: Date): number {
+  const ms =
+    startOfLocalDay(current).getTime() - startOfLocalDay(anchor).getTime();
+  return Math.round(ms / (24 * 60 * 60 * 1000));
+}
+
+/**
+ * Observed birthday in a given year.
+ * Feb 29 → Feb 28 in non-leap years.
+ */
+export function getObservedBirthday(dob: Date, year: number): Date {
+  const month = dob.getMonth();
+  const day = dob.getDate();
+  if (month === 1 && day === 29) {
+    const isLeap = new Date(year, 1, 29).getDate() === 29;
+    return new Date(year, 1, isLeap ? 29 : 28);
+  }
+  return new Date(year, month, day);
+}
+
+/**
+ * True when currentDate falls in [birthday - daysBefore, birthday + daysAfter]
+ * for the nearest birthday occurrence (prev/current/next year).
+ */
+export function isWithinBirthdayWindow(
+  userDOB: Date,
+  currentDate: Date,
+  daysBefore: number,
+  daysAfter: number
+): boolean {
+  const y = currentDate.getFullYear();
+  for (const year of [y - 1, y, y + 1]) {
+    const birthday = getObservedBirthday(userDOB, year);
+    const delta = daysSince(birthday, currentDate);
+    if (delta >= -daysBefore && delta <= daysAfter) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isExactBirthday(userDOB: Date, currentDate: Date): boolean {
+  const observed = getObservedBirthday(userDOB, currentDate.getFullYear());
+  return (
+    observed.getMonth() === currentDate.getMonth() &&
+    observed.getDate() === currentDate.getDate()
+  );
+}
+
 export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
   // Always valid (year-round)
   always: {
@@ -20,19 +74,15 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
   birthday_exact_date: {
     validityType: 'birthday_exact_date',
     description: 'Only valid on the exact birthday date',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      return (
-        userDOB.getMonth() === currentDate.getMonth() &&
-        userDOB.getDate() === currentDate.getDate()
-      );
-    },
+    validationLogic: (userDOB, currentDate) =>
+      isExactBirthday(userDOB, currentDate),
     displayText: 'validOnlyOnBirthday',
   },
 
   birthday_entire_month: {
     validityType: 'birthday_entire_month',
     description: 'Valid for the entire birthday month',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
+    validationLogic: (userDOB, currentDate) => {
       return userDOB.getMonth() === currentDate.getMonth();
     },
     displayText: 'validForEntireMonth',
@@ -41,127 +91,57 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
   birthday_week_before_after: {
     validityType: 'birthday_week_before_after',
     description: 'Valid for a week before and after the birthday',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      const birthdayMonth = userDOB.getMonth();
-      const birthdayDay = userDOB.getDate();
-      const currentMonth = currentDate.getMonth();
-      const currentDay = currentDate.getDate();
-
-      if (birthdayMonth === currentMonth) {
-        const daysUntilBirthday = birthdayDay - currentDay;
-        return daysUntilBirthday >= -7 && daysUntilBirthday <= 7;
-      }
-      return false;
-    },
+    validationLogic: (userDOB, currentDate) =>
+      isWithinBirthdayWindow(userDOB, currentDate, 7, 7),
     displayText: 'validForWeek',
   },
 
   birthday_weekend: {
     validityType: 'birthday_weekend',
     description: 'Valid for the weekend of the birthday',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      const birthdayMonth = userDOB.getMonth();
-      const birthdayDay = userDOB.getDate();
-      const currentMonth = currentDate.getMonth();
-      const currentDay = currentDate.getDate();
-
-      if (birthdayMonth === currentMonth) {
-        const daysUntilBirthday = birthdayDay - currentDay;
-        // Allow Friday before to Monday after (6 day window)
-        return daysUntilBirthday >= -6 && daysUntilBirthday <= 6;
-      }
-      return false;
-    },
+    validationLogic: (userDOB, currentDate) =>
+      // Spec: 2 days before to 2 days after
+      isWithinBirthdayWindow(userDOB, currentDate, 2, 2),
     displayText: 'validityWeekend',
   },
 
   birthday_30_days: {
     validityType: 'birthday_30_days',
-    description: 'Valid for 30 days from the birthday',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      const birthdayMonth = userDOB.getMonth();
-      const birthdayDay = userDOB.getDate();
-      const currentMonth = currentDate.getMonth();
-      const currentDay = currentDate.getDate();
-
-      if (birthdayMonth === currentMonth) {
-        const daysUntilBirthday = birthdayDay - currentDay;
-        return daysUntilBirthday >= -30 && daysUntilBirthday <= 30;
-      }
-      return false;
-    },
+    description: 'Valid for 30 days before/after the birthday',
+    validationLogic: (userDOB, currentDate) =>
+      isWithinBirthdayWindow(userDOB, currentDate, 30, 30),
     displayText: 'validity30Days',
   },
 
   birthday_7_days_before: {
     validityType: 'birthday_7_days_before',
     description: 'Valid for 7 days before the birthday',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      const birthdayMonth = userDOB.getMonth();
-      const birthdayDay = userDOB.getDate();
-      const currentMonth = currentDate.getMonth();
-      const currentDay = currentDate.getDate();
-
-      if (birthdayMonth === currentMonth) {
-        const daysUntilBirthday = birthdayDay - currentDay;
-        return daysUntilBirthday >= 0 && daysUntilBirthday <= 7;
-      }
-      return false;
-    },
+    validationLogic: (userDOB, currentDate) =>
+      isWithinBirthdayWindow(userDOB, currentDate, 7, 0),
     displayText: 'validity7DaysBefore',
   },
 
   birthday_7_days_after: {
     validityType: 'birthday_7_days_after',
     description: 'Valid for 7 days after the birthday',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      const birthdayMonth = userDOB.getMonth();
-      const birthdayDay = userDOB.getDate();
-      const currentMonth = currentDate.getMonth();
-      const currentDay = currentDate.getDate();
-
-      if (birthdayMonth === currentMonth) {
-        const daysUntilBirthday = birthdayDay - currentDay;
-        return daysUntilBirthday >= -7 && daysUntilBirthday <= 0;
-      }
-      return false;
-    },
+    validationLogic: (userDOB, currentDate) =>
+      isWithinBirthdayWindow(userDOB, currentDate, 0, 7),
     displayText: 'validity7DaysAfter',
   },
 
   birthday_3_days_before: {
     validityType: 'birthday_3_days_before',
     description: 'Valid for 3 days before the birthday',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      const birthdayMonth = userDOB.getMonth();
-      const birthdayDay = userDOB.getDate();
-      const currentMonth = currentDate.getMonth();
-      const currentDay = currentDate.getDate();
-
-      if (birthdayMonth === currentMonth) {
-        const daysUntilBirthday = birthdayDay - currentDay;
-        return daysUntilBirthday >= 0 && daysUntilBirthday <= 3;
-      }
-      return false;
-    },
+    validationLogic: (userDOB, currentDate) =>
+      isWithinBirthdayWindow(userDOB, currentDate, 3, 0),
     displayText: 'validity3DaysBefore',
   },
 
   birthday_3_days_after: {
     validityType: 'birthday_3_days_after',
     description: 'Valid for 3 days after the birthday',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      const birthdayMonth = userDOB.getMonth();
-      const birthdayDay = userDOB.getDate();
-      const currentMonth = currentDate.getMonth();
-      const currentDay = currentDate.getDate();
-
-      if (birthdayMonth === currentMonth) {
-        const daysUntilBirthday = birthdayDay - currentDay;
-        return daysUntilBirthday >= -3 && daysUntilBirthday <= 0;
-      }
-      return false;
-    },
+    validationLogic: (userDOB, currentDate) =>
+      isWithinBirthdayWindow(userDOB, currentDate, 0, 3),
     displayText: 'validity3DaysAfter',
   },
 
@@ -169,21 +149,15 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
   anniversary_exact_date: {
     validityType: 'anniversary_exact_date',
     description: 'Only valid on the exact anniversary date',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      // For testing, treat userDOB as anniversary date
-      return (
-        userDOB.getMonth() === currentDate.getMonth() &&
-        userDOB.getDate() === currentDate.getDate()
-      );
-    },
+    validationLogic: (userDOB, currentDate) =>
+      isExactBirthday(userDOB, currentDate),
     displayText: 'validOnlyOnBirthday',
   },
 
   anniversary_entire_month: {
     validityType: 'anniversary_entire_month',
     description: 'Valid for the entire anniversary month',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      // For testing, treat userDOB as anniversary date
+    validationLogic: (userDOB, currentDate) => {
       return userDOB.getMonth() === currentDate.getMonth();
     },
     displayText: 'validForEntireMonth',
@@ -192,10 +166,8 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
   anniversary_week_before_after: {
     validityType: 'anniversary_week_before_after',
     description: 'Valid for a week before and after the anniversary',
-    validationLogic: (userDOB: Date, currentDate: Date) => {
-      // This would need anniversaryDate from user profile
-      return false;
-    },
+    validationLogic: (userDOB, currentDate) =>
+      isWithinBirthdayWindow(userDOB, currentDate, 7, 7),
     displayText: 'validForWeek',
   },
 };
@@ -340,23 +312,13 @@ export function getUpcomingBenefits(
       case 'birthday_7_days_after':
       case 'birthday_3_days_before':
       case 'birthday_3_days_after':
-        const birthdayMonth = userDOB.getMonth();
-        const currentMonth = currentDate.getMonth();
-
-        // Birthday is upcoming if it's in a future month this year or next year
-        if (birthdayMonth > currentMonth) return true;
-        if (birthdayMonth < currentMonth) return true; // Next year
-
-        // Same month - check if birthday hasn't passed yet
-        const birthdayDay = userDOB.getDate();
-        const currentDay = currentDate.getDate();
-        return birthdayDay > currentDay;
-
       case 'anniversary_exact_date':
       case 'anniversary_entire_month':
-      case 'anniversary_week_before_after':
-        // For now, treat same as birthday
+      case 'anniversary_week_before_after': {
+        // Not active now ⇒ next occurrence is upcoming (including after
+        // birthday day within the same month).
         return true;
+      }
 
       default:
         return false;

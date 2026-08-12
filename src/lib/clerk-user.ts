@@ -18,10 +18,20 @@ export async function getOrCreateUser(clerkUserId: string) {
   if (email) {
     user = await prisma.user.findUnique({ where: { email } });
     if (user) {
-      return prisma.user.update({
-        where: { id: user.id },
-        data: { clerkId: clerkUserId },
-      });
+      // Only link legacy rows that have no Clerk owner yet.
+      // Never overwrite an existing clerkId (account takeover).
+      if (user.clerkId && user.clerkId !== clerkUserId) {
+        throw new Error(
+          `Email ${email} is already linked to a different Clerk account`
+        );
+      }
+      if (!user.clerkId) {
+        return prisma.user.update({
+          where: { id: user.id },
+          data: { clerkId: clerkUserId },
+        });
+      }
+      return user;
     }
   }
 

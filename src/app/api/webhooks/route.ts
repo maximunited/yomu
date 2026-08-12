@@ -18,10 +18,19 @@ export async function POST(req: NextRequest) {
     if (email) {
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
-        await prisma.user.update({
-          where: { email },
-          data: { clerkId: id, name: name || existingUser.name },
-        });
+        // Only link when unclaimed — never rebind another Clerk account
+        if (existingUser.clerkId && existingUser.clerkId !== id) {
+          console.error(
+            `Webhook user.created: email ${email} already linked to ${existingUser.clerkId}, refusing ${id}`
+          );
+          return new Response('Email already linked', { status: 409 });
+        }
+        if (!existingUser.clerkId) {
+          await prisma.user.update({
+            where: { email },
+            data: { clerkId: id, name: name || existingUser.name },
+          });
+        }
         return new Response('OK', { status: 200 });
       }
     }

@@ -1,9 +1,23 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/admin-auth';
 
 // Database initialization endpoint - creates all tables
-// IMPORTANT: This should be protected or removed after initial setup
+// Admin-only; disabled in production unless ALLOW_API_INIT_DB=1
 export async function POST() {
+  const gate = await requireAdmin();
+  if (!gate.ok) return gate.response;
+
+  if (
+    process.env.NODE_ENV === 'production' &&
+    process.env.ALLOW_API_INIT_DB !== '1'
+  ) {
+    return NextResponse.json(
+      { error: 'init-db disabled in production' },
+      { status: 403 }
+    );
+  }
+
   try {
     // Check if DATABASE_URL exists
     if (!process.env.DATABASE_URL) {
@@ -251,6 +265,9 @@ export async function POST() {
 
 // GET endpoint to check if this API is available
 export async function GET() {
+  const gate = await requireAdmin();
+  if (!gate.ok) return gate.response;
+
   return NextResponse.json({
     message:
       'Database initialization endpoint. Send POST request to initialize database.',

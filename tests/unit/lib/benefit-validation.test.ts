@@ -417,13 +417,13 @@ describe('Benefit Validation', () => {
         const twoDaysAfter = new Date('2024-06-17');
         expect(isBenefitActive(benefit, userDOB, twoDaysAfter)).toBe(true);
 
-        // 3 days before (should be true within 6-day window)
+        // 3 days before (outside ±2 weekend window)
         const threeDaysBefore = new Date('2024-06-12');
-        expect(isBenefitActive(benefit, userDOB, threeDaysBefore)).toBe(true);
+        expect(isBenefitActive(benefit, userDOB, threeDaysBefore)).toBe(false);
 
-        // 3 days after (should be true within 6-day window)
+        // 3 days after (outside ±2 weekend window)
         const threeDaysAfter = new Date('2024-06-18');
-        expect(isBenefitActive(benefit, userDOB, threeDaysAfter)).toBe(true);
+        expect(isBenefitActive(benefit, userDOB, threeDaysAfter)).toBe(false);
 
         // Different month
         const differentMonth = new Date('2024-07-15');
@@ -439,9 +439,9 @@ describe('Benefit Validation', () => {
         const birthdayDate = new Date('2024-06-15');
         expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true);
 
-        // 30 days before
+        // 30 days before (cross-month window)
         const thirtyDaysBefore = new Date('2024-05-16');
-        expect(isBenefitActive(benefit, userDOB, thirtyDaysBefore)).toBe(false); // Different month
+        expect(isBenefitActive(benefit, userDOB, thirtyDaysBefore)).toBe(true);
 
         // Within same month, 14 days before
         const fourteenDaysBefore = new Date('2024-06-01');
@@ -449,9 +449,15 @@ describe('Benefit Validation', () => {
           true
         );
 
-        // Different month
-        const differentMonth = new Date('2024-07-15');
-        expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+        // Exactly 30 days after (still in window)
+        const thirtyDaysAfter = new Date('2024-07-15');
+        expect(isBenefitActive(benefit, userDOB, thirtyDaysAfter)).toBe(true);
+
+        // 31 days after (outside ±30)
+        const thirtyOneDaysAfter = new Date('2024-07-16');
+        expect(isBenefitActive(benefit, userDOB, thirtyOneDaysAfter)).toBe(
+          false
+        );
       });
     });
 

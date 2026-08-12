@@ -58,18 +58,25 @@ describe('OnboardingPage (render)', () => {
     jest.clearAllMocks();
   });
 
-  it('renders and toggles a brand card', () => {
+  it('renders and toggles a brand card', async () => {
     render(<OnboardingPage />);
-    expect(screen.getByText(/איזה תוכניות חברות יש לכם?/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText(/איזה תוכניות חברות יש לכם?/i)
+      ).toBeInTheDocument();
+    });
     const anyCard = screen.getAllByRole('img')[0];
     fireEvent.click(anyCard);
   });
 
-  it('should display loading state initially', () => {
+  it('should display loading state initially', async () => {
     render(<OnboardingPage />);
 
-    // Just check that the page renders with the main heading
-    expect(screen.getByText(/איזה תוכניות חברות יש לכם?/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText(/איזה תוכניות חברות יש לכם?/i)
+      ).toBeInTheDocument();
+    });
   });
 
   it('should display brands after loading', async () => {

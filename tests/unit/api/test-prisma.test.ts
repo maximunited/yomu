@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/test-prisma/route';
 
-// Mock prisma
 jest.mock('@/lib/prisma', () => ({
   prisma: {
     brand: {
@@ -10,16 +10,33 @@ jest.mock('@/lib/prisma', () => ({
   },
 }));
 
-// Mock NextRequest
+jest.mock('@/lib/admin-auth', () => ({
+  requireAdmin: jest.fn(),
+}));
+
 const createMockRequest = () => {
   return new NextRequest('http://localhost:3000/api/test-prisma');
 };
 
 describe('/api/test-prisma', () => {
   const mockPrisma = require('@/lib/prisma').prisma;
+  const { requireAdmin } = require('@/lib/admin-auth');
 
   beforeEach(() => {
     jest.clearAllMocks();
+    requireAdmin.mockResolvedValue({ ok: true, userId: 'admin_1' });
+  });
+
+  it('should return 403 when not admin', async () => {
+    const { NextResponse } = require('next/server');
+    requireAdmin.mockResolvedValue({
+      ok: false,
+      response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }),
+    });
+
+    const response = await GET(createMockRequest());
+    expect(response.status).toBe(403);
+    expect(mockPrisma.brand.count).not.toHaveBeenCalled();
   });
 
   it('should return success response when database connection works', async () => {
@@ -42,7 +59,6 @@ describe('/api/test-prisma', () => {
     const mockError = new Error('Database connection failed');
     mockPrisma.brand.count.mockRejectedValue(mockError);
 
-    // Spy on console.error to verify error logging
     const consoleSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});

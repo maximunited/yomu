@@ -12,11 +12,11 @@ describe('Benefit Validation Edge Cases', () => {
       // User born on leap day (Feb 29, 1992)
       const leapYearDOB = new Date('1992-02-29');
 
-      // Test on Feb 28 in non-leap year (2023)
+      // Test on Feb 28 in non-leap year (2023) — observed birthday
       const feb28NonLeap = new Date('2023-02-28');
       expect(
         isBenefitActive('birthday_exact_date', leapYearDOB, feb28NonLeap)
-      ).toBe(false);
+      ).toBe(true);
 
       // Test on Feb 29 in leap year (2024)
       const feb29Leap = new Date('2024-02-29');
@@ -38,7 +38,7 @@ describe('Benefit Validation Edge Cases', () => {
       const dec27 = new Date('2023-12-27');
       expect(
         isBenefitActive('birthday_week_before_after', jan3DOB, dec27)
-      ).toBe(false);
+      ).toBe(true);
 
       // Test January 10 (week after birthday)
       const jan10 = new Date('2024-01-10');
@@ -62,32 +62,32 @@ describe('Benefit Validation Edge Cases', () => {
         isBenefitActive('birthday_week_before_after', dec31DOB, dec24)
       ).toBe(true);
 
-      // Test January 7th of next year (should not be valid)
+      // Test January 7th of next year (exactly 7 days after Dec 31)
       const jan7 = new Date('2024-01-07');
       expect(
         isBenefitActive('birthday_week_before_after', dec31DOB, jan7)
-      ).toBe(false);
+      ).toBe(true);
     });
 
     it('should handle weekend calculation for various days', () => {
-      const tuesdayDOB = new Date('1990-01-02'); // January 2, 1990 was a Tuesday
+      const tuesdayDOB = new Date('1990-01-02'); // month/day Jan 2
 
-      // Test Friday before (should be valid)
-      const friday = new Date('2024-01-05'); // If Jan 2 is Tuesday, Jan 5 is Friday
-      expect(isBenefitActive('birthday_weekend', tuesdayDOB, friday)).toBe(
-        true
-      );
-
-      // Test Monday after (should be valid)
-      const monday = new Date('2024-01-08'); // Monday after the weekend
-      expect(isBenefitActive('birthday_weekend', tuesdayDOB, monday)).toBe(
-        true
-      );
-
-      // Test Tuesday itself (should be valid)
+      // On birthday (±2 includes day 0)
       const tuesday = new Date('2024-01-02');
       expect(isBenefitActive('birthday_weekend', tuesdayDOB, tuesday)).toBe(
         true
+      );
+
+      // 2 days after (within ±2)
+      const thursday = new Date('2024-01-04');
+      expect(isBenefitActive('birthday_weekend', tuesdayDOB, thursday)).toBe(
+        true
+      );
+
+      // 3 days after (outside ±2)
+      const friday = new Date('2024-01-05');
+      expect(isBenefitActive('birthday_weekend', tuesdayDOB, friday)).toBe(
+        false
       );
     });
   });
@@ -97,11 +97,11 @@ describe('Benefit Validation Edge Cases', () => {
       // Anniversary on Feb 29 (leap day)
       const leapAnniversary = new Date('2020-02-29');
 
-      // Test in non-leap year
+      // Test in non-leap year — observed anniversary is Feb 28
       const feb28NonLeap = new Date('2023-02-28');
       expect(
         isBenefitActive('anniversary_exact_date', leapAnniversary, feb28NonLeap)
-      ).toBe(false);
+      ).toBe(true);
 
       // Test Feb 29 in leap year
       const feb29Leap = new Date('2024-02-29');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/Button';
@@ -23,78 +23,62 @@ interface Brand {
   description: string;
 }
 
-const popularBrands: Brand[] = [
-  {
-    id: 'fox',
-    name: 'Fox',
-    logoUrl: '/images/brands/fox.png',
+/** Preferred onboarding brands by canonical DB name → i18n description key */
+const POPULAR_BRAND_META: Record<
+  string,
+  { category: string; description: string; fallbackLogo: string }
+> = {
+  Fox: {
     category: 'fashion',
     description: 'brandDescriptionFashion',
+    fallbackLogo: '/images/brands/fox.png',
   },
-  {
-    id: 'super-pharm-lifestyle',
-    name: 'Super-Pharm - LifeStyle',
-    logoUrl: '/images/brands/super-pharm.png',
+  'Super-Pharm - LifeStyle': {
     category: 'health',
     description: 'brandDescriptionHealth',
+    fallbackLogo: '/images/brands/super-pharm.png',
   },
-  {
-    id: 'mcdonalds',
-    name: "McDonald's",
-    logoUrl: '/images/brands/mcdonalds.png',
+  "McDonald's": {
     category: 'food',
     description: 'brandDescriptionFood',
+    fallbackLogo: '/images/brands/mcdonalds.png',
   },
-  {
-    id: 'bbb',
-    name: 'BBB',
-    logoUrl: '/images/brands/bbb.png',
+  BBB: {
     category: 'home',
     description: 'brandDescriptionHome',
+    fallbackLogo: '/images/brands/bbb.png',
   },
-  {
-    id: 'hm',
-    name: 'H&M',
-    logoUrl: '/images/brands/hm.png',
+  'H&M': {
     category: 'fashion',
     description: 'brandDescriptionFashion',
+    fallbackLogo: '/images/brands/hm.png',
   },
-  {
-    id: 'isracard',
-    name: 'Isracard',
-    logoUrl: '/images/brands/isracard.png',
+  Isracard: {
     category: 'finance',
     description: 'brandDescriptionFinance',
+    fallbackLogo: '/images/brands/isracard.png',
   },
-  {
-    id: 'max',
-    name: 'Max',
-    logoUrl: '/images/brands/max.png',
+  Max: {
     category: 'fashion',
     description: 'brandDescriptionFashion',
+    fallbackLogo: '/images/brands/max.png',
   },
-  {
-    id: 'starbucks',
-    name: 'Starbucks',
-    logoUrl: '/images/brands/starbucks.png',
+  Starbucks: {
     category: 'food',
     description: 'brandDescriptionCoffee',
+    fallbackLogo: '/images/brands/starbucks.png',
   },
-  {
-    id: 'shufersal',
-    name: 'Shufersal',
-    logoUrl: '/images/brands/shufersal.png',
+  Shufersal: {
     category: 'grocery',
     description: 'brandDescriptionGrocery',
+    fallbackLogo: '/images/brands/shufersal.png',
   },
-  {
-    id: 'coffee-shop',
-    name: 'Coffee Shop',
-    logoUrl: '/images/brands/coffee-shop.svg',
+  'Coffee Shop': {
     category: 'food',
     description: 'brandDescriptionCoffee',
+    fallbackLogo: '/images/brands/coffee-shop.svg',
   },
-];
+};
 
 const categoryIcons = {
   fashion: ShoppingBag,
@@ -110,10 +94,68 @@ export default function OnboardingPage() {
   const { isLoaded } = useUser();
   const router = useRouter();
   const { t } = useLanguage();
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [brandsError, setBrandsError] = useState(false);
 
-  if (!isLoaded) {
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setBrandsLoading(true);
+        const res = await fetch('/api/brands');
+        if (!res.ok) throw new Error('brands fetch failed');
+        const data = await res.json();
+        const catalog: Array<{
+          id: string;
+          name: string;
+          logoUrl?: string | null;
+          category?: string;
+        }> = Array.isArray(data) ? data : [];
+
+        const preferred = Object.keys(POPULAR_BRAND_META)
+          .map((name) => {
+            const row = catalog.find((b) => b.name === name);
+            if (!row) return null;
+            const meta = POPULAR_BRAND_META[name];
+            return {
+              id: row.id,
+              name: row.name,
+              logoUrl: row.logoUrl || meta.fallbackLogo,
+              category: row.category || meta.category,
+              description: meta.description,
+            } satisfies Brand;
+          })
+          .filter((b): b is Brand => b !== null);
+
+        // If none of the preferred names exist, show first active brands from API
+        const resolved =
+          preferred.length > 0
+            ? preferred
+            : catalog.slice(0, 12).map((b) => ({
+                id: b.id,
+                name: b.name,
+                logoUrl: b.logoUrl || '/images/brands/placeholder.svg',
+                category: b.category || 'food',
+                description: 'brandDescriptionFood',
+              }));
+
+        if (!cancelled) setBrands(resolved);
+      } catch (error) {
+        console.error('Failed to load onboarding brands:', error);
+        if (!cancelled) setBrandsError(true);
+      } finally {
+        if (!cancelled) setBrandsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!isLoaded || brandsLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
@@ -182,82 +224,90 @@ export default function OnboardingPage() {
           </p>
         </div>
 
-        {/* Brands Grid */}
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {popularBrands.map((brand) => {
-              const IconComponent =
-                categoryIcons[brand.category as keyof typeof categoryIcons] ||
-                Gift;
-              const isSelected = selectedBrands.includes(brand.id);
-
-              return (
-                <div
-                  key={brand.id}
-                  onClick={() => handleBrandToggle(brand.id)}
-                  className={`relative cursor-pointer rounded-xl border-2 p-4 transition-all hover:shadow-lg ${
-                    isSelected
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  }`}
-                >
-                  {isSelected && (
-                    <div className="absolute top-2 right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
-                        src={brand.logoUrl}
-                        alt={brand.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-sm">
-                        {brand.name}
-                      </h3>
-                      <p className="text-gray-500 text-xs">
-                        {t(brand.description as keyof typeof t)}
-                      </p>
-                    </div>
-                    <IconComponent className="w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-              );
-            })}
+        {brandsError || brands.length === 0 ? (
+          <div className="max-w-md mx-auto text-center space-y-4">
+            <p className="text-gray-600">{t('profileLoadError')}</p>
+            <Button onClick={() => router.push('/memberships')}>
+              {t('onboardingContinueToDashboard')}
+            </Button>
           </div>
+        ) : (
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              {brands.map((brand) => {
+                const IconComponent =
+                  categoryIcons[brand.category as keyof typeof categoryIcons] ||
+                  Gift;
+                const isSelected = selectedBrands.includes(brand.id);
 
-          {/* Action Buttons */}
-          <div className="text-center space-y-4">
-            <p className="text-sm text-gray-600">
-              {t('onboardingSelectedCount').replace(
-                '{count}',
-                selectedBrands.length.toString()
-              )}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={handleSubmit}
-                disabled={isLoading || selectedBrands.length === 0}
-                className="px-8 py-3"
-              >
-                {isLoading
-                  ? t('onboardingSaving')
-                  : t('onboardingContinueToDashboard')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/dashboard')}
-                className="px-8 py-3"
-              >
-                {t('onboardingSkipForNow')}
-              </Button>
+                return (
+                  <div
+                    key={brand.id}
+                    onClick={() => handleBrandToggle(brand.id)}
+                    className={`relative cursor-pointer rounded-xl border-2 p-4 transition-all hover:shadow-lg ${
+                      isSelected
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                        <Check className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                        <img
+                          src={brand.logoUrl}
+                          alt={brand.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm">
+                          {brand.name}
+                        </h3>
+                        <p className="text-gray-500 text-xs">
+                          {t(brand.description as keyof typeof t)}
+                        </p>
+                      </div>
+                      <IconComponent className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="text-center space-y-4">
+              <p className="text-sm text-gray-600">
+                {t('onboardingSelectedCount').replace(
+                  '{count}',
+                  selectedBrands.length.toString()
+                )}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isLoading || selectedBrands.length === 0}
+                  className="px-8 py-3"
+                >
+                  {isLoading
+                    ? t('onboardingSaving')
+                    : t('onboardingContinueToDashboard')}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push('/dashboard')}
+                  className="px-8 py-3"
+                >
+                  {t('onboardingSkipForNow')}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

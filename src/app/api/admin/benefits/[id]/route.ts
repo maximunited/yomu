@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { requireAdmin } from '@/lib/admin-auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(
@@ -7,17 +7,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const gate = await requireAdmin();
+    if (!gate.ok) return gate.response;
 
     const { id } = await params;
     const benefit = await prisma.benefit.findUnique({
       where: { id },
       include: {
         brand: true,
-        notifications: true,
       },
     });
 
@@ -40,10 +37,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const gate = await requireAdmin();
+    if (!gate.ok) return gate.response;
 
     const body = await request.json();
     const { id } = await params;
@@ -81,10 +76,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const gate = await requireAdmin();
+    if (!gate.ok) return gate.response;
 
     const { id } = await params;
 

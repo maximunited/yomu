@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { requireAdmin } from '@/lib/admin-auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const gate = await requireAdmin();
+    if (!gate.ok) return gate.response;
 
     // Return all benefits for admin (including inactive)
     const benefits = await prisma.benefit.findMany({
@@ -26,10 +24,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const gate = await requireAdmin();
+    if (!gate.ok) return gate.response;
 
     const body = await request.json();
 
