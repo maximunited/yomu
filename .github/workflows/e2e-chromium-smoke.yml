@@ -4,6 +4,7 @@
 # modify a pull_request workflow to exfiltrate secrets. Triggers here are:
 #   - workflow_run after CI succeeds on a same-repo pull_request (gates PRs)
 #   - push to master
+#   - workflow_dispatch (manual re-run / post-merge when GITHUB_TOKEN push skipped workflows)
 # The workflow file executed is always from the default branch for workflow_run.
 #
 # Clerk middleware requires a real CLERK_SECRET_KEY (omit/dummy placeholders fail).
@@ -21,6 +22,7 @@ permissions:
   actions: read
 
 on:
+  workflow_dispatch:
   push:
     branches: [master]
   workflow_run:
@@ -36,9 +38,10 @@ jobs:
     name: E2E Chromium Smoke
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    # Master push: run directly. PR: only after successful same-repo CI.
+    # Master push / manual: run directly. PR: only after successful same-repo CI.
     # Skip workflow_run for CI push-to-master (avoid duplicate with push trigger).
     if: >
+      github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
