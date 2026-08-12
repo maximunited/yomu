@@ -4,8 +4,6 @@ import { urls } from './fixtures/test-data';
 
 const clerkIdentifier =
   'input[name="identifier"], input[type="email"], input[autocomplete="username"]';
-const clerkPassword =
-  'input[name="password"], input[type="password"], input[autocomplete="current-password"]';
 
 test.describe('Authentication Flow', () => {
   let authHelper: AuthHelper;
