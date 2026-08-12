@@ -170,3 +170,14 @@ model UsedBenefit {
   @@unique([userId, benefitId])
   @@map("used_benefits")
 }
+
+/** Singleton-style last admin URL-audit report (Vercel-safe; no local fs). */
+model UrlAuditReport {
+  id        String   @id @default("latest")
+  report    Json
+  checkedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("url_audit_reports")
+}

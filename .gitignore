@@ -102,3 +102,6 @@ loyalty-url-status.json
 
 # Local git worktrees
 .worktrees/
+
+# Admin ops runtime artifacts (URL audit last report)
+.data/
