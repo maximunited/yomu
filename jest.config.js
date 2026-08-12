@@ -38,10 +38,7 @@ const customJestConfig = {
     // exclude Prisma client setup (infrastructure code, globally mocked for tests)
     '!src/lib/prisma.ts',
   ],
-  testMatch: [
-    // Unit tests only for now (integration tests are shell scripts, not Jest)
-    '<rootDir>/tests/unit/**/*.{js,jsx,ts,tsx}',
-  ],
+  testMatch: ['**/tests/unit/**/*.[jt]s?(x)'],
   coveragePathIgnorePatterns: ['/node_modules/', '/.next/', '/coverage/'],
   coverageProvider: 'v8', // Use V8 coverage provider to avoid babel-plugin-istanbul issues
   coverageThreshold: {
