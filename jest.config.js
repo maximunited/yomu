@@ -11,12 +11,12 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   testPathIgnorePatterns: [
-    '<rootDir>/.next/',
-    '<rootDir>/node_modules/',
-    '<rootDir>/tests/utils/',
-    '<rootDir>/tests/unit/pages/dashboard.test.tsx',
+    '/.next/',
+    '/node_modules/',
+    '/tests/utils/',
+    '/tests/unit/pages/dashboard.test.tsx',
     // Exclude problematic tests that need provider fixes
-    '<rootDir>/tests/unit/pages/memberships.filters.multiselect.test.tsx',
+    '/tests/unit/pages/memberships.filters.multiselect.test.tsx',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
