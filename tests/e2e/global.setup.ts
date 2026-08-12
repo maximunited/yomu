@@ -5,6 +5,11 @@ import fs from 'fs';
 import path from 'path';
 
 import { loadClerkE2EEnv } from './helpers/clerk-env';
+import { seedBenefitGoldenPath } from './helpers/seed-benefit-golden-path';
+import {
+  disconnectE2EPrisma,
+  seedE2EUserWithDOB,
+} from './helpers/seed-e2e-user';
 
 loadClerkE2EEnv();
 
@@ -54,28 +59,25 @@ setup('authenticate and save storage state', async ({ page }) => {
     'Set E2E_CLERK_USER_EMAIL in .env.local to enable authenticated e2e'
   );
 
-  await ensureE2EUser(email!, password);
+  if (!process.env.DATABASE_URL) {
+    throw new Error(
+      'DATABASE_URL is required for authenticated e2e (Prisma DOB seed hard-fails without it)'
+    );
+  }
 
-  // Ensure Prisma row has DOB so dashboard benefit logic can run
+  const clerkUser = await ensureE2EUser(email!, password);
+
+  // Hard-fail: auth smoke must not green-pass without benefit-capable DOB
   try {
-    const { PrismaClient } = await import('@prisma/client');
-    const { PrismaPg } = await import('@prisma/adapter-pg');
-    const { Pool } = await import('pg');
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const prisma = new PrismaClient({
-      adapter: new PrismaPg(pool),
+    const { id: userId } = await seedE2EUserWithDOB({
+      clerkId: clerkUser.id,
+      email: email!,
+      name: 'E2E Test User',
     });
-    await prisma.user.updateMany({
-      where: { email },
-      data: {
-        dateOfBirth: new Date('1990-07-15T12:00:00.000Z'),
-        name: 'E2E Test User',
-      },
-    });
-    await prisma.$disconnect();
-    await pool.end();
-  } catch (err) {
-    console.warn('Could not seed e2e user DOB:', err);
+    // Seed once here (not in parallel worker beforeAll) to avoid duplicate brands
+    await seedBenefitGoldenPath(userId);
+  } finally {
+    await disconnectE2EPrisma();
   }
 
   fs.mkdirSync(authDir, { recursive: true });
