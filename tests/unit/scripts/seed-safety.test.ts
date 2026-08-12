@@ -36,16 +36,23 @@ describe('scripts/seed.js safety', () => {
     expect(freshBlock![0]).toMatch(/prisma\.benefit\.deleteMany/);
     expect(freshBlock![0]).toMatch(/prisma\.brand\.deleteMany/);
 
-    // Upsert branch must not wipe
-    const upsertBranch = source.match(
-      /Mode: upsert\. Existing data will be updated\/created without wiping\.[\s\S]{0,200}/
+    // Upsert branch must not wipe (wide window catches deep deleteMany)
+    const upsertMarker =
+      'Mode: upsert. Existing data will be updated/created without wiping.';
+    const upsertIdx = source.indexOf(upsertMarker);
+    expect(upsertIdx).toBeGreaterThanOrEqual(0);
+    const upsertWindow = source.slice(
+      upsertIdx,
+      upsertIdx + upsertMarker.length + 4000
     );
-    expect(upsertBranch).not.toBeNull();
-    expect(upsertBranch![0]).not.toMatch(/deleteMany/);
+    expect(upsertWindow).not.toMatch(/deleteMany/);
   });
 
   it('does not wipe before mode is parsed', () => {
-    const beforeMode = source.slice(0, source.indexOf("args.mode || 'upsert'"));
+    const modeMarker = "args.mode || 'upsert'";
+    const modeIdx = source.indexOf(modeMarker);
+    expect(modeIdx).toBeGreaterThanOrEqual(0);
+    const beforeMode = source.slice(0, modeIdx);
     expect(beforeMode).not.toMatch(/\.deleteMany\s*\(/);
   });
 });

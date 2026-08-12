@@ -31,6 +31,7 @@ describe('/api/setup security', () => {
     });
 
     const res = await GET();
+    expect(requireAdmin).toHaveBeenCalled();
     expect(res.status).toBe(401);
     expect(mockPrisma.user.count).not.toHaveBeenCalled();
   });
@@ -43,6 +44,7 @@ describe('/api/setup security', () => {
     });
 
     const res = await GET();
+    expect(requireAdmin).toHaveBeenCalled();
     expect(res.status).toBe(403);
     expect(mockPrisma.user.count).not.toHaveBeenCalled();
   });
@@ -50,6 +52,7 @@ describe('/api/setup security', () => {
   it('reaches DB check only when admin', async () => {
     mockPrisma.user.count.mockResolvedValue(1);
     const res = await GET();
+    expect(requireAdmin).toHaveBeenCalled();
     expect(res.status).toBe(200);
     expect(mockPrisma.user.count).toHaveBeenCalledTimes(1);
   });

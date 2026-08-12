@@ -48,11 +48,13 @@ describe('/api/seed security', () => {
     });
 
     const res = await post();
+    expect(requireAdmin).toHaveBeenCalled();
     expect(res.status).toBe(401);
     expect(mockPrisma.brand.deleteMany).not.toHaveBeenCalled();
   });
 
   it('returns 403 when authenticated non-admin', async () => {
+    process.env.ALLOW_API_SEED = '1';
     const { NextResponse } = require('next/server');
     requireAdmin.mockResolvedValue({
       ok: false,
@@ -60,14 +62,22 @@ describe('/api/seed security', () => {
     });
 
     const res = await post();
+    const body = await res.json();
+
+    expect(requireAdmin).toHaveBeenCalled();
     expect(res.status).toBe(403);
+    expect(body.error).toBe('Forbidden');
+    expect(body.error).not.toMatch(/ALLOW_API_SEED/);
     expect(mockPrisma.brand.deleteMany).not.toHaveBeenCalled();
+    expect(mockPrisma.benefit.deleteMany).not.toHaveBeenCalled();
+    expect(mockPrisma.userMembership.deleteMany).not.toHaveBeenCalled();
   });
 
   it('returns 403 when admin but ALLOW_API_SEED is not set', async () => {
     const res = await post();
     const body = await res.json();
 
+    expect(requireAdmin).toHaveBeenCalled();
     expect(res.status).toBe(403);
     expect(body.error).toMatch(/ALLOW_API_SEED/);
     expect(mockPrisma.brand.deleteMany).not.toHaveBeenCalled();
@@ -77,7 +87,35 @@ describe('/api/seed security', () => {
   it('returns 403 when ALLOW_API_SEED is not exactly 1', async () => {
     process.env.ALLOW_API_SEED = 'true';
     const res = await post();
+    expect(requireAdmin).toHaveBeenCalled();
     expect(res.status).toBe(403);
     expect(mockPrisma.brand.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it('wipes and seeds when admin and ALLOW_API_SEED=1', async () => {
+    process.env.ALLOW_API_SEED = '1';
+    mockPrisma.benefit.deleteMany.mockResolvedValue({ count: 0 });
+    mockPrisma.userMembership.deleteMany.mockResolvedValue({ count: 0 });
+    mockPrisma.brand.deleteMany.mockResolvedValue({ count: 0 });
+    mockPrisma.brand.create.mockImplementation(
+      async ({ data }: { data: { name: string } }) => ({
+        id: `brand_${data.name}`,
+        ...data,
+      })
+    );
+    mockPrisma.brandPartnership.create.mockResolvedValue({ id: 'p1' });
+    mockPrisma.benefit.create.mockResolvedValue({ id: 'b1' });
+
+    const res = await post();
+    const body = await res.json();
+
+    expect(requireAdmin).toHaveBeenCalled();
+    expect(res.status).toBe(200);
+    expect(body.message).toBe('databaseSeedSuccess');
+    expect(mockPrisma.benefit.deleteMany).toHaveBeenCalled();
+    expect(mockPrisma.userMembership.deleteMany).toHaveBeenCalled();
+    expect(mockPrisma.brand.deleteMany).toHaveBeenCalled();
+    expect(mockPrisma.brand.create).toHaveBeenCalled();
+    expect(mockPrisma.benefit.create).toHaveBeenCalled();
   });
 });
