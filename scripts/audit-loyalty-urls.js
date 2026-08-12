@@ -1,18 +1,20 @@
 /**
  * Monthly loyalty URL audit
  * --------------------------------------
- * HEAD-checks brand websites / benefit URLs from seed.js (or a JSON export).
+ * HEAD-checks brand websites / actionUrls / benefit URLs from seed.js (or a JSON export).
  * Flags HTTP failures and (optionally) stale Last checked dates from JSON.
+ * Writes optional machine-readable last-good status via --out=.
  *
  * Usage:
  *   node scripts/audit-loyalty-urls.js
  *   node scripts/audit-loyalty-urls.js --json=path/to/export.json
  *   node scripts/audit-loyalty-urls.js --stale-days=60
+ *   node scripts/audit-loyalty-urls.js --out=loyalty-url-status.json
  *   npm run audit:loyalty-urls
  *
  * JSON export shape (optional):
  *   {
- *     "brands": [{ "name": "...", "website": "https://...", "lastChecked": "2026-08-01" }],
+ *     "brands": [{ "name": "...", "website": "https://...", "actionUrl": "https://...", "lastChecked": "2026-08-01" }],
  *     "benefits": [{ "title": "...", "brand": "...", "url": "https://...", "lastChecked": "2026-08-01" }]
  *   }
  *
@@ -20,7 +22,7 @@
  * After reviewing the report, update Last checked in YomU Brands / YomU Benefits via Notion UI or MCP.
  *
  * Exit codes:
- *   0 — all checked URLs OK
+ *   0 — all checked URLs OK (and no stale lastChecked when provided)
  *   1 — one or more URL failures (or invalid input)
  */
 
@@ -28,6 +30,10 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 const https = require('https');
+const {
+  parseSeedCatalog,
+  daysSince,
+} = require('./lib/parse-seed-catalog');
 
 const DEFAULT_STALE_DAYS = 60;
 const REQUEST_TIMEOUT_MS = 12000;
@@ -35,9 +41,10 @@ const USER_AGENT =
   'YomU-LoyaltyUrlAudit/1.0 (+https://github.com/MaximUnited/yomu)';
 
 function parseArgs(argv) {
-  const out = { json: null, staleDays: DEFAULT_STALE_DAYS };
+  const out = { json: null, staleDays: DEFAULT_STALE_DAYS, outPath: null };
   for (const arg of argv.slice(2)) {
     if (arg.startsWith('--json=')) out.json = arg.slice('--json='.length);
+    else if (arg.startsWith('--out=')) out.outPath = arg.slice('--out='.length);
     else if (arg.startsWith('--stale-days=')) {
       const n = Number(arg.slice('--stale-days='.length));
       if (!Number.isFinite(n) || n < 1) {
@@ -47,7 +54,7 @@ function parseArgs(argv) {
       out.staleDays = n;
     } else if (arg === '--help' || arg === '-h') {
       console.log(
-        `Usage: node scripts/audit-loyalty-urls.js [--json=file] [--stale-days=${DEFAULT_STALE_DAYS}]`
+        `Usage: node scripts/audit-loyalty-urls.js [--json=file] [--out=file] [--stale-days=${DEFAULT_STALE_DAYS}]`
       );
       process.exit(0);
     }
@@ -56,39 +63,20 @@ function parseArgs(argv) {
 }
 
 function loadFromSeed() {
-  // Require seed module pieces by evaluating the brands array via regex-safe parse:
-  // seed.js is not a pure data module; extract website URLs with a light parse.
-  const seedPath = path.join(__dirname, 'seed.js');
-  const src = fs.readFileSync(seedPath, 'utf8');
-
-  const brands = [];
-  const brandBlockMatch = src.match(/const predefinedBrands = \[([\s\S]*?)\];/);
-  if (!brandBlockMatch) {
-    throw new Error('Could not find predefinedBrands in scripts/seed.js');
-  }
-
-  // Split on object starts: { name:
-  const objectChunks = brandBlockMatch[1].split(/\n\s*\{/).slice(1);
-  for (const chunk of objectChunks) {
-    const name = chunk.match(/name:\s*(['"`])([\s\S]*?)\1/)?.[2];
-    const website = chunk.match(/website:\s*(['"`])([\s\S]*?)\1/)?.[2];
-    if (name && website) {
-      brands.push({ name, website, lastChecked: null });
-    }
-  }
-
-  const benefits = [];
-  // Benefit urls from sampleBenefits title/url pairs
-  const benefitBlocks = src.split(/\n\s*\{\s*\n\s*brandId:/).slice(1);
-  for (const block of benefitBlocks) {
-    const title = block.match(/title:\s*(['"`])([\s\S]*?)\1/)?.[2];
-    const url = block.match(/\burl:\s*(['"`])([\s\S]*?)\1/)?.[2];
-    if (title && url) {
-      benefits.push({ title, brand: null, url, lastChecked: null });
-    }
-  }
-
-  return { brands, benefits, source: 'scripts/seed.js' };
+  const catalog = parseSeedCatalog();
+  const brands = catalog.brands.map((b) => ({
+    name: b.name,
+    website: b.website,
+    actionUrl: b.actionUrl,
+    lastChecked: null,
+  }));
+  const benefits = catalog.benefits.map((b) => ({
+    title: b.title,
+    brand: b.brandName,
+    url: b.url,
+    lastChecked: null,
+  }));
+  return { brands, benefits, source: catalog.source };
 }
 
 function loadFromJson(filePath) {
@@ -97,6 +85,7 @@ function loadFromJson(filePath) {
   const brands = (data.brands || []).map((b) => ({
     name: b.name || b.Name,
     website: b.website || b['Website URL'] || b.Website,
+    actionUrl: b.actionUrl || b['Action URL'] || null,
     lastChecked: b.lastChecked || b['Last checked'] || null,
   }));
   const benefits = (data.benefits || []).map((b) => ({
@@ -232,13 +221,6 @@ function getFallback(url) {
   });
 }
 
-function daysSince(isoDate) {
-  if (!isoDate) return null;
-  const t = Date.parse(String(isoDate).slice(0, 10));
-  if (Number.isNaN(t)) return null;
-  return Math.floor((Date.now() - t) / (24 * 60 * 60 * 1000));
-}
-
 function mdEscape(s) {
   // Escape backslashes first so pipe escaping is not undone
   return String(s ?? '')
@@ -246,9 +228,29 @@ function mdEscape(s) {
     .replace(/\|/g, '\\|');
 }
 
+function buildLastGoodStatus(results, checkedAt) {
+  return {
+    checkedAt,
+    source: 'audit-loyalty-urls',
+    urls: results.map((r) => ({
+      kind: r.kind,
+      label: r.label,
+      url: r.url,
+      ok: Boolean(r.ok),
+      blocked: Boolean(r.blocked),
+      status: r.status ?? null,
+      error: r.error ?? null,
+      lastChecked: r.lastChecked ?? null,
+      lastGoodAt: r.ok ? checkedAt : null,
+      broken: !r.ok && !r.blocked,
+    })),
+  };
+}
+
 async function main() {
   const args = parseArgs(process.argv);
   const loaded = args.json ? loadFromJson(args.json) : loadFromSeed();
+  const checkedAt = new Date().toISOString();
 
   const urlJobs = [];
   for (const b of loaded.brands) {
@@ -257,6 +259,14 @@ async function main() {
         kind: 'brand',
         label: b.name,
         url: b.website,
+        lastChecked: b.lastChecked,
+      });
+    }
+    if (b.actionUrl && b.actionUrl !== b.website) {
+      urlJobs.push({
+        kind: 'actionUrl',
+        label: b.name,
+        url: b.actionUrl,
         lastChecked: b.lastChecked,
       });
     }
@@ -284,7 +294,7 @@ async function main() {
   console.log(`- Source: \`${loaded.source}\``);
   console.log(`- Checked: ${unique.length} unique URLs`);
   console.log(`- Stale threshold: ${args.staleDays} days`);
-  console.log(`- When: ${new Date().toISOString()}`);
+  console.log(`- When: ${checkedAt}`);
   console.log('');
 
   const results = [];
@@ -359,6 +369,14 @@ async function main() {
         `- [${s.kind}] ${s.label}: last checked ${s.lastChecked} (${daysSince(s.lastChecked)}d ago)`
       );
     }
+    console.log('');
+  }
+
+  if (args.outPath) {
+    const statusDoc = buildLastGoodStatus(results, checkedAt);
+    const absOut = path.resolve(args.outPath);
+    fs.writeFileSync(absOut, `${JSON.stringify(statusDoc, null, 2)}\n`, 'utf8');
+    console.log(`Wrote last-good status: \`${absOut}\``);
     console.log('');
   }
 

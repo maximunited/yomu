@@ -243,6 +243,34 @@ export default function AdminPage() {
                         </p>
                         <p className="text-xs text-gray-400">
                           {brand.category}
+                          {brand.actionUrl ? (
+                            <>
+                              {' • '}
+                              <a
+                                href={brand.actionUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                              >
+                                actionUrl
+                              </a>
+                            </>
+                          ) : (
+                            ' • actionUrl: missing'
+                          )}
+                          {brand.website ? (
+                            <>
+                              {' • '}
+                              <a
+                                href={brand.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                              >
+                                website
+                              </a>
+                            </>
+                          ) : null}
                         </p>
                       </div>
                     </div>
@@ -297,6 +325,15 @@ export default function AdminPage() {
                               Free
                             </span>
                           )}
+                          <span
+                            className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              benefit.verified
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
+                          >
+                            {benefit.verified ? 'Verified' : 'Unverified'}
+                          </span>
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
                           {benefit.description}
@@ -305,6 +342,26 @@ export default function AdminPage() {
                           {benefit.redemptionMethod} • {benefit.validityType}
                           {benefit.validityDuration &&
                             ` • ${benefit.validityDuration} days`}
+                          {' • '}
+                          lastChecked:{' '}
+                          {benefit.lastChecked
+                            ? new Date(benefit.lastChecked)
+                                .toISOString()
+                                .slice(0, 10)
+                            : 'never'}
+                          {benefit.url ? (
+                            <>
+                              {' • '}
+                              <a
+                                href={benefit.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                              >
+                                benefit URL
+                              </a>
+                            </>
+                          ) : null}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2 ml-4">

@@ -54,6 +54,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run db:studio` - Alias for Prisma Studio
 - `npm run db:seed` - Seed database (alias for `node scripts/seed.js`)
 - `npm run audit:loyalty-urls` - Monthly HEAD/GET audit of brand/benefit URLs from seed (also scheduled via `.github/workflows/audit-loyalty-urls.yml`)
+- `npm run catalog:drift` - Seed catalog structural drift check (blocking in CI; optional `--db` vs Postgres). See `docs/CATALOG_OPS.md`
+- `npm run catalog:stale` - Seasonal verified refresh queue (seed) or `--db --stale-days=180` for stale lastChecked
 - `node scripts/seed.js --mode=fresh` - Wipe and reseed database completely
 - `node scripts/seed.js --mode=upsert` - Safe update without wiping data
 - `node scripts/seed.js --mode=upsert --brands="Giraffe,Nono & Mimi"` - Seed specific brands only

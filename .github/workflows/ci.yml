@@ -52,6 +52,10 @@ jobs:
       - name: Run translation checks
         run: npm run test:translations
 
+      # Blocking: seed.js structural catalog integrity (no DB / Notion / network)
+      - name: Catalog drift check (seed structure)
+        run: npm run catalog:drift
+
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
         # Only upload once: on pull_request events, or on push to master (skip push events for PR branches)
