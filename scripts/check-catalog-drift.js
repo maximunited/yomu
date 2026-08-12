@@ -30,9 +30,7 @@ function parseArgs(argv) {
     if (arg === '--db') out.db = true;
     else if (arg === '--json') out.json = true;
     else if (arg === '--help' || arg === '-h') {
-      console.log(
-        'Usage: node scripts/check-catalog-drift.js [--db] [--json]'
-      );
+      console.log('Usage: node scripts/check-catalog-drift.js [--db] [--json]');
       process.exit(0);
     }
   }
@@ -80,10 +78,7 @@ async function main() {
     dbDrift = analyzeSeedDbDrift(catalog, db);
   }
 
-  const errors = [
-    ...structural.errors,
-    ...(dbDrift ? dbDrift.errors : []),
-  ];
+  const errors = [...structural.errors, ...(dbDrift ? dbDrift.errors : [])];
   const warnings = [
     ...structural.warnings,
     ...(dbDrift ? dbDrift.warnings : []),

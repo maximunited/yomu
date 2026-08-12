@@ -195,9 +195,7 @@ function analyzeSeedDbDrift(seed, db) {
       .filter((b) => b.brandName)
       .map((b) => `${b.brandName}::${b.title}`)
   );
-  const dbKeys = new Set(
-    db.benefits.map((b) => `${b.brandName}::${b.title}`)
-  );
+  const dbKeys = new Set(db.benefits.map((b) => `${b.brandName}::${b.title}`));
 
   for (const key of seedKeys) {
     if (!dbKeys.has(key)) {
@@ -230,12 +228,7 @@ function daysSince(isoDate) {
  * DB mode: uses Benefit.verified + lastChecked.
  */
 function analyzeStaleVerified(options) {
-  const {
-    mode,
-    softBrandNames = [],
-    benefits = [],
-    staleDays = 180,
-  } = options;
+  const { mode, softBrandNames = [], benefits = [], staleDays = 180 } = options;
   const softSet = new Set(softBrandNames);
   const stale = [];
   const ok = [];

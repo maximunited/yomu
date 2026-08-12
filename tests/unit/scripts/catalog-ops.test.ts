@@ -24,7 +24,9 @@ describe('parse-seed-catalog', () => {
     expect(catalog.softBrandNames).toEqual(
       expect.arrayContaining(['H&M', 'Shufersal', 'Isracard'])
     );
-    const mcdonalds = catalog.brands.find((b: { name: string }) => b.name === "McDonald's");
+    const mcdonalds = catalog.brands.find(
+      (b: { name: string }) => b.name === "McDonald's"
+    );
     expect(mcdonalds?.website).toMatch(/^https:\/\//);
     expect(mcdonalds?.actionUrl).toMatch(/^https:\/\//);
     const benefit = catalog.benefits.find(
@@ -70,15 +72,15 @@ describe('parse-seed-catalog', () => {
     expect(errors.some((e: string) => e.includes('Duplicate brand'))).toBe(
       true
     );
-    expect(
-      warnings.some((w: string) => w.includes('missing actionUrl'))
-    ).toBe(true);
+    expect(warnings.some((w: string) => w.includes('missing actionUrl'))).toBe(
+      true
+    );
     expect(
       errors.some((e: string) => e.includes('SOFT_BRAND_NAMES entry not in'))
     ).toBe(true);
-    expect(
-      errors.some((e: string) => e.includes('Benefit brand not in'))
-    ).toBe(true);
+    expect(errors.some((e: string) => e.includes('Benefit brand not in'))).toBe(
+      true
+    );
   });
 
   it('analyzeSeedDbDrift detects missing and extra rows', () => {
@@ -146,12 +148,11 @@ describe('parse-seed-catalog', () => {
         },
       ],
     });
-    expect(report.stale.map((s: { title: string }) => s.title).sort()).toEqual(
-      ['Old', 'VerifiedNoDate']
-    );
-    expect(report.ok.map((s: { title: string }) => s.title)).toEqual([
-      'Fresh',
+    expect(report.stale.map((s: { title: string }) => s.title).sort()).toEqual([
+      'Old',
+      'VerifiedNoDate',
     ]);
+    expect(report.ok.map((s: { title: string }) => s.title)).toEqual(['Fresh']);
   });
 
   it('analyzeStaleVerified seed mode queues non-soft benefits', () => {
@@ -244,9 +245,12 @@ const sampleBenefits = [
 `;
     const benefits = parseBenefits(src);
     expect(benefits).toHaveLength(3);
-    expect(benefits.every((b: { brandName: string | null }) => b.brandName === 'Super-Pharm - LifeStyle')).toBe(
-      true
-    );
+    expect(
+      benefits.every(
+        (b: { brandName: string | null }) =>
+          b.brandName === 'Super-Pharm - LifeStyle'
+      )
+    ).toBe(true);
     expect(benefits[0].title).toBe('20% הנחה על כל הקנייה');
   });
 });
@@ -312,13 +316,18 @@ describe('audit-loyalty-urls lastGoodAt merge', () => {
       },
     ];
     const doc = buildLastGoodStatus(results, checkedAt, prior);
-    expect(doc.urls.find((u: { url: string }) => u.url === 'https://a.example')?.lastGoodAt).toBe(
-      priorGood
-    );
-    expect(doc.urls.find((u: { url: string }) => u.url === 'https://b.example')?.lastGoodAt).toBe(
-      checkedAt
-    );
-    expect(doc.urls.find((u: { url: string }) => u.url === 'https://c.example')?.lastGoodAt).toBeNull();
+    expect(
+      doc.urls.find((u: { url: string }) => u.url === 'https://a.example')
+        ?.lastGoodAt
+    ).toBe(priorGood);
+    expect(
+      doc.urls.find((u: { url: string }) => u.url === 'https://b.example')
+        ?.lastGoodAt
+    ).toBe(checkedAt);
+    expect(
+      doc.urls.find((u: { url: string }) => u.url === 'https://c.example')
+        ?.lastGoodAt
+    ).toBeNull();
   });
 
   it('sets lastGoodAt to checkedAt when ok and no prior', () => {

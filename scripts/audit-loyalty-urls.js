@@ -30,10 +30,7 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 const https = require('https');
-const {
-  parseSeedCatalog,
-  daysSince,
-} = require('./lib/parse-seed-catalog');
+const { parseSeedCatalog, daysSince } = require('./lib/parse-seed-catalog');
 
 const DEFAULT_STALE_DAYS = 60;
 const REQUEST_TIMEOUT_MS = 12000;
