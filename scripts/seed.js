@@ -943,8 +943,7 @@ async function seed() {
       {
         brandId: createdBrands.find((b) => b.name === 'שגב')?.id,
         title: 'מנה ראשונה מתנה',
-        description:
-          'מנה ראשונה מתנה בחודש יום ההולדת — בישיבה בלבד',
+        description: 'מנה ראשונה מתנה בחודש יום ההולדת — בישיבה בלבד',
         termsAndConditions:
           'תקף לכל החודש הקלנדרי של יום ההולדת | למימוש בישיבה בלבד | אין כפל מבצעים',
         redemptionMethod: 'in-store',
