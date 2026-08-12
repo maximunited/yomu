@@ -191,7 +191,61 @@ Edit `.husky/pre-commit` to change what runs before commits.
 
 Create environment-specific configurations in the CI scripts based on `NODE_ENV`.
 
-## 📚 Related Documentation
+## E2E Chromium Smoke (PR CI)
+
+PR and `master` CI run a **public Chromium-only** Playwright smoke via the
+`e2e_chromium_smoke` job in `.github/workflows/ci.yml`. It gates merges: the
+job must pass.
+
+### Decision (approaches considered)
+
+| Approach | Pros | Cons | Chosen? |
+| -------- | ---- | ---- | ------- |
+| Parallel job in `ci.yml` (chromium only, dummy `DATABASE_URL`, no Clerk E2E user) | Matches existing CI style; parallel with lint/build/Jest; minimal install (`chromium` only); no Postgres service time | Needs repo Clerk app secrets for sign-in UI pages | Yes |
+| Separate `e2e.yml` workflow | Cleaner isolation | Extra workflow/badge; same secrets; less “one CI check” cohesion | No |
+| Append Playwright to `build_and_test` | Shared `npm ci` | Serializes wall time; bloated job | No |
+| Postgres service + seed + authenticated specs | Deeper coverage | Slower; needs `E2E_CLERK_*` secrets; out of smoke scope | No (local/nightly later) |
+
+**webServer:** keep Playwright’s `npm run dev` (already in `playwright.config.ts`).
+CI sets `reuseExistingServer: false`, 120s timeout, `workers: 1`, `retries: 2`.
+
+**Browsers:** under `CI=true`, firefox/webkit/mobile projects are omitted unless
+`E2E_FULL_BROWSERS=1` (local/nightly). Authenticated projects still require
+`E2E_CLERK_USER_EMAIL` and are **not** set in PR CI.
+
+### Required GitHub Actions secrets
+
+| Secret | Purpose |
+| ------ | ------- |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | App + Clerk UI on public pages (`/sign-in`, redirects) |
+| `CLERK_SECRET_KEY` | Server-side Clerk for Next.js |
+
+Do **not** set `E2E_CLERK_USER_EMAIL` on the PR smoke job (that enables
+`chromium-authenticated` + `global.setup`).
+
+Fork PRs from external contributors will not receive these secrets — expect
+smoke to fail until maintained with a branch from the base repo or secrets
+configured for trusted workflows.
+
+### Local commands
+
+```bash
+# Same as PR CI (chromium public only)
+npm run test:e2e:ci
+
+# Explicit chromium project
+npm run test:e2e:chromium
+
+# Full multi-browser locally (default when CI unset)
+npm run test:e2e
+
+# Nightly-style multi-browser under CI env
+CI=true E2E_FULL_BROWSERS=1 npm run test:e2e
+```
+
+Install browsers once: `npx playwright install` (CI installs chromium only).
+
+---
 
 - [GitHub Actions Workflows](../.github/workflows/)
 - [Jest Testing Guide](./TESTING.md)

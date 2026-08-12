@@ -265,8 +265,11 @@ npm run test:coverage
 ### End-to-End Tests
 
 ```bash
-# Run all E2E tests
+# Run all E2E tests (local multi-browser)
 npm run test:e2e
+
+# PR CI smoke: public chromium only (no Clerk E2E user secrets)
+npm run test:e2e:ci
 
 # Run with browser UI visible
 npm run test:e2e:headed
@@ -283,6 +286,10 @@ npm run test:e2e:accessibility
 # View test reports
 npm run test:e2e:report
 ```
+
+PR CI runs Chromium public smoke and gates merges. See
+[docs/CI-TESTING.md](docs/CI-TESTING.md) (E2E Chromium Smoke) for secrets and
+the approach decision. Firefox/WebKit/mobile stay local/nightly.
 
 ### Specialized Tests
 
