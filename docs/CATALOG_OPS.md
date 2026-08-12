@@ -7,7 +7,7 @@ YomU’s product catalog source of truth is `scripts/seed.js`. Notion [YomU Loya
 | Command | What it does | CI default |
 | ------- | ------------ | ---------- |
 | `npm run catalog:drift` | Structural integrity of seed (brands, benefits, soft list, required URLs). Optional `--db` compares names/titles to Postgres (read-only). | **Blocking** in `ci.yml` (seed only, no DB) |
-| `npm run audit:loyalty-urls` | HEAD/GET check of brand `website`, distinct `actionUrl`, and benefit `url`. Optional `--out=loyalty-url-status.json` writes last-good status. | **Non-blocking** monthly (`audit-loyalty-urls.yml`) |
+| `npm run audit:loyalty-urls` | HEAD/GET check of brand `website`, distinct `actionUrl`, and benefit `url`. Optional `--out=loyalty-url-status.json` writes last-good status (merges prior `lastGoodAt` on transient failures). | **Non-blocking** monthly (`audit-loyalty-urls.yml`) |
 | `npm run catalog:stale` | Seasonal review queue from seed (researched / non-soft benefits). With `--db --stale-days=180` flags verified DB rows with old/missing `lastChecked`. | **Non-blocking** on monthly URL audit workflow |
 
 ```bash

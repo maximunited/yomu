@@ -228,22 +228,61 @@ function mdEscape(s) {
     .replace(/\|/g, '\\|');
 }
 
-function buildLastGoodStatus(results, checkedAt) {
+/**
+ * Load prior --out status JSON if present (merge source for lastGoodAt).
+ * @param {string} outPath
+ * @returns {{ checkedAt?: string, urls?: object[] } | null}
+ */
+function loadPriorStatus(outPath) {
+  try {
+    if (!fs.existsSync(outPath)) return null;
+    const data = JSON.parse(fs.readFileSync(outPath, 'utf8'));
+    if (!data || typeof data !== 'object') return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Build last-good status document. On transient failures, preserve prior
+ * lastGoodAt for the same URL when the current check is not ok.
+ * @param {object[]} results
+ * @param {string} checkedAt
+ * @param {{ urls?: { url?: string, lastGoodAt?: string|null }[] } | null} [priorStatus]
+ */
+function buildLastGoodStatus(results, checkedAt, priorStatus = null) {
+  const priorByUrl = new Map();
+  for (const u of priorStatus?.urls || []) {
+    if (u && typeof u.url === 'string' && u.url) {
+      priorByUrl.set(u.url, u);
+    }
+  }
+
   return {
     checkedAt,
     source: 'audit-loyalty-urls',
-    urls: results.map((r) => ({
-      kind: r.kind,
-      label: r.label,
-      url: r.url,
-      ok: Boolean(r.ok),
-      blocked: Boolean(r.blocked),
-      status: r.status ?? null,
-      error: r.error ?? null,
-      lastChecked: r.lastChecked ?? null,
-      lastGoodAt: r.ok ? checkedAt : null,
-      broken: !r.ok && !r.blocked,
-    })),
+    urls: results.map((r) => {
+      const prior = priorByUrl.get(r.url);
+      let lastGoodAt = null;
+      if (r.ok) {
+        lastGoodAt = checkedAt;
+      } else if (prior?.lastGoodAt) {
+        lastGoodAt = prior.lastGoodAt;
+      }
+      return {
+        kind: r.kind,
+        label: r.label,
+        url: r.url,
+        ok: Boolean(r.ok),
+        blocked: Boolean(r.blocked),
+        status: r.status ?? null,
+        error: r.error ?? null,
+        lastChecked: r.lastChecked ?? null,
+        lastGoodAt,
+        broken: !r.ok && !r.blocked,
+      };
+    }),
   };
 }
 
@@ -373,8 +412,9 @@ async function main() {
   }
 
   if (args.outPath) {
-    const statusDoc = buildLastGoodStatus(results, checkedAt);
     const absOut = path.resolve(args.outPath);
+    const priorStatus = loadPriorStatus(absOut);
+    const statusDoc = buildLastGoodStatus(results, checkedAt, priorStatus);
     fs.writeFileSync(absOut, `${JSON.stringify(statusDoc, null, 2)}\n`, 'utf8');
     console.log(`Wrote last-good status: \`${absOut}\``);
     console.log('');
@@ -388,7 +428,16 @@ async function main() {
   if (failures.length || stale.length) process.exit(1);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+module.exports = {
+  buildLastGoodStatus,
+  loadPriorStatus,
+  parseArgs,
+  classifyStatus,
+};
+
+if (require.main === module) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

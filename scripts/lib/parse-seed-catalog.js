@@ -54,9 +54,15 @@ function parseBenefits(src) {
   const benefits = [];
   const benefitBlocks = src.split(/\n\s*\{\s*\n\s*brandId:/).slice(1);
   for (const block of benefitBlocks) {
+    // Allow multiline find() / optional chaining (e.g. Super-Pharm in seed.js):
+    //   brandId: createdBrands.find((b) => b.name === '...')
+    //     ?.id,
+    //   brandId: createdBrands.find(
+    //     (b) => b.name === '...'
+    //   )?.id,
     const brandName =
       block.match(
-        /createdBrands\.find\(\(b\)\s*=>\s*b\.name\s*===\s*(['"`])([\s\S]*?)\1\)/
+        /createdBrands\.find\(\s*\(\s*b\s*\)\s*=>\s*b\.name\s*===\s*(['"`])([\s\S]*?)\1\s*\)/
       )?.[2] || null;
     const title = block.match(/title:\s*(['"`])([\s\S]*?)\1/)?.[2];
     const url = block.match(/\burl:\s*(['"`])([\s\S]*?)\1/)?.[2] || null;

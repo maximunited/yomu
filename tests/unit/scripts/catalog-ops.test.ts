@@ -205,6 +205,142 @@ const sampleBenefits = [
     expect(parseBrands(src)).toHaveLength(2);
     expect(parseBenefits(src)[0].brandName).toBe('Hard');
   });
+
+  it('parses multiline brandId find / optional chaining (Super-Pharm pattern)', () => {
+    const src = `
+const predefinedBrands = [
+  {
+    name: 'Super-Pharm - LifeStyle',
+    website: 'https://www.super-pharm.co.il',
+    actionUrl: 'https://www.super-pharm.co.il',
+    category: 'health',
+  },
+];
+const sampleBenefits = [
+  {
+    brandId: createdBrands.find((b) => b.name === 'Super-Pharm - LifeStyle')
+      ?.id,
+    title: '20% הנחה על כל הקנייה',
+    url: 'https://www.super-pharm.co.il',
+    validityType: 'birthday_entire_month',
+    isFree: false,
+  },
+  {
+    brandId: createdBrands.find(
+      (b) => b.name === 'Super-Pharm - LifeStyle'
+    )?.id,
+    title: 'Alt multiline find',
+    validityType: 'birthday_exact_date',
+    isFree: true,
+  },
+  {
+    brandId: createdBrands.find((b) => b.name === 'Super-Pharm - LifeStyle'
+)?.id,
+    title: 'Paren before optional chain',
+    validityType: 'birthday_week_before_after',
+    isFree: false,
+  },
+];
+`;
+    const benefits = parseBenefits(src);
+    expect(benefits).toHaveLength(3);
+    expect(benefits.every((b: { brandName: string | null }) => b.brandName === 'Super-Pharm - LifeStyle')).toBe(
+      true
+    );
+    expect(benefits[0].title).toBe('20% הנחה על כל הקנייה');
+  });
+});
+
+describe('audit-loyalty-urls lastGoodAt merge', () => {
+  const {
+    buildLastGoodStatus,
+  } = require('../../../scripts/audit-loyalty-urls');
+
+  it('preserves prior lastGoodAt when current check fails', () => {
+    const priorGood = '2026-07-01T00:00:00.000Z';
+    const checkedAt = '2026-08-13T00:00:00.000Z';
+    const prior = {
+      checkedAt: priorGood,
+      source: 'audit-loyalty-urls',
+      urls: [
+        {
+          kind: 'brand',
+          label: 'A',
+          url: 'https://a.example',
+          ok: true,
+          lastGoodAt: priorGood,
+        },
+        {
+          kind: 'brand',
+          label: 'B',
+          url: 'https://b.example',
+          ok: true,
+          lastGoodAt: priorGood,
+        },
+      ],
+    };
+    const results = [
+      {
+        kind: 'brand',
+        label: 'A',
+        url: 'https://a.example',
+        ok: false,
+        blocked: false,
+        status: 500,
+        error: null,
+        lastChecked: null,
+      },
+      {
+        kind: 'brand',
+        label: 'B',
+        url: 'https://b.example',
+        ok: true,
+        blocked: false,
+        status: 200,
+        error: null,
+        lastChecked: null,
+      },
+      {
+        kind: 'brand',
+        label: 'C',
+        url: 'https://c.example',
+        ok: false,
+        blocked: false,
+        status: null,
+        error: 'timeout',
+        lastChecked: null,
+      },
+    ];
+    const doc = buildLastGoodStatus(results, checkedAt, prior);
+    expect(doc.urls.find((u: { url: string }) => u.url === 'https://a.example')?.lastGoodAt).toBe(
+      priorGood
+    );
+    expect(doc.urls.find((u: { url: string }) => u.url === 'https://b.example')?.lastGoodAt).toBe(
+      checkedAt
+    );
+    expect(doc.urls.find((u: { url: string }) => u.url === 'https://c.example')?.lastGoodAt).toBeNull();
+  });
+
+  it('sets lastGoodAt to checkedAt when ok and no prior', () => {
+    const checkedAt = '2026-08-13T12:00:00.000Z';
+    const doc = buildLastGoodStatus(
+      [
+        {
+          kind: 'brand',
+          label: 'A',
+          url: 'https://a.example',
+          ok: true,
+          blocked: false,
+          status: 200,
+          error: null,
+          lastChecked: null,
+        },
+      ],
+      checkedAt,
+      null
+    );
+    expect(doc.urls[0].lastGoodAt).toBe(checkedAt);
+  });
 });
 
 describe('catalog ops scripts exist', () => {
