@@ -13,9 +13,16 @@ jest.mock('@/lib/prisma', () => ({
   prisma: {
     brand: { findMany: jest.fn() },
     benefit: { findMany: jest.fn() },
+    urlAuditReport: {
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+    },
   },
 }));
 jest.mock('@/lib/url-audit', () => ({
+  capUrlAuditJobs: jest.fn((jobs: unknown[], limit: number) =>
+    (jobs as unknown[]).slice(0, limit)
+  ),
   runUrlAudit: jest.fn(async () => ({
     checkedAt: '2026-08-13T00:00:00.000Z',
     results: [],
@@ -29,21 +36,16 @@ jest.mock('@/lib/url-audit', () => ({
     },
   })),
 }));
-jest.mock('fs/promises', () => ({
-  readFile: jest.fn(async () => {
-    throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' });
-  }),
-  writeFile: jest.fn(async () => undefined),
-  mkdir: jest.fn(async () => undefined),
-}));
 
 describe('/api/admin/url-audit', () => {
   const { requireAdmin } = require('@/lib/admin-auth');
   const prisma = require('@/lib/prisma').prisma;
-  const { runUrlAudit } = require('@/lib/url-audit');
+  const { runUrlAudit, capUrlAuditJobs } = require('@/lib/url-audit');
 
   beforeEach(() => {
     requireAdmin.mockResolvedValue({ ok: true, userId: 'user_admin' });
+    prisma.urlAuditReport.findUnique.mockResolvedValue(null);
+    prisma.urlAuditReport.upsert.mockResolvedValue({});
     jest.clearAllMocks();
   });
 
@@ -57,14 +59,15 @@ describe('/api/admin/url-audit', () => {
     expect(res.status).toBe(403);
   });
 
-  it('GET returns last=null when no report', async () => {
+  it('GET returns last=null with persistence=database when no report', async () => {
     const res = await GET();
     const json = await res.json();
     expect(res.status).toBe(200);
     expect(json.last).toBeNull();
+    expect(json.persistence).toBe('database');
   });
 
-  it('POST runs audit against DB urls', async () => {
+  it('POST runs audit against DB urls and persists', async () => {
     prisma.brand.findMany.mockResolvedValueOnce([
       { id: '1', name: 'Fox', website: 'https://www.fox.co.il' },
     ]);
@@ -85,8 +88,12 @@ describe('/api/admin/url-audit', () => {
     const res = await POST(req);
     const json = await res.json();
     expect(res.status).toBe(200);
+    expect(capUrlAuditJobs).toHaveBeenCalled();
     expect(runUrlAudit).toHaveBeenCalled();
+    expect(prisma.urlAuditReport.upsert).toHaveBeenCalled();
     expect(json.source).toBe('database');
+    expect(json.persistence).toBe('database');
+    expect(json.persisted).toBe(true);
     expect(json.summary.total).toBe(0);
   });
 

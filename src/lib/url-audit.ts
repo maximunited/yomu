@@ -169,6 +169,49 @@ export function checkUrl(url: string): Promise<UrlCheckResult> {
   });
 }
 
+/**
+ * Cap audit jobs under a limit without starving benefits behind brands.
+ * Round-robins brand ↔ benefit (then any other kinds), deduping by URL.
+ */
+export function capUrlAuditJobs(
+  jobs: UrlAuditJob[],
+  limit: number
+): UrlAuditJob[] {
+  if (limit <= 0) return [];
+
+  const brandQ: UrlAuditJob[] = [];
+  const benefitQ: UrlAuditJob[] = [];
+  const otherQ: UrlAuditJob[] = [];
+  for (const job of jobs) {
+    if (!job.url) continue;
+    if (job.kind === 'brand') brandQ.push(job);
+    else if (job.kind === 'benefit') benefitQ.push(job);
+    else otherQ.push(job);
+  }
+
+  const queues = [brandQ, benefitQ, otherQ].filter((q) => q.length > 0);
+  const indices = queues.map(() => 0);
+  const out: UrlAuditJob[] = [];
+  const seen = new Set<string>();
+
+  while (out.length < limit) {
+    let progressed = false;
+    for (let q = 0; q < queues.length && out.length < limit; q++) {
+      while (indices[q] < queues[q].length) {
+        const job = queues[q][indices[q]++];
+        if (seen.has(job.url)) continue;
+        seen.add(job.url);
+        out.push(job);
+        progressed = true;
+        break;
+      }
+    }
+    if (!progressed) break;
+  }
+
+  return out;
+}
+
 export async function runUrlAudit(
   jobs: UrlAuditJob[],
   options?: { concurrency?: number; staleDays?: number }

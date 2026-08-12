@@ -1,7 +1,11 @@
 import { verifyWebhook } from '@clerk/nextjs/webhooks';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { captureException, captureMessage } from '@/lib/monitoring';
+import {
+  captureException,
+  captureMessage,
+  hashEmailPrefix,
+} from '@/lib/monitoring';
 
 export async function POST(req: NextRequest) {
   let evt;
@@ -25,11 +29,25 @@ export async function POST(req: NextRequest) {
         if (existingUser) {
           // Only link when unclaimed — never rebind another Clerk account
           if (existingUser.clerkId && existingUser.clerkId !== id) {
-            const msg = `Webhook user.created: email ${email} already linked to ${existingUser.clerkId}, refusing ${id}`;
-            console.error(msg);
+            const msg =
+              'Webhook user.created: duplicate email link refused';
+            console.error(msg, {
+              emailHash: hashEmailPrefix(email),
+              existingClerkId: existingUser.clerkId,
+              refusedClerkId: id,
+            });
             await captureMessage(msg, {
-              tags: { area: 'clerk-webhook', stage: 'user.created' },
+              tags: {
+                area: 'clerk-webhook',
+                stage: 'user.created',
+                reason: 'duplicate-email',
+              },
               level: 'warning',
+              extra: {
+                emailHash: hashEmailPrefix(email),
+                existingClerkId: existingUser.clerkId,
+                refusedClerkId: id,
+              },
             });
             return new Response('Email already linked', { status: 409 });
           }

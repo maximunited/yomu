@@ -46,7 +46,7 @@ function formatChecked(value?: string | Date | null) {
 }
 
 export default function AdminPage() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,8 +58,8 @@ export default function AdminPage() {
   const [auditBusy, setAuditBusy] = useState(false);
   const [auditReport, setAuditReport] = useState<UrlAuditReport | null>(null);
   const [opsMessage, setOpsMessage] = useState<string | null>(null);
-
-  const isAdmin = user?.publicMetadata?.role === 'admin';
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminChecked, setAdminChecked] = useState(false);
 
   const unverifiedCount = useMemo(
     () => benefits.filter((b) => b.verified === false).length,
@@ -67,13 +67,44 @@ export default function AdminPage() {
   );
 
   useEffect(() => {
-    if (isLoaded && isSignedIn && isAdmin) {
-      loadData();
-      loadLastAudit();
-    } else if (isLoaded) {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      setIsAdmin(false);
+      setAdminChecked(true);
       setIsLoading(false);
+      return;
     }
-  }, [isLoaded, isSignedIn, isAdmin]);
+
+    let cancelled = false;
+    (async () => {
+      try {
+        // Server gate mirrors requireAdmin (role + ADMIN_USER_IDS)
+        const res = await fetch('/api/admin/me');
+        if (cancelled) return;
+        const ok = res.ok;
+        setIsAdmin(ok);
+        setAdminChecked(true);
+        if (ok) {
+          await loadData();
+          await loadLastAudit();
+        } else {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Admin auth check failed:', error);
+        if (!cancelled) {
+          setIsAdmin(false);
+          setAdminChecked(true);
+          setIsLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn]);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -113,7 +144,12 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/url-audit');
       if (!res.ok) return;
       const data = await res.json();
-      if (data?.last) setAuditReport(data.last);
+      if (data?.last) {
+        setAuditReport(data.last);
+      } else if (data?.persistence === 'database') {
+        // Honest empty state — DB persistence is supported, nothing stored yet
+        setAuditReport(null);
+      }
     } catch (error) {
       console.error('Error loading last audit:', error);
     }
@@ -263,7 +299,7 @@ export default function AdminPage() {
     }
   };
 
-  if (!isLoaded || isLoading) {
+  if (!isLoaded || !adminChecked || (isAdmin && isLoading)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

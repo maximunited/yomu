@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { scrubSentryEvent } from '@/lib/monitoring';
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -12,6 +13,9 @@ Sentry.init({
   sendDefaultPii: false,
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0,
+  beforeSend(event) {
+    return scrubSentryEvent(event as Record<string, unknown>) as typeof event;
+  },
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
