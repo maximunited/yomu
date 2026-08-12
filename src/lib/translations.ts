@@ -68,6 +68,22 @@ export interface Translations {
   myBenefits: string;
   activeNow: string;
   comingSoon: string;
+  thisMonthForMe: string;
+  thisMonthForMeSubtitle: string;
+  endingSoon: string;
+  endingInDays: string; // expects {days}
+  trustVerified: string;
+  trustSoft: string;
+  lastCheckedOn: string; // expects {date}
+  redemptionChecklist: string;
+  redeemNeedsCard: string;
+  redeemNeedsApp: string;
+  redeemNeedsCode: string;
+  redeemInStore: string;
+  redeemOnline: string;
+  redeemNoStacking: string;
+  redeemedLastYear: string;
+  opensAgainInDays: string; // expects {days}
   noActiveBenefits: string;
   noUpcomingBenefits: string;
   couponCode: string;
@@ -560,6 +576,23 @@ export const translations: Record<Language, Translations> = {
     myBenefits: 'הטבות שלי',
     activeNow: 'פעיל עכשיו',
     comingSoon: 'בקרוב',
+    thisMonthForMe: 'החודש בשבילי',
+    thisMonthForMeSubtitle:
+      'פעיל עכשיו → מסתיים בקרוב → בקרוב · מתנות לפני הנחות',
+    endingSoon: 'מסתיים בקרוב',
+    endingInDays: 'עוד {days} ימים',
+    trustVerified: 'מאומת',
+    trustSoft: 'לא מאומת במלואו',
+    lastCheckedOn: 'נבדק לאחרונה: {date}',
+    redemptionChecklist: 'איך לממש',
+    redeemNeedsCard: 'כרטיס מועדון',
+    redeemNeedsApp: 'באפליקציה',
+    redeemNeedsCode: 'קוד',
+    redeemInStore: 'בחנות / בישיבה',
+    redeemOnline: 'באתר',
+    redeemNoStacking: 'אין כפל מבצעים',
+    redeemedLastYear: 'מומש בשנה שעברה',
+    opensAgainInDays: 'נפתח שוב בעוד {days} ימים',
     noActiveBenefits: 'אין הטבות פעילות כרגע',
     noUpcomingBenefits: 'אין הטבות קרובות',
     couponCode: 'קוד קופון:',
@@ -1065,6 +1098,23 @@ export const translations: Record<Language, Translations> = {
     myBenefits: 'My Benefits',
     activeNow: 'Active Now',
     comingSoon: 'Coming Soon',
+    thisMonthForMe: 'This month for me',
+    thisMonthForMeSubtitle:
+      'Active now → ending soon → upcoming · free before % off',
+    endingSoon: 'Ending soon',
+    endingInDays: '{days} days left',
+    trustVerified: 'Verified',
+    trustSoft: 'Unverified',
+    lastCheckedOn: 'Last checked: {date}',
+    redemptionChecklist: 'How to redeem',
+    redeemNeedsCard: 'Club card',
+    redeemNeedsApp: 'In app',
+    redeemNeedsCode: 'Code',
+    redeemInStore: 'In store / sit-down',
+    redeemOnline: 'Online',
+    redeemNoStacking: 'No stacking',
+    redeemedLastYear: 'Redeemed last year',
+    opensAgainInDays: 'Opens again in {days} days',
     noActiveBenefits: 'No active benefits right now',
     noUpcomingBenefits: 'No upcoming benefits',
     couponCode: 'Coupon Code:',

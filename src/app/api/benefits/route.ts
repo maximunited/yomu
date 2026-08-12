@@ -76,6 +76,8 @@ export async function GET() {
       redemptionMethod: benefit.redemptionMethod,
       termsAndConditions: benefit.termsAndConditions,
       isFree: benefit.isFree,
+      verified: benefit.verified,
+      lastChecked: benefit.lastChecked,
       createdAt: benefit.createdAt,
       updatedAt: benefit.updatedAt,
     }));
