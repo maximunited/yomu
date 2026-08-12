@@ -437,7 +437,8 @@ export async function runReminderPipeline(
 }
 
 /**
- * Authorize cron callers: Bearer CRON_SECRET, or admin session.
+ * Timing-safe Bearer CRON_SECRET check (used by cron route gates).
+ * Route-level policy: GET = secret only; POST = secret or requireAdmin.
  */
 export function timingSafeEqualString(a: string, b: string): boolean {
   if (a.length !== b.length) return false;

@@ -1,5 +1,5 @@
 /**
- * Cron reminders route: CRON_SECRET Bearer or requireAdmin.
+ * Cron reminders route: GET = CRON_SECRET only; POST = Bearer or requireAdmin.
  */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { NextRequest } from 'next/server';
@@ -61,7 +61,7 @@ describe('/api/cron/reminders', () => {
     return method === 'GET' ? GET(req) : POST(req);
   };
 
-  it('allows Bearer CRON_SECRET without admin', async () => {
+  it('allows Bearer CRON_SECRET without admin (POST)', async () => {
     const res = await call('POST', 'Bearer test-cron-secret');
     expect(res.status).toBe(200);
     expect(requireAdmin).not.toHaveBeenCalled();
@@ -73,17 +73,43 @@ describe('/api/cron/reminders', () => {
   it('allows GET with valid secret (Vercel Cron)', async () => {
     const res = await call('GET', 'Bearer test-cron-secret');
     expect(res.status).toBe(200);
+    expect(requireAdmin).not.toHaveBeenCalled();
     expect(runReminderPipeline).toHaveBeenCalled();
   });
 
-  it('falls back to admin when secret missing from request', async () => {
+  it('rejects GET with admin session but no Bearer (CSRF)', async () => {
+    requireAdmin.mockResolvedValue({ ok: true, userId: 'admin_1' });
+    const res = await call('GET');
+    expect(res.status).toBe(401);
+    expect(requireAdmin).not.toHaveBeenCalled();
+    expect(runReminderPipeline).not.toHaveBeenCalled();
+  });
+
+  it('rejects GET with wrong Bearer even if admin', async () => {
+    requireAdmin.mockResolvedValue({ ok: true, userId: 'admin_1' });
+    const res = await call('GET', 'Bearer wrong');
+    expect(res.status).toBe(401);
+    expect(requireAdmin).not.toHaveBeenCalled();
+    expect(runReminderPipeline).not.toHaveBeenCalled();
+  });
+
+  it('returns 503 on GET when CRON_SECRET unset', async () => {
+    delete process.env.CRON_SECRET;
+    requireAdmin.mockResolvedValue({ ok: true, userId: 'admin_1' });
+    const res = await call('GET');
+    expect(res.status).toBe(503);
+    expect(requireAdmin).not.toHaveBeenCalled();
+    expect(runReminderPipeline).not.toHaveBeenCalled();
+  });
+
+  it('allows POST admin when secret missing from request', async () => {
     requireAdmin.mockResolvedValue({ ok: true, userId: 'admin_1' });
     const res = await call('POST');
     expect(requireAdmin).toHaveBeenCalled();
     expect(res.status).toBe(200);
   });
 
-  it('returns 401 when secret wrong and unauthenticated', async () => {
+  it('returns 401 when POST secret wrong and unauthenticated', async () => {
     const { NextResponse } = require('next/server');
     requireAdmin.mockResolvedValue({
       ok: false,
@@ -94,7 +120,7 @@ describe('/api/cron/reminders', () => {
     expect(runReminderPipeline).not.toHaveBeenCalled();
   });
 
-  it('returns 503 when CRON_SECRET unset and not admin', async () => {
+  it('returns 503 when CRON_SECRET unset and POST not admin', async () => {
     delete process.env.CRON_SECRET;
     const { NextResponse } = require('next/server');
     requireAdmin.mockResolvedValue({
@@ -104,5 +130,14 @@ describe('/api/cron/reminders', () => {
     const res = await call('POST');
     expect(res.status).toBe(503);
     expect(runReminderPipeline).not.toHaveBeenCalled();
+  });
+
+  it('allows POST admin when CRON_SECRET unset', async () => {
+    delete process.env.CRON_SECRET;
+    requireAdmin.mockResolvedValue({ ok: true, userId: 'admin_1' });
+    const res = await call('POST');
+    expect(requireAdmin).toHaveBeenCalled();
+    expect(res.status).toBe(200);
+    expect(runReminderPipeline).toHaveBeenCalled();
   });
 });

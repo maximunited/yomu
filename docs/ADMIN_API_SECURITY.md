@@ -35,4 +35,11 @@ Never put seed/setup/test routes back on the public allowlist.
 
 ## Related: reminders cron
 
-Daily benefit reminders use `/api/cron/reminders` (Clerk-public like webhooks) gated by `CRON_SECRET` Bearer **or** `requireAdmin()`. See [REMINDERS.md](./REMINDERS.md).
+Daily benefit reminders use `/api/cron/reminders` (Clerk-public like webhooks):
+
+| Method | Gate |
+| ------ | ---- |
+| **GET** | `CRON_SECRET` Bearer only (no admin cookie — CSRF) |
+| **POST** | `CRON_SECRET` Bearer **or** `requireAdmin()` |
+
+See [REMINDERS.md](./REMINDERS.md).

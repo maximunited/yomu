@@ -28,8 +28,9 @@ Push / WhatsApp are **not** wired (settings UI toggles only; no half-built sende
 ## Auth
 
 - Route is on Clerk `PUBLIC_ROUTES` as `/api/cron(.*)` (like webhooks) so Vercel Cron can hit it without a session.
-- Handler requires `Authorization: Bearer ${CRON_SECRET}` **or** an admin session (`requireAdmin`).
-- If `CRON_SECRET` is unset, only admins can run the job (503 for anonymous).
+- **GET** (Vercel Cron): `Authorization: Bearer ${CRON_SECRET}` only. No admin cookie fallback (CSRF). Fail closed with **503** if `CRON_SECRET` is unset, **401** if missing/invalid.
+- **POST** (manual): Bearer `CRON_SECRET` **or** `requireAdmin()` for signed-in admin runs. If secret unset and not admin → **503**.
+- Each future `/api/cron/*` route must define its own gate — Clerk public ≠ authenticated.
 - Not listed as a dangerous public allowlist hole for seed/admin — cron secret is mandatory in production.
 
 ## Env
@@ -49,7 +50,7 @@ curl -X POST "https://<host>/api/cron/reminders" \
   -H "Authorization: Bearer $CRON_SECRET"
 ```
 
-Admins can also call the route while signed in (no Bearer) when debugging.
+Admins can also **POST** while signed in (no Bearer) when debugging. Prefer POST over GET for manual runs.
 
 ## Schedule
 
