@@ -268,7 +268,7 @@ npm run test:coverage
 # Run all E2E tests (local multi-browser)
 npm run test:e2e
 
-# PR CI smoke: public chromium only (no Clerk E2E user secrets)
+# CI smoke: public chromium only (no Clerk E2E user secrets)
 npm run test:e2e:ci
 
 # Run with browser UI visible
@@ -287,9 +287,11 @@ npm run test:e2e:accessibility
 npm run test:e2e:report
 ```
 
-PR CI runs Chromium public smoke and gates merges. See
-[docs/CI-TESTING.md](docs/CI-TESTING.md) (E2E Chromium Smoke) for secrets and
-the approach decision. Firefox/WebKit/mobile stay local/nightly.
+CI runs Chromium public smoke via `e2e-chromium-smoke.yml` (`workflow_run` after
+CI on same-repo PRs; push on `master`) so `CLERK_SECRET_KEY` is not injected
+into `pull_request` jobs. Use a dedicated `pk_test_` / `sk_test_` Clerk
+instance only — never `sk_live_`. See [docs/CI-TESTING.md](docs/CI-TESTING.md).
+Firefox/WebKit/mobile stay local/nightly.
 
 ### Specialized Tests
 

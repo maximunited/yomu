@@ -61,50 +61,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
 
-  # Public chromium smoke only (firefox/webkit/mobile stay local/nightly).
-  # Decision: parallel job in ci.yml, no Postgres service, no Clerk E2E user secrets.
-  # See docs/CI-TESTING.md § E2E Chromium Smoke.
-  e2e_chromium_smoke:
-    name: E2E Chromium Smoke
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Run Chromium public e2e smoke
-        env:
-          CI: 'true'
-          NEXT_TELEMETRY_DISABLED: '1'
-          # Dummy URL — public smoke does not require a live DB
-          DATABASE_URL: 'postgresql://yomu:yomu@localhost:5432/yomu'
-          SKIP_DB_PUSH: 'true'
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          # Intentionally unset: skips chromium-authenticated + global.setup
-          # E2E_CLERK_USER_EMAIL:
-        run: npm run test:e2e:ci
-
-      - name: Upload Playwright report
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report-chromium-smoke
-          path: playwright-report/
-          retention-days: 7
+  # Public chromium e2e smoke (with Clerk secrets) lives in
+  # .github/workflows/e2e-chromium-smoke.yml — workflow_run after CI on PRs,
+  # and push to master. Not inlined here: pull_request workflows run PR code
+  # with access to secrets (same-repo exfiltration). See docs/CI-TESTING.md.
 
   # Docker smoke test is maintained as a separate workflow in .github/workflows/docker.yml

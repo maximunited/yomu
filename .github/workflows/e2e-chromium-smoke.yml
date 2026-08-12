@@ -1,0 +1,166 @@
+# Public Chromium smoke with Clerk app secrets.
+#
+# SECURITY: This workflow must NOT use `on: pull_request`. Same-repo PRs can
+# modify a pull_request workflow to exfiltrate secrets. Triggers here are:
+#   - workflow_run after CI succeeds on a same-repo pull_request (gates PRs)
+#   - push to master
+# The workflow file executed is always from the default branch for workflow_run.
+#
+# Clerk middleware requires a real CLERK_SECRET_KEY (omit/dummy placeholders fail).
+# CI Clerk secrets MUST be a dedicated development instance (pk_test_ / sk_test_),
+# never production (pk_live_ / sk_live_). See docs/CI-TESTING.md.
+#
+# Do NOT set E2E_CLERK_USER_EMAIL here — with CLERK_SECRET_KEY present that would
+# unlock global.setup / authenticated projects (exfiltration amplifier).
+
+name: E2E Chromium Smoke
+
+permissions:
+  contents: read
+  checks: write
+  actions: read
+
+on:
+  push:
+    branches: [master]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+concurrency:
+  group: e2e-chromium-smoke-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  e2e_chromium_smoke:
+    name: E2E Chromium Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    # Master push: run directly. PR: only after successful same-repo CI.
+    # Skip workflow_run for CI push-to-master (avoid duplicate with push trigger).
+    if: >
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'pull_request' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    permissions:
+      contents: read
+      checks: write
+      actions: read
+    steps:
+      - name: Resolve commit SHA
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create in-progress check (PR)
+        if: github.event_name == 'workflow_run'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = '${{ steps.meta.outputs.sha }}';
+            const { data } = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'E2E Chromium Smoke',
+              head_sha: sha,
+              status: 'in_progress',
+              started_at: new Date().toISOString(),
+            });
+            core.setOutput('check_id', String(data.id));
+        id: check
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.meta.outputs.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Assert Clerk development keys and no E2E user
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+        run: |
+          if [ -n "${E2E_CLERK_USER_EMAIL:-}" ]; then
+            echo "::error::E2E_CLERK_USER_EMAIL must not be set for public smoke (amplifier with CLERK_SECRET_KEY)"
+            exit 1
+          fi
+          case "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}" in
+            pk_test_*) ;;
+            *)
+              echo "::error::NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY must be a pk_test_ development key (never pk_live_)"
+              exit 1
+              ;;
+          esac
+          case "${CLERK_SECRET_KEY}" in
+            sk_test_*) ;;
+            *)
+              echo "::error::CLERK_SECRET_KEY must be a sk_test_ development key (never sk_live_)"
+              exit 1
+              ;;
+          esac
+
+      - name: Run Chromium public e2e smoke
+        id: smoke
+        env:
+          CI: 'true'
+          NEXT_TELEMETRY_DISABLED: '1'
+          # Dummy URL — public smoke does not require a live DB
+          DATABASE_URL: 'postgresql://yomu:yomu@localhost:5432/yomu'
+          SKIP_DB_PUSH: 'true'
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          # Intentionally unset: skips chromium-authenticated + global.setup
+          # E2E_CLERK_USER_EMAIL:
+        run: npm run test:e2e:ci
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-chromium-smoke
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Complete check (PR)
+        if: always() && github.event_name == 'workflow_run' && steps.check.outputs.check_id != ''
+        uses: actions/github-script@v7
+        env:
+          CHECK_ID: ${{ steps.check.outputs.check_id }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+        with:
+          script: |
+            // Only success if the smoke step ran and passed; prior-step failures → failure
+            const conclusion =
+              process.env.SMOKE_OUTCOME === 'success' ? 'success' : 'failure';
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: Number(process.env.CHECK_ID),
+              status: 'completed',
+              conclusion,
+              completed_at: new Date().toISOString(),
+              output: {
+                title:
+                  conclusion === 'success'
+                    ? 'Chromium public smoke passed'
+                    : 'Chromium public smoke failed',
+                summary: `See workflow run ${context.runId} for logs.`,
+              },
+            });
