@@ -31,8 +31,6 @@ const SOFT_BRAND_NAMES = new Set([
   'Shufersal',
   'Isracard',
   'Honigman',
-  'Brill Group / Gali',
-  'Jump / עונות',
 ]);
 
 const predefinedBrands = [
@@ -331,7 +329,7 @@ const predefinedBrands = [
     name: 'Brill Group / Gali',
     logoUrl: '/images/brands/gali.svg',
     website: 'https://www.gali.co.il',
-    description: '~20% הנחה ביום הולדת (לאימות)',
+    description: 'קבוצת בריל — מועדון Super Friends (Gali ורשתות)',
     category: 'fashion',
     actionUrl: 'https://www.gali.co.il',
     actionType: 'website',
@@ -341,7 +339,7 @@ const predefinedBrands = [
     name: 'Jump / עונות',
     logoUrl: '/images/brands/jump.svg',
     website: 'https://www.jump.co.il',
-    description: 'מתנת יום הולדת ~₪50 (לאימות)',
+    description: 'רשת אופנה עונות ו-Jump',
     category: 'fashion',
     actionUrl: 'https://www.jump.co.il',
     actionType: 'website',
@@ -836,31 +834,34 @@ async function seed() {
         validityDuration: 30,
         isFree: true,
       },
-      // Brill Group / Gali (soft)
+      // Brill Group / Gali (verified 2026-08-14 — gali.co.il/membership-terms)
       {
         brandId: createdBrands.find((b) => b.name === 'Brill Group / Gali')?.id,
-        title: '~20% הנחה ביום הולדת',
-        description: 'כ־20% הנחה ביום הולדת (לאימות מול Gali / Brill Group)',
-        termsAndConditions: 'לא מאומת במלואו | יש לאשר מול האתר',
+        title: '20% הנחה ביום הולדת',
+        description:
+          'הנחה חד-פעמית של 20% מסכום רכישה בודדת בכל רשתות קבוצת בריל בחודש הלועזי שבו חל יום ההולדת',
+        termsAndConditions:
+          'מוגבל לרכישה אחת בכל רשת עד 700 ₪ כולל כפל מבצעים; חברה חדשה בחודש יום ההולדת — מהשנה הלועזית העוקבת; מימוש בסניף עם תעודה מזהה',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.gali.co.il',
+        url: 'https://www.gali.co.il/membership-terms',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: false,
       },
-      // Jump / עונות (soft)
+      // Jump / עונות (verified 2026-08-14 — onot.co.il/members-policy)
       {
         brandId: createdBrands.find((b) => b.name === 'Jump / עונות')?.id,
-        title: 'מתנת יום הולדת ~₪50',
-        description: 'מתנת יום הולדת בסך כ־₪50 (לאימות)',
-        termsAndConditions: 'לא מאומת במלואו | יש לאשר מול האתר',
+        title: '20% הנחה נוספת בחודש יום ההולדת',
+        description: '20% הנחה נוספים על מבצעי החנות הקיימים בחודש יום ההולדת',
+        termsAndConditions:
+          'מימוש בסניף עם תעודה מזהה; ההנחה נוספת על מבצעים קיימים בחנות; חברות פעילה במועדון',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.jump.co.il',
+        url: 'https://www.onot.co.il/members-policy',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
-        isFree: true,
+        isFree: false,
       },
       // Burgers Bar — 10% off birthday month
       {
@@ -1243,6 +1244,12 @@ async function seed() {
       },
       KFC: {
         '1+1 על המבורגר קלאסי או זינגר': ['המבורגר 1+1 מתנה'],
+      },
+      'Brill Group / Gali': {
+        '20% הנחה ביום הולדת': ['~20% הנחה ביום הולדת'],
+      },
+      'Jump / עונות': {
+        '20% הנחה נוספת בחודש יום ההולדת': ['מתנת יום הולדת ~₪50'],
       },
     };
 
