@@ -25,13 +25,7 @@ console.log('Starting seed script...');
 const prisma = createPrismaClient();
 
 /** Soft / uncertain research — benefits seed with verified: false */
-const SOFT_BRAND_NAMES = new Set([
-  'H&M',
-  'שילב',
-  'Shufersal',
-  'Isracard',
-  'Honigman',
-]);
+const SOFT_BRAND_NAMES = new Set(['H&M', 'שילב', 'Shufersal', 'Isracard']);
 
 const predefinedBrands = [
   {
@@ -319,11 +313,13 @@ const predefinedBrands = [
     name: 'Honigman',
     logoUrl: '/images/brands/honigman.svg',
     website: 'https://www.honigman.com',
-    description: 'מתנת יום הולדת (תנאים לא ודאיים — לאימות)',
+    description:
+      'מועדון קיווי / Honigman Kids — הטבות יום הולדת לילדים רשומים (לא מועדון מבוגרים)',
     category: 'fashion',
-    actionUrl: 'https://www.honigman.com',
+    actionUrl:
+      'https://kiwi-kids.co.il/%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F-%D7%9C%D7%A7%D7%95%D7%97%D7%95%D7%AA',
     actionType: 'website',
-    actionLabel: 'הצטרפות למועדון',
+    actionLabel: 'תקנון מועדון לקוחות',
   },
   {
     name: 'Brill Group / Gali',
@@ -820,16 +816,17 @@ async function seed() {
         validityDuration: 30,
         isFree: true,
       },
-      // Honigman (soft)
+      // Honigman / Kiwi Kids club (verified 2026-08-14 — kiwi-kids.co.il מועדון לקוחות §24)
       {
         brandId: createdBrands.find((b) => b.name === 'Honigman')?.id,
-        title: 'מתנת יום הולדת',
+        title: 'הטבת יום הולדת משתנה לילדים (מועדון קיווי)',
         description:
-          'מתנת יום הולדת לחברי מועדון Honigman (תנאים לא ודאיים — לאימות)',
-        termsAndConditions: 'לא מאומת במלואו | יש לאשר מול האתר',
+          'חברי מועדון קיווי / Honigman Kids זכאים להטבת יום הולדת משתנה לכל ילד רשום (עד 4) בחודש הקלנדרי שבו חל יום הולדתו',
+        termsAndConditions:
+          'מועדון ילדים בלבד (קיווי, Honigman Kids, Yidishkeit); ההטבה משתנה לפי שיקול דעת החברה; רישום עד 4 ילדים עם תאריכי לידה; מימוש בהצגת ספח ת.ז. הכולל שמות הילדים; הטבה אחת בלבד בחודש גם אם יותר מילד אחד חוגג באותו חודש; לא בחודש ההצטרפות; זמינות 30 יום לאחר עדכון פרטי הילדים בלינק מ-SMS; הטבה שלא מומשה בחודש יום ההולדת פוקעת',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.honigman.com',
+        url: 'https://kiwi-kids.co.il/%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F-%D7%9C%D7%A7%D7%95%D7%97%D7%95%D7%AA',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -1250,6 +1247,9 @@ async function seed() {
       },
       'Jump / עונות': {
         '20% הנחה נוספת בחודש יום ההולדת': ['מתנת יום הולדת ~₪50'],
+      },
+      Honigman: {
+        'הטבת יום הולדת משתנה לילדים (מועדון קיווי)': ['מתנת יום הולדת'],
       },
     };
 
