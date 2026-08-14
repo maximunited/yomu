@@ -853,8 +853,7 @@ async function seed() {
       {
         brandId: createdBrands.find((b) => b.name === 'Jump / עונות')?.id,
         title: '20% הנחה נוספת בחודש יום ההולדת',
-        description:
-          '20% הנחה נוספים על מבצעי החנות הקיימים בחודש יום ההולדת',
+        description: '20% הנחה נוספים על מבצעי החנות הקיימים בחודש יום ההולדת',
         termsAndConditions:
           'מימוש בסניף עם תעודה מזהה; ההנחה נוספת על מבצעים קיימים בחנות; חברות פעילה במועדון',
         redemptionMethod: 'in-store',
