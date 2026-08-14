@@ -96,11 +96,11 @@
     "@next/eslint-plugin-next": "^16.2.12",
     "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4.3.3",
-    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.3",
     "@types/jest": "^30.0.0",
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.2.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "commitizen": "^4.3.2",
@@ -120,7 +120,7 @@
     "prisma": "^7.9.1",
     "tailwindcss": "^4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.66.0"
+    "typescript-eslint": "^8.67.0"
   },
   "overrides": {
     "braces": "^3.0.3",
