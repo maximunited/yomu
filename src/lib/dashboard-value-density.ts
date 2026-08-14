@@ -10,7 +10,12 @@ import {
 export const ENDING_SOON_DAYS = 7;
 
 export type RedemptionChecklistKey =
-  'card' | 'app' | 'code' | 'inStore' | 'online' | 'noStacking';
+  | 'card'
+  | 'app'
+  | 'code'
+  | 'inStore'
+  | 'online'
+  | 'noStacking';
 
 export interface ValueDensityBenefit {
   id?: string;
