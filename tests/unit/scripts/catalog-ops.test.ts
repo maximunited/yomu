@@ -24,6 +24,12 @@ describe('parse-seed-catalog', () => {
     expect(catalog.softBrandNames).toEqual(
       expect.arrayContaining(['H&M', 'Shufersal', 'Isracard'])
     );
+    expect(catalog.softBrandNames).not.toContain('Honigman');
+    const honigmanBenefit = catalog.benefits.find(
+      (b: { brandName: string | null }) => b.brandName === 'Honigman'
+    );
+    expect(honigmanBenefit?.title).toMatch(/קיווי|ילדים/);
+    expect(honigmanBenefit?.url).toMatch(/kiwi-kids\.co\.il/);
     const mcdonalds = catalog.brands.find(
       (b: { name: string }) => b.name === "McDonald's"
     );
