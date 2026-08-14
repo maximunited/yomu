@@ -4,7 +4,8 @@ import { withSentryConfig } from '@sentry/nextjs';
 // Removed next-intl plugin - using custom LanguageContext instead
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  // Standalone is for Docker; Vercel + Turbopack fails NFT tracing (next-server.js.nft.json).
+  ...(process.env.VERCEL ? {} : { output: 'standalone' as const }),
   images: {
     unoptimized: true,
   },

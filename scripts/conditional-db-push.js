@@ -6,16 +6,16 @@
 
 const { spawnSync } = require('child_process');
 
-if (process.env.SKIP_DB_PUSH) {
-  console.log('⏭️  Skipping database push (SKIP_DB_PUSH is set)');
+if (process.env.SKIP_DB_PUSH || process.env.VERCEL) {
+  console.log('⏭️  Skipping database push (SKIP_DB_PUSH or VERCEL is set)');
   process.exit(0);
 }
 
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  console.error('❌ DATABASE_URL environment variable is required');
-  process.exit(1);
+  console.log('⏭️  Skipping database push (DATABASE_URL not set)');
+  process.exit(0);
 }
 
 try {
