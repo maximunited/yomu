@@ -161,6 +161,7 @@ export interface Translations {
   noNotifications: string;
   newNotificationsCount: string; // expects {count}
   noNewNotifications: string;
+  notificationsLoadError: string;
   newBenefit: string;
   benefitExpiring: string;
   birthdayMonthStart: string;
@@ -696,6 +697,7 @@ export const translations: Record<Language, Translations> = {
     noNotifications: 'אין התראות',
     newNotificationsCount: 'יש {count} התראות חדשות',
     noNewNotifications: 'אין התראות חדשות',
+    notificationsLoadError: 'שגיאה בטעינת ההתראות',
     newBenefit: 'הטבה חדשה',
     benefitExpiring: 'הטבה פוקעת',
     birthdayMonthStart: 'חודש יום הולדת התחיל',
@@ -1236,6 +1238,7 @@ export const translations: Record<Language, Translations> = {
     noNotifications: 'No notifications',
     newNotificationsCount: '{count} new notifications',
     noNewNotifications: 'No new notifications',
+    notificationsLoadError: 'Error loading notifications',
     newBenefit: 'New Benefit',
     benefitExpiring: 'Benefit Expiring',
     birthdayMonthStart: 'Birthday Month Started',
