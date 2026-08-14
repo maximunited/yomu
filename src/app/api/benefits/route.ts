@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { getOrCreateUser } from '@/lib/clerk-user';
 import { prisma } from '@/lib/prisma';
 import {
+  isBenefitAsOfQueryAllowed,
   parseAsOfDate,
   withBenefitWindowStatus,
   getBenefitNow,
@@ -22,7 +23,10 @@ export async function GET(request?: NextRequest) {
     const userId = dbUser.id;
 
     const asOfParam = request?.nextUrl?.searchParams?.get('asOf') ?? null;
-    const asOf = parseAsOfDate(asOfParam);
+    const asOf =
+      isBenefitAsOfQueryAllowed() && asOfParam
+        ? parseAsOfDate(asOfParam)
+        : null;
     const tzParam =
       request?.nextUrl?.searchParams?.get('tz') ??
       request?.headers?.get('time-zone') ??
