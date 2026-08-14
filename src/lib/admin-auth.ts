@@ -2,7 +2,8 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 export type AdminAuthResult =
-  { ok: true; userId: string } | { ok: false; response: NextResponse };
+  | { ok: true; userId: string }
+  | { ok: false; response: NextResponse };
 
 /**
  * Require a signed-in Clerk user with publicMetadata.role === 'admin',
