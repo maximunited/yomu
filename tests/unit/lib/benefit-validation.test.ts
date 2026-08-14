@@ -8,6 +8,7 @@ import {
   ALL_VALIDITY_TYPES,
   getReferenceDateForBenefit,
   isBenefitActiveForContext,
+  isBenefitAsOfQueryAllowed,
 } from '@/lib/benefit-validation';
 
 describe('Benefit Validation', () => {
@@ -782,6 +783,35 @@ describe('Benefit Validation', () => {
           new Date('2024-08-13')
         )
       ).toBe(true);
+    });
+  });
+
+  describe('isBenefitAsOfQueryAllowed', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalAllow = process.env.ALLOW_BENEFIT_ASOF;
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalNodeEnv;
+      if (originalAllow === undefined) {
+        delete process.env.ALLOW_BENEFIT_ASOF;
+      } else {
+        process.env.ALLOW_BENEFIT_ASOF = originalAllow;
+      }
+    });
+
+    it('allows asOf outside production', () => {
+      process.env.NODE_ENV = 'development';
+      delete process.env.ALLOW_BENEFIT_ASOF;
+      expect(isBenefitAsOfQueryAllowed()).toBe(true);
+    });
+
+    it('blocks asOf in production unless ALLOW_BENEFIT_ASOF=1', () => {
+      process.env.NODE_ENV = 'production';
+      delete process.env.ALLOW_BENEFIT_ASOF;
+      expect(isBenefitAsOfQueryAllowed()).toBe(false);
+
+      process.env.ALLOW_BENEFIT_ASOF = '1';
+      expect(isBenefitAsOfQueryAllowed()).toBe(true);
     });
   });
 });

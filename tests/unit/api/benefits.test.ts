@@ -216,6 +216,66 @@ describe('/api/benefits', () => {
     expect(byId.month).toBe('active');
   });
 
+  it('ignores asOf in production unless ALLOW_BENEFIT_ASOF=1', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalAllow = process.env.ALLOW_BENEFIT_ASOF;
+
+    prisma.userMembership.findMany.mockResolvedValue([]);
+    prisma.benefit.findMany.mockResolvedValue([
+      {
+        id: 'exact',
+        title: 'Exact day',
+        description: 'Only on birthday',
+        brandId: 'brand1',
+        validityType: 'birthday_exact_date',
+        validityDuration: 1,
+        redemptionMethod: 'in-store',
+        isFree: true,
+        promoCode: null,
+        termsAndConditions: null,
+        createdAt: new Date('2023-01-01'),
+        updatedAt: new Date('2023-01-02'),
+        brand: {
+          id: 'brand1',
+          name: 'Test Brand',
+          logoUrl: 'https://example.com/logo.png',
+          website: 'https://example.com',
+          category: 'food',
+          actionUrl: null,
+          actionType: null,
+          actionLabel: null,
+        },
+      },
+    ]);
+
+    try {
+      process.env.NODE_ENV = 'production';
+      delete process.env.ALLOW_BENEFIT_ASOF;
+      setBenefitClock(new Date(2024, 0, 10, 12, 0, 0));
+
+      const req = {
+        nextUrl: {
+          searchParams: new URLSearchParams('asOf=2024-06-15'),
+        },
+      } as unknown as import('next/server').NextRequest;
+
+      const response = await GET(req);
+      const data = await response.json();
+      const evaluated = new Date(data.evaluatedAt);
+      expect(evaluated.getFullYear()).toBe(2024);
+      expect(evaluated.getMonth()).toBe(0);
+      expect(evaluated.getDate()).toBe(10);
+    } finally {
+      process.env.NODE_ENV = originalNodeEnv;
+      if (originalAllow === undefined) {
+        delete process.env.ALLOW_BENEFIT_ASOF;
+      } else {
+        process.env.ALLOW_BENEFIT_ASOF = originalAllow;
+      }
+      resetBenefitClock();
+    }
+  });
+
   it('should evaluate without asOf using Asia/Jerusalem calendar day', async () => {
     const mockBenefits = [
       {

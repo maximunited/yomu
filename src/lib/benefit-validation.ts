@@ -120,6 +120,15 @@ export function parseAsOfDate(asOf: string | null | undefined): Date | null {
 }
 
 /**
+ * Whether `?asOf=` is honored on benefit APIs.
+ * Disabled in production unless ALLOW_BENEFIT_ASOF=1 (dev/test always allowed).
+ */
+export function isBenefitAsOfQueryAllowed(): boolean {
+  if (process.env.ALLOW_BENEFIT_ASOF === '1') return true;
+  return process.env.NODE_ENV !== 'production';
+}
+
+/**
  * Classify a benefit window for a user DOB on a given calendar day.
  * Prefer this (or API `windowStatus`) over re-deriving Active/Upcoming on the client.
  */

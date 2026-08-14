@@ -136,7 +136,7 @@ Benefits appear in the "Coming Soon" section when:
 | `none` | No DOB, unknown validity type, or not Active/Upcoming |
 
 - **Timezone:** When `asOf` is omitted, “today” is the calendar day in `Asia/Jerusalem` (YomU product default), **not** the server host timezone (Vercel is UTC). Optional `?tz=` query or `Time-Zone` header may override with an allowlisted IANA zone (`Asia/Jerusalem`, `UTC`); unknown values fall back to `Asia/Jerusalem`. Response includes `timeZone` used.
-- Optional query `?asOf=YYYY-MM-DD` pins the evaluation day (process-local calendar components, no UTC shift).
+- Optional query `?asOf=YYYY-MM-DD` pins the evaluation day (process-local calendar components, no UTC shift). **Ignored in production** unless `ALLOW_BENEFIT_ASOF=1` is set (dev/test always honor it).
 - Response also includes `evaluatedAt` (ISO timestamp of the day used).
 - Dashboard prefers `windowStatus` when present **and** `evaluatedAt` is still the same local calendar day; otherwise it falls back to `isBenefitActive` / `getUpcomingBenefits`. On tab focus/visibility, it refetches when the local day has rolled.
 
