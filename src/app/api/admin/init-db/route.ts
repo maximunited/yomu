@@ -38,7 +38,6 @@ export async function POST() {
         "id" TEXT NOT NULL PRIMARY KEY,
         "name" TEXT,
         "email" TEXT UNIQUE,
-        "password" TEXT,
         "emailVerified" TIMESTAMP(3),
         "image" TEXT,
         "dateOfBirth" TIMESTAMP(3),
