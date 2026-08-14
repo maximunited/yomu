@@ -25,7 +25,7 @@ console.log('Starting seed script...');
 const prisma = createPrismaClient();
 
 /** Soft / uncertain research — benefits seed with verified: false */
-const SOFT_BRAND_NAMES = new Set(['H&M', 'שילב', 'Shufersal', 'Isracard']);
+const SOFT_BRAND_NAMES = new Set(['Shufersal', 'Isracard']);
 
 const predefinedBrands = [
   {
@@ -62,7 +62,8 @@ const predefinedBrands = [
     name: 'Isracard',
     logoUrl: '/images/brands/isracard.svg',
     website: 'https://www.isracard.co.il',
-    description: 'הטבות על דלק ותחבורה',
+    description:
+      'כרטיסי אשראי — אין מועדון קמעונאי אחיד; הטבות תלויות מוצר (לא יום הולדת קבוע)',
     category: 'transport',
     actionUrl: 'https://www.isracard.co.il',
     actionType: 'website',
@@ -72,7 +73,7 @@ const predefinedBrands = [
     name: 'H&M',
     logoUrl: '/images/brands/hm.png',
     website: 'https://www.hm.com/il',
-    description: 'הטבות על ביגוד והנעלה',
+    description: 'H&M Membership — הטבת יום הולדת שנתית משתנה',
     category: 'fashion',
     actionUrl: 'https://www.hm.com/il',
     actionType: 'website',
@@ -92,7 +93,8 @@ const predefinedBrands = [
     name: 'Shufersal',
     logoUrl: '/images/brands/shufersal.png',
     website: 'https://www.shufersal.co.il',
-    description: 'הטבות על מוצרי מזון',
+    description:
+      'מועדון שופרסל — לא נמצאה הטבת יום הולדת אישית קבועה (קופונים מותאמים בלבד)',
     category: 'grocery',
     actionUrl: 'https://www.shufersal.co.il',
     actionType: 'website',
@@ -212,7 +214,7 @@ const predefinedBrands = [
     name: 'שילב',
     logoUrl: '/images/brands/shilav.jpg',
     website: 'https://www.shilav.co.il',
-    description: 'הטבות על מוצרי תינוקות',
+    description: 'שילב — הטבות מועדון + Dream Card',
     category: 'baby',
     actionUrl: 'https://www.shilav.co.il',
     actionType: 'website',
@@ -815,6 +817,36 @@ async function seed() {
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
+      },
+      // H&M (verified 2026-08-14 — hm.com/hw_il regulations)
+      {
+        brandId: createdBrands.find((b) => b.name === 'H&M')?.id,
+        title: 'הטבת יום הולדת שנתית',
+        description:
+          'הטבת יום הולדת חד-שנתית משתנה לחברי H&M Membership (סוג ההטבה נקבע מעת לעת)',
+        termsAndConditions:
+          'מימוש חד-פעמי בחודש הלועזי של יום ההולדת; באתר או בחנות (בחנות עם תעודה מזהה); לא כולל קולקציית מעצב ופרחים יבשים; נכנס לתוקף מהחודש העוקב להצטרפות אם נרשמת בחודש יום ההולדת',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www2.hm.com/hw_il/customer-service/legal-and-privacy/regulations.html',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      // שילב — Dream Card (verified 2026-08-14 — dreamcard.co.il)
+      {
+        brandId: createdBrands.find((b) => b.name === 'שילב')?.id,
+        title: '30% הנחה בחודש יום ההולדת (Dream Card)',
+        description:
+          '30% הנחה למימוש פעם אחת בחודש יום ההולדת בחנויות ובאתר שילב — לחברי Dream Card / Dream Card VIP',
+        termsAndConditions:
+          'נדרשת חברות ב-Dream Card; עד ₪500 לקנייה (Dream Card) או עד ₪1,000 (VIP); לא לממש יחד עם הטבת הצטרפות; מימוש באתר עם התחברות באותו מספר זהות',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.dreamcard.co.il/about',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
       },
       // Honigman / Kiwi Kids club (verified 2026-08-14 — kiwi-kids.co.il מועדון לקוחות §24)
       {

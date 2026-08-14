@@ -22,14 +22,24 @@ describe('parse-seed-catalog', () => {
     expect(catalog.brands.length).toBeGreaterThan(20);
     expect(catalog.benefits.length).toBeGreaterThan(20);
     expect(catalog.softBrandNames).toEqual(
-      expect.arrayContaining(['H&M', 'Shufersal', 'Isracard'])
+      expect.arrayContaining(['Shufersal', 'Isracard'])
     );
     expect(catalog.softBrandNames).not.toContain('Honigman');
+    expect(catalog.softBrandNames).not.toContain('H&M');
+    expect(catalog.softBrandNames).not.toContain('שילב');
     const honigmanBenefit = catalog.benefits.find(
       (b: { brandName: string | null }) => b.brandName === 'Honigman'
     );
     expect(honigmanBenefit?.title).toMatch(/קיווי|ילדים/);
     expect(honigmanBenefit?.url).toMatch(/kiwi-kids\.co\.il/);
+    const hmBenefit = catalog.benefits.find(
+      (b: { brandName: string | null }) => b.brandName === 'H&M'
+    );
+    expect(hmBenefit?.title).toMatch(/יום הולדת/);
+    const shilavBenefit = catalog.benefits.find(
+      (b: { brandName: string | null }) => b.brandName === 'שילב'
+    );
+    expect(shilavBenefit?.title).toMatch(/Dream Card/);
     const mcdonalds = catalog.brands.find(
       (b: { name: string }) => b.name === "McDonald's"
     );
