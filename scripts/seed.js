@@ -27,6 +27,31 @@ const prisma = createPrismaClient();
 /** Soft / uncertain research — benefits seed with verified: false */
 const SOFT_BRAND_NAMES = new Set(['Shufersal', 'Isracard', 'Golda']);
 
+const DREAM_CARD_ABOUT_URL = 'https://www.dreamcard.co.il/about';
+
+const DREAM_CARD_BIRTHDAY_TERMS =
+  'נדרשת חברות ב-Dream Card (₪69 חד-פעמי) או Dream Card VIP; עד ₪500 לקנייה (Dream Card) או ₪1,000 (VIP); מימוש חד-פעמי בכל מותג; לא ביחד עם הטבת הצטרפות; שילב אינה חלק מ-Dream Card; תקף מהחודש העוקב להצטרפות לחברים חדשים';
+
+function buildDreamCardBirthdayBenefit(
+  createdBrands,
+  brandName,
+  storeLabel,
+  url = DREAM_CARD_ABOUT_URL
+) {
+  return {
+    brandId: createdBrands.find((b) => b.name === brandName)?.id,
+    title: '30% הנחה בחודש יום ההולדת (Dream Card)',
+    description: `30% הנחה למימוש פעם אחת בחודש יום ההולדת ב${storeLabel} — דרך מועדון Dream Card של קבוצת פוקס`,
+    termsAndConditions: DREAM_CARD_BIRTHDAY_TERMS,
+    redemptionMethod: 'in-store',
+    promoCode: null,
+    url,
+    validityType: 'birthday_entire_month',
+    validityDuration: 30,
+    isFree: false,
+  };
+}
+
 const predefinedBrands = [
   {
     name: "McDonald's",
@@ -370,60 +395,84 @@ const predefinedBrands = [
     name: 'Terminal X',
     logoUrl: '/images/brands/terminal-x.png',
     website: 'https://www.terminalx.com',
-    description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
+    description: 'מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-Terminal X',
     category: 'fashion',
-    actionUrl: 'https://www.terminalx.com',
+    actionUrl: 'https://www.dreamcard.co.il/about',
     actionType: 'website',
-    actionLabel: 'לאתר Terminal X',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: 'Billabong',
     logoUrl: '/images/brands/billabong.png',
     website: 'https://www.billabong.com',
-    description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
+    description: 'מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-Billabong',
     category: 'fashion',
+    actionUrl: 'https://www.dreamcard.co.il/about',
+    actionType: 'website',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: 'Laline',
     logoUrl: '/images/brands/laline.png',
     website: 'https://www.laline.co.il',
-    description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
+    description: 'מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-Laline',
     category: 'beauty',
+    actionUrl: 'https://www.dreamcard.co.il/about',
+    actionType: 'website',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: "The Children's Place",
     logoUrl: '/images/brands/tcp.png',
     website: 'https://www.dreamcard.co.il',
-    description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
+    description:
+      "מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-The Children's Place",
     category: 'kids',
+    actionUrl: 'https://www.dreamcard.co.il/about',
+    actionType: 'website',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: 'Aerie',
     logoUrl: '/images/brands/aerie.png',
     website: 'https://www.dreamcard.co.il',
-    description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
+    description: 'מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-Aerie',
     category: 'fashion',
+    actionUrl: 'https://www.dreamcard.co.il/about',
+    actionType: 'website',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: 'American Eagle',
     logoUrl: '/images/brands/american-eagle.png',
     website: 'https://www.dreamcard.co.il',
-    description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
+    description:
+      'מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-American Eagle',
     category: 'fashion',
+    actionUrl: 'https://www.dreamcard.co.il/about',
+    actionType: 'website',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: 'Mango',
     logoUrl: '/images/brands/mango.png',
     website: 'https://shop.mango.com/il',
-    description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
+    description: 'מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-Mango',
     category: 'fashion',
+    actionUrl: 'https://www.dreamcard.co.il/about',
+    actionType: 'website',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: 'Fox Home',
     logoUrl: '/images/brands/fox-home.png',
     website: 'https://www.fox.co.il',
-    description: '30% הנחה הטבת יום ההולדת - כרטיס DREAM CARD',
+    description: 'מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-FOX HOME',
     category: 'home',
+    actionUrl:
+      'https://fox.co.il/pages/dream-card-%D7%94%D7%98%D7%91%D7%95%D7%AA-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F',
+    actionType: 'website',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: 'Lord Kitsch',
@@ -865,6 +914,43 @@ async function seed() {
         validityDuration: 30,
         isFree: false,
       },
+      // Dream Card partners (verified 2026-08-16 — dreamcard.co.il/about)
+      buildDreamCardBirthdayBenefit(
+        createdBrands,
+        'Terminal X',
+        'Terminal X',
+        'https://www.terminalx.com'
+      ),
+      buildDreamCardBirthdayBenefit(createdBrands, 'Billabong', 'Billabong'),
+      buildDreamCardBirthdayBenefit(
+        createdBrands,
+        'Laline',
+        'Laline',
+        'https://www.laline.co.il'
+      ),
+      buildDreamCardBirthdayBenefit(
+        createdBrands,
+        "The Children's Place",
+        "The Children's Place"
+      ),
+      buildDreamCardBirthdayBenefit(createdBrands, 'Aerie', 'Aerie'),
+      buildDreamCardBirthdayBenefit(
+        createdBrands,
+        'American Eagle',
+        'American Eagle'
+      ),
+      buildDreamCardBirthdayBenefit(
+        createdBrands,
+        'Mango',
+        'Mango',
+        'https://shop.mango.com/il'
+      ),
+      buildDreamCardBirthdayBenefit(
+        createdBrands,
+        'Fox Home',
+        'FOX HOME',
+        'https://fox.co.il/pages/dream-card-%D7%94%D7%98%D7%91%D7%95%D7%AA-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F'
+      ),
       // H&M (verified 2026-08-14 — hm.com/hw_il regulations)
       {
         brandId: createdBrands.find((b) => b.name === 'H&M')?.id,

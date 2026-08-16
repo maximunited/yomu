@@ -78,6 +78,20 @@ function parseBenefits(src) {
       isFree: isFreeMatch ? isFreeMatch[1] === 'true' : null,
     });
   }
+
+  const dreamCardRe =
+    /buildDreamCardBirthdayBenefit\(\s*createdBrands,\s*(['"`])([\s\S]*?)\1\s*,\s*(['"`])([\s\S]*?)\3(?:\s*,\s*(['"`])([\s\S]*?)\5)?\s*\)/g;
+  let dreamCardMatch;
+  while ((dreamCardMatch = dreamCardRe.exec(src)) !== null) {
+    benefits.push({
+      brandName: dreamCardMatch[2],
+      title: '30% הנחה בחודש יום ההולדת (Dream Card)',
+      url: dreamCardMatch[6] || 'https://www.dreamcard.co.il/about',
+      validityType: 'birthday_entire_month',
+      isFree: false,
+    });
+  }
+
   return benefits;
 }
 

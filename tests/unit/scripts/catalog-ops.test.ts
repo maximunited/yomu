@@ -40,6 +40,14 @@ describe('parse-seed-catalog', () => {
       (b: { brandName: string | null }) => b.brandName === 'שילב'
     );
     expect(shilavBenefit?.title).toMatch(/Dream Card/);
+    const terminalXBenefit = catalog.benefits.find(
+      (b: { brandName: string | null }) => b.brandName === 'Terminal X'
+    );
+    expect(terminalXBenefit?.title).toMatch(/Dream Card/);
+    const terminalXBrand = catalog.brands.find(
+      (b: { name: string }) => b.name === 'Terminal X'
+    );
+    expect(terminalXBrand?.actionUrl).toMatch(/dreamcard\.co\.il/);
     const mcdonalds = catalog.brands.find(
       (b: { name: string }) => b.name === "McDonald's"
     );
