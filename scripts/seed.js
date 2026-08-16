@@ -25,7 +25,7 @@ console.log('Starting seed script...');
 const prisma = createPrismaClient();
 
 /** Soft / uncertain research — benefits seed with verified: false */
-const SOFT_BRAND_NAMES = new Set(['Shufersal', 'Isracard']);
+const SOFT_BRAND_NAMES = new Set(['Shufersal', 'Isracard', 'Golda']);
 
 const predefinedBrands = [
   {
@@ -52,11 +52,13 @@ const predefinedBrands = [
     name: 'Fox',
     logoUrl: '/images/brands/fox.png',
     website: 'https://www.fox.co.il',
-    description: 'הטבות על ביגוד והנעלה',
+    description:
+      'מועדון Dream Card — 30% הנחה בחודש יום ההולדת ב-FOX ובמותגי הקבוצה',
     category: 'fashion',
-    actionUrl: 'https://www.fox.co.il',
+    actionUrl:
+      'https://fox.co.il/pages/dream-card-%D7%94%D7%98%D7%91%D7%95%D7%AA-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F',
     actionType: 'website',
-    actionLabel: 'הצטרפות למועדון',
+    actionLabel: 'הצטרפות ל-Dream Card',
   },
   {
     name: 'Isracard',
@@ -427,8 +429,12 @@ const predefinedBrands = [
     name: 'Lord Kitsch',
     logoUrl: '/images/brands/lordkitsch.png',
     website: 'https://www.lordkitsch.co.il',
-    description: 'אופנת נשים',
+    description: 'מועדון לקוחות בסניפים — הטבת יום הולדת מותאמת אישית ב-SMS',
     category: 'fashion',
+    actionUrl:
+      'https://www.lordkitsch.co.il/pages/36992-%D7%94%D7%98%D7%91%D7%AA-%D7%99%D7%95%D7%9D-%D7%94%D7%95%D7%9C%D7%93%D7%AA',
+    actionType: 'website',
+    actionLabel: 'הרשמה למועדון בסניף',
   },
   {
     name: 'SOHO',
@@ -500,9 +506,13 @@ const predefinedBrands = [
   {
     name: 'Max Brenner',
     logoUrl: '/images/brands/max-brenner.png',
-    website: 'https://www.maxbrenner.com',
-    description: 'Complimentary hot chocolate',
+    website: 'https://max-brenner.co.il',
+    description: 'מועדון מקס ברנר — קינוח מתנה בחודש יום ההולדת (תשלום שנתי)',
     category: 'food',
+    actionUrl:
+      'https://max-brenner.co.il/pages/%D7%AA%D7%A7%D7%A0%D7%95%D7%9F-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F-%D7%A1%D7%A0%D7%99%D7%A4%D7%99%D7%9D',
+    actionType: 'website',
+    actionLabel: 'תקנון מועדון סניפים',
   },
   {
     name: 'ACE Hardware',
@@ -514,16 +524,23 @@ const predefinedBrands = [
   {
     name: 'The Body Shop',
     logoUrl: '/images/brands/body-shop.png',
-    website: 'https://www.thebodyshop.com',
-    description: 'Birthday voucher (e.g., ~₪25)',
+    website: 'https://www.bodyshop.co.il',
+    description: 'מועדון Body Shop Israel — 30% הנחה ביום ההולדת',
     category: 'beauty',
+    actionUrl: 'https://www.bodyshop.co.il/birthday',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
   },
   {
     name: 'Golda',
     logoUrl: '/images/brands/golda.png',
-    website: 'https://www.golda.co.il',
-    description: 'Unspecified benefit, likely bonus points',
+    website: 'https://www.goldaglida.co.il',
+    description:
+      'אפליקציית גולדה + צבירת לק — אין הטבת יום הולדת רשמית מתועדת בתקנון',
     category: 'food',
+    actionUrl: 'https://goldaglida.delivapp.com/he/home',
+    actionType: 'website',
+    actionLabel: 'לאפליקציית גולדה',
   },
   {
     name: 'Dream Card',
@@ -817,6 +834,36 @@ async function seed() {
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
+      },
+      // Fox — Dream Card (verified 2026-08-16 — fox.co.il + dreamcard.co.il)
+      {
+        brandId: createdBrands.find((b) => b.name === 'Fox')?.id,
+        title: '30% הנחה בחודש יום ההולדת (Dream Card)',
+        description:
+          '30% הנחה למימוש פעם אחת ב-FOX בחודש יום ההולדת — דרך מועדון Dream Card של קבוצת פוקס',
+        termsAndConditions:
+          'נדרשת חברות ב-Dream Card (₪69 חד-פעמי) או Dream Card VIP; עד ₪500 לקנייה (Dream Card) או ₪1,000 (VIP); מימוש חד-פעמי בכל מותג; לא ביחד עם הטבת הצטרפות; שילב אינה חלק מ-Dream Card; תקף מהחודש העוקב להצטרפות לחברים חדשים',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://fox.co.il/pages/dream-card-%D7%94%D7%98%D7%91%D7%95%D7%AA-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
+      },
+      // Lord Kitsch (verified 2026-08-16 — מועדון בסניפים + SMS; אחוז לא מפורסם)
+      {
+        brandId: createdBrands.find((b) => b.name === 'Lord Kitsch')?.id,
+        title: 'הטבת יום הולדת מותאמת אישית (SMS)',
+        description:
+          'חברי מועדון Lord Kitsch (הרשמה בסניף בלבד) מקבלים הטבת יום הולדת מותאמת אישית ב-SMS עם קישור למימוש בקופה',
+        termsAndConditions:
+          'המועדון פועל בסניפים בלבד (לא באתר); נדרשת תעודת זהות ותאריך לידה בהצטרפות; מימוש בהצגת SMS בקופה; אחוז ההנחה משתנה ואינו מפורסם בתקנון ציבורי — לפי מדיניות פרטיות lordkitsch.co.il (יוני 2026)',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.lordkitsch.co.il/pages/36992-%D7%94%D7%98%D7%91%D7%AA-%D7%99%D7%95%D7%9D-%D7%94%D7%95%D7%9C%D7%93%D7%AA',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: false,
       },
       // H&M (verified 2026-08-14 — hm.com/hw_il regulations)
       {
@@ -1166,16 +1213,16 @@ async function seed() {
       },
       {
         brandId: createdBrands.find((b) => b.name === 'Max Brenner')?.id,
-        title: 'Complimentary Hot Chocolate',
+        title: 'קינוח מתנה בחודש יום ההולדת',
         description:
-          'Complimentary hot chocolate. Download the app (Free membership).',
+          'קינוח מתנה לחברי מועדון מקס ברנר (תשלום שנתי) — מימוש בחודש הקלנדרי של יום ההולדת בסניפי השוקולד בר',
         termsAndConditions:
-          'Based on Australian program. Requires local verification. 14 days before/after birthday. Verification Status: Requires Confirmation',
-        redemptionMethod: 'app',
+          'מועדון סניפים בלבד (מופעל ע״י וליוקארד); דמי חברות שנתיים; אין כפל מבצעים; הטבות אישיות ולא ניתנות להעברה או להמרה בכסף — תקנון מועדון סניפים §3.3 max-brenner.co.il',
+        redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.maxbrenner.com',
-        validityType: 'birthday_plus_period',
-        validityDuration: 14,
+        url: 'https://max-brenner.co.il/pages/%D7%AA%D7%A7%D7%A0%D7%95%D7%9F-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F-%D7%A1%D7%A0%D7%99%D7%A4%D7%99%D7%9D',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
         isFree: true,
       },
       {
@@ -1194,28 +1241,28 @@ async function seed() {
       },
       {
         brandId: createdBrands.find((b) => b.name === 'The Body Shop')?.id,
-        title: 'Birthday Voucher',
+        title: '30% הנחה ביום ההולדת',
         description:
-          'Birthday voucher (e.g., ~₪25). Sign up for Love Your Body online or in-store (Free membership).',
+          '30% הנחה על קנייה ממגוון מוצרי Body Shop Israel — לחברי מועדון הלקוחות',
         termsAndConditions:
-          'Based on UK/SA programs. Value in ILS requires local verification. Verification Status: Requires Confirmation',
+          'מימוש עד חודש מתאריך יום ההולדת; אין כפל מבצעים; מק״ט הנחה 1964; הצגת ת.ז. ומסך ההטבה בחנות — bodyshop.co.il/birthday',
         redemptionMethod: 'in-store',
         promoCode: null,
-        url: 'https://www.thebodyshop.com',
+        url: 'https://www.bodyshop.co.il/birthday',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
-        isFree: true,
+        isFree: false,
       },
       {
         brandId: createdBrands.find((b) => b.name === 'Golda')?.id,
-        title: 'Birthday Bonus Points',
+        title: 'אין הטבת יום הולדת רשמית מתועדת',
         description:
-          "Unspecified benefit, likely bonus points ('Lek'). Download the Golda app and register (Free membership).",
+          'אפליקציית גולדה מציעה צבירת לק (Lek) על הזמנות, אך לא נמצא תקנון רשמי להטבת יום הולדת קבועה',
         termsAndConditions:
-          'Specific birthday benefit is not stated. Verification Status: Requires Confirmation',
+          'soft — שיווק עונתי/מארזים אפשריים; אין מקור רשמי לבונוס לק ביום הולדת; goldaglida.co.il + אפליקציית המשלוחים',
         redemptionMethod: 'app',
         promoCode: null,
-        url: 'https://www.golda.co.il',
+        url: 'https://www.goldaglida.co.il',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
@@ -1226,7 +1273,7 @@ async function seed() {
         description:
           '30% discount at each participating brand. Sign up in-store at any participating brand or online (₪69 one-time membership).',
         termsAndConditions:
-          "Max purchase of ₪500 per brand. One use per brand. Participating brands: Terminal X, Billabong, Laline, The Children's Place, Aerie, American Eagle, Mango, Fox Home, Fox. Verification Status: Verified",
+          "עד ₪500 לקנייה (Dream Card) או ₪1,000 (VIP); מימוש חד-פעמי בכל מותג; מותגים: FOX, FOX HOME, AMERICAN EAGLE, AERIE, MANGO, FOOT LOCKER, LALINE, BILLABONG, THE CHILDREN'S PLACE, TERMINAL X, RUBY BAY, FLYING TIGER, SUNGLASSES HUT, QUICKSILVER (dreamcard.co.il/about); שילב אינה חלק מהמועדון",
         redemptionMethod: 'in-store',
         promoCode: null,
         url: 'https://www.dreamcard.co.il',
@@ -1282,6 +1329,15 @@ async function seed() {
       },
       Honigman: {
         'הטבת יום הולדת משתנה לילדים (מועדון קיווי)': ['מתנת יום הולדת'],
+      },
+      'Max Brenner': {
+        'קינוח מתנה בחודש יום ההולדת': ['Complimentary Hot Chocolate'],
+      },
+      'The Body Shop': {
+        '30% הנחה ביום ההולדת': ['Birthday Voucher'],
+      },
+      Golda: {
+        'אין הטבת יום הולדת רשמית מתועדת': ['Birthday Bonus Points'],
       },
     };
 

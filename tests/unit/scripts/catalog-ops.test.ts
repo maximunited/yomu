@@ -22,7 +22,7 @@ describe('parse-seed-catalog', () => {
     expect(catalog.brands.length).toBeGreaterThan(20);
     expect(catalog.benefits.length).toBeGreaterThan(20);
     expect(catalog.softBrandNames).toEqual(
-      expect.arrayContaining(['Shufersal', 'Isracard'])
+      expect.arrayContaining(['Shufersal', 'Isracard', 'Golda'])
     );
     expect(catalog.softBrandNames).not.toContain('Honigman');
     expect(catalog.softBrandNames).not.toContain('H&M');

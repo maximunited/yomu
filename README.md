@@ -439,7 +439,7 @@ We use a single, unified seed entry point that covers brands, partnerships, and 
 | `lastChecked` | `Benefit` | When the benefit/URL was last reviewed (`null` for soft brands) |
 | `remindEnabled` | `UserMembership` | Default `true`; PATCH `/api/user/memberships`; bell toggle on Memberships; dashboard Reminders section filters on this |
 
-Soft brands (seed `verified: false`): H&M, שילב, Shufersal, Isracard, Honigman, Brill Group / Gali, Jump / עונות.
+Soft brands (seed `verified: false`): Shufersal, Isracard, Golda.
 
 ### Loyalty URL audit & catalog ops
 

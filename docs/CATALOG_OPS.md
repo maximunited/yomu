@@ -62,7 +62,7 @@ Admin UI (`/admin`) surfaces `verified`, `lastChecked`, and links for brand `act
 
 - Seed upsert sets `verified: true` + `lastChecked: now` for non-soft brands, and `verified: false` + `lastChecked: null` for `SOFT_BRAND_NAMES`.
 - Re-seed alone does **not** prove research is still accurate — use `catalog:stale --db` after ~180 days, or the seed queue as a manual research checklist.
-- Soft brands today: Shufersal, Isracard. H&M, שילב, and Honigman verified (Honigman = Kiwi/Honigman Kids kids-only club).
+- Soft brands today: Shufersal, Isracard, Golda. H&M, שילב, Honigman, Gali, Jump, Fox (Dream Card), Lord Kitsch verified (2026-08-16).
 
 ## Safety
 
