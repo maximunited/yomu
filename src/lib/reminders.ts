@@ -9,6 +9,12 @@ import {
   LEGACY_VALIDITY_TYPES,
 } from '@/lib/benefit-validation';
 import { translations, type Language } from '@/lib/translations';
+import {
+  maybeSendReminderEmail,
+  maybeSendReminderPush,
+  maybeSendReminderSms,
+  type PushSubscriptionRow,
+} from '@/lib/notification-channels';
 
 export const REMINDER_TYPE_UPCOMING = 'reminder_upcoming';
 export const REMINDER_TYPE_ACTIVE = 'reminder_active';
@@ -190,6 +196,10 @@ export function shouldNotifyOnActive(
 export type ReminderCandidate = {
   userId: string;
   email: string | null;
+  notifyEmail: boolean;
+  notifyPush: boolean;
+  notifySms: boolean;
+  phoneNumber: string | null;
   language: Language;
   benefitId: string;
   benefitTitle: string;
@@ -242,6 +252,10 @@ export type MembershipForReminders = {
     id: string;
     email: string | null;
     dateOfBirth: Date | null;
+    notifyEmail?: boolean;
+    notifyPush?: boolean;
+    notifySms?: boolean;
+    phoneNumber?: string | null;
   };
   brand: {
     id: string;
@@ -271,6 +285,13 @@ export function collectReminderCandidates(
   const leadSet = new Set(leadDays);
   const out: ReminderCandidate[] = [];
 
+  const channelPrefs = (user: MembershipForReminders['user']) => ({
+    notifyEmail: user.notifyEmail !== false,
+    notifyPush: user.notifyPush !== false,
+    notifySms: user.notifySms === true,
+    phoneNumber: user.phoneNumber ?? null,
+  });
+
   for (const membership of memberships) {
     if (!membership.isActive || membership.remindEnabled === false) continue;
     if (!membership.brand || !membership.user.dateOfBirth) continue;
@@ -291,6 +312,7 @@ export function collectReminderCandidates(
         out.push({
           userId: membership.user.id,
           email: membership.user.email,
+          ...channelPrefs(membership.user),
           language,
           benefitId: benefit.id,
           benefitTitle: benefit.title,
@@ -306,6 +328,7 @@ export function collectReminderCandidates(
         out.push({
           userId: membership.user.id,
           email: membership.user.email,
+          ...channelPrefs(membership.user),
           language,
           benefitId: benefit.id,
           benefitTitle: benefit.title,
@@ -329,6 +352,11 @@ export type ReminderPrisma = {
   userMembership: {
     findMany: (args: unknown) => Promise<MembershipForReminders[]>;
   };
+  pushSubscription: {
+    findMany: (
+      args: unknown
+    ) => Promise<Array<PushSubscriptionRow & { userId: string }>>;
+  };
 };
 
 export type ReminderRunResult = {
@@ -338,6 +366,10 @@ export type ReminderRunResult = {
   skippedDuplicate: number;
   emailsAttempted: number;
   emailsSent: number;
+  pushAttempted: number;
+  pushSent: number;
+  smsAttempted: number;
+  smsSent: number;
   errors: string[];
 };
 
@@ -348,37 +380,9 @@ function dedupeKeyDay(date: Date): { gte: Date; lt: Date } {
 }
 
 /**
- * Optional Resend email. No-op when RESEND_API_KEY / RESEND_FROM_EMAIL missing.
+ * @deprecated Import from `@/lib/notification-channels` instead.
  */
-export async function maybeSendReminderEmail(
-  candidate: ReminderCandidate,
-  copy: ReminderCopy,
-  fetchImpl: typeof fetch = fetch
-): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL;
-  if (!apiKey || !from || !candidate.email) return false;
-
-  const res = await fetchImpl('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from,
-      to: [candidate.email],
-      subject: copy.title,
-      text: copy.message,
-    }),
-  });
-
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`Resend ${res.status}: ${body.slice(0, 200)}`);
-  }
-  return true;
-}
+export { maybeSendReminderEmail } from '@/lib/notification-channels';
 
 export async function runReminderPipeline(
   db: ReminderPrisma,
@@ -388,10 +392,14 @@ export async function runReminderPipeline(
     notifyOnActive?: boolean;
     language?: Language;
     sendEmail?: typeof maybeSendReminderEmail;
+    sendPush?: typeof maybeSendReminderPush;
+    sendSms?: typeof maybeSendReminderSms;
   } = {}
 ): Promise<ReminderRunResult> {
   const currentDate = options.currentDate ?? new Date();
   const sendEmail = options.sendEmail ?? maybeSendReminderEmail;
+  const sendPush = options.sendPush ?? maybeSendReminderPush;
+  const sendSms = options.sendSms ?? maybeSendReminderSms;
   const result: ReminderRunResult = {
     scannedMemberships: 0,
     candidates: 0,
@@ -399,6 +407,10 @@ export async function runReminderPipeline(
     skippedDuplicate: 0,
     emailsAttempted: 0,
     emailsSent: 0,
+    pushAttempted: 0,
+    pushSent: 0,
+    smsAttempted: 0,
+    smsSent: 0,
     errors: [],
   };
 
@@ -410,7 +422,15 @@ export async function runReminderPipeline(
     },
     include: {
       user: {
-        select: { id: true, email: true, dateOfBirth: true },
+        select: {
+          id: true,
+          email: true,
+          dateOfBirth: true,
+          notifyEmail: true,
+          notifyPush: true,
+          notifySms: true,
+          phoneNumber: true,
+        },
       },
       brand: {
         select: {
@@ -438,6 +458,25 @@ export async function runReminderPipeline(
     language: options.language,
   });
   result.candidates = candidates.length;
+
+  const userIds = [...new Set(candidates.map((c) => c.userId))];
+  const pushRows =
+    userIds.length > 0
+      ? await db.pushSubscription.findMany({
+          where: { userId: { in: userIds } },
+          select: { userId: true, endpoint: true, p256dh: true, auth: true },
+        })
+      : [];
+  const pushByUser = new Map<string, PushSubscriptionRow[]>();
+  for (const row of pushRows) {
+    const list = pushByUser.get(row.userId) ?? [];
+    list.push({
+      endpoint: row.endpoint,
+      p256dh: row.p256dh,
+      auth: row.auth,
+    });
+    pushByUser.set(row.userId, list);
+  }
 
   const dayRange = dedupeKeyDay(currentDate);
 
@@ -498,10 +537,25 @@ export async function runReminderPipeline(
       });
       result.created += 1;
 
-      if (candidate.email && process.env.RESEND_API_KEY) {
+      if (candidate.notifyEmail && candidate.email) {
         result.emailsAttempted += 1;
         const sent = await sendEmail(candidate, copy);
         if (sent) result.emailsSent += 1;
+      }
+
+      if (candidate.notifyPush) {
+        const subs = pushByUser.get(candidate.userId) ?? [];
+        if (subs.length > 0) {
+          result.pushAttempted += 1;
+          const pushCount = await sendPush(candidate, copy, subs);
+          if (pushCount > 0) result.pushSent += pushCount;
+        }
+      }
+
+      if (candidate.notifySms && candidate.phoneNumber) {
+        result.smsAttempted += 1;
+        const sent = await sendSms(candidate, copy);
+        if (sent) result.smsSent += 1;
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

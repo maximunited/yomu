@@ -39,6 +39,10 @@ describe('/api/cron/reminders', () => {
       skippedDuplicate: 0,
       emailsAttempted: 0,
       emailsSent: 0,
+      pushAttempted: 0,
+      pushSent: 0,
+      smsAttempted: 0,
+      smsSent: 0,
       errors: [],
     });
   });

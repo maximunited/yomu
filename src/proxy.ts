@@ -20,6 +20,7 @@ export const PUBLIC_ROUTES = [
   '/api/cron(.*)',
   '/api/benefits(.*)',
   '/api/brands(.*)',
+  '/api/push/vapid-public-key',
 ] as const;
 
 const isPublicRoute = createRouteMatcher([...PUBLIC_ROUTES]);

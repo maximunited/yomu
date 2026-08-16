@@ -24,6 +24,10 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
+import {
+  registerWebPushSubscription,
+  unregisterWebPushSubscription,
+} from '@/lib/push-client';
 
 interface UserProfile {
   name: string;
@@ -62,7 +66,9 @@ export default function SettingsPage() {
     email: true,
     push: true,
     sms: false,
+    phoneNumber: '',
   });
+  const [prefsLoading, setPrefsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [apiKey, setApiKey] = useState('key123');
@@ -140,6 +146,29 @@ export default function SettingsPage() {
     };
 
     loadApiKey();
+
+    const loadNotificationPrefs = async () => {
+      try {
+        const response = await fetch('/api/user/notification-preferences');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.preferences) {
+            setNotifications({
+              email: data.preferences.email,
+              push: data.preferences.push,
+              sms: data.preferences.sms,
+              phoneNumber: data.preferences.phoneNumber ?? '',
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading notification preferences:', error);
+      } finally {
+        setPrefsLoading(false);
+      }
+    };
+
+    loadNotificationPrefs();
   }, []);
 
   const toggleDarkMode = () => {
@@ -338,6 +367,63 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error copying API key:', error);
     }
+  };
+
+  const patchNotificationPrefs = async (
+    patch: Partial<{
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+      phoneNumber: string;
+    }>
+  ) => {
+    const prev = notifications;
+    const next = { ...notifications, ...patch };
+    setNotifications(next);
+    try {
+      const body: Record<string, boolean | string | null> = {};
+      if (patch.email !== undefined) body.email = patch.email;
+      if (patch.push !== undefined) body.push = patch.push;
+      if (patch.sms !== undefined) body.sms = patch.sms;
+      if (patch.phoneNumber !== undefined) {
+        body.phoneNumber = patch.phoneNumber.trim() || null;
+      }
+      const response = await fetch('/api/user/notification-preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) {
+        setNotifications(prev);
+      }
+    } catch (error) {
+      console.error('Error saving notification preferences:', error);
+      setNotifications(prev);
+    }
+  };
+
+  const handleEmailToggle = (checked: boolean) => {
+    void patchNotificationPrefs({ email: checked });
+  };
+
+  const handlePushToggle = async (checked: boolean) => {
+    if (checked) {
+      const registered = await registerWebPushSubscription();
+      if (!registered) {
+        return;
+      }
+    } else {
+      await unregisterWebPushSubscription();
+    }
+    void patchNotificationPrefs({ push: checked });
+  };
+
+  const handleSmsToggle = (checked: boolean) => {
+    void patchNotificationPrefs({ sms: checked });
+  };
+
+  const handlePhoneBlur = () => {
+    void patchNotificationPrefs({ phoneNumber: notifications.phoneNumber });
   };
 
   return (
@@ -725,6 +811,11 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-4">
+              {prefsLoading ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('loading')}
+                </p>
+              ) : null}
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white">
@@ -738,12 +829,8 @@ export default function SettingsPage() {
                   <input
                     type="checkbox"
                     checked={notifications.email}
-                    onChange={(e) =>
-                      setNotifications((prev) => ({
-                        ...prev,
-                        email: e.target.checked,
-                      }))
-                    }
+                    disabled={prefsLoading}
+                    onChange={(e) => handleEmailToggle(e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
@@ -763,12 +850,8 @@ export default function SettingsPage() {
                   <input
                     type="checkbox"
                     checked={notifications.push}
-                    onChange={(e) =>
-                      setNotifications((prev) => ({
-                        ...prev,
-                        push: e.target.checked,
-                      }))
-                    }
+                    disabled={prefsLoading}
+                    onChange={(e) => void handlePushToggle(e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
@@ -788,17 +871,34 @@ export default function SettingsPage() {
                   <input
                     type="checkbox"
                     checked={notifications.sms}
-                    onChange={(e) =>
-                      setNotifications((prev) => ({
-                        ...prev,
-                        sms: e.target.checked,
-                      }))
-                    }
+                    disabled={prefsLoading}
+                    onChange={(e) => handleSmsToggle(e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                 </label>
               </div>
+
+              {notifications.sms ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('phoneNumber')}
+                  </label>
+                  <Input
+                    type="tel"
+                    value={notifications.phoneNumber}
+                    onChange={(e) =>
+                      setNotifications((prev) => ({
+                        ...prev,
+                        phoneNumber: e.target.value,
+                      }))
+                    }
+                    onBlur={handlePhoneBlur}
+                    placeholder="+972501234567"
+                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
 

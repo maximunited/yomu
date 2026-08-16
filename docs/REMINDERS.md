@@ -12,7 +12,7 @@ Closes the loop on `UserMembership.remindEnabled`: a daily job creates in-app `N
 | GitHub Action schedule | Familiar ops pattern (like loyalty URL audit) | Needs `DATABASE_URL` + app URL secrets; easy to drift from deploy; not ideal for user DB writes |
 | Clerk / email provider alone | Good delivery | No scheduling of benefit windows; still needs a cron + validation logic |
 
-Push / WhatsApp are **not** wired (settings UI toggles only; no half-built sender).
+Push / WhatsApp are wired when credentials exist: Web Push (VAPID + `push_subscriptions`), SMS (Twilio). Settings toggles persist on `User.notifyEmail` / `notifyPush` / `notifySms` + optional `phoneNumber`.
 
 ## Behavior
 
@@ -21,7 +21,9 @@ Push / WhatsApp are **not** wired (settings UI toggles only; no half-built sende
 3. If days-until-Active ∈ lead days (default `7,3,1` via `REMINDER_LEAD_DAYS`) → create `reminder_upcoming`.
 4. If today is the **first** day of Active and `REMINDER_NOTIFY_ON_ACTIVE` is truthy (default) → create `reminder_active` (not every day of a multi-day window).
 5. Dedupe: upcoming = same local calendar day; active = any `reminder_active` for that user+benefit since the window opened → skip.
-6. Optional email when `RESEND_API_KEY` + `RESEND_FROM_EMAIL` + user email are set.
+6. Optional email when `RESEND_API_KEY` + `RESEND_FROM_EMAIL` + user `notifyEmail` + email are set.
+7. Optional Web Push when VAPID env + user `notifyPush` + stored subscription.
+8. Optional SMS when Twilio env + user `notifySms` + `phoneNumber` are set.
 
 `remindEnabled: false` memberships are never scanned (`where: { remindEnabled: true }` and a second guard in `collectReminderCandidates`).
 
@@ -42,6 +44,12 @@ Push / WhatsApp are **not** wired (settings UI toggles only; no half-built sende
 | `REMINDER_NOTIFY_ON_ACTIVE` | No | Default on (`1`/`true`); set `0` to disable active-day notices |
 | `RESEND_API_KEY` | No | Enables email channel |
 | `RESEND_FROM_EMAIL` | No | Verified Resend from address |
+| `VAPID_PUBLIC_KEY` | No | Web Push VAPID public key (settings registration) |
+| `VAPID_PRIVATE_KEY` | No | Web Push VAPID private key |
+| `VAPID_SUBJECT` | No | e.g. `mailto:team@yomu.app` |
+| `TWILIO_ACCOUNT_SID` | No | SMS channel |
+| `TWILIO_AUTH_TOKEN` | No | SMS channel |
+| `TWILIO_FROM_NUMBER` | No | SMS sender E.164 |
 
 ## Manual run
 

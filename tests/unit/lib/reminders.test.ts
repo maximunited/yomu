@@ -399,6 +399,9 @@ describe('runReminderPipeline', () => {
           return { id: 'n1' };
         }),
       },
+      pushSubscription: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
     };
 
     // First run: memberships include disabled one but collect filters it;
@@ -433,6 +436,7 @@ describe('runReminderPipeline', () => {
         findFirst: jest.fn(),
         create: jest.fn(),
       },
+      pushSubscription: { findMany: jest.fn().mockResolvedValue([]) },
     };
 
     await runReminderPipeline(db, { currentDate: new Date(2026, 5, 8) });
@@ -465,6 +469,7 @@ describe('runReminderPipeline', () => {
         findFirst: jest.fn().mockResolvedValue(null),
         create: jest.fn().mockResolvedValue({ id: 'n1' }),
       },
+      pushSubscription: { findMany: jest.fn().mockResolvedValue([]) },
     };
 
     const firstDay = await runReminderPipeline(db, {
@@ -490,5 +495,41 @@ describe('runReminderPipeline', () => {
       expect(mid.created).toBe(0);
       expect(db.notification.create).not.toHaveBeenCalled();
     }
+  });
+
+  it('respects notifyEmail=false for outbound email', async () => {
+    const m = membership({
+      benefits: [
+        {
+          id: 'ben1',
+          title: 'Free dessert',
+          validityType: 'birthday_exact_date',
+          isActive: true,
+        },
+      ],
+    });
+    m.user.notifyEmail = false;
+
+    const sendEmail = jest.fn().mockResolvedValue(true);
+    const db: ReminderPrisma = {
+      userMembership: { findMany: jest.fn().mockResolvedValue([m]) },
+      notification: {
+        findFirst: jest.fn().mockResolvedValue(null),
+        create: jest.fn().mockResolvedValue({ id: 'n1' }),
+      },
+      pushSubscription: { findMany: jest.fn().mockResolvedValue([]) },
+    };
+
+    const result = await runReminderPipeline(db, {
+      currentDate: new Date(2026, 5, 8),
+      leadDays: [7],
+      sendEmail,
+      sendPush: async () => 0,
+      sendSms: async () => false,
+    });
+
+    expect(result.created).toBe(1);
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(result.emailsAttempted).toBe(0);
   });
 });
