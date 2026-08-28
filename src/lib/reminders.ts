@@ -43,6 +43,7 @@ export const REMINDER_WINDOW_OFFSETS: Record<string, ReminderWindowOffsets> = {
   birthday_30_days: { daysBefore: 30, daysAfter: 30 },
   birthday_7_days_before: { daysBefore: 7, daysAfter: 0 },
   birthday_7_days_after: { daysBefore: 0, daysAfter: 7 },
+  birthday_10_days_after: { daysBefore: 0, daysAfter: 10 },
   birthday_3_days_before: { daysBefore: 3, daysAfter: 0 },
   birthday_3_days_after: { daysBefore: 0, daysAfter: 3 },
   anniversary_exact_date: { daysBefore: 0, daysAfter: 0 },

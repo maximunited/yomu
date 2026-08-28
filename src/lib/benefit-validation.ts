@@ -282,6 +282,14 @@ export const VALIDITY_TYPES: Record<string, BenefitValidationRule> = {
     displayText: 'validity7DaysAfter',
   },
 
+  birthday_10_days_after: {
+    validityType: 'birthday_10_days_after',
+    description: 'Valid for 10 days after the birthday',
+    validationLogic: (userDOB, currentDate) =>
+      isWithinBirthdayWindow(userDOB, currentDate, 0, 10),
+    displayText: 'validity10DaysAfter',
+  },
+
   birthday_3_days_before: {
     validityType: 'birthday_3_days_before',
     description: 'Valid for 3 days before the birthday',
@@ -338,6 +346,7 @@ export const LEGACY_VALIDITY_TYPES: Record<string, string> = {
   validity30Days: 'birthday_30_days',
   validity7DaysBefore: 'birthday_7_days_before',
   validity7DaysAfter: 'birthday_7_days_after',
+  validity10DaysAfter: 'birthday_10_days_after',
   validity3DaysBefore: 'birthday_3_days_before',
   validity3DaysAfter: 'birthday_3_days_after',
 };
@@ -463,6 +472,7 @@ export function getUpcomingBenefits(
       case 'birthday_30_days':
       case 'birthday_7_days_before':
       case 'birthday_7_days_after':
+      case 'birthday_10_days_after':
       case 'birthday_3_days_before':
       case 'birthday_3_days_after':
       case 'anniversary_exact_date':

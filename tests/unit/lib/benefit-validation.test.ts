@@ -26,6 +26,7 @@ describe('Benefit Validation', () => {
         'birthday_30_days',
         'birthday_7_days_before',
         'birthday_7_days_after',
+        'birthday_10_days_after',
         'birthday_3_days_before',
         'birthday_3_days_after',
         'anniversary_exact_date',
@@ -516,6 +517,27 @@ describe('Benefit Validation', () => {
       });
     });
 
+    describe('birthday_10_days_after', () => {
+      it('should validate 10 days after correctly', () => {
+        const benefit = { validityType: 'birthday_10_days_after' };
+
+        const birthdayDate = new Date('2024-06-15');
+        expect(isBenefitActive(benefit, userDOB, birthdayDate)).toBe(true);
+
+        const tenDaysAfter = new Date('2024-06-25');
+        expect(isBenefitActive(benefit, userDOB, tenDaysAfter)).toBe(true);
+
+        const dayBefore = new Date('2024-06-14');
+        expect(isBenefitActive(benefit, userDOB, dayBefore)).toBe(false);
+
+        const elevenDaysAfter = new Date('2024-06-26');
+        expect(isBenefitActive(benefit, userDOB, elevenDaysAfter)).toBe(false);
+
+        const differentMonth = new Date('2024-07-15');
+        expect(isBenefitActive(benefit, userDOB, differentMonth)).toBe(false);
+      });
+    });
+
     describe('birthday_3_days_before', () => {
       it('should validate 3 days before correctly', () => {
         const benefit = { validityType: 'birthday_3_days_before' };
@@ -672,6 +694,7 @@ describe('Benefit Validation', () => {
         'validity30Days',
         'validity7DaysBefore',
         'validity7DaysAfter',
+        'validity10DaysAfter',
         'validity3DaysBefore',
         'validity3DaysAfter',
       ];

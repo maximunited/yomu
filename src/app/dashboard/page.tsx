@@ -685,6 +685,7 @@ function DashboardPageContent() {
       birthday_30_days: t('validity30Days'),
       birthday_7_days_before: t('validity7DaysBefore'),
       birthday_7_days_after: t('validity7DaysAfter'),
+      birthday_10_days_after: t('validity10DaysAfter'),
       birthday_3_days_before: t('validity3DaysBefore'),
       birthday_3_days_after: t('validity3DaysAfter'),
     };

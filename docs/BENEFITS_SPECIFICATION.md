@@ -19,6 +19,7 @@ Benefits are categorized by their validity period relative to a user's birthday 
 | `birthday_30_days`           | Valid for 30 days from the birthday            | 30 days before to 30 days after birthday | "תקף ל-30 ימים"           |
 | `birthday_7_days_before`     | Valid for 7 days before the birthday           | 7 days before birthday only              | "תקף ל-7 ימים לפני"       |
 | `birthday_7_days_after`      | Valid for 7 days after the birthday            | 7 days after birthday only               | "תקף ל-7 ימים אחרי"       |
+| `birthday_10_days_after`     | Valid for 10 days after the birthday           | 10 days after birthday only              | "תקף ל-10 ימים אחרי"      |
 | `birthday_3_days_before`     | Valid for 3 days before the birthday           | 3 days before birthday only              | "תקף ל-3 ימים לפני"       |
 | `birthday_3_days_after`      | Valid for 3 days after the birthday            | 3 days after birthday only               | "תקף ל-3 ימים אחרי"       |
 
@@ -79,6 +80,7 @@ When adding a new benefit, ensure all required fields are provided:
 
 | Brand | Validity | Notes |
 | ----- | -------- | ----- |
+| McDonald's | `birthday_10_days_after` | גלידה פיצוץ regular size; not for delivery |
 | יומנגס - Humongous | `birthday_exact_date` | Free burger on exact birthday |
 | BBB | `birthday_entire_month` | Happy BBBirthday drink + starter |
 | Soft clubs (H&M, Honigman, etc.) | varies | Seed with `verified: false` until T&Cs confirmed |

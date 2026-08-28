@@ -56,8 +56,8 @@ describe('parse-seed-catalog', () => {
     const benefit = catalog.benefits.find(
       (b: { brandName: string | null }) => b.brandName === "McDonald's"
     );
-    expect(benefit?.title).toBeTruthy();
-    expect(benefit?.validityType).toBeTruthy();
+    expect(benefit?.title).toMatch(/גלידה פיצוץ/);
+    expect(benefit?.validityType).toBe('birthday_10_days_after');
   });
 
   it('analyzeCatalogStructure reports clean on live seed', () => {

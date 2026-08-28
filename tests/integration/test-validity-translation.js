@@ -11,6 +11,7 @@ const mockTranslations = {
   validity30Days: '30 ימים',
   validity7DaysBefore: '7 ימים לפני',
   validity7DaysAfter: '7 ימים אחרי',
+  validity10DaysAfter: '10 ימים אחרי',
   validity3DaysBefore: '3 ימים לפני',
   validity3DaysAfter: '3 ימים אחרי',
   validityLimitedPeriod: 'תקופה מוגבלת',
@@ -30,6 +31,7 @@ function getValidityDisplayText(validityType) {
     birthday_30_days: { displayTextKey: 'validity30Days' },
     birthday_7_days_before: { displayTextKey: 'validity7DaysBefore' },
     birthday_7_days_after: { displayTextKey: 'validity7DaysAfter' },
+    birthday_10_days_after: { displayTextKey: 'validity10DaysAfter' },
     birthday_3_days_before: { displayTextKey: 'validity3DaysBefore' },
     birthday_3_days_after: { displayTextKey: 'validity3DaysAfter' },
   };

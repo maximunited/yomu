@@ -58,6 +58,8 @@ function getRelativeWindow(
       return { before: 7, after: 0 };
     case 'birthday_7_days_after':
       return { before: 0, after: 7 };
+    case 'birthday_10_days_after':
+      return { before: 0, after: 10 };
     case 'birthday_3_days_before':
       return { before: 3, after: 0 };
     case 'birthday_3_days_after':

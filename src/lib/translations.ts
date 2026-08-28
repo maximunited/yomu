@@ -387,6 +387,7 @@ export interface Translations {
   validity30Days: string;
   validity7DaysBefore: string;
   validity7DaysAfter: string;
+  validity10DaysAfter: string;
   validity3DaysBefore: string;
   validity3DaysAfter: string;
   validityLimitedPeriod: string;
@@ -1008,6 +1009,7 @@ export const translations: Record<Language, Translations> = {
     validity30Days: '30 ימים',
     validity7DaysBefore: '7 ימים לפני',
     validity7DaysAfter: '7 ימים אחרי',
+    validity10DaysAfter: '10 ימים אחרי',
     validity3DaysBefore: '3 ימים לפני',
     validity3DaysAfter: '3 ימים אחרי',
     validityLimitedPeriod: 'תקופה מוגבלת',
@@ -1473,6 +1475,7 @@ export const translations: Record<Language, Translations> = {
     validity30Days: '30 days',
     validity7DaysBefore: '7 days before',
     validity7DaysAfter: '7 days after',
+    validity10DaysAfter: '10 days after',
     validity3DaysBefore: '3 days before',
     validity3DaysAfter: '3 days after',
     validityLimitedPeriod: 'Limited period',

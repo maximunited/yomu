@@ -711,14 +711,16 @@ async function seed() {
     const sampleBenefits = [
       {
         brandId: createdBrands.find((b) => b.name === "McDonald's")?.id,
-        title: 'המבורגר חינם ביום הולדת',
-        description: 'קבלו המבורגר חינם ביום הולדתכם',
-        termsAndConditions: 'תקף רק ביום ההולדת עצמו, לא ניתן להעביר לאחרים',
+        title: 'גלידה פיצוץ מתנה',
+        description:
+          "גלידה פיצוץ בגודל רגיל מיום ההולדת ולמשך 10 ימים לחברי אפליקציית McDonald's",
+        termsAndConditions:
+          'גודל רגיל בלבד | מיום ההולדת + 10 ימים | לא תקף למשלוחים | לפי תקנון האפליקציה',
         redemptionMethod: 'app',
         promoCode: null,
         url: 'https://www.mcdonalds.co.il',
-        validityType: 'birthday_exact_date',
-        validityDuration: 1,
+        validityType: 'birthday_10_days_after',
+        validityDuration: 10,
         isFree: true,
       },
       // Minna Tomei: Free sushi roll with purchase over 50 NIS during birthday month
@@ -1401,6 +1403,9 @@ async function seed() {
 
     // Legacy benefit titles → current titles (rename-safe upsert by brand)
     const benefitTitleAliases = {
+      "McDonald's": {
+        'גלידה פיצוץ מתנה': ['המבורגר חינם ביום הולדת'],
+      },
       'M32 המבורגרים': {
         '15% הנחה בחודש יום ההולדת': ['15% הנחה ביום הולדת'],
       },

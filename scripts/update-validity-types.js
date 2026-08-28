@@ -19,17 +19,18 @@ const validityTypeMapping = {
   birthday_30_days: 'birthday_30_days', // 30 days from birthday
   birthday_7_days_before: 'birthday_7_days_before', // 7 days before birthday
   birthday_7_days_after: 'birthday_7_days_after', // 7 days after birthday
+  birthday_10_days_after: 'birthday_10_days_after', // 10 days after birthday
   birthday_3_days_before: 'birthday_3_days_before', // 3 days before birthday
   birthday_3_days_after: 'birthday_3_days_after', // 3 days after birthday
 };
 
 // Updated benefits with better categorization
 const updatedBenefits = [
-  // McDonald's - exact birthday only
+  // McDonald's - birthday + 10 days
   {
     brandName: "McDonald's",
-    validityType: 'birthday_exact_date',
-    validityDuration: 1,
+    validityType: 'birthday_10_days_after',
+    validityDuration: 10,
   },
 
   // Super-Pharm - entire month
