@@ -390,6 +390,17 @@ const predefinedBrands = [
     actionType: 'website',
     actionLabel: 'הצטרפות למועדון',
   },
+  {
+    name: 'בייגל קפה',
+    logoUrl: '/images/brands/bagel-cafe.png',
+    website: 'https://www.bagelcafe.co.il',
+    description: "מועדון +BAGEL'S CLUB — עוגה מתנה בחודש יום ההולדת",
+    category: 'food',
+    actionUrl:
+      'https://www.bagelcafe.co.il/he/%D7%97%D7%91%D7%A8-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F/',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
   // DREAM CARD brands
   {
     name: 'Terminal X',
@@ -654,6 +665,7 @@ async function seed() {
       'באקרו - Buckaroo': ['מסעדת באקרו (רעננה)', 'באקרו'],
       "ג'מס - Jem's": ["ג'מס"],
       שגב: ['שגב (מסעדה)'],
+      'בייגל קפה': ['Bagel Cafe', "Bagel's Cafe", 'בייגלס קפה'],
       'פראג הקטנה': ['פראג הקטנה (מסעדה)'],
     };
 
@@ -1052,6 +1064,21 @@ async function seed() {
         redemptionMethod: 'in-store',
         promoCode: null,
         url: 'https://burgerstation.co.il/club/',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
+      },
+      // בייגל קפה — cake of choice during birthday month (+BAGEL'S CLUB)
+      {
+        brandId: createdBrands.find((b) => b.name === 'בייגל קפה')?.id,
+        title: 'קינוח מתנה בחודש יום ההולדת',
+        description:
+          "עוגה לבחירה במתנה לחברי מועדון +BAGEL'S CLUB במהלך חודש יום ההולדת",
+        termsAndConditions:
+          'למימוש החל מהעסקה השנייה במועדון | מינימום הזמנה 60₪ | מימוש חד-פעמי לאורך כל חודש יום ההולדת | מועדון חינם | bagelcafe.co.il חבר מועדון',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.bagelcafe.co.il/he/%D7%97%D7%91%D7%A8-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F/',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,

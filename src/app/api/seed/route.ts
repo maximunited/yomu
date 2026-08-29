@@ -292,6 +292,17 @@ const predefinedBrands = [
     actionLabel: 'הצטרפות למועדון',
   },
   {
+    name: 'בייגל קפה',
+    logoUrl: '/images/brands/bagel-cafe.png',
+    website: 'https://www.bagelcafe.co.il',
+    description: "מועדון +BAGEL'S CLUB — עוגה מתנה בחודש יום ההולדת",
+    category: 'food',
+    actionUrl:
+      'https://www.bagelcafe.co.il/he/%D7%97%D7%91%D7%A8-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F/',
+    actionType: 'website',
+    actionLabel: 'הצטרפות למועדון',
+  },
+  {
     name: 'מסעדת ליבירה',
     logoUrl: '/images/brands/libira.png',
     website: 'https://www.libira.co.il',
@@ -633,6 +644,20 @@ export async function POST(request: NextRequest) {
         redemptionMethod: 'in-store',
         promoCode: null,
         url: 'https://burgerstation.co.il/club/',
+        validityType: 'birthday_entire_month',
+        validityDuration: 30,
+        isFree: true,
+      },
+      {
+        brandId: createdBrands.find((b) => b.name === 'בייגל קפה')?.id,
+        title: 'קינוח מתנה בחודש יום ההולדת',
+        description:
+          "עוגה לבחירה במתנה לחברי מועדון +BAGEL'S CLUB במהלך חודש יום ההולדת",
+        termsAndConditions:
+          'למימוש החל מהעסקה השנייה במועדון | מינימום הזמנה 60₪ | מימוש חד-פעמי לאורך כל חודש יום ההולדת | מועדון חינם | bagelcafe.co.il חבר מועדון',
+        redemptionMethod: 'in-store',
+        promoCode: null,
+        url: 'https://www.bagelcafe.co.il/he/%D7%97%D7%91%D7%A8-%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F/',
         validityType: 'birthday_entire_month',
         validityDuration: 30,
         isFree: true,
