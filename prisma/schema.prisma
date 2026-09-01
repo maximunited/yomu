@@ -85,6 +85,7 @@ model Benefit {
   title              String
   description        String
   termsAndConditions String?
+  termsUrl           String?
   redemptionMethod   String
   promoCode          String?
   url                String?
@@ -146,6 +147,7 @@ model CustomBenefit {
   title              String
   description        String
   termsAndConditions String?
+  termsUrl           String?
   redemptionMethod   String
   promoCode          String?
   url                String?

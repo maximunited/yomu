@@ -334,6 +334,22 @@ export default function AdminForm({
 
                 <div>
                   <label
+                    htmlFor="benefit-termsUrl"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Terms URL
+                  </label>
+                  <input
+                    id="benefit-termsUrl"
+                    type="url"
+                    value={(formData as Benefit).termsUrl || ''}
+                    onChange={(e) => handleChange('termsUrl', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                  />
+                </div>
+
+                <div>
+                  <label
                     htmlFor="benefit-url"
                     className="block text-sm font-medium text-gray-700"
                   >

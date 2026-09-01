@@ -49,6 +49,7 @@ export async function PATCH(
         title: body.title,
         description: body.description,
         termsAndConditions: body.termsAndConditions,
+        termsUrl: body.termsUrl,
         redemptionMethod: body.redemptionMethod,
         promoCode: body.promoCode,
         url: body.url,

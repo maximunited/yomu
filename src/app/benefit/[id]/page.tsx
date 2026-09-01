@@ -30,6 +30,7 @@ interface Benefit {
   validityType: string;
   redemptionMethod: string;
   termsAndConditions?: string;
+  termsUrl?: string;
   howToRedeem?: string;
 }
 
@@ -235,6 +236,17 @@ export default function BenefitDetailPage() {
                     <p className="text-gray-600 dark:text-gray-300 text-sm">
                       {benefit.termsAndConditions}
                     </p>
+                    {benefit.termsUrl && (
+                      <a
+                        href={benefit.termsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-3 text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        {t('fullTermsLink')}
+                      </a>
+                    )}
                   </div>
                 </div>
               )}

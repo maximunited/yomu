@@ -17,6 +17,7 @@ export interface Benefit {
   title: string;
   description: string;
   termsAndConditions?: string;
+  termsUrl?: string;
   redemptionMethod: string;
   promoCode?: string;
   url?: string;

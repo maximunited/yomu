@@ -177,6 +177,7 @@ export interface Translations {
   // Benefit Details
   benefitDetails: string;
   termsAndConditions: string;
+  fullTermsLink: string;
   howToRedeem: string;
   visitWebsite: string;
   buyOnBrandWebsite?: string;
@@ -712,6 +713,7 @@ export const translations: Record<Language, Translations> = {
     // Benefit Details
     benefitDetails: 'פרטי ההטבה',
     termsAndConditions: 'תנאים והגבלות',
+    fullTermsLink: 'תקנון מלא',
     howToRedeem: 'איך לממש',
     visitWebsite: 'בקר באתר',
     buyOnBrandWebsite: 'לקנייה באתר המותג',
@@ -1254,6 +1256,7 @@ export const translations: Record<Language, Translations> = {
     // Benefit Details
     benefitDetails: 'Benefit Details',
     termsAndConditions: 'Terms & Conditions',
+    fullTermsLink: 'Full terms',
     howToRedeem: 'How to Redeem',
     visitWebsite: 'Visit Website',
     buyOnBrandWebsite: 'Buy on brand website',
