@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
         title: benefit.title,
         description: benefit.description,
         termsAndConditions: benefit.termsAndConditions,
+        termsUrl: benefit.termsUrl,
         redemptionMethod: benefit.redemptionMethod,
         promoCode: benefit.promoCode,
         url: benefit.url,

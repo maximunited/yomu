@@ -99,6 +99,7 @@ describe('/api/custom-memberships', () => {
           title: mockBenefit.title,
           description: mockBenefit.description,
           termsAndConditions: undefined,
+          termsUrl: undefined,
           redemptionMethod: mockBenefit.redemptionMethod,
           promoCode: undefined,
           url: undefined,

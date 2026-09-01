@@ -657,7 +657,10 @@ const predefinedBrands = [
   },
 ];
 
-async function seed() {
+async function seed(options = {}) {
+  let brandsCreated = 0;
+  let benefitsProcessed = 0;
+
   try {
     console.log('Starting database seed...');
 
@@ -665,15 +668,17 @@ async function seed() {
     await prisma.$connect();
     console.log('Database connected successfully');
 
-    // Args
+    // Args (CLI argv, overridable when invoked programmatically e.g. /api/seed)
     const rawArgs = process.argv.slice(2);
     const args = rawArgs.reduce((acc, arg) => {
       const [k, v] = arg.replace(/^--/, '').split('=');
       acc[k] = v === undefined ? true : v;
       return acc;
     }, {});
-    const mode = (args.mode || 'upsert').toLowerCase(); // 'fresh' | 'upsert'
-    const brandFilter = (args.brands || '')
+    const mode = String(options.mode ?? args.mode ?? 'upsert').toLowerCase();
+    const brandFilter = (
+      options.brands !== undefined ? options.brands : args.brands || ''
+    )
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
@@ -741,6 +746,7 @@ async function seed() {
       await Promise.all(predefinedBrands.map((b) => upsertBrandByName(b)))
     ).filter(Boolean);
 
+    brandsCreated = createdBrands.length;
     console.log(`Created ${createdBrands.length} brands`);
 
     // Create brand partnerships (co-branding)
@@ -1588,10 +1594,13 @@ async function seed() {
     );
 
     console.log(`Created ${benefitsWithTermsUrl.length} benefits`);
+    benefitsProcessed = benefitsWithTermsUrl.length;
     console.log('Database seeded successfully!');
+    return { mode, brandsCreated, benefitsProcessed };
   } catch (error) {
     console.error('Error seeding database:', error);
     console.error('Error stack:', error.stack);
+    throw error;
   } finally {
     await disconnectPrisma();
     console.log('Database disconnected');

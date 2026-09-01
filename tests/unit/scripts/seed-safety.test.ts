@@ -15,7 +15,7 @@ describe('scripts/seed.js safety', () => {
 
   it('defaults mode to upsert when --mode omitted', () => {
     expect(source).toMatch(
-      /const mode = \(args\.mode \|\| ['"]upsert['"]\)\.toLowerCase\(\)/
+      /const mode = String\(options\.mode \?\? args\.mode \?\? ['"]upsert['"]\)\.toLowerCase\(\)/
     );
   });
 
@@ -49,7 +49,7 @@ describe('scripts/seed.js safety', () => {
   });
 
   it('does not wipe before mode is parsed', () => {
-    const modeMarker = "args.mode || 'upsert'";
+    const modeMarker = "options.mode ?? args.mode ?? 'upsert'";
     const modeIdx = source.indexOf(modeMarker);
     expect(modeIdx).toBeGreaterThanOrEqual(0);
     const beforeMode = source.slice(0, modeIdx);
