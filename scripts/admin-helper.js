@@ -61,6 +61,7 @@ async function importBenefitsFromJson(filePath) {
           redemptionMethod: benefit.redemptionMethod,
           promoCode: benefit.promoCode,
           url: benefit.url,
+          termsUrl: benefit.termsUrl ?? null,
           validityType: benefit.validityType,
           validityDuration: benefit.validityDuration,
           isFree: benefit.isFree ?? true,

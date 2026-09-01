@@ -621,6 +621,19 @@ export default function AdminPage() {
                                 </a>
                               </>
                             ) : null}
+                            {benefit.termsUrl ? (
+                              <>
+                                {' · '}
+                                <a
+                                  href={benefit.termsUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:underline"
+                                >
+                                  terms URL
+                                </a>
+                              </>
+                            ) : null}
                           </p>
                         </div>
                       </div>

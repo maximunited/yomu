@@ -47,6 +47,7 @@ CREATE TABLE benefits (
   redemptionMethod TEXT NOT NULL,
   promoCode TEXT,
   url TEXT,
+  termsUrl TEXT,
   validityType TEXT NOT NULL,
   validityDuration INTEGER,
   isActive BOOLEAN DEFAULT true,
@@ -69,9 +70,10 @@ When adding a new benefit, ensure all required fields are provided:
 
 ### 3. Optional Fields
 
-- **termsAndConditions**: Terms and conditions (Hebrew)
+- **termsAndConditions**: Inline terms summary (Hebrew)
 - **promoCode**: Promotional code if applicable
-- **url**: Direct link to the benefit
+- **url**: Direct link to the benefit or club page
+- **termsUrl**: Link to the official full terms PDF or club terms page (resolved per brand in `scripts/seed.js` via `resolveTermsUrl()`)
 - **validityDuration**: Number of days the benefit is valid (for reference)
 - **verified**: Research confidence flag (`true` when terms/URL confirmed; soft brands seed `false`)
 - **lastChecked**: When the benefit/URL was last reviewed (ISO timestamp; often `null` when `verified` is false)
@@ -83,6 +85,7 @@ When adding a new benefit, ensure all required fields are provided:
 | McDonald's | `birthday_10_days_after` | גלידה פיצוץ regular size; not for delivery |
 | יומנגס - Humongous | `birthday_exact_date` | Free burger on exact birthday |
 | BBB | `birthday_entire_month` | Happy BBBirthday drink + starter |
+| Minna Tomei | `birthday_entire_month` + `anniversary_entire_month` | ₪55 min order birthday benefit; anniversary first course; official terms PDF in `termsUrl` |
 | Soft clubs (H&M, Honigman, etc.) | varies | Seed with `verified: false` until T&Cs confirmed |
 
 ### 4. Validation
@@ -102,8 +105,10 @@ All benefits are validated using the `validateBenefitData()` function which chec
   title: "Benefit Title",
   description: "Detailed description of the benefit",
   termsAndConditions: "Terms and conditions text",
+  termsUrl: "https://example.com/club-terms.pdf",
   redemptionMethod: "How to redeem the benefit",
   promoCode: "PROMO123", // or null
+  url: "https://example.com/benefit",
   validityType: "birthday_entire_month",
   validityDuration: 30
 }

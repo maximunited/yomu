@@ -19,6 +19,13 @@
  *   - Inline SVGs are used for new logos to avoid missing assets. Replace with files in public/images/brands/ when available.
  */
 const { createPrismaClient, disconnectPrisma } = require('./prisma-client');
+const {
+  DREAM_CARD_ABOUT_URL,
+  MINNA_TOMEI_TERMS_URL,
+  BRAND_TERMS_URLS,
+  buildBrandLookupMaps,
+  resolveTermsUrl,
+} = require('./lib/terms-url');
 
 if (require.main === module) {
   console.log('Starting seed script...');
@@ -29,50 +36,8 @@ const prisma = createPrismaClient();
 /** Soft / uncertain research — benefits seed with verified: false */
 const SOFT_BRAND_NAMES = new Set(['Shufersal', 'Isracard', 'Golda']);
 
-const DREAM_CARD_ABOUT_URL = 'https://www.dreamcard.co.il/about';
-
-const MINNA_TOMEI_TERMS_URL =
-  'https://www.minna-tomei.co.il/wp-content/uploads/2026/08/%D7%97%D7%93%D7%A9-%D7%AA%D7%A7%D7%A0%D7%95%D7%9F-%D7%9E%D7%99%D7%A0%D7%94-%D7%98%D7%95%D7%9E%D7%99%D7%99.pdf';
-
 const DREAM_CARD_BIRTHDAY_TERMS =
   'נדרשת חברות ב-Dream Card (₪69 חד-פעמי) או Dream Card VIP; עד ₪500 לקנייה (Dream Card) או ₪1,000 (VIP); מימוש חד-פעמי בכל מותג; לא ביחד עם הטבת הצטרפות; שילב אינה חלק מ-Dream Card; תקף מהחודש העוקב להצטרפות לחברים חדשים';
-
-/** Official full terms/disclaimer URLs where known (overrides benefit.url). */
-const BRAND_TERMS_URLS = {
-  'Minna Tomei': MINNA_TOMEI_TERMS_URL,
-  Fox: DREAM_CARD_ABOUT_URL,
-  'Terminal X': DREAM_CARD_ABOUT_URL,
-  Billabong: DREAM_CARD_ABOUT_URL,
-  Laline: DREAM_CARD_ABOUT_URL,
-  Aerie: DREAM_CARD_ABOUT_URL,
-  'American Eagle': DREAM_CARD_ABOUT_URL,
-  Mango: DREAM_CARD_ABOUT_URL,
-  'Fox Home': DREAM_CARD_ABOUT_URL,
-  'Lord Kitsch': DREAM_CARD_ABOUT_URL,
-  SOHO: DREAM_CARD_ABOUT_URL,
-  Lavido: DREAM_CARD_ABOUT_URL,
-  'Dream Card': DREAM_CARD_ABOUT_URL,
-};
-
-function buildBrandLookupMaps(brands) {
-  const websiteByName = {};
-  const actionUrlByName = {};
-  for (const brand of brands) {
-    websiteByName[brand.name] = brand.website;
-    actionUrlByName[brand.name] = brand.actionUrl;
-  }
-  return { websiteByName, actionUrlByName };
-}
-
-function resolveTermsUrl(brandName, benefit, lookup) {
-  if (benefit.termsUrl) return benefit.termsUrl;
-  if (BRAND_TERMS_URLS[brandName]) return BRAND_TERMS_URLS[brandName];
-  if (benefit.url) return benefit.url;
-  if (lookup.actionUrlByName[brandName]) {
-    return lookup.actionUrlByName[brandName];
-  }
-  return lookup.websiteByName[brandName] || null;
-}
 
 function buildDreamCardBirthdayBenefit(
   createdBrands,

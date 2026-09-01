@@ -129,6 +129,8 @@ async function upsertBenefit(input: {
   const data = {
     description: input.description,
     termsAndConditions: 'E2E fixture only — not a real brand benefit',
+    url: 'https://example.com/e2e-golden/benefit',
+    termsUrl: 'https://example.com/e2e-golden/terms',
     redemptionMethod: 'show-app',
     validityType: input.validityType,
     validityDuration: input.validityDuration,

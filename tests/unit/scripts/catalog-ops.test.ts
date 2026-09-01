@@ -7,6 +7,7 @@ import fs from 'fs';
 
 const {
   parseSeedCatalog,
+  enrichCatalogBenefits,
   parseBrands,
   parseBenefits,
   parseSoftBrandNames,
@@ -15,6 +16,7 @@ const {
   analyzeStaleVerified,
   daysSince,
 } = require('../../../scripts/lib/parse-seed-catalog');
+const { MINNA_TOMEI_TERMS_URL } = require('../../../scripts/lib/terms-url');
 
 describe('parse-seed-catalog', () => {
   it('parses live seed.js brands, benefits, and soft list', () => {
@@ -66,6 +68,15 @@ describe('parse-seed-catalog', () => {
     expect(errors).toEqual([]);
   });
 
+  it('every live seed benefit resolves a termsUrl', () => {
+    const catalog = parseSeedCatalog();
+    const enriched = enrichCatalogBenefits(catalog);
+    const missing = enriched.filter((b) => !b.termsUrl);
+    expect(missing).toEqual([]);
+    const minna = enriched.find((b) => b.brandName === 'Minna Tomei');
+    expect(minna?.termsUrl).toBe(MINNA_TOMEI_TERMS_URL);
+  });
+
   it('flags duplicate brands and soft-list / benefit orphans', () => {
     const { errors, warnings } = analyzeCatalogStructure({
       softBrandNames: ['SoftOnly'],
@@ -111,15 +122,15 @@ describe('parse-seed-catalog', () => {
     const seed = {
       brands: [{ name: 'A' }, { name: 'B' }],
       benefits: [
-        { brandName: 'A', title: 'T1' },
-        { brandName: 'B', title: 'T2' },
+        { brandName: 'A', title: 'T1', termsUrl: 'https://a.example/terms' },
+        { brandName: 'B', title: 'T2', termsUrl: 'https://b.example/terms' },
       ],
     };
     const db = {
       brands: [{ name: 'A' }, { name: 'C' }],
       benefits: [
-        { brandName: 'A', title: 'T1' },
-        { brandName: 'C', title: 'Extra' },
+        { brandName: 'A', title: 'T1', termsUrl: 'https://a.example/terms' },
+        { brandName: 'C', title: 'Extra', termsUrl: 'https://c.example/terms' },
       ],
     };
     const { errors, warnings } = analyzeSeedDbDrift(seed, db);

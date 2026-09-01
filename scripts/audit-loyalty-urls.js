@@ -1,7 +1,7 @@
 /**
  * Monthly loyalty URL audit
  * --------------------------------------
- * HEAD-checks brand websites / actionUrls / benefit URLs from seed.js (or a JSON export).
+ * HEAD-checks brand websites / actionUrls / benefit URLs / terms URLs from seed.js (or a JSON export).
  * Flags HTTP failures and (optionally) stale Last checked dates from JSON.
  * Writes optional machine-readable last-good status via --out=.
  *
@@ -15,7 +15,7 @@
  * JSON export shape (optional):
  *   {
  *     "brands": [{ "name": "...", "website": "https://...", "actionUrl": "https://...", "lastChecked": "2026-08-01" }],
- *     "benefits": [{ "title": "...", "brand": "...", "url": "https://...", "lastChecked": "2026-08-01" }]
+ *     "benefits": [{ "title": "...", "brand": "...", "url": "https://...", "termsUrl": "https://...", "lastChecked": "2026-08-01" }]
  *   }
  *
  * Notion update: not performed by this script (no Notion token in-repo).
@@ -30,7 +30,11 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 const https = require('https');
-const { parseSeedCatalog, daysSince } = require('./lib/parse-seed-catalog');
+const {
+  parseSeedCatalog,
+  enrichCatalogBenefits,
+  daysSince,
+} = require('./lib/parse-seed-catalog');
 
 const DEFAULT_STALE_DAYS = 60;
 const REQUEST_TIMEOUT_MS = 12000;
@@ -67,10 +71,11 @@ function loadFromSeed() {
     actionUrl: b.actionUrl,
     lastChecked: null,
   }));
-  const benefits = catalog.benefits.map((b) => ({
+  const benefits = enrichCatalogBenefits(catalog).map((b) => ({
     title: b.title,
     brand: b.brandName,
     url: b.url,
+    termsUrl: b.termsUrl,
     lastChecked: null,
   }));
   return { brands, benefits, source: catalog.source };
@@ -89,6 +94,7 @@ function loadFromJson(filePath) {
     title: b.title || b.Title,
     brand: b.brand || b.Brand || null,
     url: b.url || b['Benefit URL'],
+    termsUrl: b.termsUrl || b['Terms URL'] || null,
     lastChecked: b.lastChecked || b['Last checked'] || null,
   }));
   return { brands, benefits, source: abs };
@@ -313,6 +319,16 @@ async function main() {
         kind: 'benefit',
         label: b.brand ? `${b.brand} — ${b.title}` : b.title,
         url: b.url,
+        lastChecked: b.lastChecked,
+      });
+    }
+    if (b.termsUrl) {
+      urlJobs.push({
+        kind: 'termsUrl',
+        label: b.brand
+          ? `${b.brand} — ${b.title} (terms)`
+          : `${b.title} (terms)`,
+        url: b.termsUrl,
         lastChecked: b.lastChecked,
       });
     }

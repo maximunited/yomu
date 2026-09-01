@@ -70,6 +70,7 @@ interface Benefit {
   };
   promoCode?: string;
   url?: string;
+  termsUrl?: string;
   validityType: string;
   validityDuration?: number;
   redemptionMethod: string;

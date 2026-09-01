@@ -20,6 +20,7 @@
 
 const {
   parseSeedCatalog,
+  enrichCatalogBenefits,
   analyzeCatalogStructure,
   analyzeSeedDbDrift,
 } = require('./lib/parse-seed-catalog');
@@ -48,6 +49,7 @@ async function loadDbCatalog() {
     const benefits = await prisma.benefit.findMany({
       select: {
         title: true,
+        termsUrl: true,
         verified: true,
         lastChecked: true,
         brand: { select: { name: true } },
@@ -58,6 +60,7 @@ async function loadDbCatalog() {
       benefits: benefits.map((b) => ({
         brandName: b.brand.name,
         title: b.title,
+        termsUrl: b.termsUrl,
         verified: b.verified,
         lastChecked: b.lastChecked,
       })),
@@ -75,7 +78,13 @@ async function main() {
   let dbDrift = null;
   if (args.db) {
     const db = await loadDbCatalog();
-    dbDrift = analyzeSeedDbDrift(catalog, db);
+    dbDrift = analyzeSeedDbDrift(
+      {
+        brands: catalog.brands,
+        benefits: enrichCatalogBenefits(catalog),
+      },
+      db
+    );
   }
 
   const errors = [...structural.errors, ...(dbDrift ? dbDrift.errors : [])];

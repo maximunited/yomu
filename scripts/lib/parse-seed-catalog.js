@@ -66,6 +66,8 @@ function parseBenefits(src) {
       )?.[2] || null;
     const title = block.match(/title:\s*(['"`])([\s\S]*?)\1/)?.[2];
     const url = block.match(/\burl:\s*(['"`])([\s\S]*?)\1/)?.[2] || null;
+    const termsUrl =
+      block.match(/\btermsUrl:\s*(['"`])([\s\S]*?)\1/)?.[2] || null;
     const validityType =
       block.match(/validityType:\s*(['"`])([\s\S]*?)\1/)?.[2] || null;
     const isFreeMatch = block.match(/isFree:\s*(true|false)/);
@@ -74,6 +76,7 @@ function parseBenefits(src) {
       brandName,
       title,
       url,
+      termsUrl,
       validityType,
       isFree: isFreeMatch ? isFreeMatch[1] === 'true' : null,
     });
@@ -87,6 +90,7 @@ function parseBenefits(src) {
       brandName: dreamCardMatch[2],
       title: '30% הנחה בחודש יום ההולדת (Dream Card)',
       url: dreamCardMatch[6] || 'https://www.dreamcard.co.il/about',
+      termsUrl: 'https://www.dreamcard.co.il/about',
       validityType: 'birthday_entire_month',
       isFree: false,
     });
@@ -110,6 +114,23 @@ function parseSeedCatalog(seedPath = DEFAULT_SEED_PATH) {
 }
 
 /**
+ * Resolve termsUrl for each parsed benefit using seed.js lookup (same as upsert).
+ * @param {{ brands: object[], benefits: object[] }} catalog
+ */
+function enrichCatalogBenefits(catalog) {
+  const { buildBrandLookupMaps, resolveTermsUrl } = require('./terms-url');
+  const lookup = buildBrandLookupMaps(catalog.brands);
+  return catalog.benefits.map((benefit) => ({
+    ...benefit,
+    termsUrl: resolveTermsUrl(
+      benefit.brandName,
+      { url: benefit.url, termsUrl: benefit.termsUrl },
+      lookup
+    ),
+  }));
+}
+
+/**
  * Structural catalog checks (seed as SoT). Returns { errors, warnings }.
  * @param {{ softBrandNames: string[], brands: object[], benefits: object[] }} catalog
  */
@@ -119,6 +140,7 @@ function analyzeCatalogStructure(catalog) {
   const brandNames = catalog.brands.map((b) => b.name);
   const brandSet = new Set(brandNames);
   const softSet = new Set(catalog.softBrandNames);
+  const enrichedBenefits = enrichCatalogBenefits(catalog);
 
   const seenNames = new Set();
   for (const name of brandNames) {
@@ -146,7 +168,7 @@ function analyzeCatalogStructure(catalog) {
   }
 
   const benefitKeys = new Set();
-  for (const benefit of catalog.benefits) {
+  for (const benefit of enrichedBenefits) {
     if (!benefit.brandName) {
       errors.push(`Benefit missing brand name resolution: ${benefit.title}`);
       continue;
@@ -161,6 +183,11 @@ function analyzeCatalogStructure(catalog) {
         `Benefit missing validityType: ${benefit.brandName} — ${benefit.title}`
       );
     }
+    if (!benefit.termsUrl) {
+      errors.push(
+        `Benefit missing termsUrl: ${benefit.brandName} — ${benefit.title}`
+      );
+    }
     const key = `${benefit.brandName}::${benefit.title}`;
     if (benefitKeys.has(key)) {
       errors.push(`Duplicate benefit title for brand: ${key}`);
@@ -169,7 +196,7 @@ function analyzeCatalogStructure(catalog) {
   }
 
   const brandsWithBenefits = new Set(
-    catalog.benefits.map((b) => b.brandName).filter(Boolean)
+    enrichedBenefits.map((b) => b.brandName).filter(Boolean)
   );
   for (const name of brandNames) {
     if (!brandsWithBenefits.has(name)) {
@@ -183,8 +210,8 @@ function analyzeCatalogStructure(catalog) {
 
 /**
  * Compare seed catalog to DB rows (name/title level). Does not wipe or mutate.
- * @param {{ brands: {name:string}[], benefits: {brandName:string|null,title:string}[] }} seed
- * @param {{ brands: {name:string}[], benefits: {brandName:string,title:string,verified?:boolean,lastChecked?:Date|string|null}[] }} db
+ * @param {{ brands: {name:string}[], benefits: {brandName:string|null,title:string,termsUrl?:string|null}[] }} seed
+ * @param {{ brands: {name:string}[], benefits: {brandName:string,title:string,termsUrl?:string|null,verified?:boolean,lastChecked?:Date|string|null}[] }} db
  */
 function analyzeSeedDbDrift(seed, db) {
   const errors = [];
@@ -204,20 +231,34 @@ function analyzeSeedDbDrift(seed, db) {
     }
   }
 
-  const seedKeys = new Set(
+  const seedByKey = new Map(
     seed.benefits
       .filter((b) => b.brandName)
-      .map((b) => `${b.brandName}::${b.title}`)
+      .map((b) => [`${b.brandName}::${b.title}`, b])
   );
   const dbKeys = new Set(db.benefits.map((b) => `${b.brandName}::${b.title}`));
 
-  for (const key of seedKeys) {
+  for (const [key, seedBenefit] of seedByKey) {
     if (!dbKeys.has(key)) {
       errors.push(`Seed benefit missing from DB: ${key}`);
+      continue;
+    }
+    const dbBenefit = db.benefits.find(
+      (b) => `${b.brandName}::${b.title}` === key
+    );
+    if (!dbBenefit?.termsUrl) {
+      errors.push(`DB benefit missing termsUrl: ${key}`);
+    } else if (
+      seedBenefit.termsUrl &&
+      dbBenefit.termsUrl !== seedBenefit.termsUrl
+    ) {
+      warnings.push(
+        `DB termsUrl differs from seed for ${key}: ${dbBenefit.termsUrl} vs ${seedBenefit.termsUrl}`
+      );
     }
   }
   for (const key of dbKeys) {
-    if (!seedKeys.has(key)) {
+    if (!seedByKey.has(key)) {
       warnings.push(`DB benefit not in seed: ${key}`);
     }
   }
@@ -299,6 +340,7 @@ module.exports = {
   parseBrands,
   parseBenefits,
   parseSeedCatalog,
+  enrichCatalogBenefits,
   analyzeCatalogStructure,
   analyzeSeedDbDrift,
   analyzeStaleVerified,
