@@ -83,7 +83,7 @@
     "pg": "^8.23.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "tailwind-merge": "^3.6.0",
+    "tailwind-merge": "^3.7.0",
     "type-check": "^0.4.0",
     "web-push": "^3.6.7"
   },
