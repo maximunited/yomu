@@ -116,7 +116,7 @@
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
     "lint-staged": "^17.5.1",
-    "msw": "^2.15.0",
+    "msw": "^3.0.0",
     "playwright": "^1.55.0",
     "prettier": "^3.9.8",
     "prisma": "^7.10.0",
