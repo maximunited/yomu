@@ -7,7 +7,7 @@
 - React root capture: `src/app/global-error.tsx`
 - Helper: `src/lib/monitoring.ts` (`captureException` / `captureMessage`) — no-ops when DSN unset
 - Build wrapper: `withSentryConfig` from `@sentry/nextjs/config` (moved in v11)
-- Restrictive `dataCollection` (`sentryRestrictiveDataCollection`) + `beforeSend` email scrubbing; webhook duplicate-link events use email hash + Clerk IDs in `extra`, never raw email in message strings
+- Restrictive `dataCollection` (`sentryRestrictiveDataCollection`: headers/query off) + `beforeSend` email scrubbing (incl. request URL/Authorization); webhook duplicate-link events use email hash + Clerk IDs in `extra`, never raw email in message strings
 - Wired for Clerk webhook verify/handler failures and `/api/seed` failures
 - Env: `SENTRY_DSN` and/or `NEXT_PUBLIC_SENTRY_DSN` (see `.env.example`)
 - Do **not** inject `SENTRY_AUTH_TOKEN` (or Clerk secrets) into `pull_request` CI

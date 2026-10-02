@@ -4,19 +4,21 @@
  */
 
 /**
- * v11 replacement for `sendDefaultPii: false` — keeps the restrictive v10
- * collection defaults (v11 collects everything when dataCollection is unset).
+ * v11 replacement for `sendDefaultPii: false` — restrictive collection.
+ * Stricter than Sentry’s published v10-parity snippet: request/response
+ * headers and URL query params are fully off so Authorization (cron bearer)
+ * and email-bearing query strings never reach telemetry by default.
  * @see https://docs.sentry.io/platforms/javascript/guides/nextjs/migration/v10-to-v11/
  */
 export const sentryRestrictiveDataCollection = {
   userInfo: false,
   cookies: false,
   httpHeaders: {
-    request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
-    response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+    request: false,
+    response: false,
   },
   httpBodies: [] as string[],
-  urlQueryParams: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+  urlQueryParams: false,
   genAI: { inputs: false, outputs: false },
   databaseQueryData: false,
   graphQL: { document: false, variables: false },
@@ -55,6 +57,12 @@ export function scrubSentryEvent<T extends Record<string, unknown>>(
     exception?: { values?: Array<{ value?: string; type?: string }> };
     breadcrumbs?: Array<{ message?: string; data?: Record<string, unknown> }>;
     extra?: Record<string, unknown>;
+    request?: {
+      url?: string;
+      query_string?: string | Array<[string, string]> | Record<string, string>;
+      headers?: Record<string, string> | Array<[string, string]>;
+      [key: string]: unknown;
+    };
   };
 
   if (typeof next.message === 'string') {
@@ -104,5 +112,65 @@ export function scrubSentryEvent<T extends Record<string, unknown>>(
     next.extra = scrubUnknown(next.extra) as Record<string, unknown>;
   }
 
+  if (next.request) {
+    next.request = scrubRequest(next.request);
+  }
+
   return next;
+}
+
+const SENSITIVE_HEADER =
+  /^(authorization|cookie|set-cookie|x-api-key|proxy-authorization)$/i;
+
+function scrubRequest<
+  T extends {
+    url?: string;
+    query_string?: string | Array<[string, string]> | Record<string, string>;
+    headers?: Record<string, string> | Array<[string, string]>;
+    [key: string]: unknown;
+  },
+>(request: T): T {
+  const out = { ...request };
+
+  if (typeof out.url === 'string') {
+    out.url = scrubEmailLikeText(stripQueryString(out.url));
+  }
+
+  if (typeof out.query_string === 'string') {
+    out.query_string = scrubEmailLikeText(out.query_string);
+  } else if (Array.isArray(out.query_string)) {
+    out.query_string = out.query_string.map(
+      ([k, v]) => [k, scrubEmailLikeText(String(v))] as [string, string]
+    );
+  } else if (out.query_string && typeof out.query_string === 'object') {
+    out.query_string = scrubUnknown(out.query_string) as Record<string, string>;
+  }
+
+  if (out.headers) {
+    out.headers = scrubHeaders(out.headers);
+  }
+
+  return out;
+}
+
+function stripQueryString(url: string): string {
+  const q = url.indexOf('?');
+  return q === -1 ? url : url.slice(0, q);
+}
+
+function scrubHeaders(
+  headers: Record<string, string> | Array<[string, string]>
+): Record<string, string> | Array<[string, string]> {
+  if (Array.isArray(headers)) {
+    return headers.map(([k, v]) =>
+      SENSITIVE_HEADER.test(k)
+        ? ([k, '[redacted]'] as [string, string])
+        : ([k, scrubEmailLikeText(String(v))] as [string, string])
+    );
+  }
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(headers)) {
+    out[k] = SENSITIVE_HEADER.test(k) ? '[redacted]' : scrubEmailLikeText(v);
+  }
+  return out;
 }
