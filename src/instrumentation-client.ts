@@ -1,5 +1,8 @@
 import * as Sentry from '@sentry/nextjs';
-import { scrubSentryEvent } from '@/lib/monitoring-scrub';
+import {
+  scrubSentryEvent,
+  sentryRestrictiveDataCollection,
+} from '@/lib/monitoring-scrub';
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -11,7 +14,7 @@ Sentry.init({
   tracesSampleRate: Number(
     process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE ?? 0.1
   ),
-  sendDefaultPii: false,
+  dataCollection: sentryRestrictiveDataCollection,
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0,
   beforeSend(event) {

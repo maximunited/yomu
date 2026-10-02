@@ -3,6 +3,25 @@
  * Import from here in sentry.*.config and instrumentation-client.
  */
 
+/**
+ * v11 replacement for `sendDefaultPii: false` — keeps the restrictive v10
+ * collection defaults (v11 collects everything when dataCollection is unset).
+ * @see https://docs.sentry.io/platforms/javascript/guides/nextjs/migration/v10-to-v11/
+ */
+export const sentryRestrictiveDataCollection = {
+  userInfo: false,
+  cookies: false,
+  httpHeaders: {
+    request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+    response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+  },
+  httpBodies: [] as string[],
+  urlQueryParams: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+  genAI: { inputs: false, outputs: false },
+  databaseQueryData: false,
+  graphQL: { document: false, variables: false },
+} as const;
+
 /** Matches common email shapes in free-form Sentry strings. */
 const EMAIL_LIKE = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
 
