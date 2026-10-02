@@ -5,6 +5,7 @@ import {
   scrubEmailLikeText,
   scrubSentryEvent,
 } from '@/lib/monitoring';
+import { sentryRestrictiveDataCollection } from '@/lib/monitoring-scrub';
 
 describe('monitoring helpers', () => {
   const originalDsn = process.env.SENTRY_DSN;
@@ -50,5 +51,30 @@ describe('monitoring helpers', () => {
     expect(scrubbed.exception?.values?.[0]?.value).toBe(
       'mail [email-redacted] failed'
     );
+  });
+
+  it('keeps request headers and query params off in dataCollection', () => {
+    expect(sentryRestrictiveDataCollection.httpHeaders.request).toBe(false);
+    expect(sentryRestrictiveDataCollection.httpHeaders.response).toBe(false);
+    expect(sentryRestrictiveDataCollection.urlQueryParams).toBe(false);
+  });
+
+  it('scrubs email-bearing request URLs and redacts Authorization', () => {
+    const scrubbed = scrubSentryEvent({
+      request: {
+        url: 'https://yomu.app/api/x?email=jane@example.com',
+        query_string: 'email=jane@example.com',
+        headers: {
+          authorization: 'Bearer cron-secret-value',
+          'content-type': 'application/json',
+        },
+      },
+    });
+    expect(scrubbed.request?.url).toBe('https://yomu.app/api/x');
+    expect(scrubbed.request?.query_string).toBe('email=[email-redacted]');
+    expect(scrubbed.request?.headers).toEqual({
+      authorization: '[redacted]',
+      'content-type': 'application/json',
+    });
   });
 });
