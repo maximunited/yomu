@@ -400,3 +400,16 @@ if (!window.matchMedia) {
 afterEach(() => {
   jest.clearAllMocks();
 });
+
+// web-push >= 4 is ESM-only; Jest (CommonJS) can't load it, and no test sends real pushes.
+jest.mock('web-push', () => ({
+  setVapidDetails: jest.fn(),
+  sendNotification: jest
+    .fn()
+    .mockResolvedValue({ statusCode: 201, body: '', headers: {} }),
+  generateVAPIDKeys: jest.fn(() => ({
+    publicKey: 'test-public',
+    privateKey: 'test-private',
+  })),
+  WebPushError: class WebPushError extends Error {},
+}));

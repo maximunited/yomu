@@ -2,7 +2,7 @@
  * Optional outbound reminder channels (email, Web Push, SMS).
  * Each channel no-ops when env credentials or user prefs are missing.
  */
-import webpush from 'web-push';
+import * as webpush from 'web-push';
 import type { ReminderCandidate, ReminderCopy } from '@/lib/reminders';
 
 export type PushSubscriptionRow = {
